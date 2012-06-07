@@ -13,7 +13,7 @@ using namespace libed2k;
 static libed2k::md4_hash QStringToMD4(const QString& s)
 {
     Q_ASSERT(s.length() == libed2k::md4_hash::hash_size*2);
-    return libed2k::md4_hash(s.toStdString());
+    return libed2k::md4_hash::fromString(s.toStdString());
 }
 
 static QString md4toQString(const libed2k::md4_hash& hash)
