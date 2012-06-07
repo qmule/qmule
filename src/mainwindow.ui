@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>912</width>
+    <height>563</height>
+   </rect>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout">
+    <property name="spacing">
+     <number>1</number>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>64</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionConnect"/>
+   <addaction name="actionCatalog"/>
+   <addaction name="actionTransfer"/>
+   <addaction name="actionSearch"/>
+   <addaction name="separator"/>
+   <addaction name="actionTools"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Add torrent file...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>&amp;Options...</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>&amp;Resume</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="text">
+    <string>&amp;Pause</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionWebsite">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/Icons/skin/qbittorrent32.png</normaloff>:/Icons/skin/qbittorrent32.png</iconset>
+   </property>
+   <property name="text">
+    <string>Visit &amp;Website</string>
+   </property>
+  </action>
+  <action name="actionDownload_from_URL">
+   <property name="text">
+    <string>Add &amp;link to torrent...</string>
+   </property>
+  </action>
+  <action name="actionCreate_torrent">
+   <property name="text">
+    <string>Torrent &amp;creator</string>
+   </property>
+  </action>
+  <action name="actionBugReport">
+   <property name="text">
+    <string>Report a &amp;bug</string>
+   </property>
+  </action>
+  <action name="actionSet_upload_limit">
+   <property name="text">
+    <string>Set upload limit...</string>
+   </property>
+  </action>
+  <action name="actionSet_download_limit">
+   <property name="text">
+    <string>Set download limit...</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>&amp;Documentation</string>
+   </property>
+  </action>
+  <action name="actionSet_global_download_limit">
+   <property name="text">
+    <string>Set global download limit...</string>
+   </property>
+  </action>
+  <action name="actionSet_global_upload_limit">
+   <property name="text">
+    <string>Set global upload limit...</string>
+   </property>
+  </action>
+  <action name="actionDecreasePriority">
+   <property name="text">
+    <string>Decrease priority</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionIncreasePriority">
+   <property name="text">
+    <string>Increase priority</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionUse_alternative_speed_limits">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Alternative speed limits</string>
+   </property>
+   <property name="toolTip">
+    <string>Alternative speed limits</string>
+   </property>
+  </action>
+  <action name="actionTop_tool_bar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Top &amp;tool bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Display top tool bar</string>
+   </property>
+  </action>
+  <action name="actionSpeed_in_title_bar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Speed in title bar</string>
+   </property>
+   <property name="toolTip">
+    <string>Show transfer speed in title bar</string>
+   </property>
+  </action>
+  <action name="actionRSS_Reader">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;RSS reader</string>
+   </property>
+  </action>
+  <action name="actionSearch_engine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Search &amp;engine</string>
+   </property>
+  </action>
+  <action name="actionLock_qBittorrent">
+   <property name="text">
+    <string>Lock qBittorrent</string>
+   </property>
+   <property name="toolTip">
+    <string>Lock qBittorrent</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="action_Import_Torrent">
+   <property name="text">
+    <string>Import existing torrent...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import torrent...</string>
+   </property>
+  </action>
+  <action name="actionDonate_money">
+   <property name="text">
+    <string>Donate money</string>
+   </property>
+   <property name="toolTip">
+    <string>If you like qBittorrent, please donate!</string>
+   </property>
+  </action>
+  <action name="actionStart_All">
+   <property name="text">
+    <string>R&amp;esume All</string>
+   </property>
+  </action>
+  <action name="actionPause_All">
+   <property name="text">
+    <string>P&amp;ause All</string>
+   </property>
+  </action>
+  <action name="actionExecution_Logs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Execution &amp;Log</string>
+   </property>
+   <property name="toolTip">
+    <string>Execution Log</string>
+   </property>
+  </action>
+  <action name="actionAutoExit_qBittorrent">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Exit qBittorrent</string>
+   </property>
+  </action>
+  <action name="actionAutoSuspend_system">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Suspend system</string>
+   </property>
+  </action>
+  <action name="actionAutoShutdown_system">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Shutdown system</string>
+   </property>
+  </action>
+  <action name="actionAutoShutdown_Disabled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Disabled</string>
+   </property>
+  </action>
+  <action name="actionToggleVisibility">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionMinimize">
+   <property name="text">
+    <string notr="true">Minimize</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="actionStatus">
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/status.png</normaloff>:/emule/status.png</iconset>
+   </property>
+   <property name="text">
+    <string>Status</string>
+   </property>
+   <property name="toolTip">
+    <string>Status</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/Search.png</normaloff>:/emule/Search.png</iconset>
+   </property>
+   <property name="text">
+    <string>Search</string>
+   </property>
+   <property name="toolTip">
+    <string>Search</string>
+   </property>
+  </action>
+  <action name="actionTools">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/Tools.png</normaloff>:/emule/Tools.png</iconset>
+   </property>
+   <property name="text">
+    <string>Tools</string>
+   </property>
+   <property name="toolTip">
+    <string>Tools</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/ConnectDoBig.png</normaloff>:/emule/ConnectDoBig.png</iconset>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionCatalog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/catalog_2.png</normaloff>:/emule/catalog_2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Catalog</string>
+   </property>
+   <property name="toolTip">
+    <string>Catalog</string>
+   </property>
+  </action>
+  <action name="actionTransfer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/Transfer.png</normaloff>:/emule/Transfer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Transfer</string>
+   </property>
+   <property name="toolTip">
+    <string>Transfer</string>
+   </property>
+  </action>
+  <action name="actionMessages">
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/Messages.ico</normaloff>:/emule/Messages.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Messages</string>
+   </property>
+  </action>
+  <action name="actionFiles">
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/SharedFiles.png</normaloff>:/emule/SharedFiles.png</iconset>
+   </property>
+   <property name="text">
+    <string>Files</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="icons.qrc"/>
+  <include location="Icons/emule/emule.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="qrc:/resources/common.css" />
+</head>
+<body>
+</style>
+</head>
+<body>
+<table width="100%" class="top-panel">
+<tr>
+<td style="width:16px">
+  <a href="http://report.link/?postid=%XPOSTID%" title="Пожаловаться">
+    <img src="qrc:/images/postreport.png">
+  </a>
+</td>
+<td style="width:16px">
+  <a href="http://city.is74.ru/forum/showthread.php?t=%XTOPICID%&p=%XPOSTID%&viewfull=1#post%XPOSTID%" title="Ссылка на форум">
+    <img src="qrc:/images/postlink.png">
+  </a>
+</td>
+<td width="100%">
+  %AUTHOR%
+</td>
+<td style="width:16px">
+  <img src="qrc:/images/date.png" alt="Дата">
+<td align="right">
+  <nobr>%DATE%</nobr>
+</td>
+</tr>
+</table>
+%INFO%
+<!--PREVIEW-->
+</body>
+</html>

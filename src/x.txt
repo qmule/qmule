@@ -1,0 +1,105 @@
+Python version is: "2.7.2+" 
+Preferences constructor 
+Qt ru.ts locale recognized, using translation.
+ru.ts locale recognized, using translation.
+QPainter::begin: Paint device returned engine == 0, type: 2
+QPainter::setPen: Painter not active
+QPainter::setFont: Painter not active
+QPainter::fontMetrics: Painter not active
+QPainter::fontMetrics: Painter not active
+QPainter::fontMetrics: Painter not active
+Couldn't set environment variable...
+QMetaObject::connectSlotsByName: No matching signal for on_actionStatus_triggerd()
+QMetaObject::connectSlotsByName: No matching signal for on_actionTransfer_triggerd()
+QMetaObject::connectSlotsByName: No matching signal for on_actionSearch_triggerd()
+Preferences constructor 
+Preferences constructor 
+Preferences constructor 
+Peer ID: -qB3000-
+Configuring session
+Preferences constructor 
+int QBtSession::getListenPort() const 0 
+Session port changes in program preferences: 0 -> 6881
+void QBtSession::setListeningPort(int) 6881 
+Preferences constructor 
+int QBtSession::getListenPort() const 6881 
+static QString misc::QDesktopServicesDownloadLocation() SUCCESS: Using XDG path for downloads:  "/home/apavlov/ÐÐ°Ð³ÑÑÐ·ÐºÐ¸" 
+void QBtSession::setDownloadRateLimit(long int) -1 
+void QBtSession::setUploadRateLimit(long int) 51200 
+Loading country resolution settings
+in country reoslution settings
+Loading geoip database
+Loading GeoIP database from /usr/share/GeoIP/GeoIP.dat...
+Preferences constructor 
+Enabling UPnP / NAT-PMP
+HTTP user agent is qBittorrent v3.0.0alpha
+Using a disk cache size of 16 MiB 
+Ignore limits on LAN true 
+void QBtSession::setMaxConnections(int) 500 
+Settings SessionSettings 
+Set session settings
+void QBtSession::setMaxConnectionsPerTorrent(int) 100 
+void QBtSession::setMaxUploadsPerTorrent(int) 4 
+Starting DHT... 
+DHT enabled
+Enabling Local Peer Discovery
+Applying encryption settings
+Disabling IPFilter
+void QBtSession::setProxySettings(libtorrent::proxy_settings) 
+Preferences constructor 
+Disabling HTTP communications proxy
+Session configured
+* BTSession constructed
+create tabWidget
+Preferences constructor 
+Sorting by decoration
+Preferences constructor 
+"sni-qt/24683" WARN  16:17:28.684 void StatusNotifierItemFactory::connectToSnw() Invalid interface to SNW_SERVICE 
+Preferences constructor 
+Preferences constructor 
+Preferences constructor 
+Settings transfer list refresh interval to 1500ms
+hidePriorityColumn(1)
+GUI settings loaded
+Preferences constructor 
+Preferences constructor 
+** Show Event **
+Resuming unfinished torrents
+Starting up torrents
+Starting up torrent f2c2dccdee3822f089e8aaf04118469fbe82cf5a
+Adding /home/apavlov/.local/share/data/qBittorrent/BT_backup/f2c2dccdee3822f089e8aaf04118469fbe82cf5a.torrent to download list
+Loading torrent at "/home/apavlov/.local/share/data/qBittorrent/BT_backup/f2c2dccdee3822f089e8aaf04118469fbe82cf5a.torrent" 
+ -> Hash: f2c2dccdee3822f089e8aaf04118469fbe82cf5a
+ -> Name: My Neighbor Totoro.avi
+Last part length: 22 
+Truncated root folder: 
+Trying to load fastresume data: /home/apavlov/.local/share/data/qBittorrent/BT_backup/f2c2dccdee3822f089e8aaf04118469fbe82cf5a.fastresume
+Successfully loaded fast resume data
+SavePath got from persistant data is /home/apavlov/
+getSavePath, got save_path from persistent data: /home/apavlov/
+addTorrent: using save_path: /home/apavlov/
+Preferences constructor 
+Unfinished torrents resumed
+Preferences constructor 
+GUI Built
+Preferences constructor 
+Sucessfully listening on 0.0.0.0 / 6881 
+Sucessfully listening on :: / 6881 
+f2c2dccdee3822f089e8aaf04118469fbe82cf5a have just finished checking
+CURRENT CHANGED
+Preferences constructor 
+Application has exited
+GUI destruction
+virtual StatusBar::~StatusBar() 
+virtual TransferListWidget::~TransferListWidget() ENTER 
+virtual TorrentModel::~TorrentModel() ENTER 
+virtual TorrentModel::~TorrentModel() EXIT 
+virtual TransferListWidget::~TransferListWidget() EXIT 
+Deleting QBtSession::instance()
+BTSession destructor IN
+Deleted the torrent speed monitor
+Saving session state to disk...
+Saving fast resume data...
+Deleting the session
+BTSession destructor OUT
+Exiting GUI destructor...

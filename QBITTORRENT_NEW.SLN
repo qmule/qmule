@@ -1,0 +1,22 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qbittorrent", "src\qbittorrent.vcproj", "{7F4B448F-5547-3242-8419-C9183FBEB427}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F4B448F-5547-3242-8419-C9183FBEB427}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7F4B448F-5547-3242-8419-C9183FBEB427}.Debug|Win32.Build.0 = Debug|Win32
+		{7F4B448F-5547-3242-8419-C9183FBEB427}.Release|Win32.ActiveCfg = Release|Win32
+		{7F4B448F-5547-3242-8419-C9183FBEB427}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		QtVersion = 4.8.1
+	EndGlobalSection
+EndGlobal

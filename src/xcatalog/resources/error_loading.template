@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="qrc:/resources/common.css" />
+<style type="text/css">
+div.central_helper {
+	margin-top: 200px;
+	text-align: center;
+}
+
+</style>
+</head>
+<body>
+<div class="central_helper">
+    <img src="qrc:/images/error.png" alt="Ошибка">
+    <br>
+    %REASON%
+    <br><br>
+    <a href="http://reload.link/?type=%TYPE%" class="cool-button">
+    <table>
+    <tr>
+        <td><img src="qrc:/images/refresh.png" alt="Обновить"></td>
+        <td>&nbsp;&nbsp;Попробовать еще раз</td>
+    </tr>
+    </table>
+    </a>
+</div>
+</body>
+</html>
