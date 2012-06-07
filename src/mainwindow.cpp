@@ -232,11 +232,13 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));  
 
   on_actionCatalog_triggerd();
+#ifndef NOAUTH
   actionStatus->setDisabled(true);
   actionTransfer->setDisabled(true);
   actionSearch->setDisabled(true);
   actionCatalog->setDisabled(true);
   menuStatus->setDisabled(true);
+#endif
 
   //properties = new PropertiesWidget(hSplitter, this, transferList);
   //transferListFilters = new TransferListFiltersWidget(vSplitter, transferList);

@@ -46,6 +46,11 @@ CONFIG(release, debug|release) {
    DEFINES += QT_NO_DEBUG_OUTPUT
 }
 
+# Disable authentication
+CONFIG(noauth) {
+   DEFINES += NOAUTH
+}
+
 # VERSION DEFINES
 include(../version.pri)
 
