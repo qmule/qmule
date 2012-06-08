@@ -18,7 +18,7 @@ static libed2k::md4_hash QStringToMD4(const QString& s)
 
 static QString md4toQString(const libed2k::md4_hash& hash)
 {
-	return QString::fromAscii(hash.toString().c_str(), hash.toString().size());
+    return QString::fromAscii(hash.toString().c_str(), hash.toString().size());
 }
 
 QED2KSearchResultEntry::QED2KSearchResultEntry()
@@ -31,70 +31,70 @@ QED2KSearchResultEntry::QED2KSearchResultEntry(const libed2k::shared_file_entry&
     m_hFile = md4toQString(sf.m_hFile);
     m_network_point = sf.m_network_point;
 
-	try
-	{
-		for (size_t n = 0; n < sf.m_list.count(); n++)
-		{
-			boost::shared_ptr<libed2k::base_tag> ptag = sf.m_list[n];
+    try
+    {
+        for (size_t n = 0; n < sf.m_list.count(); n++)
+        {
+            boost::shared_ptr<libed2k::base_tag> ptag = sf.m_list[n];
 
-			switch(ptag->getNameId())
-			{
+            switch(ptag->getNameId())
+            {
 
-			case libed2k::FT_FILENAME:
-				m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
-				break;
-			case libed2k::FT_FILESIZE:
-				m_nFilesize = ptag->asInt();
-				break;
-			case libed2k::FT_SOURCES:
-				m_nSources = ptag->asInt();
-				break;
-			case libed2k::FT_COMPLETE_SOURCES:
-				m_nCompleteSources = ptag->asInt();
-				break;
-			case libed2k::FT_MEDIA_BITRATE:
-				m_nMediaBitrate = ptag->asInt();
-				break;
-			case libed2k::FT_MEDIA_CODEC:
-				m_strMediaCodec = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
-				break;
-			case libed2k::FT_MEDIA_LENGTH:
-				m_nMediaLength = ptag->asInt();
-				break;
-			default:
-			    break;
-			}
-		}
+            case libed2k::FT_FILENAME:
+                m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
+                break;
+            case libed2k::FT_FILESIZE:
+                m_nFilesize = ptag->asInt();
+                break;
+            case libed2k::FT_SOURCES:
+                m_nSources = ptag->asInt();
+                break;
+            case libed2k::FT_COMPLETE_SOURCES:
+                m_nCompleteSources = ptag->asInt();
+                break;
+            case libed2k::FT_MEDIA_BITRATE:
+                m_nMediaBitrate = ptag->asInt();
+                break;
+            case libed2k::FT_MEDIA_CODEC:
+                m_strMediaCodec = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
+                break;
+            case libed2k::FT_MEDIA_LENGTH:
+                m_nMediaLength = ptag->asInt();
+                break;
+            default:
+                break;
+            }
+        }
 
-		if (m_nMediaLength == 0)
-		{
+        if (m_nMediaLength == 0)
+        {
             if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_LENGTH))
             {
                 m_nMediaLength = p->asInt();
             }
-		}
+        }
 
-		if (m_nMediaBitrate == 0)
-		{
-		    if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_BITRATE))
+        if (m_nMediaBitrate == 0)
+        {
+            if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_BITRATE))
             {
                 m_nMediaLength = p->asInt();
             }
-		}
+        }
 
-		// for users
-		// m_nMediaLength  - low part of real size
-		// m_nMediaBitrate - high part of real size
-	}
-	catch(libed2k::libed2k_exception& e)
-	{
-		qDebug("%s", e.what());
-	}
+        // for users
+        // m_nMediaLength  - low part of real size
+        // m_nMediaBitrate - high part of real size
+    }
+    catch(libed2k::libed2k_exception& e)
+    {
+        qDebug("%s", e.what());
+    }
 }
 
 bool QED2KSearchResultEntry::isCorrect() const
 {
-	return (m_hFile.size() == libed2k::MD4_HASH_SIZE*2 && !m_strFilename.isEmpty());
+    return (m_hFile.size() == libed2k::MD4_HASH_SIZE*2 && !m_strFilename.isEmpty());
 }
 
 QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2k::misc_options2& mo2)
@@ -119,12 +119,12 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 
 QED2KSession::QED2KSession()
 {
-	m_alerts_timer.reset(new QTimer(this));
-	m_settings.server_hostname = "che-d-113.rocketsoftware.com";
-	m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
+    m_alerts_timer.reset(new QTimer(this));
+    m_settings.server_hostname = "che-s-amd1.rocketsoftware.com";
+    m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
 
-	connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
+    connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
     m_alerts_timer->start(500);
 }
 
@@ -186,9 +186,9 @@ void QED2KSession::searchFiles(const QString& strQuery,
         quint32 nMediaLength,
         quint32 nMediaBitrate)
 {
-	try
-	{
-		libed2k::search_request sr = libed2k::generateSearchRequest(nMinSize, nMaxSize, nSources, nCompleteSources,
+    try
+    {
+        libed2k::search_request sr = libed2k::generateSearchRequest(nMinSize, nMaxSize, nSources, nCompleteSources,
             strFileType.toUtf8().constData(),
             strFileExt.toUtf8().constData(),
             strMediaCodec.toUtf8().constData(),
@@ -196,15 +196,15 @@ void QED2KSession::searchFiles(const QString& strQuery,
             nMediaBitrate,
             strQuery.toUtf8().constData());
 
-		m_session->post_search_request(sr);
-	}
-	catch(libed2k::libed2k_exception& e)
-	{
-		QMessageBox msgBox;
+        m_session->post_search_request(sr);
+    }
+    catch(libed2k::libed2k_exception& e)
+    {
+        QMessageBox msgBox;
         msgBox.setText(e.what());
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
-	}
+    }
 }
 
 void QED2KSession::searchRelatedFiles(QString strHash)
@@ -271,36 +271,36 @@ void QED2KSession::readAlerts()
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
-        	qDebug("server connection closed");
-        	emit serverConnectionClosed(QString::fromStdString(p->m_error.message()));
+            qDebug("server connection closed");
+            emit serverConnectionClosed(QString::fromStdString(p->m_error.message()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))
         {
-        	std::vector<QED2KSearchResultEntry> vRes;
-        	vRes.resize(p->m_files.m_collection.size());
-        	bool bMoreResult = p->m_more;
+            std::vector<QED2KSearchResultEntry> vRes;
+            vRes.resize(p->m_files.m_collection.size());
+            bool bMoreResult = p->m_more;
 
-        	for (size_t n = 0; n < p->m_files.m_collection.size(); ++n)
-        	{
-        		QED2KSearchResultEntry sre(p->m_files.m_collection[n]);
+            for (size_t n = 0; n < p->m_files.m_collection.size(); ++n)
+            {
+                QED2KSearchResultEntry sre(p->m_files.m_collection[n]);
 
-        		if (sre.isCorrect())
-        		{
-        			vRes[n] = sre;
-        		}
-        	}
+                if (sre.isCorrect())
+                {
+                    vRes[n] = sre;
+                }
+            }
 
-        	// emit special signal for derived class
-        	if (libed2k::shared_directory_files_alert* p2 =
+            // emit special signal for derived class
+            if (libed2k::shared_directory_files_alert* p2 =
                 dynamic_cast<libed2k::shared_directory_files_alert*>(p))
-        	{
-        	    emit peerSharedDirectoryFiles(
+            {
+                emit peerSharedDirectoryFiles(
                     p2->m_np, md4toQString(p2->m_hash),
                     QString::fromUtf8(p2->m_strDirectory.c_str(), p2->m_strDirectory.size()), vRes);
-        	    continue;
-        	}
+                continue;
+            }
 
-        	emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);
+            emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);
         }
         else if (libed2k::mule_listen_failed_alert* p =
                  dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
