@@ -134,7 +134,7 @@ QED2KSession::~QED2KSession()
 
 Transfer QED2KSession::getTransfer(const QString &hash) const
 {
-    return QED2KHandle(m_session->find_transfer(libed2k::md4_hash(hash.toStdString())));
+    return QED2KHandle(m_session->find_transfer(libed2k::md4_hash::fromString(hash.toStdString())));
 }
 
 std::vector<Transfer> QED2KSession::getTransfers() const

@@ -703,7 +703,7 @@ void search_widget::download()
     QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
 
     libed2k::add_transfer_params params;
-    params.file_hash = selected_data(treeResult, SWDelegate::SW_ID).toString().toStdString();
+    params.file_hash = libed2k::md4_hash::fromString(selected_data(treeResult, SWDelegate::SW_ID).toString().toStdString());
     params.file_path = filepath.toLocal8Bit().constData();
     params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE).toULongLong();
     params.seed_mode = false;
