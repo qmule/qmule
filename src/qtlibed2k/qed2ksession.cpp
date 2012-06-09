@@ -157,7 +157,21 @@ void QED2KSession::changeLabelInSavePath(
     const Transfer& t, const QString& old_label,const QString& new_label) {}
 void QED2KSession::pauseTransfer(const QString& hash) { getTransfer(hash).pause(); }
 void QED2KSession::resumeTransfer(const QString& hash) { getTransfer(hash).resume(); }
-void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {}
+void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {
+    const Transfer t = getTransfer(hash);
+    if (!t.is_valid())
+    {
+        return;
+    }
+
+    emit transferAboutToBeRemoved(t);
+
+    m_session->remove_transfer(
+        t.ed2kHandle().delegate(),
+        delete_files ? libed2k::session::delete_files : libed2k::session::none);
+
+    emit deletedTransfer(hash);
+}
 void QED2KSession::recheckTransfer(const QString& hash) {}
 void QED2KSession::setDownloadLimit(const QString& hash, long limit) {}
 void QED2KSession::setUploadLimit(const QString& hash, long limit) {}
@@ -362,6 +376,11 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::resumed_transfer_alert*>(a.get()))
         {
             emit resumedTransfer(Transfer(QED2KHandle(p->m_handle)));
+        }
+        else if (libed2k::deleted_transfer_alert* p =
+                 dynamic_cast<libed2k::deleted_transfer_alert*>(a.get()))
+        {
+            emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
 
         a = m_session->pop_alert();

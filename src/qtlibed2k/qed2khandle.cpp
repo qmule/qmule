@@ -79,7 +79,7 @@ TransferSize QED2KHandle::all_time_upload() const {return 0;}
 TransferSize QED2KHandle::all_time_download() const {return 0;}
 qlonglong QED2KHandle::active_time() const {return 0;}
 qlonglong QED2KHandle::seeding_time() const {return 0;}
-bool QED2KHandle::is_valid() const { return true; }
+bool QED2KHandle::is_valid() const { return m_delegate.is_valid(); }
 bool QED2KHandle::is_seed() const { return m_delegate.is_seed(); }
 bool QED2KHandle::is_paused() const { return m_delegate.is_paused(); }
 bool QED2KHandle::is_queued() const { return false; }

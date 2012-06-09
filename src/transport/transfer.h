@@ -19,6 +19,7 @@ public:
     bool operator==(const Transfer& t) const;
     bool operator<(const Transfer& t) const;
     QTorrentHandle torrentHandle() const;
+    QED2KHandle ed2kHandle() const;
 
     QString hash() const;
     QString name() const;

@@ -64,6 +64,9 @@ Session::Session()
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
+    connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
+            this, SIGNAL(transferAboutToBeRemoved(Transfer)));
 }
 
 QBtSession* Session::get_torrent_session()
@@ -163,7 +166,6 @@ void Session::deleteTransfer(const QString& hash, bool delete_files) {
 void Session::recheckTransfer(const QString& hash) {
     delegate(hash)->recheckTransfer(hash);
 }
-
 void Session::setDownloadLimit(const QString& hash, long limit) {
     delegate(hash)->setDownloadLimit(hash, limit); }
 

@@ -10,6 +10,7 @@ class QED2KHandle: public TransferBase
 public:
     QED2KHandle();
     explicit QED2KHandle(const libed2k::transfer_handle& h);
+    const libed2k::transfer_handle& delegate() const { return m_delegate; }
 
     bool operator==(const TransferBase& t) const;
     bool operator<(const TransferBase& t) const;
