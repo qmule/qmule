@@ -9,7 +9,7 @@ class login_dlg : public QDialog, public Ui::login_dlg
     Q_OBJECT
 
 public:
-    login_dlg(QWidget *parent = 0);
+    login_dlg(QWidget *parent, QString login, QString password);
     ~login_dlg();
     QString getLogin() { return strLogin; }
     void setLogin(QString login);

@@ -33,10 +33,14 @@ private:
     QAction* userAdd;
     QAction* userBrowseFiles;
     QAction* userDelete;
+    int lastMessageTab;
 
 public:
     messages_widget(QWidget *parent = 0);
     ~messages_widget();
+
+protected:
+    virtual void showEvent(QShowEvent *e);
 
 public slots:
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
@@ -49,7 +53,11 @@ private slots:
     void peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult);
     void displayListMenu(const QPoint& pos);
     void addFriend();
-    void sendMessage();
+    void sendMessage();    
+
+signals:
+    void newMessage();
+    void stopMessageNotification();
 };
 
 #endif // MESSAGES_WIDGET_H

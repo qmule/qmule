@@ -158,7 +158,8 @@ nox {
               search_filter.h \
 	      messages_widget.h \
               add_friend.h \
-              files_widget.h
+              files_widget.h \
+              status_bar.h 
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -181,7 +182,8 @@ nox {
              search_filter.cpp \
 	     messages_widget.cpp \
              add_friend.cpp \
-             files_widget.cpp 
+             files_widget.cpp \
+             status_bar.cpp
   win32 {
     HEADERS += programupdater.h
     SOURCES += programupdater.cpp
@@ -211,7 +213,8 @@ nox {
            login_dlg.ui \
 	   messages_widget.ui \
            add_friend.ui \
-           files_widget.ui 
+           files_widget.ui \
+           status_bar.ui
 }
 
 DESTDIR = .

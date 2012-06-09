@@ -50,5 +50,14 @@
         <file>files/SharedFilesList.ico</file>
         <file>files/all.ico</file>
         <file>files/HardDisk.ico</file>
+        <file>statusbar/disconnected.ico</file>
+        <file>statusbar/connected.ico</file>
+        <file>statusbar/Up1down1.ico</file>
+        <file>statusbar/Up0down0.ico</file>
+        <file>statusbar/Up0down1.ico</file>
+        <file>statusbar/Up1down0.ico</file>
+        <file>statusbar/MessagePending.ico</file>
+        <file>statusbar/Message.ico</file>
+        <file>TrayDisconnected.ico</file>
     </qresource>
 </RCC>
