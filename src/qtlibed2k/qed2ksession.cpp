@@ -155,8 +155,8 @@ qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global
 bool QED2KSession::isFilePreviewPossible(const QString& hash) const { return false; }
 void QED2KSession::changeLabelInSavePath(
     const Transfer& t, const QString& old_label,const QString& new_label) {}
-void QED2KSession::pauseTransfer(const QString& hash) {}
-void QED2KSession::resumeTransfer(const QString& hash) {}
+void QED2KSession::pauseTransfer(const QString& hash) { getTransfer(hash).pause(); }
+void QED2KSession::resumeTransfer(const QString& hash) { getTransfer(hash).resume(); }
 void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {}
 void QED2KSession::recheckTransfer(const QString& hash) {}
 void QED2KSession::setDownloadLimit(const QString& hash, long limit) {}
@@ -353,7 +353,16 @@ void QED2KSession::readAlerts()
         {
             emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
         }
-
+        else if (libed2k::paused_transfer_alert* p =
+                 dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
+        {
+            emit pausedTransfer(Transfer(QED2KHandle(p->m_handle)));
+        }
+        else if (libed2k::resumed_transfer_alert* p =
+                 dynamic_cast<libed2k::resumed_transfer_alert*>(a.get()))
+        {
+            emit resumedTransfer(Transfer(QED2KHandle(p->m_handle)));
+        }
 
         a = m_session->pop_alert();
     }

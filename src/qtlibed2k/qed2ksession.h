@@ -176,6 +176,8 @@ signals:
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
 
     void addedTransfer(Transfer t);
+    void pausedTransfer(Transfer t);
+    void resumedTransfer(Transfer t);
 };
 
 #endif //__QED2KSESSION_

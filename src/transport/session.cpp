@@ -62,6 +62,8 @@ Session::Session()
 
     // libed2k signals
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
 }
 
 QBtSession* Session::get_torrent_session()
@@ -82,6 +84,7 @@ SessionBase* Session::delegate(const QString& hash) const {
         return const_cast<QED2KSession*>(&m_edSession);
 
     Q_ASSERT(false);
+    return NULL;
 }
 
 SessionBase* Session::delegate(const Transfer& t) const { return delegate(t.hash()); }
