@@ -120,7 +120,7 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 QED2KSession::QED2KSession()
 {
 	m_alerts_timer.reset(new QTimer(this));
-	m_settings.server_hostname = "che-d-113.rocketsoftware.com";
+	m_settings.server_hostname = "emule.is74.ru";
 	m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
 

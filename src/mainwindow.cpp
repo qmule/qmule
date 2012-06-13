@@ -104,6 +104,7 @@ using namespace libtorrent;
 
 #define TIME_TRAY_BALLOON 5000
 #define PREVENT_SUSPEND_INTERVAL 60000
+//#define NOAUTH
 
 /*****************************************************
  *                                                   *
