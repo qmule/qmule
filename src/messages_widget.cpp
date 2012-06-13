@@ -17,6 +17,8 @@ messages_widget::messages_widget(QWidget *parent)
 {
     setupUi(this);
 
+    lastMessageTab = -1;
+
     imgFriends->setPixmap(QIcon(":/emule/users/Friend.ico").pixmap(16, 16));
     imgMessages->setPixmap(QIcon(":/emule/users/Message.ico").pixmap(16, 16));
     
@@ -34,7 +36,7 @@ messages_widget::messages_widget(QWidget *parent)
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
 
-    userMenu = new QMenu(this);
+    userMenu = new QMenu(listFriends);
     userMenu->setObjectName(QString::fromUtf8("userMenu"));
     userMenu->setTitle(tr("Friends"));
 
@@ -81,6 +83,7 @@ messages_widget::messages_widget(QWidget *parent)
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerMessage(const libed2k::net_identifier&, const QString&, const QString&)), this, SLOT(newMessage(const libed2k::net_identifier&, const QString&, const QString&)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)), this, SLOT(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)), this, SLOT(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)));
+    connect(this, SIGNAL(setFocus()), this, SLOT(setFocus()));
 }
 
 messages_widget::~messages_widget()
@@ -149,6 +152,11 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
         QDateTime date_time = QDateTime::currentDateTime();
         QString msg = "[" + date_time.toString("hh:mm") + "] " + it->strName + ": " + strMessage;
         edit->append(msg);
+
+        lastMessageTab = nTab;
+
+        if (!this->hasFocus() || nTab != tabWidget->currentIndex())
+            emit newMessage();
     }
 }
 
@@ -186,25 +194,24 @@ void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const
 
 void messages_widget::displayListMenu(const QPoint& pos) 
 {
-    QItemSelectionModel* model = listFriends->selectionModel();
-    QModelIndexList selectedIndexes = model->selectedRows();
+    QModelIndex index = listFriends->currentIndex();
 
-    if (selectedIndexes.size() == 0)
+    if (!index.isValid())
     {
-        userSendMessage->setEnabled(false);;
-        userDetails->setEnabled(false);;
-        userBrowseFiles->setEnabled(false);;
-        userDelete->setEnabled(false);;
+        userSendMessage->setEnabled(false);
+        userDetails->setEnabled(false);
+        userBrowseFiles->setEnabled(false);
+        userDelete->setEnabled(false);
     }
     else
     {
-        userSendMessage->setEnabled(true);;
-        userDetails->setEnabled(true);;
-        userBrowseFiles->setEnabled(true);;
-        userDelete->setEnabled(true);;
+        userSendMessage->setEnabled(true);
+        userDetails->setEnabled(true);
+        userBrowseFiles->setEnabled(true);
+        userDelete->setEnabled(true);
     }
 
-    userMenu->exec(pos);
+    userMenu->exec(QCursor::pos());
 }
 
 void messages_widget::addFriend()
@@ -230,13 +237,12 @@ void messages_widget::addFriend()
 
 void messages_widget::sendMessage()
 {
-    QItemSelectionModel* model = listFriends->selectionModel();
-    QModelIndexList selectedIndexes = model->selectedRows();
+    QModelIndex index = listFriends->currentIndex();
 
-    if (selectedIndexes.size() == 0)
+    if (!index.isValid())
         return;
 
-    int num = selectedIndexes[0].row();
+    int num = index.row();
 
     std::vector<USER>::iterator it;
     int tab_num = 0;
@@ -255,4 +261,11 @@ void messages_widget::sendMessage()
     {
         startChat(friends[num].strName, friends[num].netPoint);
     }
+}
+
+void messages_widget::showEvent(QShowEvent* e)
+{
+    QWidget::showEvent(e);
+    if (lastMessageTab == tabWidget->currentIndex())
+        emit stopMessageNotification();
 }

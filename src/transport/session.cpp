@@ -62,6 +62,11 @@ Session::Session()
 
     // libed2k signals
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
+    connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
+            this, SIGNAL(transferAboutToBeRemoved(Transfer)));
 }
 
 QBtSession* Session::get_torrent_session()
@@ -82,6 +87,7 @@ SessionBase* Session::delegate(const QString& hash) const {
         return const_cast<QED2KSession*>(&m_edSession);
 
     Q_ASSERT(false);
+    return NULL;
 }
 
 SessionBase* Session::delegate(const Transfer& t) const { return delegate(t.hash()); }
@@ -160,7 +166,6 @@ void Session::deleteTransfer(const QString& hash, bool delete_files) {
 void Session::recheckTransfer(const QString& hash) {
     delegate(hash)->recheckTransfer(hash);
 }
-
 void Session::setDownloadLimit(const QString& hash, long limit) {
     delegate(hash)->setDownloadLimit(hash, limit); }
 

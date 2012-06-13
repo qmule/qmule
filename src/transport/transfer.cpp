@@ -21,6 +21,12 @@ QTorrentHandle Transfer::torrentHandle() const {
     return h ? *h : QTorrentHandle();
 }
 
+QED2KHandle Transfer::ed2kHandle() const
+{
+    const QED2KHandle* h = dynamic_cast<const QED2KHandle*>(m_delegate.data());
+    return h ? *h : QED2KHandle();
+}
+
 QString Transfer::hash() const { return m_delegate->hash(); }
 
 QString Transfer::name() const { return m_delegate->name(); }

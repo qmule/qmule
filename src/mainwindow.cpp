@@ -86,6 +86,7 @@
 #include "login_dlg.h"
 #include "messages_widget.h"
 #include "files_widget.h"
+#include "status_bar.h"
 
 #include "xcatalog/catalogwidget.h"
 
@@ -125,7 +126,23 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   // Clean exit on log out
   connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteBTSession()));
   // Setting icons
-  this->setWindowIcon(QIcon(QString::fromUtf8(":/emule/TrayConnected.ico")));
+
+  icon_TrayConn.addFile(":/emule/TrayConnected.ico", QSize(22, 22));
+  icon_TrayConn.addFile(":/emule/TrayConnected.ico", QSize(16, 16));
+  icon_TrayConn.addFile(":/emule/TrayConnected.ico", QSize(32, 32));
+
+  icon_TrayDisconn.addFile(":/emule/TrayDisconnected.ico", QSize(22, 22));
+  icon_TrayDisconn.addFile(":/emule/TrayDisconnected.ico", QSize(16, 16));
+  icon_TrayDisconn.addFile(":/emule/TrayDisconnected.ico", QSize(32, 32));
+
+  icon_NewMsg.addFile(":/emule/statusbar/MessagePending.ico", QSize(22, 22));
+  icon_NewMsg.addFile(":/emule/statusbar/MessagePending.ico", QSize(16, 16));
+  icon_NewMsg.addFile(":/emule/statusbar/MessagePending.ico", QSize(32, 32));
+
+  icon_CurTray = icon_TrayDisconn;
+
+  this->setWindowIcon(icon_TrayConn);
+
   actionOpen->setIcon(IconProvider::instance()->getIcon("list-add"));
   actionDownload_from_URL->setIcon(IconProvider::instance()->getIcon("insert-link"));
   actionSet_upload_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/seeding.png")));
@@ -232,6 +249,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));  
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));  
 
+  connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
+  connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
+  flickerTimer = new QTimer(this);
+  connect(flickerTimer, SIGNAL(timeout()), SLOT(on_flickerTimer()));
+
   on_actionCatalog_triggerd();
 #ifndef NOAUTH
   actionStatus->setDisabled(true);
@@ -295,9 +317,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   setAcceptDrops(true);
   createKeyboardShortcuts();
   // Create status bar
-  status_bar = new StatusBar(QMainWindow::statusBar());
-  connect(status_bar->connectionStatusButton(), SIGNAL(clicked()), SLOT(showConnectionSettings()));
-  connect(actionUse_alternative_speed_limits, SIGNAL(triggered()), status_bar, SLOT(toggleAlternativeSpeeds()));
+  statusBar = new status_bar(this, QMainWindow::statusBar());
 
 #ifdef Q_WS_MAC
   setUnifiedTitleAndToolBarOnMac(true);
@@ -416,13 +436,12 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(QString, QString)), this, SLOT(ed2kIdentity(QString, QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionFailed(QString)), this, SLOT(ed2kConnectionFailed(QString)));
 
-  connectToServer();
+  authRequest();
 }
 
 void MainWindow::deleteBTSession()
 {
   guiUpdater->stop();
-  status_bar->stopTimer();
   Session::drop();
   m_pwr->setActivityState(false);
   // Save window size, columns size
@@ -443,7 +462,7 @@ MainWindow::~MainWindow() {
   // Delete other GUI objects
   if(executable_watcher)
     delete executable_watcher;
-  delete status_bar;
+  delete statusBar;
 //  delete search_filter;
 //  delete transferList;
   delete guiUpdater;
@@ -795,8 +814,6 @@ bool MainWindow::unlockUI() {
 }
 
 void MainWindow::notifyOfUpdate(QString) {
-  // Show restart message
-  status_bar->showRestartRequired();
   // Delete the executable watcher
   delete executable_watcher;
   executable_watcher = 0;
@@ -1144,7 +1161,7 @@ void MainWindow::on_actionConnect_triggered()
     {
         case csDisconnected:
         {
-            connectToServer();
+            authRequest();
             break;
         }
         case csConnecting:
@@ -1164,6 +1181,11 @@ void MainWindow::on_actionConnect_triggered()
                 actionConnect->setIcon(icon_disconnected);
                 connectioh_state = csDisconnected;
                 status->setDisconnectedInfo();
+                statusBar->reset();
+                icon_CurTray = icon_TrayDisconn;
+                if (systrayIcon) {
+                    systrayIcon->setIcon(getSystrayIcon());
+                }
             }
             break;
         }
@@ -1631,18 +1653,14 @@ QIcon MainWindow::getSystrayIcon() const
   TrayIcon::Style style = Preferences().trayIconStyle();
   switch(style) {
   case TrayIcon::MONO_DARK:
-    return QIcon(":/Icons/skin/qbittorrent_mono_dark.png");
+    return QIcon(":/emule/TrayConnected.ico");
   case TrayIcon::MONO_LIGHT:
-    return QIcon(":/Icons/skin/qbittorrent_mono_light.png");
+    return QIcon(":/emule/TrayConnected.ico");
   default:
     break;
   }
 #endif
-  QIcon icon;
-  icon.addFile(":/emule/TrayConnected.ico", QSize(22, 22));
-  icon.addFile(":/emule/TrayConnected.ico", QSize(16, 16));
-  icon.addFile(":/emule/TrayConnected.ico", QSize(32, 32));
-  return icon;
+  return icon_CurTray;
 }
 
 void MainWindow::emitAuthSignal(const std::string& strRes, const boost::system::error_code& error)
@@ -1652,14 +1670,22 @@ void MainWindow::emitAuthSignal(const std::string& strRes, const boost::system::
 
 void MainWindow::on_auth(const std::string& strRes, const boost::system::error_code& error)
 {
+
     if (error)
     {
-        addToLog(tr("Authorization Error: ") + QString(error.message().c_str()));
+        QString msg = tr("Authentication Error: ") + QString::fromLocal8Bit(error.message().c_str());
+        QString msg2 = tr("New authentication attempt in 30 seconds.");
+        addToLog(msg);
+        addToLog(msg2);
+        authTimer->start(30000);
+
+        statusBar->setStatusMsg(msg + " " + msg2);
         return;
     }
 
     QString str(error.message().c_str());
     QString result = QString::fromUtf8(strRes.c_str(), strRes.size());
+
     QString sample("Message type=");
     int nPos = result.indexOf(sample);
     if (nPos >= 0)
@@ -1710,7 +1736,7 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
 
     if (authMessage.length())
     {
-        addToLog(tr("Message from authorization server: ") + authMessage);
+        addToLog(tr("Message from authentication server: ") + authMessage);
 
         if (authMessageType)
         {
@@ -1725,7 +1751,9 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
     {
         case 0:
         {
-            addToLog(tr("Authorization comleted"));
+            QString msg = tr("Authentication comleted");
+            addToLog(msg);
+            statusBar->setStatusMsg(msg);
             actionConnect->setIcon(icon_connected);
             connectioh_state = csConnected;
 
@@ -1736,6 +1764,12 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
             menuStatus->setEnabled(true);
 
             status->updateConnectedInfo();
+            statusBar->setConnected(true);
+
+            icon_CurTray = icon_TrayConn;
+            if (systrayIcon) {
+                systrayIcon->setIcon(getSystrayIcon());
+            }
 
             break;
         }
@@ -1744,6 +1778,7 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
             actionConnect->setIcon(icon_disconnected);
             connectioh_state = csDisconnected;
             authTimer->start(1000);
+            userPassword = "";
             break;
         }
         case 2:
@@ -1755,17 +1790,31 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
 
 }
 
-void MainWindow::connectToServer()
+void MainWindow::authRequest()
 {
+    QString msg = tr("Sending authentication request.");
     authTimer->stop();
-    addToLog(tr("Connecting"));
+
     callback_wrapper::window = this;
-    login_dlg dlg(this);
+
+    if (userName.length() && userPassword.length())
+    {
+        ar.start("el.is74.ru", "auth.php", userName.toUtf8().constData(), userPassword.toUtf8().constData(), "0.5.6.7", callback_wrapper::on_auth);
+        addToLog(msg);
+        statusBar->setStatusMsg(msg);
+        return;
+    }
+
+    login_dlg dlg(this, userName, userPassword);
     if (dlg.exec() == QDialog::Accepted)
     {
+        userName = dlg.getLogin();
+        userPassword = dlg.getPasswd();
         actionConnect->setIcon(icon_connecting);
         connectioh_state = csConnecting;
-        ar.start("el.is74.ru", "auth.php", dlg.getLogin().toUtf8().constData(), dlg.getPasswd().toUtf8().constData(), "0.5.6.7", callback_wrapper::on_auth);
+        ar.start("el.is74.ru", "auth.php", userName.toUtf8().constData(), userPassword.toUtf8().constData(), "0.5.6.7", callback_wrapper::on_auth);
+        addToLog(msg);
+        statusBar->setStatusMsg(msg);
     }
 }
 
@@ -1776,7 +1825,7 @@ void MainWindow::addToLog(QString log_message)
 
 void MainWindow::startAuthByTimer()
 {
-    connectToServer();
+    authRequest();
 }
 
 void MainWindow::ed2kServerNameResolved(QString strServer)
@@ -1808,6 +1857,7 @@ void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
     status->addLogMessage(log_msg);
 
     status->serverStatus(nFiles, nUsers);
+    statusBar->setServerInfo(nFiles, nUsers);
 }
 
 void MainWindow::ed2kServerMessage(QString strMessage)
@@ -1835,4 +1885,36 @@ void MainWindow::startChat(const QString& user_name, const libed2k::net_identifi
     messages->startChat(user_name, np);
 }
 
+void MainWindow::startMessageFlickering()
+{
+    flickerTimer->start(1000);
+}
 
+void MainWindow::on_flickerTimer()
+{
+    static int state = 0;
+
+    statusBar->setNewMessage(state + 1);
+
+    if (state)
+        icon_CurTray = icon_TrayConn;
+    else
+        icon_CurTray = icon_NewMsg;
+
+    if (systrayIcon) {
+        systrayIcon->setIcon(getSystrayIcon());
+    }
+
+    state = (++state) % 2;
+}
+
+void MainWindow::stopMessageFlickering()
+{
+    icon_CurTray = icon_TrayConn;
+    if (systrayIcon) {
+        systrayIcon->setIcon(getSystrayIcon());
+    }
+    statusBar->setNewMessage(0);
+
+    flickerTimer->stop();
+}

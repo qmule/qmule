@@ -143,6 +143,7 @@ QVariant TorrentModelItem::data(int column, int role) const
     return m_fgColor;
   }
   if (role != Qt::DisplayRole && role != Qt::UserRole) return QVariant();
+  if (!m_torrent.is_valid()) return QVariant();
   switch(column) {
   case TR_NAME:
     return m_name.isEmpty()? m_torrent.name() : m_name;

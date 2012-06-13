@@ -54,7 +54,7 @@ class options_imp;
 class TransferListWidget;
 class TransferListFiltersWidget;
 class PropertiesWidget;
-class StatusBar;
+class status_bar;
 class consoleDlg;
 class about;
 class TorrentCreatorDlg;
@@ -193,7 +193,7 @@ private:
   bool m_posInitialized;
   QTimer *guiUpdater;
   //HidableTabWidget *tabs;
-  StatusBar *status_bar;
+  status_bar* statusBar;
   QPointer<options_imp> options;
   QPointer<consoleDlg> console;
   QPointer<about> aboutDlg;
@@ -213,6 +213,9 @@ private:
   XCatalogWidget* catalog;
   messages_widget* messages;
   files_widget* files;
+
+  QString userName;
+  QString userPassword;
 
   //TransferListFiltersWidget *transferListFilters;
   //PropertiesWidget *properties;
@@ -242,11 +245,18 @@ private:
   PowerManagement *m_pwr;
   QTimer *preventTimer;
   QTimer *authTimer;
+  QTimer *flickerTimer;
   libed2k::auth_runner ar;
 
   QIcon icon_disconnected;
   QIcon icon_connected;
   QIcon icon_connecting;
+
+  QIcon icon_TrayConn;
+  QIcon icon_TrayDisconn;
+  QIcon icon_NewMsg;
+  QIcon icon_CurTray;
+
   ConeectionState connectioh_state;
 
 private slots:
@@ -263,9 +273,12 @@ private slots:
     // Check for active torrents and set preventing from suspend state
     void checkForActiveTorrents();
     void on_auth(const std::string& strRes, const boost::system::error_code& error);
-    void connectToServer();
+    void authRequest();
     void startAuthByTimer();
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
+    void startMessageFlickering();
+    void stopMessageFlickering();
+    void on_flickerTimer();
 
     void ed2kServerNameResolved(QString strServer);
     void ed2kConnectionInitialized(unsigned int nClientId);

@@ -22,18 +22,18 @@
 
 struct QED2KSearchResultEntry
 {
+    quint64                 m_nFilesize;
+    int                     m_nSources;
+    int                     m_nCompleteSources;
+    int                     m_nMediaBitrate;
+    int                     m_nMediaLength;
 	QString	                m_hFile;
 	QString                 m_strFilename;
-	quint64	                m_nFilesize;
-	int		                m_nSources;
-	int		                m_nCompleteSources;
-	int		                m_nMediaBitrate;
-	int		                m_nMediaLength;
 	QString	                m_strMediaCodec;
     libed2k::net_identifier m_network_point; 
 	bool isCorrect() const;
 	QED2KSearchResultEntry();
-	QED2KSearchResultEntry(const libed2k::shared_file_entry& sf);
+	static QED2KSearchResultEntry fromSharedFileEntry(const libed2k::shared_file_entry& sf);
 };
 
 struct QED2KPeerOptions
@@ -176,6 +176,10 @@ signals:
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
 
     void addedTransfer(Transfer t);
+    void pausedTransfer(Transfer t);
+    void resumedTransfer(Transfer t);
+    void deletedTransfer(QString hash);
+    void transferAboutToBeRemoved(Transfer t);
 };
 
 #endif //__QED2KSESSION_
