@@ -44,8 +44,12 @@ TransferInfo QED2KHandle::get_info() const
 	return TransferInfo(ret);
 }
 
-qreal QED2KHandle::download_payload_rate() const { return 1; }
-qreal QED2KHandle::upload_payload_rate() const { return 0; }
+qreal QED2KHandle::download_payload_rate() const {
+    return m_delegate.status().download_payload_rate;
+}
+qreal QED2KHandle::upload_payload_rate() const {
+    return m_delegate.status().upload_payload_rate;
+}
 int QED2KHandle::queue_position() const { return 0; }
 float QED2KHandle::progress() const {
     libed2k::transfer_status st = m_delegate.status();
