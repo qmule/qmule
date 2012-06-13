@@ -105,6 +105,7 @@ using namespace libtorrent;
 
 #define TIME_TRAY_BALLOON 5000
 #define PREVENT_SUSPEND_INTERVAL 60000
+//#define NOAUTH
 
 /*****************************************************
  *                                                   *
@@ -1669,6 +1670,7 @@ void MainWindow::emitAuthSignal(const std::string& strRes, const boost::system::
 
 void MainWindow::on_auth(const std::string& strRes, const boost::system::error_code& error)
 {
+
     if (error)
     {
         QString msg = tr("Authentication Error: ") + QString::fromLocal8Bit(error.message().c_str());
@@ -1683,6 +1685,7 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
 
     QString str(error.message().c_str());
     QString result = QString::fromUtf8(strRes.c_str(), strRes.size());
+
     QString sample("Message type=");
     int nPos = result.indexOf(sample);
     if (nPos >= 0)

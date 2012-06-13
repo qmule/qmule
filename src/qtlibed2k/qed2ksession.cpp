@@ -21,15 +21,22 @@ static QString md4toQString(const libed2k::md4_hash& hash)
     return QString::fromAscii(hash.toString().c_str(), hash.toString().size());
 }
 
-QED2KSearchResultEntry::QED2KSearchResultEntry()
+QED2KSearchResultEntry::QED2KSearchResultEntry() :
+        m_nFilesize(0),
+        m_nSources(0),
+        m_nCompleteSources(0),
+        m_nMediaBitrate(0),
+        m_nMediaLength(0)
 {
-
 }
 
-QED2KSearchResultEntry::QED2KSearchResultEntry(const libed2k::shared_file_entry& sf)
+// static
+QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k::shared_file_entry& sf)
 {
-    m_hFile = md4toQString(sf.m_hFile);
-    m_network_point = sf.m_network_point;
+    QED2KSearchResultEntry sre;
+
+    sre.m_hFile = md4toQString(sf.m_hFile);
+    sre.m_network_point = sf.m_network_point;
 
     try
     {
@@ -41,44 +48,44 @@ QED2KSearchResultEntry::QED2KSearchResultEntry(const libed2k::shared_file_entry&
             {
 
             case libed2k::FT_FILENAME:
-                m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
+                sre.m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
                 break;
             case libed2k::FT_FILESIZE:
-                m_nFilesize = ptag->asInt();
+                sre.m_nFilesize = ptag->asInt();
                 break;
             case libed2k::FT_SOURCES:
-                m_nSources = ptag->asInt();
+                sre.m_nSources = ptag->asInt();
                 break;
             case libed2k::FT_COMPLETE_SOURCES:
-                m_nCompleteSources = ptag->asInt();
+                sre.m_nCompleteSources = ptag->asInt();
                 break;
             case libed2k::FT_MEDIA_BITRATE:
-                m_nMediaBitrate = ptag->asInt();
+                sre.m_nMediaBitrate = ptag->asInt();
                 break;
             case libed2k::FT_MEDIA_CODEC:
-                m_strMediaCodec = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
+                sre.m_strMediaCodec = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
                 break;
             case libed2k::FT_MEDIA_LENGTH:
-                m_nMediaLength = ptag->asInt();
+                sre.m_nMediaLength = ptag->asInt();
                 break;
             default:
                 break;
             }
         }
 
-        if (m_nMediaLength == 0)
+        if (sre.m_nMediaLength == 0)
         {
             if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_LENGTH))
             {
-                m_nMediaLength = p->asInt();
+                sre.m_nMediaLength = p->asInt();
             }
         }
 
-        if (m_nMediaBitrate == 0)
+        if (sre.m_nMediaBitrate == 0)
         {
             if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_BITRATE))
             {
-                m_nMediaLength = p->asInt();
+                sre.m_nMediaLength = p->asInt();
             }
         }
 
@@ -90,6 +97,8 @@ QED2KSearchResultEntry::QED2KSearchResultEntry(const libed2k::shared_file_entry&
     {
         qDebug("%s", e.what());
     }
+
+    return (sre);
 }
 
 bool QED2KSearchResultEntry::isCorrect() const
@@ -119,9 +128,9 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 
 QED2KSession::QED2KSession()
 {
-    m_alerts_timer.reset(new QTimer(this));
-    m_settings.server_hostname = "che-s-amd1.rocketsoftware.com";
-    m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
+	m_alerts_timer.reset(new QTimer(this));
+	m_settings.server_hostname = "emule.is74.ru";
+	m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
 
     connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
@@ -296,7 +305,7 @@ void QED2KSession::readAlerts()
 
             for (size_t n = 0; n < p->m_files.m_collection.size(); ++n)
             {
-                QED2KSearchResultEntry sre(p->m_files.m_collection[n]);
+                QED2KSearchResultEntry sre = QED2KSearchResultEntry::fromSharedFileEntry(p->m_files.m_collection[n]);
 
                 if (sre.isCorrect())
                 {
