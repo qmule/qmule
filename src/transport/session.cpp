@@ -95,6 +95,7 @@ SessionBase* Session::delegate(const Transfer& t) const { return delegate(t.hash
 std::vector<SessionBase*> Session::delegates() const {
     std::vector<SessionBase*> sessions;
     sessions.push_back(const_cast<QBtSession*>(&m_btSession));
+    sessions.push_back(const_cast<QED2KSession*>(&m_edSession));
     return sessions;
 }
 

@@ -44,8 +44,12 @@ TransferInfo QED2KHandle::get_info() const
 	return TransferInfo(ret);
 }
 
-qreal QED2KHandle::download_payload_rate() const { return 1; }
-qreal QED2KHandle::upload_payload_rate() const { return 0; }
+qreal QED2KHandle::download_payload_rate() const {
+    return m_delegate.status().download_payload_rate;
+}
+qreal QED2KHandle::upload_payload_rate() const {
+    return m_delegate.status().upload_payload_rate;
+}
 int QED2KHandle::queue_position() const { return 0; }
 float QED2KHandle::progress() const {
     libed2k::transfer_status st = m_delegate.status();
@@ -108,7 +112,9 @@ QStringList QED2KHandle::absolute_files_path() const {
     res << filepath_at(0);
     return res;
 }
-void QED2KHandle::get_peer_info(std::vector<PeerInfo>& peers) const {}
+void QED2KHandle::get_peer_info(std::vector<PeerInfo>& infos) const {
+    m_delegate.get_peer_info(infos);
+}
 std::vector<AnnounceEntry> QED2KHandle::trackers() const { return std::vector<AnnounceEntry>(); }
 void QED2KHandle::pause() const { m_delegate.pause(); }
 void QED2KHandle::resume() const { m_delegate.resume(); }
