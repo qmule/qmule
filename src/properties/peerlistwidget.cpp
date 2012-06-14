@@ -318,7 +318,7 @@ void PeerListWidget::loadPeers(bool force_hostname_resolution)
     QSet<QString> old_peers_set = m_peerItems.keys().toSet();
     for(transferIt = transfers.begin(); transferIt != transfers.end(); transferIt++)
     {
-        QTorrentHandle h = transferIt->torrentHandle();
+        Transfer h = *transferIt;
         if(!h.is_valid()) 
             continue;
 
@@ -459,6 +459,9 @@ QString PeerListWidget::getConnectionString(int connection_type)
 {
   QString connection;
   switch(connection_type) {
+  case libed2k::STANDARD_EDONKEY:
+    connection = "eDonkey";
+    break;
 #if LIBTORRENT_VERSION_MINOR > 15
   case peer_info::bittorrent_utp:
     connection = "uTP";

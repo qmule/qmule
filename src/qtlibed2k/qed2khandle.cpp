@@ -112,7 +112,9 @@ QStringList QED2KHandle::absolute_files_path() const {
     res << filepath_at(0);
     return res;
 }
-void QED2KHandle::get_peer_info(std::vector<PeerInfo>& peers) const {}
+void QED2KHandle::get_peer_info(std::vector<PeerInfo>& infos) const {
+    m_delegate.get_peer_info(infos);
+}
 std::vector<AnnounceEntry> QED2KHandle::trackers() const { return std::vector<AnnounceEntry>(); }
 void QED2KHandle::pause() const { m_delegate.pause(); }
 void QED2KHandle::resume() const { m_delegate.resume(); }
