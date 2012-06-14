@@ -14,7 +14,7 @@ CONFIG(debug, debug|release) {
   LIBS += libtorrent.lib \
           libboost_system-vc90-mt-1_49.lib \
           libboost_filesystem-vc90-mt-1_49.lib \
-          libboost_thread-vc90-mt-1_49.lib \
+          libboost_thread-vc90-mt-1_49.lib \		  
           libed2k.lib
 }
 

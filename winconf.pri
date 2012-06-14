@@ -17,9 +17,22 @@ LIBS += -L$$(OPENSSL_ROOT)/lib/VC
 LIBS += -L$$(LIBTORRENT_ROOT)/lib
 #Point this to the boost lib folder
 LIBS += -L$$(BOOST_ROOT)/stage/lib
-LIBS += -L$$(CRYPTOPP_ROOT)/lib
+
+# select appropriate crypto++ library
+CONFIG(debug, debug|release) 
+{
+    LIBS += -L$$(CRYPTOPP_ROOT)/lib/debug
+} else {
+    LIBS += -L$$(CRYPTOPP_ROOT)/lib/release
+}
+
 #Point this to the ed2klib lib folder
-LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
+CONFIG(debug, debug|release) 
+{
+    LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
+} else {
+    LIBS += -L$$(LIBED2K_ROOT)/Win32/Release
+}
 
 # LIBTORRENT DEFINES
 DEFINES += BOOST_ALL_NO_LIB
