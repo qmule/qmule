@@ -192,12 +192,19 @@ int main(int argc, char *argv[]) {
   QString locale = pref.getLocale();
   QTranslator qtTranslator;
   QTranslator translator;
+
   if (locale.isEmpty()) 
   {
     locale = QLocale::system().name();
     qDebug("locale is empty, use %s", qPrintable(locale));
     pref.setLocale(locale);
+    if (locale.isEmpty())
+    {
+        locale = "en_GB";
+    }
   }
+
+  qDebug("Program locale: %s", qPrintable(locale));
 
   //locale = "ru.ts";
 

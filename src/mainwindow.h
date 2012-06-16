@@ -297,6 +297,7 @@ public:
     static MainWindow* window;
     static void on_auth(const std::string& strRes, const boost::system::error_code& error)
     { 
+        qDebug("emit Auth signal");
         //QMetaObject::invokeMethod(window, "on_auth", Qt::QueuedConnection, Q_ARG(const std::string&, strRes), 
         //    Q_ARG(const boost::system::error_code&, error));
         window->emitAuthSignal(strRes, error); 

@@ -507,6 +507,9 @@ void search_widget::selectTab(int nTabNum)
                 case ED2KFT_EMULECOLLECTION:
                     model->setData(model->index(row, SWDelegate::SW_TYPE), tr("Emule Collection"));
                     break;
+                default:
+                    // should set model any?
+                    break;
             }
             model->setData(model->index(row, SWDelegate::SW_ID), it->m_hFile);
             if (fileType == ED2KFT_AUDIO || fileType == ED2KFT_VIDEO)

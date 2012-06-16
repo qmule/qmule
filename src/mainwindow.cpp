@@ -1669,7 +1669,7 @@ void MainWindow::emitAuthSignal(const std::string& strRes, const boost::system::
 
 void MainWindow::on_auth(const std::string& strRes, const boost::system::error_code& error)
 {
-
+    qDebug("MainWindow::on_auth");
     if (error)
     {
         QString msg = tr("Authentication Error: ") + QString::fromLocal8Bit(error.message().c_str());
