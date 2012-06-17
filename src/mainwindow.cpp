@@ -112,8 +112,6 @@ using namespace libtorrent;
  *                                                   *
  *****************************************************/
 
-MainWindow* callback_wrapper::window = NULL;
-
 // Constructor
 MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
   setupUi(this);
@@ -426,7 +424,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connectioh_state = csDisconnected;
   authTimer = new QTimer(this);
   connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
-  connect(this, SIGNAL(signalAuth(const std::string&, const boost::system::error_code&)), SLOT(on_auth(const std::string&, const boost::system::error_code&)), Qt::BlockingQueuedConnection);
+  connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
   
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(unsigned int)), this, SLOT(ed2kConnectionInitialized(unsigned int)));
@@ -1098,6 +1096,19 @@ void MainWindow::on_actionFiles_triggerd()
     selectWidget(6);
 }
 
+void MainWindow::on_auth_result(const std::string& strRes, const boost::system::error_code& ec)
+{
+    qDebug("MainWindow::on_auth_result: %s", strRes.c_str());
+    QString strError;
+
+    if (ec)
+    {
+        strError = QString::fromLocal8Bit(ec.message().c_str());
+    }
+
+    emit signalAuth(QString::fromUtf8(strRes.c_str(), strRes.size()), strError);
+}
+
 void MainWindow::selectWidget(int num)
 {
     actionCatalog->setChecked(false);
@@ -1662,17 +1673,13 @@ QIcon MainWindow::getSystrayIcon() const
   return icon_CurTray;
 }
 
-void MainWindow::emitAuthSignal(const std::string& strRes, const boost::system::error_code& error)
-{
-    emit signalAuth(strRes, error);
-}
-
-void MainWindow::on_auth(const std::string& strRes, const boost::system::error_code& error)
+void MainWindow::on_auth(const QString& strRes, const QString& strError)
 {
     qDebug("MainWindow::on_auth");
-    if (error)
+
+    if (!strError.isEmpty())
     {
-        QString msg = tr("Authentication Error: ") + QString::fromLocal8Bit(error.message().c_str());
+        QString msg = tr("Authentication Error: ") + strError;
         QString msg2 = tr("New authentication attempt in 30 seconds.");
         addToLog(msg);
         addToLog(msg2);
@@ -1682,8 +1689,8 @@ void MainWindow::on_auth(const std::string& strRes, const boost::system::error_c
         return;
     }
 
-    QString str(error.message().c_str());
-    QString result = QString::fromUtf8(strRes.c_str(), strRes.size());
+    QString str(strError);
+    QString result = strRes;
 
     QString sample("Message type=");
     int nPos = result.indexOf(sample);
@@ -1794,11 +1801,13 @@ void MainWindow::authRequest()
     QString msg = tr("Sending authentication request.");
     authTimer->stop();
 
-    callback_wrapper::window = this;
-
     if (userName.length() && userPassword.length())
     {
-        ar.start("el.is74.ru", "auth.php", userName.toUtf8().constData(), userPassword.toUtf8().constData(), "0.5.6.7", callback_wrapper::on_auth);
+        ar.start("el.is74.ru", "auth.php",
+                userName.toUtf8().constData(),
+                userPassword.toUtf8().constData(), "0.5.6.7",
+                boost::bind(&MainWindow::on_auth_result, this, _1, _2));
+
         addToLog(msg);
         statusBar->setStatusMsg(msg);
         return;
@@ -1811,7 +1820,12 @@ void MainWindow::authRequest()
         userPassword = dlg.getPasswd();
         actionConnect->setIcon(icon_connecting);
         connectioh_state = csConnecting;
-        ar.start("el.is74.ru", "auth.php", userName.toUtf8().constData(), userPassword.toUtf8().constData(), "0.5.6.7", callback_wrapper::on_auth);
+        ar.start("el.is74.ru", "auth.php",
+                userName.toUtf8().constData(),
+                userPassword.toUtf8().constData(),
+                "0.5.6.7",
+                boost::bind(&MainWindow::on_auth_result, this, _1, _2));
+
         addToLog(msg);
         statusBar->setStatusMsg(msg);
     }

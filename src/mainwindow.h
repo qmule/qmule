@@ -111,7 +111,6 @@ public slots:
   void updateNbTorrents();
   void deleteBTSession();
   void on_actionOpen_triggered();
-  void emitAuthSignal(const std::string& strRes, const boost::system::error_code& error);
   void addToLog(QString log_message);
 
 protected slots:
@@ -173,6 +172,7 @@ protected slots:
   void on_actionConnect_triggered();
   void on_actionMessages_triggerd();
   void on_actionFiles_triggerd();
+  void on_auth_result(const std::string& strRes, const boost::system::error_code& ec);
 
 protected:
   void closeEvent(QCloseEvent *);
@@ -272,7 +272,7 @@ private slots:
     void on_actionAutoShutdown_system_toggled(bool );
     // Check for active torrents and set preventing from suspend state
     void checkForActiveTorrents();
-    void on_auth(const std::string& strRes, const boost::system::error_code& error);
+    void on_auth(const QString& strRes, const QString& strError);
     void authRequest();
     void startAuthByTimer();
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
@@ -288,20 +288,7 @@ private slots:
     void ed2kConnectionFailed(QString strError);
 
 signals:
-    void signalAuth(const std::string& strRes, const boost::system::error_code& error);
-};
-
-class callback_wrapper
-{
-public:
-    static MainWindow* window;
-    static void on_auth(const std::string& strRes, const boost::system::error_code& error)
-    { 
-        qDebug("emit Auth signal");
-        //QMetaObject::invokeMethod(window, "on_auth", Qt::QueuedConnection, Q_ARG(const std::string&, strRes), 
-        //    Q_ARG(const boost::system::error_code&, error));
-        window->emitAuthSignal(strRes, error); 
-    }
+    void signalAuth(const QString& strRes, const QString& strError);
 };
 
 #endif
