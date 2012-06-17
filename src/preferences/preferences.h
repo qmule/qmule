@@ -65,7 +65,7 @@ class Preferences : public QIniSettings {
   Q_DISABLE_COPY(Preferences)
 
 public:
-  Preferences() : QIniSettings("qBittorrent", "qBittorrent") {
+  Preferences() : QIniSettings("intersvyaz", "newmule") {
     qDebug() << "Preferences constructor";
   }
 
@@ -179,6 +179,62 @@ public:
   void setPreventFromSuspend(bool b) {
     setValue("Preferences/General/PreventFromSuspend", b);
   }
+
+  // ED2K settings
+
+  QString clientName() const
+  {
+      return value(QString::fromUtf8("Preferences/General/ClientName"), QString("newmule"));
+  }
+
+  void setClientName(const QString& strClientName)
+  {
+      setValue("Preferences/General/ClientName", strClientName);
+  }
+
+  QString ISLogin()
+  {
+      QString strISLogin = value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
+      // on windows attempt to extract login
+#ifdef Q_WS_WIN
+      if (strISLogin.isEmpty())
+      {
+          eMuleReg er;
+          strISLogin = er.getAuthLogin();
+      }
+#endif
+      return strISLogin;
+  }
+
+  void setISLogin(const QString& strISLogin)
+  {
+      setValue("Preferences/General/ISLogin", strISLogin);
+  }
+
+  QString ISPassword()
+  {
+      QString strISPassword = value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString();
+
+      if (!strISPassword.isEmpty())
+      {
+          // decode pass
+      }
+      else
+      {
+#ifdef Q_WS_WIN
+
+#endif
+      }
+      return strISPassword;
+
+  }
+
+  void setISPassword(const QString& strISPassword)
+  {
+      // encode password
+      setValue("Preferences/General/ISPassword", strISPassword);
+  }
+
 
   // Downloads
   QString getSavePath() const {
@@ -426,6 +482,38 @@ public:
 
   void setAltBandwidthEnabled(bool enabled) {
     setValue("Preferences/Connection/alt_speeds_on", enabled);
+  }
+
+  // ED2K settings
+
+  int listenPort()
+  {
+      return value(QString::fromUtf8("Preferences/Connection/ListenPort"), 4662).toInt();
+  }
+
+  void setListenPort(int nListenPort)
+  {
+      setValue("Preferences/Connection/ListenPort", nListenPort);
+  }
+
+  int serverPort()
+  {
+      return value(QString::fromUtf8("Preferences/Connection/ServerPort"), 4661).toInt();
+  }
+
+  void setServerPort(int nServerPort)
+  {
+      setValue("Preferences/Connection/ServerPort", nServerPort);
+  }
+
+  QString serverName()
+  {
+      return value(QString::fromUtf8("Preferences/Connection/ServerName"), "emule.is74.ru").toString();
+  }
+
+  void setServerName(const QString& strServerName)
+  {
+      setValue("Preferences/Connection/ServerName", strServerName);
   }
 
   void setSchedulerEnabled(bool enabled) {
