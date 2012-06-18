@@ -65,7 +65,7 @@ class Preferences : public QIniSettings {
   Q_DISABLE_COPY(Preferences)
 
 public:
-  Preferences() : QIniSettings("intersvyaz", "newmule") {
+  Preferences() : QIniSettings("intersvyaz", "qMule") {
     qDebug() << "Preferences constructor";
   }
 
@@ -184,7 +184,7 @@ public:
 
   QString clientName() const
   {
-      return value(QString::fromUtf8("Preferences/General/ClientName"), QString("newmule"));
+      return value(QString::fromUtf8("Preferences/General/ClientName"), QString("qMule")).toString();
   }
 
   void setClientName(const QString& strClientName)
@@ -511,6 +511,16 @@ public:
       return value(QString::fromUtf8("Preferences/Connection/ServerName"), "emule.is74.ru").toString();
   }
 
+  bool serverReconnect()
+  {
+      return value("Preferences/Connection/ServerReconnect", true).toBool();
+  }
+
+  void setServerReconnect(bool bServerReconnect)
+  {
+      setValue("Preferences/Connection/ServerReconnect", bServerReconnect);
+  }
+
   void setServerName(const QString& strServerName)
   {
       setValue("Preferences/Connection/ServerName", strServerName);
@@ -715,6 +725,28 @@ public:
 
   int getMaxRatioAction() const {
     return value(QString::fromUtf8("Preferences/Bittorrent/MaxRatioAction"), PAUSE_ACTION).toInt();
+  }
+
+  //LIBED2K options
+
+  bool isShowSharedFilesEnabled() const
+  {
+      return value(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), true).toBool();
+  }
+
+  void setShowSharedFiles(bool bShowSharedFiles)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), bShowSharedFiles);
+  }
+
+  bool isShowSharedDirectories() const
+  {
+      return value(QString::fromUtf8("Preferences/eDonkey/ShowSharedDirectories"), true).toBool();
+  }
+
+  void setShowSharedDirectories(bool bShowSharedDirs)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedDirectories"), bShowSharedDirs);
   }
 
   // IP Filter
