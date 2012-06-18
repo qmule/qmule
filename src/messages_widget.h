@@ -35,25 +35,34 @@ private:
     QAction* userDelete;
     int lastMessageTab;
 
+    QIcon imgMsg1;
+    QIcon imgMsg2;
+
 public:
     messages_widget(QWidget *parent = 0);
     ~messages_widget();
+    void setNewMessageImg(int state);
 
 protected:
-    virtual void showEvent(QShowEvent *e);
+    //virtual void showEvent(QShowEvent* e);
+    //virtual void focusInEvent(QFocusEvent* e);
+    virtual bool event(QEvent* e);
 
 public slots:
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
 
 private slots:
     void pushMessage();
+    void closeCurrentTab();
     void closeTab(int index);
     void newMessage(const libed2k::net_identifier& np, const QString& hash, const QString& strMessage);
     void peerCaptchaRequest(const libed2k::net_identifier& np, const QString& hash, const QPixmap& pm);
     void peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult);
     void displayListMenu(const QPoint& pos);
     void addFriend();
-    void sendMessage();    
+    void deleteFriend();
+    void sendMessage();
+    void selectTab(int nTabNum);
 
 signals:
     void newMessage();

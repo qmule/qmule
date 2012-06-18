@@ -255,7 +255,11 @@
         </layout>
        </item>
        <item>
-        <widget class="QTabWidget" name="tabWidget"/>
+        <widget class="MyTabWidget" name="tabWidget">
+         <property name="tabsClosable">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -318,6 +322,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>mytabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Icons/emule/emule.qrc"/>
  </resources>
