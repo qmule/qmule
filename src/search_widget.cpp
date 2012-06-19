@@ -193,7 +193,8 @@ search_widget::search_widget(QWidget *parent)
     connect(defValue,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defKilos,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defMegas,  SIGNAL(triggered()), this, SLOT(setSizeType()));
-    connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));     
+    connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));
+    connect(comboName->lineEdit(), SIGNAL(returnPressed()), this, SLOT(startSearch()));
     connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
     connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));
     connect(btnDownload, SIGNAL(clicked()), this, SLOT(download()));
