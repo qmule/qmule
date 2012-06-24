@@ -248,6 +248,8 @@ search_widget::search_widget(QWidget *parent)
             SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(resultSelectionChanged(const QItemSelection&, const QItemSelection&)));
     btnDownload->setEnabled(false);
+    // sort by availability descending
+    treeResult->header()->setSortIndicator(SWDelegate::SW_AVAILABILITY, Qt::DescendingOrder);
 }
 
 search_widget::~search_widget()
