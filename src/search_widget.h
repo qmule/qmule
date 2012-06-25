@@ -40,8 +40,7 @@ private:
     QAction* defKilos;
     QAction* defMegas;
     QTabBar* tabSearch;
-    //QStandardItemModel *listModel;
-    //QSortFilterProxyModel* proxyModel;
+
     std::vector<SearchResult> searchItems;
     std::vector<libed2k::net_identifier> connectedPeers;
 
@@ -49,9 +48,9 @@ private:
     bool moreSearch;
     QIcon iconSerachActive;
     QIcon iconSearchResult;
-    QStandardItemModel* model;
+    QScopedPointer<QStandardItemModel> model;
+    QScopedPointer<QSortFilterProxyModel> filterModel;
     SWDelegate* itemDelegate;
-    QSortFilterProxyModel *filterModel;
     search_filter* searchFilter;
 
     QMenu* userMenu;

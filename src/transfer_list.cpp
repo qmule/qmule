@@ -17,10 +17,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     : QMainWindow(parent)
 {
     btnText << tr("Download") << tr("Download") << tr("Upload") << tr("Download") << tr("InQueue") << tr("KnownClient");
-    //vboxLayout = new QVBoxLayout(this);
-    //vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
-    //vboxLayout->setContentsMargins(0, 0, 0, 0);
-    //vboxLayout->setSpacing(0);    
 
     hSplitter = new QSplitter(Qt::Vertical);
     hSplitter->setChildrenCollapsible(false);
@@ -75,11 +71,18 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
 
     topRowButtons = new QPushButton*[topRowBtnCnt];
     for (int ii = 0; ii < topRowBtnCnt; ii++)
+    {
         topRowButtons[ii] = createFlatButton(icons[ii]);
+        topRowButtons[ii]->setToolTip(btnText[ii]);
+    }
+    topRowButtons[0]->setToolTip(tr("Split window"));
 
     bottomRowButtons = new QPushButton*[bottomRowBtnCnt];
     for (int ii = 0; ii < bottomRowBtnCnt; ii++)
+    {
         bottomRowButtons[ii] = createFlatButton(icons[ii + 2]);
+        bottomRowButtons[ii]->setToolTip(btnText[ii + 2]);
+    }
 
     horizontalSpacer = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacer2 = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -120,10 +123,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     connect(transferList->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
     connect(transferList->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
     transferList->getSourceModel()->populate();
-
-    //connect(transferList2->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
-    //connect(transferList2->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
-    //transferList2->getSourceModel()->populate();
 
     connect(btnSwitch, SIGNAL(clicked()), this, SLOT(btnSwitchClick()));
     connect(btnSwitch2, SIGNAL(clicked()), this, SLOT(btnSwitchClick2()));
@@ -188,24 +187,8 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
 transfer_list::~transfer_list()
 {
     delete[] icons;
-
-    delete actionOpen;
-    delete actionDelete;
-    delete actionStart;
-    delete actionPause;
-    delete mainToolBar;
-    for (int ii = 0; ii < topRowBtnCnt; ii++)
-        delete topRowButtons[ii];
     delete[] topRowButtons;
-    for (int ii = 0; ii < bottomRowBtnCnt; ii++)
-        delete bottomRowButtons[ii];
     delete[] bottomRowButtons;
-
-    delete transferList;
-    delete peersList;    
-
-    delete btnSwitch;
-    delete btnSwitch2;
 
     delete hboxLayout1;
     delete hboxLayout2;
