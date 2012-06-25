@@ -241,7 +241,7 @@ void QED2KSession::searchMoreResults()
     m_session->post_search_more_result_request();
 }
 
-void QED2KSession::initializePeer(const libed2k::net_identifier& np)
+libed2k::peer_connection_handle QED2KSession::getPeer(const libed2k::net_identifier& np)
 {
     libed2k::peer_connection_handle pch = m_session->find_peer_connection(np);
 
@@ -249,17 +249,7 @@ void QED2KSession::initializePeer(const libed2k::net_identifier& np)
     {
         pch = m_session->add_peer_connection(np);
     }
-}
-
-void QED2KSession::sendMessageToPeer(const libed2k::net_identifier& np, const QString& strMessage)
-{
-    libed2k::peer_connection_handle pch = m_session->find_peer_connection(np);
-
-    if (pch.empty())
-    {
-        pch = m_session->add_peer_connection(np);
-    }
-    pch.send_message(strMessage.toUtf8().constData());
+    return pch;
 }
 
 void QED2KSession::readAlerts()

@@ -39,10 +39,10 @@ files_widget::files_widget(QWidget *parent)
         item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
     }
 
-    model = new QStandardItemModel(0, FW_COLUMNS_NUM);
+    model.reset(new QStandardItemModel(0, FW_COLUMNS_NUM));
     model->setHeaderData(FW_NAME, Qt::Horizontal,           tr("File Name"));
     model->setHeaderData(FW_SIZE, Qt::Horizontal,           tr("File Size"));
-    tableFiles->setModel(model);
+    tableFiles->setModel(model.data());
     tableFiles->setColumnWidth(0, 250);
 
     connect(treeFiles, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(itemExpanded(QTreeWidgetItem*)));
