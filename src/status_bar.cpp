@@ -21,6 +21,7 @@ status_bar::status_bar(QWidget *parent, QStatusBar *bar)
 
     imgMsg1.addFile(QString::fromUtf8(":/emule/statusbar/Message.ico"), QSize(), QIcon::Normal, QIcon::Off);
     imgMsg2.addFile(QString::fromUtf8(":/emule/statusbar/MessagePending.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    imgEmpty.addFile(QString::fromUtf8(":/emule/statusbar/empty.ico"), QSize(), QIcon::Normal, QIcon::Off);
 
     labelInfoImg->setPixmap(QIcon(":/emule/common/User.ico").pixmap(16,16));
 
@@ -80,14 +81,13 @@ void status_bar::reset()
     setServerInfo(0, 0);
 }
 
-void status_bar::setNewMessage(int state)
+void status_bar::setNewMessageImg(int state)
 {
-    QPixmap empty(16, 16);
     switch (state)
     {
         case 0:
         {
-            labelMsg->setPixmap(empty);
+            labelMsg->setPixmap(imgEmpty.pixmap(16, 16));
             break;
         }
         case 1:

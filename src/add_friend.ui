@@ -29,7 +29,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>add_friend</string>
+   <string>Add...</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="Icons/emule/emule.qrc">
+    <normaloff>:/emule/users/UserAdd.ico</normaloff>:/emule/users/UserAdd.ico</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -230,6 +234,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="Icons/emule/emule.qrc"/>
+ </resources>
  <connections/>
 </ui>

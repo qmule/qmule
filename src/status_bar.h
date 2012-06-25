@@ -20,6 +20,7 @@ class status_bar : public QWidget, public Ui::status_bar
     QIcon Up1Down1;
     QIcon imgMsg1;
     QIcon imgMsg2;
+    QIcon imgEmpty;
 
 public:
     status_bar(QWidget *parent, QStatusBar *bar);
@@ -28,7 +29,7 @@ public:
     void setUpDown(unsigned long nUp, unsigned long nDown);
     void setServerInfo(unsigned long nFiles, unsigned long nClients);
     void setStatusMsg(QString strMsg);
-    void setNewMessage(int state);
+    void setNewMessageImg(int state);
     void reset();
 };
 

@@ -78,16 +78,24 @@ messages_widget::messages_widget(QWidget *parent)
     connect(listFriends, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
     connect(userAdd, SIGNAL(triggered()), this, SLOT(addFriend()));
     connect(userSendMessage, SIGNAL(triggered()), this, SLOT(sendMessage()));
+    connect(userDelete, SIGNAL(triggered()), this, SLOT(deleteFriend()));    
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    connect(tabWidget, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(btnSend, SIGNAL(clicked()), this, SLOT(pushMessage()));
+    connect(btnClose, SIGNAL(clicked()), this, SLOT(closeCurrentTab()));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerMessage(const libed2k::net_identifier&, const QString&, const QString&)), this, SLOT(newMessage(const libed2k::net_identifier&, const QString&, const QString&)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)), this, SLOT(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)), this, SLOT(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)));
-    connect(this, SIGNAL(setFocus()), this, SLOT(setFocus()));
+
+    imgMsg1.addFile(QString::fromUtf8(":/emule/statusbar/Message.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    imgMsg2.addFile(QString::fromUtf8(":/emule/statusbar/MessagePending.ico"), QSize(), QIcon::Normal, QIcon::Off);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 messages_widget::~messages_widget()
 {
+    lastMessageTab = -1;
     int nSize = tabWidget->count();
     for (int ii = 0; ii < nSize; ii++)
     {
@@ -110,8 +118,8 @@ void messages_widget::closeTab(int index)
 void messages_widget::startChat(const QString& user_name, const libed2k::net_identifier& np)
 {
     QTextEdit* edit = new QTextEdit(this);
-    edit->setReadOnly(true);
-    tabWidget->addTab(edit, user_name);
+    edit->setReadOnly(true);int new_tab = tabWidget->addTab(edit, QIcon(":/emule/users/Chat.ico"), user_name);    
+    tabWidget->setCurrentIndex(new_tab);
 
     USER user;
     user.strName = user_name;
@@ -155,8 +163,29 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
 
         lastMessageTab = nTab;
 
-        if (!this->hasFocus() || nTab != tabWidget->currentIndex())
+        if (!this->isActiveWindow() || nTab != tabWidget->currentIndex())
+        {
+            tabWidget->setTabFontColor(nTab, QColor(Qt::darkRed));
             emit newMessage();
+        }
+    }
+    else
+    {
+        QString name = "user name";
+        startChat(name, np);
+
+        nTab = tabWidget->currentIndex();
+        QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
+        QDateTime date_time = QDateTime::currentDateTime();
+        QString msg = "[" + date_time.toString("hh:mm") + "] " + name + ": " + strMessage;
+        edit->append(msg);
+
+        lastMessageTab = nTab;
+        if (!this->isActiveWindow())
+        {
+            tabWidget->setTabFontColor(nTab, QColor(Qt::darkRed));
+            emit newMessage();
+        }
     }
 }
 
@@ -173,23 +202,39 @@ void messages_widget::peerCaptchaRequest(const libed2k::net_identifier& np, cons
     {
         QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
         QTextCursor cursor = edit->textCursor();
-        //QTextImageFormat imageFormat;
-        //imageFormat.setWidth( 16 );
-        //imageFormat.setHeight( 16 );
-        //imageFormat.setName( ":/emule/common/client_red.ico" );
 
-        cursor.insertText(tr("\nTo avoid spam user is asking for captcha autentification. Please enter symbols on the picture below: "));
+        QDateTime date_time = QDateTime::currentDateTime();
+        QString msg = "\n[" + date_time.toString("hh:mm") + "] *** ";
+        cursor.insertText(msg + tr("To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below:\n"));
         cursor.insertImage(pm.toImage());
-        //cursor.insertImage(imageFormat);
     }
-    //captcha* dlg = new captcha(pm, this);
-    //dlg->exec();
 }
 
 void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult)
 {
     std::vector<USER>::const_iterator it;
     int nTab = 0;
+    for (it = users.begin(); it != users.end(); ++it, ++nTab)
+    {
+        if (it->netPoint == np)
+            break;
+    }
+    if (it != users.end())
+    {
+        QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
+        QTextCursor cursor = edit->textCursor();
+
+        QDateTime date_time = QDateTime::currentDateTime();
+        QString msg = "\n[" + date_time.toString("hh:mm") + "] *** ";
+        if (nResult)
+        {            
+            cursor.insertText(msg + tr("Your answer is incorrect and message is ignored. You may request captcha again by sending new message.\n"));
+        }
+        else
+        {
+            cursor.insertText(msg + tr("Your answer is correct. User has recived your message.\n"));
+        }
+    }
 }
 
 void messages_widget::displayListMenu(const QPoint& pos) 
@@ -235,6 +280,19 @@ void messages_widget::addFriend()
     }
 }
 
+void messages_widget::deleteFriend()
+{
+    QModelIndex index = listFriends->currentIndex();
+
+    if (!index.isValid())
+        return;
+
+    int num = index.row();
+
+    model->removeRow(num);
+    friends.erase(friends.begin() + num);    
+}
+
 void messages_widget::sendMessage()
 {
     QModelIndex index = listFriends->currentIndex();
@@ -262,10 +320,77 @@ void messages_widget::sendMessage()
         startChat(friends[num].strName, friends[num].netPoint);
     }
 }
-
+/*
 void messages_widget::showEvent(QShowEvent* e)
 {
     QWidget::showEvent(e);
     if (lastMessageTab == tabWidget->currentIndex())
+    {
         emit stopMessageNotification();
+        lastMessageTab = -1;
+    }
+}
+
+void messages_widget::focusInEvent(QFocusEvent* e)
+{
+    QWidget::focusInEvent(e);
+    if (lastMessageTab == tabWidget->currentIndex())
+    {
+        emit stopMessageNotification();
+        lastMessageTab = -1;
+    }
+}
+*/
+void messages_widget::selectTab(int nTabNum)
+{
+    if (lastMessageTab == nTabNum && lastMessageTab >= 0)
+    {
+        emit stopMessageNotification();
+        lastMessageTab = -1;
+    }
+}
+
+void messages_widget::setNewMessageImg(int state)
+{
+    if (lastMessageTab < 0)
+        return;
+
+    switch (state)
+    {
+        case 0:
+        {
+            tabWidget->setTabIcon(lastMessageTab, QIcon(":/emule/users/Chat.ico"));
+            tabWidget->setTabFontColor(lastMessageTab, QColor(Qt::black));
+            break;
+        }
+        case 1:
+        {
+            tabWidget->setTabIcon(lastMessageTab, imgMsg1);
+            break;
+        }
+        case 2:
+        {
+            tabWidget->setTabIcon(lastMessageTab, imgMsg2);
+            break;
+        }
+    }
+}
+
+bool messages_widget::event(QEvent* e)
+{
+    if (e->type() == QEvent::WindowActivate || e->type() == QEvent::Show)
+    {
+        if (lastMessageTab == tabWidget->currentIndex())
+        {
+            emit stopMessageNotification();
+            lastMessageTab = -1;
+        }
+    }
+    return QWidget::event(e);
+}
+
+void messages_widget::closeCurrentTab()
+{
+    if (tabWidget->currentIndex() >= 0)
+        closeTab(tabWidget->currentIndex());
 }

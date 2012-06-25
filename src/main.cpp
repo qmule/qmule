@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 #ifdef DISABLE_GUI
   QtSingleCoreApplication app("qBittorrent-"+uid, argc, argv);
 #else
-  SessionApplication app("qBittorrent-"+uid, argc, argv);
+  SessionApplication app("eMule-"+uid, argc, argv);
 #endif
 
   // Check if qBittorrent is already running for this user

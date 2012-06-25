@@ -2186,31 +2186,39 @@ Would you like to update qBittorrent to version %1?</source>
     </message>
     <message>
         <source>Connecting</source>
-        <translation type="unfinished">Соединение</translation>
+        <translation type="obsolete">Соединение</translation>
     </message>
     <message>
         <source>Do you want to break network connection?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Authorization Error: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Message from authorization server: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Authorization comleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Разорвать соединение с сетью?</translation>
     </message>
     <message>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщения</translation>
     </message>
     <message>
         <source>Files</source>
-        <translation type="unfinished">Файлы</translation>
+        <translation>Файлы</translation>
+    </message>
+    <message>
+        <source>Authentication Error: </source>
+        <translation>Ошибка авторизации:</translation>
+    </message>
+    <message>
+        <source>New authentication attempt in 30 seconds.</source>
+        <translation>Новая попытка авторизации через 30 секунд.</translation>
+    </message>
+    <message>
+        <source>Message from authentication server: </source>
+        <translation>Сообщение сервера авторизации:</translation>
+    </message>
+    <message>
+        <source>Authentication comleted</source>
+        <translation>Авторизация пройдена</translation>
+    </message>
+    <message>
+        <source>Sending authentication request.</source>
+        <translation>Запрос авторизации.</translation>
     </message>
 </context>
 <context>
@@ -5109,20 +5117,16 @@ Do you want to install it now?</source>
 <context>
     <name>add_friend</name>
     <message>
-        <source>add_friend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Required information</source>
-        <translation type="unfinished"></translation>
+        <translation>Необходимая информация</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <source>IP address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP Адрес:</translation>
     </message>
     <message>
         <source>009.009.009.009; </source>
@@ -5130,23 +5134,27 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Additional information</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительная информация</translation>
     </message>
     <message>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Хэш:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <source>Was visible:</source>
-        <translation type="unfinished"></translation>
+        <translation>Был виден:</translation>
     </message>
     <message>
         <source>Incorrect IP and port!</source>
-        <translation type="unfinished"></translation>
+        <translation>ВВедите верный IP и порт!</translation>
+    </message>
+    <message>
+        <source>Add...</source>
+        <translation>Добавить...</translation>
     </message>
 </context>
 <context>
@@ -5748,80 +5756,90 @@ However, those plugins were disabled.</source>
     <name>messages_widget</name>
     <message>
         <source>messages_widget</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Friends</source>
-        <translation type="unfinished"></translation>
+        <translation>Друзья</translation>
     </message>
     <message>
         <source>GroupBox</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <source>Hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Хэш:</translation>
     </message>
     <message>
         <source>Programm:</source>
-        <translation type="unfinished"></translation>
+        <translation>Программа:</translation>
     </message>
     <message>
         <source>Identification:</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификация:</translation>
     </message>
     <message>
         <source>Upload:</source>
-        <translation type="unfinished">Отдача:</translation>
+        <translation>Отдал:</translation>
     </message>
     <message>
         <source>Download:</source>
-        <translation type="unfinished">Загрузка:</translation>
+        <translation>Принял:</translation>
     </message>
     <message>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщения</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <source>Send message</source>
-        <translation type="unfinished"></translation>
+        <translation>Послать сообщение</translation>
     </message>
     <message>
         <source>Details...</source>
-        <translation type="unfinished"></translation>
+        <translation>Детали...</translation>
     </message>
     <message>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <source>Browse files</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотреть файлы</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
-        <source>
-To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below: </source>
-        <translation type="unfinished"></translation>
+        <source>To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below:
+</source>
+        <translation>Чтобы избежать спама, пользователь запросил captcha аутентификацию для отсылки ему сообщения. Пожалуйста, введите символы, которые Вы видите на этом изображении:</translation>
+    </message>
+    <message>
+        <source>Your answer is incorrect and message is ignored. You may request captcha again by sending new message.
+</source>
+        <translation>Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
+    </message>
+    <message>
+        <source>Your answer is correct. User has recived your message.
+</source>
+        <translation>Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
     </message>
 </context>
 <context>
@@ -6321,6 +6339,37 @@ To avoid spam user is asking for captcha autentification. Please enter symbols o
     </message>
     <message>
         <source>Browse files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>status_bar</name>
+    <message>
+        <source>status_bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>eD2K:Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>eD2K:Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload:</source>
+        <translation type="unfinished">Отдача:</translation>
+    </message>
+    <message>
+        <source> Download:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clients: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>|Files: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

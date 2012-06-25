@@ -193,7 +193,8 @@ search_widget::search_widget(QWidget *parent)
     connect(defValue,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defKilos,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defMegas,  SIGNAL(triggered()), this, SLOT(setSizeType()));
-    connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));     
+    connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));
+    connect(comboName->lineEdit(), SIGNAL(returnPressed()), this, SLOT(startSearch()));
     connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
     connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));
     connect(btnDownload, SIGNAL(clicked()), this, SLOT(download()));
@@ -247,6 +248,8 @@ search_widget::search_widget(QWidget *parent)
             SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(resultSelectionChanged(const QItemSelection&, const QItemSelection&)));
     btnDownload->setEnabled(false);
+    // sort by availability descending
+    treeResult->header()->setSortIndicator(SWDelegate::SW_AVAILABILITY, Qt::DescendingOrder);
 }
 
 search_widget::~search_widget()
@@ -707,7 +710,7 @@ void search_widget::download()
 
     libed2k::add_transfer_params params;
     params.file_hash = libed2k::md4_hash::fromString(selected_data(treeResult, SWDelegate::SW_ID).toString().toStdString());
-    params.file_path = filepath.toLocal8Bit().constData();
+    params.file_path = filepath.toUtf8().constData();
     params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE).toULongLong();
     params.seed_mode = false;
     Session::instance()->addTransfer(params);

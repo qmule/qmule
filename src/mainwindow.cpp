@@ -1907,18 +1907,19 @@ void MainWindow::on_flickerTimer()
 {
     static int state = 0;
 
-    statusBar->setNewMessage(state + 1);
+    statusBar->setNewMessageImg(state + 1);
+    messages->setNewMessageImg(state + 1);
 
     if (state)
-        icon_CurTray = icon_TrayConn;
-    else
         icon_CurTray = icon_NewMsg;
+    else
+        icon_CurTray = icon_TrayConn;
 
     if (systrayIcon) {
         systrayIcon->setIcon(getSystrayIcon());
     }
 
-    state = (++state) % 2;
+    state = (state + 1) % 2;
 }
 
 void MainWindow::stopMessageFlickering()
@@ -1927,7 +1928,8 @@ void MainWindow::stopMessageFlickering()
     if (systrayIcon) {
         systrayIcon->setIcon(getSystrayIcon());
     }
-    statusBar->setNewMessage(0);
+    statusBar->setNewMessageImg(0);
+    messages->setNewMessageImg(0);
 
     flickerTimer->stop();
 }

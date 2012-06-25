@@ -59,5 +59,7 @@
         <file>statusbar/MessagePending.ico</file>
         <file>statusbar/Message.ico</file>
         <file>TrayDisconnected.ico</file>
+        <file>statusbar/empty.ico</file>
+        <file>users/Chat.ico</file>
     </qresource>
 </RCC>
