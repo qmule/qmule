@@ -19,25 +19,19 @@ LIBS += -L$$(LIBTORRENT_ROOT)/lib
 LIBS += -L$$(BOOST_ROOT)/stage/lib
 
 # select appropriate crypto++ library
-CONFIG(debug, debug|release) 
-{
-    LIBS += -L$$(CRYPTOPP_ROOT)/lib/debug
-} else {
-    LIBS += -L$$(CRYPTOPP_ROOT)/lib/release
-}
+Debug:LIBS += -L$$(CRYPTOPP_ROOT)/lib/debug
+Release:LIBS += -L$$(CRYPTOPP_ROOT)/lib/release
 
 #Point this to the ed2klib lib folder
-CONFIG(debug, debug|release) 
-{
-    LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
-} else {
-    LIBS += -L$$(LIBED2K_ROOT)/Win32/Release
-}
+Debug:LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
+Release:LIBS += -L$$(LIBED2K_ROOT)/Win32/Release
+Release:DEFINES += _BIND_TO_CURRENT_VCLIBS_VERSION=1
+
 
 # LIBTORRENT DEFINES
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += BOOST_ASIO_HASH_MAP_BUCKETS=1021
-DEFINES += BOOST_EXCEPTION_DISABLE
+#DEFINES += BOOST_EXCEPTION_DISABLE
 DEFINES += BOOST_SYSTEM_STATIC_LINK=1
 DEFINES += BOOST_THREAD_USE_LIB
 DEFINES += BOOST_THREAD_USE_LIB=1
