@@ -11,6 +11,7 @@
 
 #include "libed2k/file.hpp"
 #include "transport/session.h"
+#include "qed2kpeerhandle.h"
 
 using namespace libed2k;
 
@@ -144,30 +145,26 @@ search_widget::search_widget(QWidget *parent)
     tableCond->item(10, 0)->setFlags(Qt::NoItemFlags);
     tableCond->item(10, 1)->setFlags(Qt::NoItemFlags);
 
-    model = new QStandardItemModel(0, SWDelegate::SW_COLUMNS_NUM);
-    model->setHeaderData(SWDelegate::SW_NAME, Qt::Horizontal,           tr("File Name"));
-    model->setHeaderData(SWDelegate::SW_SIZE, Qt::Horizontal,           tr("File Size"));
-    model->setHeaderData(SWDelegate::SW_AVAILABILITY, Qt::Horizontal,   tr("Availability"));
-    model->setHeaderData(SWDelegate::SW_SOURCES, Qt::Horizontal,        tr("Sources"));
-    model->setHeaderData(SWDelegate::SW_TYPE, Qt::Horizontal,           tr("Type"));
-    model->setHeaderData(SWDelegate::SW_ID, Qt::Horizontal,             tr("ID"));
-    model->setHeaderData(SWDelegate::SW_DURATION, Qt::Horizontal,       tr("Duration"));
-    model->setHeaderData(SWDelegate::SW_BITRATE, Qt::Horizontal,        tr("Bitrate"));
-    model->setHeaderData(SWDelegate::SW_CODEC, Qt::Horizontal,          tr("Codec"));
+    model.reset(new QStandardItemModel(0, SWDelegate::SW_COLUMNS_NUM));
+    model.data()->setHeaderData(SWDelegate::SW_NAME, Qt::Horizontal,           tr("File Name"));
+    model.data()->setHeaderData(SWDelegate::SW_SIZE, Qt::Horizontal,           tr("File Size"));
+    model.data()->setHeaderData(SWDelegate::SW_AVAILABILITY, Qt::Horizontal,   tr("Availability"));
+    model.data()->setHeaderData(SWDelegate::SW_SOURCES, Qt::Horizontal,        tr("Sources"));
+    model.data()->setHeaderData(SWDelegate::SW_TYPE, Qt::Horizontal,           tr("Type"));
+    model.data()->setHeaderData(SWDelegate::SW_ID, Qt::Horizontal,             tr("ID"));
+    model.data()->setHeaderData(SWDelegate::SW_DURATION, Qt::Horizontal,       tr("Duration"));
+    model.data()->setHeaderData(SWDelegate::SW_BITRATE, Qt::Horizontal,        tr("Bitrate"));
+    model.data()->setHeaderData(SWDelegate::SW_CODEC, Qt::Horizontal,          tr("Codec"));
 
-    filterModel = new QSortFilterProxyModel();
-    filterModel->setDynamicSortFilter(true);
-    filterModel->setSourceModel(model);
-    filterModel->setFilterKeyColumn(SWDelegate::SW_NAME);
-    filterModel->setFilterRole(Qt::DisplayRole);
-    filterModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    filterModel.reset(new QSortFilterProxyModel());
+    filterModel.data()->setDynamicSortFilter(true);
+    filterModel.data()->setSourceModel(model.data());
+    filterModel.data()->setFilterKeyColumn(SWDelegate::SW_NAME);
+    filterModel.data()->setFilterRole(Qt::DisplayRole);
+    filterModel.data()->setSortCaseSensitivity(Qt::CaseInsensitive);
 
-    treeResult->setModel(filterModel);
+    treeResult->setModel(filterModel.data());
 
-    //proxyModel = new QSortFilterProxyModel();
-    //proxyModel->setDynamicSortFilter(true);
-    //proxyModel->setSourceModel(tableWidget_2->model());
-    //tableWidget_2->setModel(proxyModel);
     itemDelegate = new SWDelegate(treeResult);
     treeResult->setItemDelegate(itemDelegate);
 
@@ -242,7 +239,8 @@ search_widget::search_widget(QWidget *parent)
     connect(Session::instance()->get_ed2k_session(),
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
             this, SLOT(peerConnected(const libed2k::net_identifier&, const QString&, bool)));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)),
+    connect(Session::instance()->get_ed2k_session(),
+            SIGNAL(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)),
             this, SLOT(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)));
     connect(treeResult->selectionModel(),
             SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -254,20 +252,7 @@ search_widget::search_widget(QWidget *parent)
 
 search_widget::~search_widget()
 {
-    delete defValue;
-    delete defKilos;
-    delete defMegas;
-    delete closeAll;
-    delete menuSubResults;
-    delete menuResults;
-    delete itemDelegate;
 
-    delete userUpdate;
-    delete userDetails;
-    delete userAddToFriends;
-    delete userSendMessage;
-    delete userBrowseFiles;
-    delete userMenu;
 }
 
 void search_widget::addCondRow()
@@ -648,7 +633,8 @@ void search_widget::displayListMenu(const QPoint&)
                     userDetails->setEnabled(true);
                     userAddToFriends->setEnabled(true);
                     userSendMessage->setEnabled(true);
-                    userBrowseFiles->setEnabled(true);
+                    if (QED2KPeerHandle::getPeerHandle(entry.m_network_point).isAllowedSharedFilesView())
+                        userBrowseFiles->setEnabled(true);
                     userUpdate->setEnabled(false);
                     break;
                 }
@@ -663,7 +649,7 @@ void search_widget::initPeer()
     QED2KSearchResultEntry entry;
     if (findSelectedUser(entry))
     {
-        Session::instance()->get_ed2k_session()->initializePeer(entry.m_network_point);
+        QED2KPeerHandle::getPeerHandle(entry.m_network_point);
     }
 }
 

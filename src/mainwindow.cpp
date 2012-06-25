@@ -473,20 +473,6 @@ MainWindow::~MainWindow() {
     delete options;
   if (downloadFromURLDialog)
     delete downloadFromURLDialog;
-#ifdef RSS_ENABLE
-  if (rssWidget)
-    delete rssWidget;
-#endif
-//  if (searchEngine)
-//    delete searchEngine;
-  delete menuStatus;
-  delete transfer_List;
-  delete dock;
-  delete status;
-  delete search;
-  delete catalog;
-  delete messages;
-  delete files;
 
   if(systrayCreator) {
     delete systrayCreator;

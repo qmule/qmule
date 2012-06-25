@@ -25,6 +25,8 @@ private:
     std::vector<USER> users;
     std::vector<USER> friends;
 
+    std::vector<libed2k::net_identifier> connectedPeers;
+
     QStandardItemModel* model;
 
     QMenu* userMenu;
@@ -47,6 +49,7 @@ protected:
     //virtual void showEvent(QShowEvent* e);
     //virtual void focusInEvent(QFocusEvent* e);
     virtual bool event(QEvent* e);
+    virtual bool eventFilter(QObject *obj, QEvent *e);
 
 public slots:
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
@@ -63,6 +66,8 @@ private slots:
     void deleteFriend();
     void sendMessage();
     void selectTab(int nTabNum);
+    void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
+    void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
 
 signals:
     void newMessage();

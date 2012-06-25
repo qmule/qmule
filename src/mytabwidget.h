@@ -1,3 +1,6 @@
+#ifndef __MY_TAB_WIDGET__
+#define __MY_TAB_WIDGET__
+
 class MyTabWidget : public QTabWidget
 {
 public:
@@ -11,3 +14,5 @@ public:
         tabBar()->setTabTextColor(nTab, color);
     }
 };
+
+#endif

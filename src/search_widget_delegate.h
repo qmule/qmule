@@ -42,15 +42,23 @@ public:
             }
             case SW_DURATION:
             {
-                drawDisplay(painter, option, option.rect, misc::userFriendlyDuration(index.data().toLongLong(), 1));
+                qlonglong seconds = index.data().toLongLong();
+                if (seconds > 0)
+                    drawDisplay(painter, option, option.rect, misc::userFriendlyDuration(seconds, 1));
+                else
+                    drawDisplay(painter, option, option.rect, "");
                 break;
             }
             case SW_BITRATE:
             {
                 QString bitRate = index.data().toString();
-                if (bitRate.length()) 
+                if (bitRate.length() && index.data().toInt() > 0) 
+                {
                     bitRate += tr(" kBit/s");
-                drawDisplay(painter, option, option.rect, bitRate);
+                    drawDisplay(painter, option, option.rect, bitRate);
+                }
+                else
+                    drawDisplay(painter, option, option.rect, "");
                 break;
             }
 

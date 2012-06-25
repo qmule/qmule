@@ -6,6 +6,7 @@
 #include "libed2k/util.hpp"
 #include "libed2k/session.hpp"
 #include "transport/session.h"
+#include "qed2kpeerhandle.h"
 
 #include "add_friend.h"
 #include "messages_widget.h"
@@ -83,12 +84,27 @@ messages_widget::messages_widget(QWidget *parent)
     connect(tabWidget, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(btnSend, SIGNAL(clicked()), this, SLOT(pushMessage()));
     connect(btnClose, SIGNAL(clicked()), this, SLOT(closeCurrentTab()));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(peerMessage(const libed2k::net_identifier&, const QString&, const QString&)), this, SLOT(newMessage(const libed2k::net_identifier&, const QString&, const QString&)));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)), this, SLOT(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)), this, SLOT(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)));
+    connect(Session::instance()->get_ed2k_session(), 
+            SIGNAL(peerMessage(const libed2k::net_identifier&, const QString&, const QString&)), 
+            this, SLOT(newMessage(const libed2k::net_identifier&, const QString&, const QString&)));
+    connect(Session::instance()->get_ed2k_session(), 
+            SIGNAL(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)), 
+            this, SLOT(peerCaptchaRequest(const libed2k::net_identifier&, const QString&, const QPixmap&)));
+    connect(Session::instance()->get_ed2k_session(), 
+            SIGNAL(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)), 
+            this, SLOT(peerCaptchaResult(const libed2k::net_identifier&, const QString&, quint8)));
+
+    connect(Session::instance()->get_ed2k_session(),
+    		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
+            this, SLOT(peerConnected(const libed2k::net_identifier&, const QString&, bool)));
+    connect(Session::instance()->get_ed2k_session(),
+            SIGNAL(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)),
+            this, SLOT(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)));
 
     imgMsg1.addFile(QString::fromUtf8(":/emule/statusbar/Message.ico"), QSize(), QIcon::Normal, QIcon::Off);
     imgMsg2.addFile(QString::fromUtf8(":/emule/statusbar/MessagePending.ico"), QSize(), QIcon::Normal, QIcon::Off);
+
+    textMsg->installEventFilter(this);
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -142,7 +158,8 @@ void messages_widget::pushMessage()
 
     edit->append(newMsg);
 
-    Session::instance()->get_ed2k_session()->sendMessageToPeer(user.netPoint, msg);
+    QED2KPeerHandle::getPeerHandle(user.netPoint).sendMessageToPeer(msg);
+    textMsg->setFocus();
 }
 
 void messages_widget::newMessage(const libed2k::net_identifier& np, const QString& hash, const QString& strMessage)
@@ -320,27 +337,7 @@ void messages_widget::sendMessage()
         startChat(friends[num].strName, friends[num].netPoint);
     }
 }
-/*
-void messages_widget::showEvent(QShowEvent* e)
-{
-    QWidget::showEvent(e);
-    if (lastMessageTab == tabWidget->currentIndex())
-    {
-        emit stopMessageNotification();
-        lastMessageTab = -1;
-    }
-}
 
-void messages_widget::focusInEvent(QFocusEvent* e)
-{
-    QWidget::focusInEvent(e);
-    if (lastMessageTab == tabWidget->currentIndex())
-    {
-        emit stopMessageNotification();
-        lastMessageTab = -1;
-    }
-}
-*/
 void messages_widget::selectTab(int nTabNum)
 {
     if (lastMessageTab == nTabNum && lastMessageTab >= 0)
@@ -393,4 +390,40 @@ void messages_widget::closeCurrentTab()
 {
     if (tabWidget->currentIndex() >= 0)
         closeTab(tabWidget->currentIndex());
+}
+
+bool messages_widget::eventFilter(QObject *obj, QEvent *e)
+ {
+     if (obj == textMsg) 
+     {
+         if (e->type() == QEvent::KeyPress) 
+         {
+             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e);
+             if ( (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) &&
+                  (keyEvent->modifiers() == Qt::ControlModifier) )
+             {
+                 pushMessage();
+                 return true;
+             }
+             return false;
+         }
+         else
+         {
+             return false;
+         }
+     } 
+     else 
+     {
+         return QWidget::eventFilter(obj, e);
+     }
+ }
+
+void messages_widget::peerConnected(const libed2k::net_identifier& np, const QString& hash, bool bActive)
+{
+    connectedPeers.push_back(np);
+}
+
+void messages_widget::peerDisconnected(const libed2k::net_identifier& np, const QString& hash, const libed2k::error_code ec)
+{
+	connectedPeers.erase(std::remove(connectedPeers.begin(), connectedPeers.end(), np), connectedPeers.end());
 }

@@ -22,7 +22,7 @@ class files_widget : public QWidget, public Ui::files_widget
     Q_OBJECT
     QTreeWidgetItem* allFiles;
     QTreeWidgetItem* allDirs;
-    QStandardItemModel* model;
+    QScopedPointer<QStandardItemModel> model;
     QFileIconProvider provider;
 
 public:

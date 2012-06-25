@@ -123,8 +123,7 @@ public slots:
 	 */
 	void searchMoreResults();
 
-    void initializePeer(const libed2k::net_identifier& np);
-    void sendMessageToPeer(const libed2k::net_identifier& np, const QString& strMessage);
+    libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
 
 private slots:
     void readAlerts();

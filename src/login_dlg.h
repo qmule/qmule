@@ -22,6 +22,7 @@ private:
 private slots:
     void onAccept();
     void onReject();
+    void checkEmptyFields(const QString & text);
 };
 
 #endif // LOGIN_DLG_H
