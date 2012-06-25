@@ -11,6 +11,7 @@
 
 #include "libed2k/file.hpp"
 #include "transport/session.h"
+#include "qed2kpeerhandle.h"
 
 using namespace libed2k;
 

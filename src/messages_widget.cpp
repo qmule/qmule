@@ -6,6 +6,7 @@
 #include "libed2k/util.hpp"
 #include "libed2k/session.hpp"
 #include "transport/session.h"
+#include "qed2kpeerhandle.h"
 
 #include "add_friend.h"
 #include "messages_widget.h"
