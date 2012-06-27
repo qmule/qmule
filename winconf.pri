@@ -2,7 +2,7 @@
 
 #Point this to the boost include folder
 INCLUDEPATH += $$(BOOST_ROOT)
-#Point this to the libtorrent include folser
+#Point this to the libtorrent include folder
 INCLUDEPATH += $$(LIBTORRENT_ROOT)/include
 #Point this to the zlib include folder(libtorrent's if you used that)
 INCLUDEPATH += $$(LIBTORRENT_ROOT)/zlib
@@ -19,8 +19,8 @@ LIBS += -L$$(LIBTORRENT_ROOT)/lib
 LIBS += -L$$(BOOST_ROOT)/stage/lib
 
 # select appropriate crypto++ library
-Debug:LIBS += -L$$(CRYPTOPP_ROOT)/lib/debug
-Release:LIBS += -L$$(CRYPTOPP_ROOT)/lib/release
+Debug:LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 
+Release:LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Release -L$$(CRYPTOPP_ROOT)/Win32/Output/Release
 
 #Point this to the ed2klib lib folder
 Debug:LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
@@ -31,7 +31,7 @@ Release:DEFINES += _BIND_TO_CURRENT_VCLIBS_VERSION=1
 # LIBTORRENT DEFINES
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += BOOST_ASIO_HASH_MAP_BUCKETS=1021
-#DEFINES += BOOST_EXCEPTION_DISABLE
+DEFINES += BOOST_EXCEPTION_DISABLE
 DEFINES += BOOST_SYSTEM_STATIC_LINK=1
 DEFINES += BOOST_THREAD_USE_LIB
 DEFINES += BOOST_THREAD_USE_LIB=1
