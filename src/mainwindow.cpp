@@ -138,7 +138,12 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   icon_CurTray = icon_TrayDisconn;
 
-  this->setWindowIcon(icon_TrayConn);
+  QIcon mainWndIcon;
+  mainWndIcon.addFile(":/emule/newmule.png", QSize(22, 22));
+  mainWndIcon.addFile(":/emule/newmule.png", QSize(16, 16));
+  mainWndIcon.addFile(":/emule/newmule.png", QSize(32, 32));
+
+  this->setWindowIcon(mainWndIcon);
 
   actionOpen->setIcon(IconProvider::instance()->getIcon("list-add"));
   actionDownload_from_URL->setIcon(IconProvider::instance()->getIcon("insert-link"));

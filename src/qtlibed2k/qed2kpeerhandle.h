@@ -9,9 +9,10 @@ public:
     QED2KPeerHandle(const libed2k::peer_connection_handle& pch);
     ~QED2KPeerHandle();
 
-    void sendMessageToPeer(const QString& strMessage);
-    bool isAllowedSharedFilesView();
-    void requestDirs();
+    void    sendMessageToPeer(const QString& strMessage);
+    bool    isAllowedSharedFilesView();
+    void    requestDirs();
+    QString getUserName();
 
     static QED2KPeerHandle getPeerHandle(const libed2k::net_identifier& np);
 

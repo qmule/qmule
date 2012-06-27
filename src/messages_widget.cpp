@@ -188,7 +188,7 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
     }
     else
     {
-        QString name = "user name";
+        QString name = QED2KPeerHandle::getPeerHandle(np).getUserName();
         startChat(name, np);
 
         nTab = tabWidget->currentIndex();
