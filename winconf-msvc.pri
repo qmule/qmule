@@ -9,15 +9,18 @@ CONFIG(debug, debug|release) {
           libboost_system-vc90-mt-gd-1_49.lib \
           libboost_filesystem-vc90-mt-gd-1_49.lib \
           libboost_thread-vc90-mt-gd-1_49.lib \
-          libed2kd.lib
+          libed2kd.lib \
+		  libeay32MDd.lib\ 
+		  ssleay32MDd.lib
 } else {
   LIBS += libtorrent.lib \
           libboost_system-vc90-mt-1_49.lib \
           libboost_filesystem-vc90-mt-1_49.lib \
           libboost_thread-vc90-mt-1_49.lib \		  
-          libed2k.lib
+          libed2k.lib\
+		  libeay32MD.lib\
+		  ssleay32MD.lib
 }
 
 LIBS += advapi32.lib shell32.lib cryptopp.lib cryptlib.lib
-LIBS += libeay32MD.lib ssleay32MD.lib
 LIBS += PowrProf.lib

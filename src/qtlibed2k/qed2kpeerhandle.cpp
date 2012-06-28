@@ -47,3 +47,8 @@ void QED2KPeerHandle::requestDirs()
 {
     m_delegate.get_shared_directories();
 }
+
+QString QED2KPeerHandle::getUserName()
+{
+    return QString::fromStdString(m_delegate.get_options().m_strName);
+}

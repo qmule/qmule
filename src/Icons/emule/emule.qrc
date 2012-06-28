@@ -61,5 +61,7 @@
         <file>TrayDisconnected.ico</file>
         <file>statusbar/empty.ico</file>
         <file>users/Chat.ico</file>
+        <file>newmule.ico</file>
+        <file>newmule.png</file>
     </qresource>
 </RCC>
