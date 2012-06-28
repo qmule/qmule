@@ -310,10 +310,11 @@ void QED2KSession::readAlerts()
                 emit peerSharedDirectoryFiles(
                     p2->m_np, md4toQString(p2->m_hash),
                     QString::fromUtf8(p2->m_strDirectory.c_str(), p2->m_strDirectory.size()), vRes);
-                continue;
             }
-
-            emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);
+            else
+            {
+                emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);
+            }
         }
         else if (libed2k::mule_listen_failed_alert* p =
                  dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
