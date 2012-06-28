@@ -23,10 +23,10 @@
 struct QED2KSearchResultEntry
 {
     quint64                 m_nFilesize;
-    int                     m_nSources;
-    int                     m_nCompleteSources;
-    int                     m_nMediaBitrate;
-    int                     m_nMediaLength;
+    quint64                 m_nSources;
+    quint64                 m_nCompleteSources;
+    quint64                 m_nMediaBitrate;
+    quint64                 m_nMediaLength;
 	QString	                m_hFile;
 	QString                 m_strFilename;
 	QString	                m_strMediaCodec;

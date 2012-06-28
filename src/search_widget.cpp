@@ -520,8 +520,12 @@ void search_widget::selectTab(int nTabNum)
             model->insertRow(row);
             QString user_name = it->m_strFilename;
             user_name.replace("+++USERNICK+++", "");
+            // for users size calculated from
+            // m_nMediaLength  - low part of real size
+            // m_nMediaBitrate - high part of real size
+            quint64 nSize =  (it->m_nMediaBitrate << 32) + it->m_nMediaLength;
             model->setData(model->index(row, SWDelegate::SW_NAME), user_name.trimmed());
-            model->setData(model->index(row, SWDelegate::SW_SIZE), it->m_nFilesize);
+            model->setData(model->index(row, SWDelegate::SW_SIZE), nSize);
             model->setData(model->index(row, SWDelegate::SW_ID), it->m_hFile);
 
             std::vector<libed2k::net_identifier>::const_iterator con_ip;
