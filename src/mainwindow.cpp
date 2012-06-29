@@ -409,11 +409,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 #endif
 #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
   // Check for update
-  if (pref.isUpdateCheckEnabled()) {
+/*  if (pref.isUpdateCheckEnabled()) {
     ProgramUpdater *updater = new ProgramUpdater(this);
     connect(updater, SIGNAL(updateCheckFinished(bool, QString)), SLOT(handleUpdateCheckFinished(bool, QString)));
     updater->checkForUpdates();
-  }
+  }*/
 #endif
 
   // Make sure the Window is visible if we don't have a tray icon
