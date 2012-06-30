@@ -62,6 +62,8 @@ private:
     std::vector<libed2k::net_identifier> connectedPeers;
 
     int nCurTabSearch;
+    int nSortedColumn;
+
     bool moreSearch;
     QIcon iconSerachActive;
     QIcon iconSearchResult;

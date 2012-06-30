@@ -32,7 +32,7 @@ QVariant selected_data(QAbstractItemView* view, int column, QModelIndex& index)
 }
 
 search_widget::search_widget(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent) , nCurTabSearch(-1), nSortedColumn(-1)
 {
     setupUi(this);
 
@@ -291,13 +291,12 @@ void search_widget::itemCondClicked(QTableWidgetItem* item)
 
 void search_widget::sortChanged(int logicalIndex, Qt::SortOrder order)
 {
-    static int sort_column = 0;
-    if (sort_column != logicalIndex && logicalIndex == SWDelegate::SW_AVAILABILITY)
+    if (nSortedColumn != logicalIndex && logicalIndex == SWDelegate::SW_AVAILABILITY)
     {
-        sort_column = logicalIndex;
+        nSortedColumn = logicalIndex;
         treeResult->header()->setSortIndicator(SWDelegate::SW_AVAILABILITY, Qt::DescendingOrder);
     }
-    sort_column = logicalIndex;
+    nSortedColumn = logicalIndex;
 }
 
 void search_widget::startSearch()
@@ -518,14 +517,13 @@ void search_widget::selectTab(int nTabNum)
     {
         treeResult->setItemsExpandable(true);
         treeResult->setRootIsDecorated(true);
-        QIcon folderIcon(":/emule/common/FolderOpen.ico");
         std::vector<UserDir>& userDirs = searchItems[nTabNum].vecUserDirs;
         std::vector<UserDir>::iterator dir_iter;
         for (dir_iter = userDirs.begin(); dir_iter != userDirs.end(); ++dir_iter)
         {
             model->insertRow(row);
             model->setData(model->index(row, SWDelegate::SW_NAME), dir_iter->dirPath);
-            model->item(row)->setIcon(folderIcon);            
+            model->item(row)->setIcon(iconFolder);
             QModelIndex index = model->index(row, 0);
             row++;
 
@@ -547,6 +545,57 @@ void search_widget::selectTab(int nTabNum)
             if (dir_iter->bExpanded)
                 treeResult->setExpanded(filterModel->mapFromSource(index), true);
         }        
+    }
+    else if (searchItems[nTabNum].resultType == RT_FOLDERS)
+    {
+        treeResult->setItemsExpandable(true);
+        treeResult->setRootIsDecorated(true);
+        std::vector<UserDir>& userDirs = searchItems[nTabNum].vecUserDirs;
+
+        for (it = vRes.begin(); it != vRes.end(); ++it)
+        {
+            UserDir dir;
+            dir.dirPath = it->m_strFilename;
+            userDirs.push_back(dir);
+            
+            model->insertRow(row);
+            QString folderName = it->m_strFilename;
+            int nPos = folderName.lastIndexOf("+++");
+            if (nPos >= 0)
+                folderName = folderName.right(folderName.length() - nPos - 3);
+            
+            nPos = folderName.lastIndexOf("ED2K--");
+            if (nPos >= 0)
+                folderName = "ED2K:\\" + folderName.right(folderName.length() - nPos - 6);
+
+            nPos = folderName.indexOf(".emulecollection");
+            int nQnty = 0;
+            if (nPos >= 0)
+            {
+                folderName = folderName.left(nPos);
+                nPos = folderName.lastIndexOf('-');
+                if (nPos < 0)
+                    nPos = folderName.lastIndexOf('\\');
+                if (nPos >= 0)
+                {
+                    nQnty = folderName.right(folderName.length() - nPos - 1).toInt();
+                    folderName = folderName.left(nPos);
+                }
+            }
+            folderName.replace('-', '\\');
+
+            model->setData(model->index(row, SWDelegate::SW_NAME), folderName);
+            model->item(row)->setIcon(iconFolder);
+            model->setData(model->index(row, SWDelegate::SW_AVAILABILITY), nQnty);
+            quint64 total_size = ((quint64)it->m_nMediaBitrate << 32) + (unsigned int)it->m_nMediaLength;
+            total_size = total_size ? total_size : it->m_nFilesize;
+            model->setData(model->index(row, SWDelegate::SW_SIZE), total_size);
+            model->setData(model->index(row, SWDelegate::SW_ID), it->m_hFile);
+
+            QModelIndex index = model->index(row, 0);
+            model->insertRows(0, 1, index);
+            model->insertColumns(0, 9, index);
+        }
     }
 
     QHeaderView* header = treeResult->header();
@@ -935,27 +984,49 @@ void search_widget::itemCollapsed(const QModelIndex& index)
 
 void search_widget::itemExpanded(const QModelIndex& index)
 {
-    std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
-    QString dirName = index.data().toString();
-    std::vector<UserDir>::iterator iter;
-    for (iter = userDirs.begin(); iter != userDirs.end(); ++iter)
+    if (searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS)
     {
-        if(iter->dirPath == dirName && iter->vecFiles.size() > 0)
+        std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
+        QString dirName = index.data().toString();
+        std::vector<UserDir>::iterator iter;
+        for (iter = userDirs.begin(); iter != userDirs.end(); ++iter)
         {
-            iter->bExpanded = true;
-            if (!iter->bFilled)
+            if(iter->dirPath == dirName && iter->vecFiles.size() > 0)
             {
-                QModelIndex real_index = filterModel->mapToSource(index);
-                std::vector<QED2KSearchResultEntry>::const_iterator file_iter;
-                int sub_row = 0;
-                for (file_iter = iter->vecFiles.begin(); file_iter != iter->vecFiles.end(); ++file_iter)
+                iter->bExpanded = true;
+                if (!iter->bFilled)
                 {
-                    fillFileValues(sub_row, *file_iter, real_index);
-                    sub_row++;
+                    QModelIndex real_index = filterModel->mapToSource(index);
+                    std::vector<QED2KSearchResultEntry>::const_iterator file_iter;
+                    int sub_row = 0;
+                    for (file_iter = iter->vecFiles.begin(); file_iter != iter->vecFiles.end(); ++file_iter)
+                    {
+                        fillFileValues(sub_row, *file_iter, real_index);
+                        sub_row++;
+                    }
+                    iter->bFilled = true;
                 }
-                iter->bFilled = true;
+                break;
             }
-            break;
+        }
+    }
+    else if (searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS)
+    {
+        QModelIndex real_index = filterModel->mapToSource(index);
+        QString hash = model->data(model->index(real_index.row(), SWDelegate::SW_ID)).toString();
+
+        std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
+        std::vector<QED2KSearchResultEntry>::const_iterator it;
+        std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
+        std::vector<UserDir>::const_iterator dir_iter = userDirs.begin();
+        for (it = vRes.begin(); it != vRes.end(); ++it, ++dir_iter)
+            if (it->m_hFile == hash)
+                break;
+
+        if (dir_iter != userDirs.end())
+        {
+            if (!dir_iter->bFilled)
+                model->item(real_index.row())->removeRows(0, 1);
         }
     }
 }
