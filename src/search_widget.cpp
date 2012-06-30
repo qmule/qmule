@@ -530,7 +530,8 @@ void search_widget::selectTab(int nTabNum)
             const std::vector<QED2KSearchResultEntry>& files = dir_iter->vecFiles;
             if (files.size() > 0)
             {
-                model->setData(model->index(row, SWDelegate::SW_AVAILABILITY), files.size());
+                model->setData(model->index(row, SWDelegate::SW_AVAILABILITY),
+                               qulonglong(files.size()));
                 quint64 size = 0;
                 std::vector<QED2KSearchResultEntry>::const_iterator file_iter;
                 for (file_iter = files.begin(); file_iter != files.end(); ++file_iter)
@@ -952,7 +953,8 @@ void search_widget::processUserFiles(const libed2k::net_identifier& np, const QS
             if (strDirectory == model->data(model->index(row, SWDelegate::SW_NAME)).toString()&&
                 iter->vecFiles.size() > 0)
             {
-                model->setData(model->index(row, SWDelegate::SW_AVAILABILITY), iter->vecFiles.size());
+                model->setData(model->index(row, SWDelegate::SW_AVAILABILITY),
+                               qulonglong(iter->vecFiles.size()));
                 quint64 size = 0;
                 std::vector<QED2KSearchResultEntry>::const_iterator file_iter;
                 for (file_iter = iter->vecFiles.begin(); file_iter != iter->vecFiles.end(); ++file_iter)
