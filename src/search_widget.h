@@ -34,15 +34,16 @@ struct UserDir
 
 struct SearchResult
 {
-    SearchResult(RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes) : 
-        resultType(type), vecResults(vRes), vecUserDirs(), netPoint() {}
-    SearchResult(RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes, const std::vector<UserDir> userDirs, const libed2k::net_identifier& np) : 
-        resultType(type), vecResults(vRes), vecUserDirs(userDirs), netPoint(np) {}
+    SearchResult(QString request, RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes) : 
+        strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(), netPoint() {}
+    SearchResult(QString request, RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes, const std::vector<UserDir> userDirs, const libed2k::net_identifier& np) : 
+        strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(userDirs), netPoint(np) {}
 
+    QString strRequest;
     RESULT_TYPE resultType;
     std::vector<QED2KSearchResultEntry> vecResults;
     std::vector<UserDir> vecUserDirs;
-    libed2k::net_identifier netPoint;
+    libed2k::net_identifier netPoint;    
 };
 
 class search_widget : public QWidget , private Ui::search_widget

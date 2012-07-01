@@ -63,5 +63,6 @@
         <file>users/Chat.ico</file>
         <file>newmule.ico</file>
         <file>newmule.png</file>
+        <file>Preferences.png</file>
     </qresource>
 </RCC>

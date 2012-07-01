@@ -214,9 +214,6 @@ private:
   messages_widget* messages;
   files_widget* files;
 
-  QString userName;
-  QString userPassword;
-
   //TransferListFiltersWidget *transferListFilters;
   //PropertiesWidget *properties;
   bool displaySpeedInTitle;
