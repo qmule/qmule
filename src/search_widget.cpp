@@ -478,7 +478,7 @@ void search_widget::processSearchResult(const libed2k::net_identifier& np,
             }
         }
 
-        strCaption += searchItems[nCurTabSearch].strRequest + " (" + QString::number(vecResults.size()) + ") - " + misc::friendlyUnit(overallSize);
+        strCaption += searchItems[nCurTabSearch].strRequest + " (" + QString::number(qulonglong(vecResults.size())) + ") - " + misc::friendlyUnit(overallSize);
         tabSearch->setTabText(nCurTabSearch, strCaption);
     }
 
