@@ -12,6 +12,7 @@ public:
     void    sendMessageToPeer(const QString& strMessage);
     bool    isAllowedSharedFilesView();
     void    requestDirs();
+    void    requestFiles(QString dirName);
     QString getUserName();
 
     static QED2KPeerHandle getPeerHandle(const libed2k::net_identifier& np);

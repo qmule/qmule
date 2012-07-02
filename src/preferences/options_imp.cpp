@@ -68,6 +68,7 @@ options_imp::options_imp(QWidget *parent):
   setAttribute(Qt::WA_DeleteOnClose);
   setModal(true);
   // Icons
+  tabSelection->item(TAB_EMULE)->setIcon(QIcon(":/emule/newmule.png"));
   tabSelection->item(TAB_UI)->setIcon(IconProvider::instance()->getIcon("preferences-desktop"));
   tabSelection->item(TAB_BITTORRENT)->setIcon(IconProvider::instance()->getIcon("preferences-system-network"));
   tabSelection->item(TAB_CONNECTION)->setIcon(IconProvider::instance()->getIcon("network-wired"));
@@ -242,6 +243,10 @@ options_imp::options_imp(QWidget *parent):
   connect(domainNameTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(DNSUsernameTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(DNSPasswordTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(editLogin, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(editPort, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   // Disable apply Button
   applyButton->setEnabled(false);
   // Tab selection mecanism
@@ -493,6 +498,12 @@ void options_imp::saveOptions() {
     pref.setDynDNSPassword(DNSPasswordTxt->text());
   }
   // End Web UI
+  // Emule
+  pref.setISLogin(editLogin->text());
+  pref.setISPassword(editPassword->text());
+  pref.setClientName(editUserName->text());
+  pref.setListenPort(editPort->text().toInt());
+  // End Emule
   // End preferences
   // Save advanced settings
   advancedSettings->saveAdvancedSettings();
@@ -751,6 +762,12 @@ void options_imp::loadOptions() {
   DNSUsernameTxt->setText(pref.getDynDNSUsername());
   DNSPasswordTxt->setText(pref.getDynDNSPassword());
   // End Web UI
+  //Emule
+  editLogin->setText(pref.getISLogin());
+  editPassword->setText(pref.getISPassword());
+  editUserName->setText(pref.getClientName());
+  editPort->setText(QString::number(pref.getListenPort()));
+
   // Random stuff
   srand(time(0));
 }

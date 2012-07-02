@@ -68,6 +68,7 @@ private slots:
     void selectTab(int nTabNum);
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
+    void requestUserDirs();
 
 signals:
     void newMessage();
