@@ -7,6 +7,7 @@
 #include <libtorrent/torrent_handle.hpp>
 
 typedef libtorrent::torrent_status::state_t TransferState;
+typedef libtorrent::torrent_status TransferStatus;
 typedef libtorrent::size_type TransferSize;
 typedef libtorrent::torrent_info TransferInfo;
 typedef libtorrent::bitfield TransferBitfield;
@@ -32,6 +33,7 @@ public:
     virtual QString comment() const = 0;
     virtual QString next_announce() const = 0;
     virtual TransferState state() const = 0;
+    virtual TransferStatus status() const = 0;
     virtual TransferInfo get_info() const = 0;
     virtual qreal download_payload_rate() const = 0;
     virtual qreal upload_payload_rate() const = 0;
@@ -49,6 +51,7 @@ public:
     virtual int connections_limit() const = 0;
     virtual QString current_tracker() const = 0;
     virtual TransferSize actual_size() const = 0;
+    virtual TransferSize total_done() const = 0;
     virtual TransferSize total_wanted_done() const = 0;
     virtual TransferSize total_wanted() const = 0;
     virtual TransferSize total_failed_bytes() const = 0;

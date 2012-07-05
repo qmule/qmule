@@ -32,7 +32,7 @@
 #include <QList>
 #include <vector>
 
-#include "qbtsession.h"
+#include "transport/session.h"
 #include "misc.h"
 #include "torrentspeedmonitor.h"
 
@@ -53,11 +53,11 @@ private:
   QList<int> m_speedSamples;
 };
 
-TorrentSpeedMonitor::TorrentSpeedMonitor(QBtSession* session) :
+TorrentSpeedMonitor::TorrentSpeedMonitor(Session* session) :
   QThread(session), m_abort(false), m_session(session)
 {
-  connect(m_session, SIGNAL(deletedTorrent(QString)), SLOT(removeSamples(QString)));
-  connect(m_session, SIGNAL(pausedTorrent(QTorrentHandle)), SLOT(removeSamples(QTorrentHandle)));
+  connect(m_session, SIGNAL(deletedTransfer(QString)), SLOT(removeSamples(QString)));
+  connect(m_session, SIGNAL(pausedTransfer(Transfer)), SLOT(removeSamples(Transfer)));
 }
 
 TorrentSpeedMonitor::~TorrentSpeedMonitor() {
@@ -103,7 +103,7 @@ void TorrentSpeedMonitor::removeSamples(const QString &hash)
   m_samples.remove(hash);
 }
 
-void TorrentSpeedMonitor::removeSamples(const QTorrentHandle& h) {
+void TorrentSpeedMonitor::removeSamples(const Transfer& h) {
   try {
     m_samples.remove(h.hash());
   } catch(invalid_handle&) {}
@@ -112,7 +112,7 @@ void TorrentSpeedMonitor::removeSamples(const QTorrentHandle& h) {
 qlonglong TorrentSpeedMonitor::getETA(const QString &hash) const
 {
   QMutexLocker locker(&m_mutex);
-  QTorrentHandle h = m_session->getTorrentHandle(hash);
+  Transfer h = m_session->getTransfer(hash);
   if (h.is_paused() || !m_samples.contains(hash)) return -1;
   const qreal speed_average = m_samples.value(hash).average();
   if (speed_average == 0) return -1;
@@ -121,18 +121,12 @@ qlonglong TorrentSpeedMonitor::getETA(const QString &hash) const
 
 void TorrentSpeedMonitor::getSamples()
 {
-  const std::vector<torrent_handle> torrents = m_session->getSession()->get_torrents();
-  std::vector<torrent_handle>::const_iterator it;
+  const std::vector<Transfer> torrents = m_session->getTransfers();
+  std::vector<Transfer>::const_iterator it;
   for (it = torrents.begin(); it != torrents.end(); it++) {
     try {
-#if LIBTORRENT_VERSION_MINOR > 15
-      torrent_status st = it->status(0x0);
-      if (!st.paused)
-        m_samples[misc::toQString(it->info_hash())].addSample(st.download_payload_rate);
-#else
       if (!it->is_paused())
-        m_samples[misc::toQString(it->info_hash())].addSample(it->status().download_payload_rate);
-#endif
+        m_samples[it->hash()].addSample(it->status().download_payload_rate);
     } catch(invalid_handle&) {}
   }
 }

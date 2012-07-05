@@ -24,6 +24,7 @@ public:
     QString comment() const;
     QString next_announce() const;
     TransferState state() const;
+    TransferStatus status() const;
     TransferInfo get_info() const;
     qreal download_payload_rate() const;
     qreal upload_payload_rate() const;
@@ -41,6 +42,7 @@ public:
     int connections_limit() const;
     QString current_tracker() const;
     TransferSize actual_size() const;
+    TransferSize total_done() const;
     TransferSize total_wanted_done() const;
     TransferSize total_wanted() const;
     TransferSize total_failed_bytes() const;

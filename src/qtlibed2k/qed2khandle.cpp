@@ -34,6 +34,7 @@ QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
 TransferState QED2KHandle::state() const { return m_delegate.status().state; }
+TransferStatus QED2KHandle::status() const { return m_delegate.status(); }
 
 TransferInfo QED2KHandle::get_info() const
 {
@@ -71,8 +72,9 @@ int QED2KHandle::num_connections() const{return 0;}
 int QED2KHandle::upload_limit() const {return 0;}
 int QED2KHandle::download_limit() const {return 0;}
 int QED2KHandle::connections_limit() const {return 0;}
-QString QED2KHandle::current_tracker() const {	return QString();}
+QString QED2KHandle::current_tracker() const {	return QString(); }
 TransferSize QED2KHandle::actual_size() const { return m_delegate.status().total_wanted; }
+TransferSize QED2KHandle::total_done() const { return m_delegate.status().total_done; }
 TransferSize QED2KHandle::total_wanted_done() const { return m_delegate.status().total_wanted_done; }
 TransferSize QED2KHandle::total_wanted() const { return m_delegate.status().total_wanted; }
 TransferSize QED2KHandle::total_failed_bytes() const {return 0;}

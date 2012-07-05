@@ -44,6 +44,8 @@ QString Transfer::next_announce() const { return m_delegate->next_announce(); }
 
 TransferState Transfer::state() const { return m_delegate->state(); }
 
+TransferStatus Transfer::status() const { return m_delegate->status(); }
+
 TransferInfo Transfer::get_info() const { return m_delegate->get_info(); }
 
 qreal Transfer::download_payload_rate() const {
@@ -80,8 +82,9 @@ QString Transfer::current_tracker() const { return m_delegate->current_tracker()
 
 TransferSize Transfer::actual_size() const { return m_delegate->actual_size(); }
 
-TransferSize Transfer::total_wanted_done() const {
-    return m_delegate->total_wanted_done(); }
+TransferSize Transfer::total_done() const { return m_delegate->total_done(); }
+
+TransferSize Transfer::total_wanted_done() const { return m_delegate->total_wanted_done(); }
 
 TransferSize Transfer::total_wanted() const { return m_delegate->total_wanted(); }
 

@@ -11,7 +11,6 @@ public:
     virtual ~SessionBase() {};
     virtual Transfer getTransfer(const QString& hash) const = 0;
     virtual std::vector<Transfer> getTransfers() const = 0;
-    virtual qlonglong getETA(const QString& hash) const = 0;
     virtual qreal getRealRatio(const QString& hash) const = 0;
     virtual qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const = 0;
     virtual bool isFilePreviewPossible(const QString& hash) const = 0;
