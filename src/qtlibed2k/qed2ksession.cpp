@@ -135,7 +135,9 @@ QED2KSession::QED2KSession()
     Preferences pref;
 
     m_alerts_timer.reset(new QTimer(this));
-    m_settings.server_hostname = "che-s-amd1";
+    m_settings.server_reconnect_timeout = 20;
+    m_settings.server_keep_alive_timeout = -1;
+    m_settings.server_hostname = "emule.is74.ru";
     m_settings.listen_port = pref.getListenPort();
     m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
