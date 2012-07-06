@@ -276,6 +276,7 @@ private slots:
     void startMessageFlickering();
     void stopMessageFlickering();
     void on_flickerTimer();
+    void setDisconnectedStatus();
 
     void ed2kServerNameResolved(QString strServer);
     void ed2kConnectionInitialized(unsigned int nClientId);

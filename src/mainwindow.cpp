@@ -436,7 +436,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(int, int)), this, SLOT(ed2kServerStatus(int, int)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverMessage(QString)), this, SLOT(ed2kServerMessage(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(QString, QString)), this, SLOT(ed2kIdentity(QString, QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionFailed(QString)), this, SLOT(ed2kConnectionFailed(QString)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionFailed(QString)));
 
   authRequest();
 }
@@ -1179,14 +1179,7 @@ void MainWindow::on_actionConnect_triggered()
         {
             if (msgBox.exec() == QMessageBox::Ok)
             {
-                actionConnect->setIcon(icon_disconnected);
-                connectioh_state = csDisconnected;
-                status->setDisconnectedInfo();
-                statusBar->reset();
-                icon_CurTray = icon_TrayDisconn;
-                if (systrayIcon) {
-                    systrayIcon->setIcon(getSystrayIcon());
-                }
+                setDisconnectedStatus();
             }
             break;
         }
@@ -1884,6 +1877,10 @@ void MainWindow::ed2kIdentity(QString strName, QString strDescription)
 void MainWindow::ed2kConnectionFailed(QString strError)
 {
     status->addLogMessage(strError);
+
+    setDisconnectedStatus();
+
+    statusBar->setStatusMsg(strError);
 }
 
 
@@ -1927,4 +1924,16 @@ void MainWindow::stopMessageFlickering()
     messages->setNewMessageImg(0);
 
     flickerTimer->stop();
+}
+
+void MainWindow::setDisconnectedStatus()
+{
+    actionConnect->setIcon(icon_disconnected);
+    connectioh_state = csDisconnected;
+    status->setDisconnectedInfo();
+    statusBar->reset();
+    icon_CurTray = icon_TrayDisconn;
+    if (systrayIcon) {
+        systrayIcon->setIcon(getSystrayIcon());
+    }
 }

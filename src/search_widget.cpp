@@ -291,10 +291,13 @@ void search_widget::itemCondClicked(QTableWidgetItem* item)
 
 void search_widget::sortChanged(int logicalIndex, Qt::SortOrder order)
 {
-    if (nSortedColumn != logicalIndex && logicalIndex == SWDelegate::SW_AVAILABILITY)
+    if (nSortedColumn != logicalIndex)
     {
         nSortedColumn = logicalIndex;
-        treeResult->header()->setSortIndicator(SWDelegate::SW_AVAILABILITY, Qt::DescendingOrder);
+        if (logicalIndex == SWDelegate::SW_AVAILABILITY)
+            treeResult->header()->setSortIndicator(SWDelegate::SW_AVAILABILITY, Qt::DescendingOrder);
+        if (logicalIndex == SWDelegate::SW_SIZE)
+            treeResult->header()->setSortIndicator(SWDelegate::SW_SIZE, Qt::DescendingOrder);
     }
     nSortedColumn = logicalIndex;
 }
@@ -520,7 +523,7 @@ void search_widget::selectTab(int nTabNum)
 
     treeResult->setItemsExpandable(false);
     treeResult->setRootIsDecorated(false);
-    treeResult->setSelectionMode(QAbstractItemView::MultiSelection);
+    treeResult->setSelectionMode(QAbstractItemView::ExtendedSelection);
     if (searchItems[nTabNum].resultType == RT_FILES)
     {
         for (it = vRes.begin(); it != vRes.end(); ++it)

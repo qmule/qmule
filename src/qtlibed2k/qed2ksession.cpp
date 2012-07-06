@@ -294,7 +294,7 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
             qDebug("server connection closed");
-            emit serverConnectionClosed(QString::fromStdString(p->m_error.message()));
+            emit serverConnectionClosed(QString::fromLocal8Bit(p->m_error.message().c_str()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))
         {
