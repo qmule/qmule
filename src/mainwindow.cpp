@@ -51,7 +51,7 @@
 #include <QDomNode>
 
 #include <libed2k/log.hpp>
-
+#define NOAUTH
 #include "transport/session.h"
 #include "mainwindow.h"
 //#include "transferlistwidget.h"

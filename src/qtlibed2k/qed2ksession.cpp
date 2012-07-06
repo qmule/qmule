@@ -52,8 +52,11 @@ QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k
                 sre.m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
                 break;
             case libed2k::FT_FILESIZE:
-                sre.m_nFilesize = ptag->asInt();
+                sre.m_nFilesize += ptag->asInt();
                 break;
+            case libed2k::FT_FILESIZE_HI:
+            	sre.m_nFilesize += (ptag->asInt() << 32);
+            	break;
             case libed2k::FT_SOURCES:
                 sre.m_nSources = ptag->asInt();
                 break;
@@ -132,7 +135,7 @@ QED2KSession::QED2KSession()
     Preferences pref;
 
     m_alerts_timer.reset(new QTimer(this));
-    m_settings.server_hostname = "emule.is74.ru";
+    m_settings.server_hostname = "che-s-amd1";
     m_settings.listen_port = pref.getListenPort();
     m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
