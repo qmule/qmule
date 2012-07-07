@@ -80,6 +80,7 @@ messages_widget::messages_widget(QWidget *parent)
     connect(userAdd, SIGNAL(triggered()), this, SLOT(addFriend()));
     connect(userSendMessage, SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userDelete, SIGNAL(triggered()), this, SLOT(deleteFriend()));    
+    connect(userBrowseFiles, SIGNAL(triggered()), this, SLOT(requestUserDirs()));
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabWidget, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(btnSend, SIGNAL(clicked()), this, SLOT(pushMessage()));
@@ -98,8 +99,8 @@ messages_widget::messages_widget(QWidget *parent)
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
             this, SLOT(peerConnected(const libed2k::net_identifier&, const QString&, bool)));
     connect(Session::instance()->get_ed2k_session(),
-            SIGNAL(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)),
-            this, SLOT(peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code)));
+            SIGNAL(peerDisconnected(const libed2k::net_identifier&, const QString&, const libed2k::error_code)),
+            this, SLOT(peerDisconnected(const libed2k::net_identifier&, const QString&, const libed2k::error_code)));
 
     imgMsg1.addFile(QString::fromUtf8(":/emule/statusbar/Message.ico"), QSize(), QIcon::Normal, QIcon::Off);
     imgMsg2.addFile(QString::fromUtf8(":/emule/statusbar/MessagePending.ico"), QSize(), QIcon::Normal, QIcon::Off);
@@ -426,4 +427,15 @@ void messages_widget::peerConnected(const libed2k::net_identifier& np, const QSt
 void messages_widget::peerDisconnected(const libed2k::net_identifier& np, const QString& hash, const libed2k::error_code ec)
 {
 	connectedPeers.erase(std::remove(connectedPeers.begin(), connectedPeers.end(), np), connectedPeers.end());
+}
+
+void messages_widget::requestUserDirs()
+{
+    QModelIndex index = listFriends->currentIndex();
+
+    if (!index.isValid())
+        return;
+
+    int num = index.row();
+    QED2KPeerHandle::getPeerHandle(friends[num].netPoint).requestDirs();
 }

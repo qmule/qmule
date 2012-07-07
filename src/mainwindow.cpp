@@ -161,7 +161,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionExit->setIcon(IconProvider::instance()->getIcon("application-exit"));
   actionIncreasePriority->setIcon(IconProvider::instance()->getIcon("go-up"));
   actionLock_qBittorrent->setIcon(IconProvider::instance()->getIcon("object-locked"));
-  actionOptions->setIcon(IconProvider::instance()->getIcon("preferences-system"));
   actionPause->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
   actionPause_All->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
   actionStart->setIcon(IconProvider::instance()->getIcon("media-playback-start"));
@@ -205,6 +204,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   menuStatus->addAction(actionStatus);
   menuStatus->addAction(actionFiles);
   menuStatus->addAction(actionMessages);
+  menuStatus->addAction(actionOptions);
   menuStatus->addSeparator();
 
   actionTools->setMenu(menuStatus);
@@ -409,11 +409,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 #endif
 #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
   // Check for update
-  if (pref.isUpdateCheckEnabled()) {
+/*  if (pref.isUpdateCheckEnabled()) {
     ProgramUpdater *updater = new ProgramUpdater(this);
     connect(updater, SIGNAL(updateCheckFinished(bool, QString)), SLOT(handleUpdateCheckFinished(bool, QString)));
     updater->checkForUpdates();
-  }
+  }*/
 #endif
 
   // Make sure the Window is visible if we don't have a tray icon
@@ -660,7 +660,7 @@ void MainWindow::createKeyboardShortcuts() {
   switchRSSShortcut = new QShortcut(QKeySequence(tr("Alt+3", "shortcut to switch to fourth tab")), this);
   connect(switchRSSShortcut, SIGNAL(activated()), this, SLOT(displayRSSTab()));
   actionDocumentation->setShortcut(QKeySequence("F1"));
-  actionOptions->setShortcut(QKeySequence(QString::fromUtf8("Alt+O")));
+//  actionOptions->setShortcut(QKeySequence(QString::fromUtf8("Alt+O")));
 #ifdef Q_WS_MAC
   actionDelete->setShortcut(QKeySequence("Ctrl+Backspace"));
 #else
@@ -1775,7 +1775,8 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             actionConnect->setIcon(icon_disconnected);
             connectioh_state = csDisconnected;
             authTimer->start(1000);
-            userPassword = "";
+            Preferences pref;
+            pref.setISPassword("");
             break;
         }
         case 2:
@@ -1789,14 +1790,17 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
 
 void MainWindow::authRequest()
 {
+    Preferences pref;
+
     QString msg = tr("Sending authentication request.");
     authTimer->stop();
 
-    if (userName.length() && userPassword.length())
+    if (pref.getISLogin().length() && pref.getISPassword().length())
     {
         ar.start("el.is74.ru", "auth.php",
-                userName.toUtf8().constData(),
-                userPassword.toUtf8().constData(), "0.5.6.7",
+                pref.getISLogin().toUtf8().constData(),
+                pref.getISPassword().toUtf8().constData(),
+                "0.5.6.7",
                 boost::bind(&MainWindow::on_auth_result, this, _1, _2));
 
         addToLog(msg);
@@ -1804,16 +1808,16 @@ void MainWindow::authRequest()
         return;
     }
 
-    login_dlg dlg(this, userName, userPassword);
+    login_dlg dlg(this, pref.getISLogin(), pref.getISPassword());
     if (dlg.exec() == QDialog::Accepted)
     {
-        userName = dlg.getLogin();
-        userPassword = dlg.getPasswd();
+        pref.setISLogin(dlg.getLogin());
+        pref.setISPassword(dlg.getPasswd());
         actionConnect->setIcon(icon_connecting);
         connectioh_state = csConnecting;
         ar.start("el.is74.ru", "auth.php",
-                userName.toUtf8().constData(),
-                userPassword.toUtf8().constData(),
+                pref.getISLogin().toUtf8().constData(),
+                pref.getISPassword().toUtf8().constData(),
                 "0.5.6.7",
                 boost::bind(&MainWindow::on_auth_result, this, _1, _2));
 

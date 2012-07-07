@@ -87,6 +87,11 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     horizontalSpacer = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacer2 = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    topRowButtons[4]->setEnabled(false);
+    topRowButtons[5]->setEnabled(false);
+    bottomRowButtons[2]->setEnabled(false);
+    bottomRowButtons[3]->setEnabled(false);
+
     hboxLayout1->addWidget(btnSwitch);
     hboxLayout1->addWidget(topRowButtons[0]);
     hboxLayout1->addWidget(topRowButtons[1]);

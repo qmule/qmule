@@ -61,7 +61,6 @@ class HttpServer;
 #endif
 class BandwidthScheduler;
 class ScanFoldersModel;
-class TorrentSpeedMonitor;
 class DNSUpdater;
 
 const int MAX_LOG_MESSAGES = 100;
@@ -116,7 +115,6 @@ public slots:
   void startUpTransfers();
   void recheckTransfer(const QString& hash);
   void useAlternativeSpeedsLimit(bool alternative);
-  qlonglong getETA(const QString& hash) const;
   /* Needed by Web UI */
   void pauseAllTorrents();
   void pauseTransfer(const QString& hash);
@@ -267,7 +265,6 @@ private:
 #endif
   // Tracker
   QPointer<QTracker> m_tracker;
-  TorrentSpeedMonitor *m_speedMonitor;
   shutDownAction m_shutdownAct;
   // Port forwarding
   libtorrent::upnp *m_upnp;

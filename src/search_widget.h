@@ -18,14 +18,32 @@ enum RESULT_TYPE
 {
     RT_FILES,
     RT_CLIENTS,
-    RT_FOLDERS
+    RT_FOLDERS,
+    RT_USER_DIRS
+};
+
+struct UserDir
+{
+    UserDir() : bExpanded(false), bFilled(false), dirPath("") {}
+
+    bool    bExpanded;
+    bool    bFilled;
+    QString dirPath;
+    std::vector<QED2KSearchResultEntry> vecFiles;
 };
 
 struct SearchResult
 {
-    SearchResult(const std::vector<QED2KSearchResultEntry>& vRes, RESULT_TYPE type) : resultType(type), vecResults(vRes) {}
+    SearchResult(QString request, RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes) : 
+        strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(), netPoint() {}
+    SearchResult(QString request, RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes, const std::vector<UserDir> userDirs, const libed2k::net_identifier& np) : 
+        strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(userDirs), netPoint(np) {}
+
+    QString strRequest;
     RESULT_TYPE resultType;
     std::vector<QED2KSearchResultEntry> vecResults;
+    std::vector<UserDir> vecUserDirs;
+    libed2k::net_identifier netPoint;    
 };
 
 class search_widget : public QWidget , private Ui::search_widget
@@ -45,9 +63,12 @@ private:
     std::vector<libed2k::net_identifier> connectedPeers;
 
     int nCurTabSearch;
+    int nSortedColumn;
+
     bool moreSearch;
     QIcon iconSerachActive;
     QIcon iconSearchResult;
+    QIcon iconUserFiles;
     QScopedPointer<QStandardItemModel> model;
     QScopedPointer<QSortFilterProxyModel> filterModel;
     SWDelegate* itemDelegate;
@@ -60,6 +81,18 @@ private:
     QAction* userSendMessage;
     QAction* userBrowseFiles;
 
+    QIcon iconAny;
+    QIcon iconArchive;
+    QIcon iconAudio;
+    QIcon iconCDImage;
+    QIcon iconPicture;
+    QIcon iconProgram;
+    QIcon iconVideo;
+    QIcon iconDocument;
+    QIcon iconCollection;
+    QIcon iconFolder;
+    QIcon iconUser;
+
 public:
     search_widget(QWidget *parent = 0);
     ~search_widget();
@@ -70,9 +103,11 @@ private:
     void showErrorParamMsg(int numParam);
     void setUserPicture(const libed2k::net_identifier& np, QIcon& icon);
     bool findSelectedUser(QED2KSearchResultEntry& entry);
+    void fillFileValues(int row, const QED2KSearchResultEntry& fileEntry, const QModelIndex& parent = QModelIndex());
 
 private slots:
     void itemCondClicked(QTableWidgetItem* item);
+    void sortChanged(int logicalIndex, Qt::SortOrder order);
     void startSearch();
     void continueSearch();
     void processSearchResult(const libed2k::net_identifier& np,
@@ -91,6 +126,12 @@ private slots:
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);
     void download();
+    void requestUserDirs();
+    void processUserDirs(const libed2k::net_identifier& np, const QString& hash, const QStringList& strList);
+    void processUserFiles(const libed2k::net_identifier& np, const QString& hash,
+                          const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
+    void itemCollapsed(const QModelIndex& index);
+    void itemExpanded(const QModelIndex& index);
 
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);

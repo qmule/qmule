@@ -68,7 +68,6 @@ public:
 
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
-    qlonglong getETA(const QString& hash) const;
     qreal getRealRatio(const QString& hash) const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     bool isFilePreviewPossible(const QString& hash) const;

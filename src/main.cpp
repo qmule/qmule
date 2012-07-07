@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
                    &loader, SLOT(processParams(const QString&)));
 #endif
 
-  init_logs(); // init libed2k logger
+  LOGGER_INIT(LOG_ALL)
 
   int ret = app.exec();
   qDebug("Application has exited");

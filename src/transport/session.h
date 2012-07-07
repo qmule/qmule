@@ -7,6 +7,7 @@
 #include "transport/transfer.h"
 #include "qtlibtorrent/qbtsession.h"
 #include "qtlibed2k/qed2ksession.h"
+#include "torrentspeedmonitor.h"
 
 typedef libtorrent::session_status SessionStatus;
 
@@ -114,6 +115,8 @@ private:
 
     QBtSession m_btSession;
     QED2KSession m_edSession;
+
+    QScopedPointer<TorrentSpeedMonitor> m_speedMonitor;
 };
 
 #endif

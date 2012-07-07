@@ -3061,6 +3061,26 @@ Would you like to update qBittorrent to version %1?</source>
         <source> (&lt;a href=&quot;http://sourceforge.net/apps/mediawiki/qbittorrent/index.php?title=Anonymous_mode&quot;&gt;More information&lt;/a&gt;)</source>
         <translation> (&lt;a href=&quot;http://sourceforge.net/apps/mediawiki/qbittorrent/index.php?title=Anonymous_mode&quot;&gt;Дополнительная информация&lt;/a&gt;)</translation>
     </message>
+    <message>
+        <source>User name</source>
+        <translation>Имя пользователя</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation>Логин</translation>
+    </message>
+    <message>
+        <source>Connection settings</source>
+        <translation>Настройки соединения</translation>
+    </message>
+    <message>
+        <source>Port</source>
+        <translation>Порт</translation>
+    </message>
 </context>
 <context>
     <name>PreviewSelect</name>
@@ -5129,10 +5149,6 @@ Do you want to install it now?</source>
         <translation>IP Адрес:</translation>
     </message>
     <message>
-        <source>009.009.009.009; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Additional information</source>
         <translation>Дополнительная информация</translation>
     </message>
@@ -5211,7 +5227,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Details...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Детали...</translation>
     </message>
     <message>
         <source>Add to friends</source>
@@ -5219,11 +5235,11 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Send message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Послать сообщение</translation>
     </message>
     <message>
         <source>Browse files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Просмотреть файлы</translation>
     </message>
 </context>
 <context>
@@ -6327,7 +6343,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Details...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Детали...</translation>
     </message>
     <message>
         <source>Add to friends</source>
@@ -6335,10 +6351,22 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Send message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Послать сообщение</translation>
     </message>
     <message>
         <source>Browse files</source>
+        <translation type="unfinished">Просмотреть файлы</translation>
+    </message>
+    <message>
+        <source>Files: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folders: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clients: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6607,6 +6635,10 @@ eD2K Server</source>
     <message>
         <source>Pause</source>
         <translation type="unfinished">Приостановить</translation>
+    </message>
+    <message>
+        <source>Split window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

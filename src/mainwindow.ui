@@ -73,6 +73,10 @@
    </property>
   </action>
   <action name="actionOptions">
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/Preferences.png</normaloff>:/emule/Preferences.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Options...</string>
    </property>

@@ -381,6 +381,15 @@ torrent_status::state_t QTorrentHandle::state() const {
 #endif
 }
 
+libtorrent::torrent_status QTorrentHandle::status() const
+{
+#if LIBTORRENT_VERSION_MINOR > 15
+  return torrent_handle::status(0x0);
+#else
+  return torrent_handle::status();
+#endif
+}
+
 libtorrent::torrent_info QTorrentHandle::get_info() const {
     return torrent_handle::get_torrent_info();
 }

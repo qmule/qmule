@@ -155,9 +155,6 @@ QBtSession::QBtSession()
   connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), SLOT(addTorrentsFromScanFolder(QStringList&)));
   // Apply user settings to Bittorrent session
   configureSession();
-  // Torrent speed monitor
-  m_speedMonitor = new TorrentSpeedMonitor(this);
-  m_speedMonitor->start();
   // To download from urls
   downloader = new DownloadThread(this);
   connect(downloader, SIGNAL(downloadFinished(QString, QString)), SLOT(processDownloadedFile(QString, QString)));
@@ -171,8 +168,6 @@ QBtSession::QBtSession()
 // Main destructor
 QBtSession::~QBtSession() {
   qDebug("BTSession destructor IN");
-  delete m_speedMonitor;
-  qDebug("Deleted the torrent speed monitor");
   // Do some BT related saving
   saveSessionState();
   saveFastResumeData();
@@ -2773,11 +2768,6 @@ void QBtSession::startUpTransfers() {
   QIniSettings settings("qBittorrent", "qBittorrent");
   settings.setValue("ported_to_new_savepath_system", true);
   qDebug("Unfinished torrents resumed");
-}
-
-qlonglong QBtSession::getETA(const QString &hash) const
-{
-  return m_speedMonitor->getETA(hash);
 }
 
 void QBtSession::handleIPFilterParsed(int ruleCount)

@@ -182,7 +182,7 @@ public:
 
   // ED2K settings
 
-  QString clientName() const
+  QString getClientName() const
   {
       return value(QString::fromUtf8("Preferences/General/ClientName"), QString("qMule")).toString();
   }
@@ -192,7 +192,7 @@ public:
       setValue("Preferences/General/ClientName", strClientName);
   }
 
-  QString ISLogin()
+  QString getISLogin() const
   {
       QString strISLogin = value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
       // on windows attempt to extract login
@@ -211,7 +211,7 @@ public:
       setValue("Preferences/General/ISLogin", strISLogin);
   }
 
-  QString ISPassword()
+  QString getISPassword() const
   {
       QString strISPassword = value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString();
 
@@ -486,7 +486,7 @@ public:
 
   // ED2K settings
 
-  int listenPort()
+  int getListenPort() const
   {
       return value(QString::fromUtf8("Preferences/Connection/ListenPort"), 4662).toInt();
   }

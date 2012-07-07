@@ -67,6 +67,9 @@ Session::Session()
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
+
+    m_speedMonitor.reset(new TorrentSpeedMonitor(this));
+    m_speedMonitor->start();
 }
 
 QBtSession* Session::get_torrent_session()
@@ -119,7 +122,8 @@ std::vector<Transfer> Session::getTransfers() const {
 }
 
 qlonglong Session::getETA(const QString& hash) const {
-    return delegate(hash)->getETA(hash); }
+    return m_speedMonitor->getETA(hash);
+}
 
 qreal Session::getRealRatio(const QString& hash) const {
     return delegate(hash)->getRealRatio(hash);

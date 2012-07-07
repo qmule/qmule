@@ -4,6 +4,7 @@
 #include <libed2k/error_code.hpp>
 #include "qed2ksession.h"
 #include "libed2k/alert_types.hpp"
+#include "preferences.h"
 
 #include <QMessageBox>
 
@@ -128,10 +129,14 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 
 QED2KSession::QED2KSession()
 {
+    Preferences pref;
+
     m_alerts_timer.reset(new QTimer(this));
     m_settings.server_hostname = "emule.is74.ru";
 	m_settings.server_keep_alive_timeout = -1;
     m_settings.server_reconnect_timeout = -1;
+    m_settings.listen_port = pref.getListenPort();
+    m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
 
@@ -160,7 +165,6 @@ std::vector<Transfer> QED2KSession::getTransfers() const
     return transfers;
 }
 
-qlonglong QED2KSession::getETA(const QString& hash) const { return 0; }
 qreal QED2KSession::getRealRatio(const QString& hash) const { return 0; }
 qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const { return 0; }
 bool QED2KSession::isFilePreviewPossible(const QString& hash) const { return false; }

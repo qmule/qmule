@@ -36,9 +36,9 @@
 #include <QWaitCondition>
 #include <QHash>
 #include <QMutex>
-#include "qtorrenthandle.h"
 
-class QBtSession;
+class Session;
+class Transfer;
 class SpeedSample;
 
 class TorrentSpeedMonitor : public QThread
@@ -46,7 +46,7 @@ class TorrentSpeedMonitor : public QThread
   Q_OBJECT
 
 public:
-  explicit TorrentSpeedMonitor(QBtSession* session);
+  explicit TorrentSpeedMonitor(Session* session);
   ~TorrentSpeedMonitor();
   qlonglong getETA(const QString &hash) const;
 
@@ -58,7 +58,7 @@ private:
 
 private slots:
   void removeSamples(const QString& hash);
-  void removeSamples(const QTorrentHandle& h);
+  void removeSamples(const Transfer& h);
 
 private:
   static const int sampling_interval = 1000; // 1s
@@ -68,7 +68,7 @@ private:
   QWaitCondition m_abortCond;
   QHash<QString, SpeedSample> m_samples;
   mutable QMutex m_mutex;
-  QBtSession *m_session;
+  Session *m_session;
 };
 
 #endif // TORRENTSPEEDMONITOR_H
