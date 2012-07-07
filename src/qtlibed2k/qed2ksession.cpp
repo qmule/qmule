@@ -52,8 +52,11 @@ QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k
                 sre.m_strFilename = QString::fromUtf8(ptag->asString().c_str(), ptag->asString().size());
                 break;
             case libed2k::FT_FILESIZE:
-                sre.m_nFilesize = ptag->asInt();
+                sre.m_nFilesize += ptag->asInt();
                 break;
+            case libed2k::FT_FILESIZE_HI:
+            	sre.m_nFilesize += (ptag->asInt() << 32);
+            	break;
             case libed2k::FT_SOURCES:
                 sre.m_nSources = ptag->asInt();
                 break;
@@ -132,6 +135,8 @@ QED2KSession::QED2KSession()
     Preferences pref;
 
     m_alerts_timer.reset(new QTimer(this));
+    m_settings.server_reconnect_timeout = 20;
+    m_settings.server_keep_alive_timeout = -1;
     m_settings.server_hostname = "emule.is74.ru";
 	m_settings.server_keep_alive_timeout = -1;
     m_settings.server_reconnect_timeout = -1;
@@ -291,7 +296,7 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
             qDebug("server connection closed");
-            emit serverConnectionClosed(QString::fromStdString(p->m_error.message()));
+            emit serverConnectionClosed(QString::fromLocal8Bit(p->m_error.message().c_str()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))
         {

@@ -224,7 +224,8 @@ void transfer_list::btnSwitchClick()
         if (topRowButtons[ii]->isChecked())
             break;
     topRowButtons[ii]->setChecked(false);
-    ii = (++ii) % topRowBtnCnt;
+    ++ii;
+    ii = ii % topRowBtnCnt;
     topRowButtons[ii]->setChecked(true);
     btnSwitch->setIcon(icons[ii]);
     btnSwitch->setText(btnText[ii]);
@@ -239,7 +240,8 @@ void transfer_list::btnSwitchClick2()
         if (bottomRowButtons[ii]->isChecked())
             break;
     bottomRowButtons[ii]->setChecked(false);
-    ii = (++ii) % bottomRowBtnCnt;
+    ++ii;
+    ii = ii % bottomRowBtnCnt;
     bottomRowButtons[ii]->setChecked(true);
     btnSwitch2->setIcon(icons[ii + 2]);
     btnSwitch2->setText(btnText[ii + 2]);
