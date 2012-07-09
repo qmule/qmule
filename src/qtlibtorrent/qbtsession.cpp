@@ -85,8 +85,6 @@
 
 using namespace libtorrent;
 
-const qreal QBtSession::MAX_RATIO = 9999.;
-
 const int MAX_TRACKER_ERRORS = 2;
 
 /* Converts a QString hash into a libtorrent sha1_hash */
@@ -1558,32 +1556,6 @@ bool QBtSession::enableDHT(bool b) {
     }
   }
   return true;
-}
-
-qreal QBtSession::getRealRatio(const QString &hash) const {
-  QTorrentHandle h = getTorrentHandle(hash);
-  if (!h.is_valid()) {
-    return 0.;
-  }
-
-  libtorrent::size_type all_time_upload = h.all_time_upload();
-  libtorrent::size_type all_time_download = h.all_time_download();
-  if (all_time_download == 0 && h.is_seed()) {
-    // Purely seeded torrent
-    all_time_download = h.total_done();
-  }
-
-  if (all_time_download == 0) {
-    if (all_time_upload == 0)
-      return 0;
-    return MAX_RATIO+1;
-  }
-
-  qreal ratio = all_time_upload / (float) all_time_download;
-  Q_ASSERT(ratio >= 0.);
-  if (ratio > MAX_RATIO)
-    ratio = MAX_RATIO;
-  return ratio;
 }
 
 // Called periodically

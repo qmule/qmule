@@ -8,10 +8,11 @@
 class SessionBase
 {
 public:
+    static const qreal MAX_RATIO;
+
     virtual ~SessionBase() {};
     virtual Transfer getTransfer(const QString& hash) const = 0;
     virtual std::vector<Transfer> getTransfers() const = 0;
-    virtual qreal getRealRatio(const QString& hash) const = 0;
     virtual qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const = 0;
     virtual bool isFilePreviewPossible(const QString& hash) const = 0;
     virtual void changeLabelInSavePath(
@@ -32,6 +33,9 @@ public:
     virtual void startUpTransfers() = 0;
     virtual void configureSession() = 0;
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
+
+    // implemented methods
+    qreal getRealRatio(const QString& hash) const;
 };
 
 #endif

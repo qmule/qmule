@@ -20,8 +20,6 @@ class Session: public QObject, public SessionBase
     Q_DISABLE_COPY(Session)
 
 public:
-    static const qreal MAX_RATIO;
-
     static Session* instance();
     static void drop();
 
@@ -31,7 +29,6 @@ public:
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
     qlonglong getETA(const QString& hash) const;
-    qreal getRealRatio(const QString& hash) const;
     qreal getGlobalMaxRatio() const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     bool isFilePreviewPossible(const QString& hash) const;

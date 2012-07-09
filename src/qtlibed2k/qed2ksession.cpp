@@ -168,7 +168,6 @@ std::vector<Transfer> QED2KSession::getTransfers() const
     return transfers;
 }
 
-qreal QED2KSession::getRealRatio(const QString& hash) const { return 0; }
 qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const { return 0; }
 bool QED2KSession::isFilePreviewPossible(const QString& hash) const { return false; }
 void QED2KSession::changeLabelInSavePath(
