@@ -68,7 +68,6 @@ public:
 
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
-    qreal getRealRatio(const QString& hash) const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     bool isFilePreviewPossible(const QString& hash) const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);

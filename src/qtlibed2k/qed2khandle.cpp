@@ -81,8 +81,8 @@ TransferSize QED2KHandle::total_failed_bytes() const {return 0;}
 TransferSize QED2KHandle::total_redundant_bytes() const {return 0;}
 TransferSize QED2KHandle::total_payload_upload() const {return 0;}
 TransferSize QED2KHandle::total_payload_download() const {return 0;}
-TransferSize QED2KHandle::all_time_upload() const {return 0;}
-TransferSize QED2KHandle::all_time_download() const {return 0;}
+TransferSize QED2KHandle::all_time_upload() const { return m_delegate.status().all_time_upload; }
+TransferSize QED2KHandle::all_time_download() const { return m_delegate.status().all_time_download; }
 qlonglong QED2KHandle::active_time() const {return 0;}
 qlonglong QED2KHandle::seeding_time() const {return 0;}
 bool QED2KHandle::is_valid() const { return m_delegate.is_valid(); }
