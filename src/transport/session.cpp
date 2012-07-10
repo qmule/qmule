@@ -4,8 +4,6 @@
 
 using namespace libtorrent;
 
-const qreal Session::MAX_RATIO = 9999.;
-
 Session* Session::m_instance = NULL;
 
 Session* Session::instance()
@@ -125,9 +123,6 @@ qlonglong Session::getETA(const QString& hash) const {
     return m_speedMonitor->getETA(hash);
 }
 
-qreal Session::getRealRatio(const QString& hash) const {
-    return delegate(hash)->getRealRatio(hash);
-}
 qreal Session::getGlobalMaxRatio() const { return m_btSession.getGlobalMaxRatio(); }
 qreal Session::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const {
     return delegate(hash)->getMaxRatioPerTransfer(hash, use_global);

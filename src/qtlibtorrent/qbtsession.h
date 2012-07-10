@@ -69,9 +69,6 @@ class QBtSession : public QObject, public SessionBase {
   Q_OBJECT
   Q_DISABLE_COPY(QBtSession)
 
-public:
-  static const qreal MAX_RATIO;
-
 private:
 
   enum shutDownAction { NO_SHUTDOWN, SHUTDOWN_COMPUTER, SUSPEND_COMPUTER };
@@ -88,7 +85,6 @@ public:
   qreal getPayloadUploadRate() const;
   libtorrent::session_status getSessionStatus() const;
   int getListenPort() const;
-  qreal getRealRatio(const QString& hash) const;
   QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
   bool hasActiveTransfers() const;
   bool hasDownloadingTorrents() const;
