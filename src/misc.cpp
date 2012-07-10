@@ -600,6 +600,15 @@ QString misc::BTBackupLocation() {
   return location;
 }
 
+QString misc::ED2KBackupLocation()
+{
+    const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
+                                               + QDir::separator() + "ED2K_backup");
+    QDir locationDir(location);
+    if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
+    return location;
+}
+
 QString misc::cacheLocation() {
   QString location = QDir::cleanPath(QDesktopServicesCacheLocation());
   QDir locationDir(location);

@@ -143,3 +143,4 @@ void QED2KHandle::queue_position_top() const {}
 void QED2KHandle::queue_position_bottom() const {}
 void QED2KHandle::super_seeding(bool ss) const {}
 void QED2KHandle::set_sequential_download(bool sd) const {}
+void QED2KHandle::save_resume_data() const { m_delegate.save_resume_data(); }

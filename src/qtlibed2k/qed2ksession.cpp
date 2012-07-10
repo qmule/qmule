@@ -1,9 +1,13 @@
+#include <fstream>
+#include <iostream>
+#include <libtorrent/bencode.hpp>
 #include <libed2k/file.hpp>
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
 #include <libed2k/error_code.hpp>
 #include "qed2ksession.h"
 #include "libed2k/alert_types.hpp"
+#include "libed2k/transfer_handle.hpp"
 #include "preferences.h"
 
 #include <QMessageBox>
@@ -130,11 +134,47 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
     m_bLargeFiles       = mo2.support_large_files();
 }
 
+bool writeResumeData(const libed2k::save_resume_data_alert* p)
+{
+    try
+    {
+        QED2KHandle h(p->m_handle);
+        qDebug() << "save fast resume data for " << h.hash();
+
+        if (h.is_valid() && p->resume_data)
+        {
+            QDir libed2kBackup(misc::ED2KBackupLocation());
+            // Remove old fastresume file if it exists
+            std::vector<char> out;
+            libtorrent::bencode(back_inserter(out), *p->resume_data);
+            const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
+            //QFile resume_file(filepath);
+            //if (resume_file.exists()) QFile::remove(filepath);
+
+            libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
+
+            std::ofstream fs(filepath.toLocal8Bit(), std::ios_base::out | std::ios_base::binary);
+
+            if (fs)
+            {
+                libed2k::archive::ed2k_oarchive oa(fs);
+                oa << trd;
+                return true;
+            }
+        }
+    }
+    catch(const libed2k::libed2k_exception&)
+    {}
+
+    return false;
+}
+
 QED2KSession::QED2KSession()
 {
     Preferences pref;
 
     m_alerts_timer.reset(new QTimer(this));
+    m_periodic_resume.reset(new QTimer(this));
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_hostname = "emule.is74.ru";
@@ -146,11 +186,14 @@ QED2KSession::QED2KSession()
     m_session->set_alert_mask(alert::all_categories);
 
     connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
+    connect(m_periodic_resume.data(), SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
     m_alerts_timer->start(500);
+    m_periodic_resume->start(170000); // 3min
 }
 
 QED2KSession::~QED2KSession()
 {
+    saveFastResumeData();
 }
 
 Transfer QED2KSession::getTransfer(const QString &hash) const
@@ -329,7 +372,7 @@ void QED2KSession::readAlerts()
         else if (libed2k::mule_listen_failed_alert* p =
                  dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
         {
-
+            // TODO - process signal - it means we have different client on same port
         }
         else if (libed2k::peer_connected_alert* p = dynamic_cast<libed2k::peer_connected_alert*>(a.get()))
         {
@@ -392,7 +435,102 @@ void QED2KSession::readAlerts()
         {
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
+        else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
+        {
+            writeResumeData(p);
+        }
 
         a = m_session->pop_alert();
     }
 }
+
+// Called periodically
+void QED2KSession::saveTempFastResumeData()
+{
+    std::vector<libed2k::transfer_handle> transfers =  m_session->get_transfers();
+
+    for (std::vector<libed2k::transfer_handle>::iterator th_itr = transfers.begin(); th_itr != transfers.end(); ++th_itr)
+    {
+        QED2KHandle h = QED2KHandle(*th_itr);
+
+        try
+        {
+            if (!h.is_valid() || !h.has_metadata()) continue;
+
+            if (h.state() == libed2k::transfer_status::checking_files ||
+                  h.state() == libed2k::transfer_status::queued_for_checking) continue;
+
+            qDebug("Saving fastresume data for %s", qPrintable(h.name()));
+            h.save_resume_data();
+        }
+        catch(std::exception&)
+        {}
+    }
+}
+
+void QED2KSession::saveFastResumeData()
+{
+    qDebug("Saving fast resume data...");
+    // Stop listening for alerts
+    //resumeDataTimer.stop();
+    m_alerts_timer->stop();
+    int num_resume_data = 0;
+    // Pause session
+    delegate()->pause();
+    std::vector<transfer_handle> transfers =  delegate()->get_transfers();
+
+    for (std::vector<transfer_handle>::iterator th_itr = transfers.begin(); th_itr != transfers.end(); th_itr++)
+    {
+        QED2KHandle h = QED2KHandle(*th_itr);
+        if (!h.is_valid() || !h.has_metadata()) continue;
+        try
+        {
+
+            if (h.state() == libed2k::transfer_status::checking_files || h.state() == libed2k::transfer_status::queued_for_checking) continue;
+            h.save_resume_data();
+            ++num_resume_data;
+        }
+        catch(libed2k::libed2k_exception&)
+        {}
+    }
+
+    while (num_resume_data > 0)
+    {
+        libed2k::alert const* a = delegate()->wait_for_alert(boost::posix_time::seconds(30));
+
+        if (a == 0)
+        {
+            qDebug("On save fast resume data we got empty alert - alert wasn't generated");
+            break;
+        }
+
+        if (libed2k::save_resume_data_failed_alert const* rda = dynamic_cast<libed2k::save_resume_data_failed_alert const*>(a))
+        {
+            --num_resume_data;
+
+            try
+            {
+                // Remove torrent from session
+                if (rda->m_handle.is_valid())
+                    delegate()->remove_transfer(rda->m_handle);
+            }
+            catch(const libed2k::libed2k_exception&)
+            {}
+        }
+        else if (libed2k::save_resume_data_alert const* rd = dynamic_cast<libed2k::save_resume_data_alert const*>(a))
+        {
+            --num_resume_data;
+            writeResumeData(rd);
+
+            try
+            {
+                delegate()->remove_transfer(rd->m_handle);
+            }
+            catch(const libed2k::libed2k_exception& )
+            {}
+        }
+
+        delegate()->pop_alert();
+    }
+}
+

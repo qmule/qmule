@@ -92,11 +92,13 @@ private:
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
     QScopedPointer<QTimer> m_alerts_timer;
+    QScopedPointer<QTimer> m_periodic_resume;
 
 public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);
+	void saveFastResumeData();
 
 	/**
 	  * number parameters were ignored on zero value
@@ -125,6 +127,7 @@ public slots:
 
 private slots:
     void readAlerts();
+    void saveTempFastResumeData();
 
 signals:
     void serverNameResolved(QString strName);

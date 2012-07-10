@@ -142,6 +142,7 @@ public:
   static int pythonVersion();
   static QString searchEngineLocation();
   static QString BTBackupLocation();
+  static QString ED2KBackupLocation();
   static QString cacheLocation();
   static long long freeDiskSpaceOnPath(QString path);
   // return best userfriendly storage unit (B, KiB, MiB, GiB, TiB)
