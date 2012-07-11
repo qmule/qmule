@@ -63,6 +63,8 @@ files_widget::files_widget(QWidget *parent)
 
     connect(model.data(), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(tableItemChanged(QStandardItem*)));
 
+    connect(btnApply, SIGNAL(clicked()), this, SLOT(applyChanges()));
+
     filesMenu = new QMenu(this);
     filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
     filesMenu->setTitle(tr("Exchange files"));
@@ -255,7 +257,7 @@ void files_widget::generatedSharedTree()
     QList<QTreeWidgetItem*> children = sharedDirs->takeChildren();
     children.erase(children.begin(), children.end());
 
-    QMap<QString, QList<QString>>::iterator iter;
+    QMap<QString, QList<QString> >::iterator iter;
     QVector<QString> stackDirs;
     QString curParentDir = dirRules.begin().key() + "!";
     QTreeWidgetItem* curParentNode = sharedDirs;
@@ -358,7 +360,7 @@ void files_widget::notExchangeSubdir()
     QTreeWidgetItem* curItem = treeFiles->currentItem();
     QString strPath = getDirPath(curItem);
 
-    QMap<QString, QList<QString>>::iterator iter = iter = dirRules.begin();
+    QMap<QString, QList<QString> >::iterator iter = dirRules.begin();
     while (iter != dirRules.end())
     {
         if (iter.key().startsWith(strPath))
@@ -420,7 +422,7 @@ void files_widget::applyChanges()
 
     QString curParentDir = dirRules.begin().key() + "!";
     QString basePath;
-    QMap<QString, QList<QString>>::iterator iter;
+    QMap<QString, QList<QString> >::iterator iter;
     QList<QString>::iterator filesIter;
     std::deque<std::string> files;
 
