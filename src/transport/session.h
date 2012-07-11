@@ -9,8 +9,6 @@
 #include "qtlibed2k/qed2ksession.h"
 #include "torrentspeedmonitor.h"
 
-typedef libtorrent::session_status SessionStatus;
-
 /**
  * Generic data transfer session
  */

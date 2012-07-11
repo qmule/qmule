@@ -115,11 +115,13 @@ std::vector<SessionBase*> Session::delegates() const {
 
 void Session::start()
 {
-    std::vector<SessionBase*> sessions = delegates();
-    for(std::vector<SessionBase*>::iterator si = sessions.begin();
-        si != sessions.end(); ++si)
-    {
-        (*si)->start();
+    if (!started()) {
+        std::vector<SessionBase*> sessions = delegates();
+        for(std::vector<SessionBase*>::iterator si = sessions.begin();
+            si != sessions.end(); ++si)
+        {
+            (*si)->start();
+        }
     }
 }
 
