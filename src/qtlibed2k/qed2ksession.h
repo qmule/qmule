@@ -93,14 +93,18 @@ public:
     virtual void readAlerts();
     virtual void saveFastResumeData();
 
+    /**
+      * scan ed2k backup directory and load all files were matched name filter
+      *
+    */
+    void loadFastResumeData();
+
     libed2k::session* delegate() const;
 
 private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
-    QScopedPointer<QTimer> m_alerts_timer;
-
 public slots:
 	void startUpTransfers();
 	void configureSession();

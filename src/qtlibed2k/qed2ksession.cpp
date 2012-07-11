@@ -148,9 +148,6 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             std::vector<char> out;
             libtorrent::bencode(back_inserter(out), *p->resume_data);
             const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
-            //QFile resume_file(filepath);
-            //if (resume_file.exists()) QFile::remove(filepath);
-
             libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
 
             std::ofstream fs(filepath.toLocal8Bit(), std::ios_base::out | std::ios_base::binary);
@@ -179,8 +176,6 @@ QED2KSession::QED2KSession()
 void QED2KSession::start()
 {
     Preferences pref;
-
-    m_alerts_timer.reset(new QTimer(this));
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
 #ifdef NOAUTH
@@ -192,9 +187,6 @@ void QED2KSession::start()
     m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
-
-    connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
-    m_alerts_timer->start(500);
 }
 
 bool QED2KSession::started() const { return !m_session.isNull(); }
@@ -254,7 +246,10 @@ QHash<QString, TrackerInfos> QED2KSession::getTrackersInfo(const QString &hash) 
 void QED2KSession::setDownloadRateLimit(long rate) {}
 void QED2KSession::setUploadRateLimit(long rate) {}
 bool QED2KSession::hasActiveTransfers() const { return false; }
-void QED2KSession::startUpTransfers() {}
+void QED2KSession::startUpTransfers()
+{
+    loadFastResumeData();
+}
 void QED2KSession::configureSession() {}
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/) {}
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
@@ -479,9 +474,6 @@ void QED2KSession::saveTempFastResumeData()
 void QED2KSession::saveFastResumeData()
 {
     qDebug("Saving fast resume data...");
-    // Stop listening for alerts
-    //resumeDataTimer.stop();
-    m_alerts_timer->stop();
     int num_resume_data = 0;
     // Pause session
     delegate()->pause();
@@ -539,6 +531,61 @@ void QED2KSession::saveFastResumeData()
         }
 
         delegate()->pop_alert();
+    }
+}
+
+void QED2KSession::loadFastResumeData()
+{
+    qDebug("load fast resume data");
+    // we need files 32 length(MD4_HASH_SIZE*2) name and extension fastresume
+    QStringList filter;
+    filter << "????????????????????????????????.fastresume";
+
+    QDir fastresume_dir(misc::ED2KBackupLocation());
+    const QStringList files = fastresume_dir.entryList(filter, QDir::Files, QDir::Unsorted);
+
+    foreach (const QString &file, files)
+    {
+        qDebug("Trying to load fastresume data: %s", qPrintable(file));
+        const QString file_abspath = fastresume_dir.absoluteFilePath(file);
+        // extract hash from name
+        libed2k::md4_hash hash = libed2k::md4_hash::fromString(file.toStdString().substr(0, libed2k::MD4_HASH_SIZE*2));
+
+        if (hash.defined())
+        {
+            try
+            {
+                std::ifstream fs(file_abspath.toLocal8Bit(), std::ios_base::in | std::ios_base::binary);
+
+                if (fs)
+                {
+                    libed2k::transfer_resume_data trd;
+                    libed2k::archive::ed2k_iarchive ia(fs);
+                    ia >> trd;
+                    // compare hashes
+                    if (trd.m_hash == hash)
+                    {
+                        // add transfer
+                        libed2k::add_transfer_params params;
+                        params.seed_mode = false;
+                        params.file_path = trd.m_filepath.m_collection;
+                        params.file_size = trd.m_filesize;
+                        params.file_hash = trd.m_hash;
+
+                        if (trd.m_fast_resume_data.count() > 0)
+                        {
+                            params.resume_data = const_cast<std::vector<char>* >(&trd.m_fast_resume_data.getTagByNameId(libed2k::FT_FAST_RESUME_DATA)->asBlob());
+                        }
+
+                        delegate()->add_transfer(params);
+                    }
+                }
+            }
+            catch(const libed2k::libed2k_exception&)
+            {}
+        }
+
+        QFile::remove(file_abspath);
     }
 }
 
