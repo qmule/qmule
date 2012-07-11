@@ -6,6 +6,7 @@
 #include "misc.h"
 #include "files_widget.h"
 #include "libed2k/types.hpp"
+#include "transport/session.h"
 
 files_widget::files_widget(QWidget *parent)
     : QWidget(parent), bProcessFiles(false)
@@ -256,7 +257,7 @@ void files_widget::generatedSharedTree()
 
     QMap<QString, QList<QString>>::iterator iter;
     QVector<QString> stackDirs;
-    QString curParentDir = "@@@";
+    QString curParentDir = dirRules.begin().key() + "!";
     QTreeWidgetItem* curParentNode = sharedDirs;
 
     for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
@@ -411,4 +412,38 @@ QString files_widget::getDirPath(QTreeWidgetItem* item)
     }
 
     return path;
+}
+
+void files_widget::applyChanges()
+{
+    Session::instance()->get_ed2k_session()->delegate()->begin_share_transaction();
+
+    QString curParentDir = dirRules.begin().key() + "!";
+    QString basePath;
+    QMap<QString, QList<QString>>::iterator iter;
+    QList<QString>::iterator filesIter;
+    std::deque<std::string> files;
+
+    for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
+    {
+        QString dirPath = iter.key();
+        if (!dirPath.startsWith(curParentDir))
+        {
+            curParentDir = dirPath;
+            if (dirPath.lastIndexOf('/') == (dirPath.length() - 1))
+                basePath = dirPath.left(dirPath.length() - 1);
+            basePath = basePath.left(basePath.lastIndexOf('/'));
+        }
+        files.clear();
+        QList<QString>& dirFiles = dirRules[dirPath];
+        for (filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
+            files.push_back(filesIter->toStdString());
+
+        Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toStdString(), dirPath.toStdString(), files);
+    }
+
+    for (filesIter = fileRules.begin(); filesIter != fileRules.end(); ++filesIter)
+        Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toStdString());
+
+    Session::instance()->get_ed2k_session()->delegate()->end_share_transaction();
 }
