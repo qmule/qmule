@@ -4,8 +4,13 @@
 
 #include <QHash>
 
+#include <vector>
+#include <libtorrent/session_status.hpp>
+
 #include <transport/transfer.h>
 #include <qtlibtorrent/trackerinfos.h>
+
+typedef libtorrent::session_status SessionStatus;
 
 class SessionBase
 {
@@ -20,6 +25,7 @@ public:
     virtual std::vector<Transfer> getTransfers() const = 0;
     virtual qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const = 0;
     virtual bool isFilePreviewPossible(const QString& hash) const = 0;
+    virtual SessionStatus getSessionStatus() const = 0;
     virtual void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) = 0;
     virtual void pauseTransfer(const QString& hash) = 0;
@@ -65,6 +71,8 @@ public:
         FORWARD_RETURN(getMaxRatioPerTransfer(hash, use_global), 0); }
     bool isFilePreviewPossible(const QString& hash) const {
         FORWARD_RETURN(isFilePreviewPossible(hash), false); }
+    SessionStatus getSessionStatus() const {
+        FORWARD_RETURN(getSessionStatus(), SessionStatus()); }
     void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) {
         FORWARD(changeLabelInSavePath(t, old_label, new_label)); }

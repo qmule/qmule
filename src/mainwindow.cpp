@@ -179,7 +179,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
   actionLock_qBittorrent->setMenu(lockMenu);
   // Creating Bittorrent session
-  connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)), 
+  connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)),
           this, SLOT(fullDiskError(Transfer, QString)));
   connect(Session::instance(), SIGNAL(finishedTransfer(Transfer)),
           this, SLOT(finishedTorrent(Transfer)));
@@ -210,7 +210,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionTools->setMenu(menuStatus);
   if(QToolButton * btn = qobject_cast<QToolButton *>(toolBar->widgetForAction(actionTools)))
     btn->setPopupMode(QToolButton::InstantPopup);
-  
+
   //tabs = new HidableTabWidget();
   //connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_changed(int)));
   //vSplitter = new QSplitter(Qt::Horizontal);
@@ -229,7 +229,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   transfer_List = new transfer_list(centralwidget, this);
   transfer_List->setParent(dock);
   dock->setWidget(transfer_List);
-  
+
   status = new status_widget(this);
   search = new search_widget(this);
   catalog = new XCatalogWidget(this);
@@ -247,9 +247,9 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionTransfer, SIGNAL(triggered()), this, SLOT(on_actionTransfer_triggerd()));
   connect(actionSearch, SIGNAL(triggered()), this, SLOT(on_actionSearch_triggerd()));
   connect(actionCatalog, SIGNAL(triggered()), this, SLOT(on_actionCatalog_triggerd()));
-  connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));  
-  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));  
-  connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));  
+  connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
+  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
+  connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
@@ -278,7 +278,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   //vSplitter->setCollapsible(1, false);
   //tabs->addTab(vSplitter, IconProvider::instance()->getIcon("folder-remote"), tr("Transfers"));
 
-  
+
   // Name filter
   /*
   search_filter = new LineEdit();
@@ -430,7 +430,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   authTimer = new QTimer(this);
   connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
   connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
-  
+
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(unsigned int)), this, SLOT(ed2kConnectionInitialized(unsigned int)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(int, int)), this, SLOT(ed2kServerStatus(int, int)));
@@ -1057,32 +1057,32 @@ void MainWindow::on_actionOpen_triggered() {
   }
 }
 
-void MainWindow::on_actionStatus_triggerd() 
+void MainWindow::on_actionStatus_triggerd()
 {
     selectWidget(1);
 }
 
-void MainWindow::on_actionCatalog_triggerd() 
+void MainWindow::on_actionCatalog_triggerd()
 {
     selectWidget(2);
 }
 
-void MainWindow::on_actionTransfer_triggerd() 
+void MainWindow::on_actionTransfer_triggerd()
 {
     selectWidget(3);
 }
 
-void MainWindow::on_actionSearch_triggerd() 
+void MainWindow::on_actionSearch_triggerd()
 {
     selectWidget(4);
 }
 
-void MainWindow::on_actionMessages_triggerd() 
+void MainWindow::on_actionMessages_triggerd()
 {
     selectWidget(5);
 }
 
-void MainWindow::on_actionFiles_triggerd() 
+void MainWindow::on_actionFiles_triggerd()
 {
     selectWidget(6);
 }
@@ -1151,7 +1151,7 @@ void MainWindow::selectWidget(int num)
     }
 }
 
-void MainWindow::on_actionConnect_triggered() 
+void MainWindow::on_actionConnect_triggered()
 {
     QMessageBox msgBox;
     msgBox.setText(tr("Do you want to break network connection?"));
@@ -1356,6 +1356,7 @@ void MainWindow::trackerAuthenticationRequired(const Transfer& h) {
 
 // Check connection status and display right icon
 void MainWindow::updateGUI() {
+    SessionStatus status = Session::instance()->get_torrent_session()->getSessionStatus();
   // update global informations
   if (systrayIcon) {
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
@@ -1363,21 +1364,31 @@ void MainWindow::updateGUI() {
     html += tr("qBittorrent");
     html += "</div>";
     html += "<div style='vertical-align: baseline; height: 18px;'>";
-    html += "<img src=':/Icons/skin/download.png'/>&nbsp;"+tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s").arg(QString::number(Session::instance()->get_torrent_session()->getPayloadDownloadRate()/1024., 'f', 1));
+    html += "<img src=':/Icons/skin/download.png'/>&nbsp;" +
+        tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s")
+        .arg(QString::number(status.payload_download_rate/1024., 'f', 1));
     html += "</div>";
     html += "<div style='vertical-align: baseline; height: 18px;'>";
-    html += "<img src=':/Icons/skin/seeding.png'/>&nbsp;"+tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s").arg(QString::number(Session::instance()->get_torrent_session()->getPayloadUploadRate()/1024., 'f', 1));
+    html += "<img src=':/Icons/skin/seeding.png'/>&nbsp;" +
+        tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s")
+        .arg(QString::number(status.payload_upload_rate/1024., 'f', 1));
     html += "</div>";
 #else
     // OSes such as Windows do not support html here
-    QString html =tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s").arg(QString::number(Session::instance()->get_torrent_session()->getPayloadDownloadRate()/1024., 'f', 1));
+    QString html =tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s")
+        .arg(QString::number(status.payload_download_rate/1024., 'f', 1));
     html += "\n";
-    html += tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s").arg(QString::number(Session::instance()->get_torrent_session()->getPayloadUploadRate()/1024., 'f', 1));
+    html += tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s")
+        .arg(QString::number(status.payload_upload_rate/1024., 'f', 1));
 #endif
     systrayIcon->setToolTip(html); // tray icon
   }
   if (displaySpeedInTitle) {
-    setWindowTitle(tr("[D: %1/s, U: %2/s] qBittorrent %3", "D = Download; U = Upload; %3 is qBittorrent version").arg(misc::friendlyUnit(Session::instance()->get_torrent_session()->getSessionStatus().payload_download_rate)).arg(misc::friendlyUnit(Session::instance()->get_torrent_session()->getSessionStatus().payload_upload_rate)).arg(QString::fromUtf8(VERSION)));
+    setWindowTitle(
+        tr("[D: %1/s, U: %2/s] qBittorrent %3", "D = Download; U = Upload; %3 is qBittorrent version")
+        .arg(misc::friendlyUnit(status.payload_download_rate))
+        .arg(misc::friendlyUnit(status.payload_upload_rate))
+        .arg(QString::fromUtf8(VERSION)));
   }
 }
 
@@ -1689,7 +1700,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     int errorLine;
     int errorColumn;
 
-    if (!doc.setContent(result, true, &errorStr, &errorLine, &errorColumn)) 
+    if (!doc.setContent(result, true, &errorStr, &errorLine, &errorColumn))
     {
         return;
     }
@@ -1703,7 +1714,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     QString authFilter;
     QString authServer;
 
-    while (!node.isNull()) 
+    while (!node.isNull())
     {
         if (node.toElement().tagName() == "AuthResult")
             authResult = node.toElement().text().toInt();
@@ -1761,6 +1772,8 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
                 systrayIcon->setIcon(getSystrayIcon());
             }
 
+            Session::instance()->start();
+
             break;
         }
         case 1:
@@ -1777,7 +1790,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             break;
         }
     }
-   
+
 
 }
 
@@ -1817,6 +1830,12 @@ void MainWindow::authRequest()
         addToLog(msg);
         statusBar->setStatusMsg(msg);
     }
+#ifdef NOAUTH
+    else
+    {
+        Session::instance()->start();
+    }
+#endif
 }
 
 void MainWindow::addToLog(QString log_message)
