@@ -111,12 +111,18 @@ private:
     Session();
     SessionBase* delegate(const QString& hash) const;
     SessionBase* delegate(const Transfer& t) const;
-    std::vector<SessionBase*> delegates() const;
+
+    template<typename Functor>
+    void for_each(const Functor& f)
+    {
+        std::for_each(m_sessions.begin(), m_sessions.end(), f);
+    }
 
     static Session* m_instance;
 
     QBtSession m_btSession;
     QED2KSession m_edSession;
+    std::vector<SessionBase*> m_sessions;
 
     QScopedPointer<TorrentSpeedMonitor> m_speedMonitor;
     QScopedPointer<QTimer>  m_periodic_resume;

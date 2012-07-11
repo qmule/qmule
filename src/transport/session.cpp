@@ -1,4 +1,4 @@
-
+#include <boost/bind.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include "transport/session.h"
 
@@ -30,6 +30,10 @@ Session::~Session()
 
 Session::Session()
 {
+    // prepare sessions container
+    m_sessions.push_back(&m_btSession);
+    m_sessions.push_back(&m_edSession);
+
     start();
 
     // libtorrent signals
@@ -106,39 +110,28 @@ SessionBase* Session::delegate(const QString& hash) const {
 
 SessionBase* Session::delegate(const Transfer& t) const { return delegate(t.hash()); }
 
-std::vector<SessionBase*> Session::delegates() const {
-    std::vector<SessionBase*> sessions;
-    sessions.push_back(const_cast<QBtSession*>(&m_btSession));
-    sessions.push_back(const_cast<QED2KSession*>(&m_edSession));
-    return sessions;
-}
-
 void Session::start()
 {
-    if (!started()) {
-        std::vector<SessionBase*> sessions = delegates();
-        for(std::vector<SessionBase*>::iterator si = sessions.begin();
-            si != sessions.end(); ++si)
-        {
-            (*si)->start();
-        }
+    if (!started())
+    {
+        for_each(std::mem_fun(&SessionBase::start));
     }
 }
 
 bool Session::started() const
 {
-    return (*delegates().begin())->started();
+    return (*m_sessions.begin())->started();
 }
 
 Transfer Session::getTransfer(const QString& hash) const {
     return delegate(hash)->getTransfer(hash);
 }
 
-std::vector<Transfer> Session::getTransfers() const {
+std::vector<Transfer> Session::getTransfers() const
+{
     std::vector<Transfer> transfers;
-    std::vector<SessionBase*> sessions = delegates();
-    for(std::vector<SessionBase*>::iterator si = sessions.begin();
-        si != sessions.end(); ++si)
+    for(std::vector<SessionBase*>::const_iterator si = m_sessions.begin();
+        si != m_sessions.end(); ++si)
     {
         std::vector<Transfer> sessionTransfers = (*si)->getTransfers();
         for(std::vector<Transfer>::iterator ti = sessionTransfers.begin();
@@ -214,9 +207,9 @@ void Session::useAlternativeSpeedsLimit(bool alternative) {
 void Session::addConsoleMessage(const QString& msg, QColor color) {
     m_btSession.addConsoleMessage(msg, color);
 }
-void Session::banIP(QString ip) {
-	m_btSession.banIP(ip);
-	m_edSession.banIP(ip);
+void Session::banIP(QString ip)
+{
+    for_each(std::bind2nd(std::mem_fun(&SessionBase::banIP), ip));
 }
 QHash<QString, TrackerInfos> Session::getTrackersInfo(const QString &hash) const {
 	return delegate(hash)->getTrackersInfo(hash);
@@ -224,14 +217,12 @@ QHash<QString, TrackerInfos> Session::getTrackersInfo(const QString &hash) const
 
 void Session::setDownloadRateLimit(long rate)
 {
-	m_btSession.setDownloadRateLimit(rate);
-	m_edSession.setDownloadRateLimit(rate);
+    for_each(std::bind2nd(std::mem_fun(&SessionBase::setDownloadRateLimit), rate));
 }
 
 void Session::setUploadRateLimit(long rate)
 {
-	m_btSession.setUploadRateLimit(rate);
-	m_edSession.setUploadRateLimit(rate);
+    for_each(std::bind2nd(std::mem_fun(&SessionBase::setUploadRateLimit), rate));
 }
 
 bool Session::hasActiveTransfers() const
@@ -245,19 +236,19 @@ bool Session::isPexEnabled() const { return m_btSession.isPexEnabled(); }
 bool Session::isLSDEnabled() const { return m_btSession.isLSDEnabled(); }
 bool Session::isQueueingEnabled() const { return m_btSession.isQueueingEnabled(); }
 bool Session::isListening() const { return m_btSession.getSession()->is_listening(); }
-void Session::startUpTransfers() {
-	m_btSession.startUpTransfers();
-	m_edSession.startUpTransfers();
+void Session::startUpTransfers()
+{
+    for_each(std::mem_fun(&SessionBase::startUpTransfers));
 }
 
-void Session::configureSession() {
-	m_btSession.configureSession();
-	m_edSession.configureSession();
+void Session::configureSession()
+{
+    for_each(std::mem_fun(&SessionBase::configureSession));
 }
 
-void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/) {
-	m_btSession.enableIPFilter(filter_path, force);
-	m_edSession.enableIPFilter(filter_path, force);
+void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
+{
+    for_each(boost::bind(&SessionBase::enableIPFilter, _1, filter_path, force));
 }
 
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }
@@ -281,12 +272,10 @@ void Session::on_savePathChanged(const QTorrentHandle& h) { emit savePathChanged
 
 void Session::saveTempFastResumeData()
 {
-    m_btSession.saveTempFastResumeData();
-    m_edSession.saveTempFastResumeData();
+    for_each(std::mem_fun(&SessionBase::saveTempFastResumeData));
 }
 
 void Session::readAlerts()
 {
-    m_btSession.readAlerts();
-    m_edSession.readAlerts();
+    for_each(std::mem_fun(&SessionBase::readAlerts));
 }
