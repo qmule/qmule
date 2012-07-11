@@ -38,6 +38,8 @@ public:
     virtual void startUpTransfers() = 0;
     virtual void configureSession() = 0;
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
+    virtual void readAlerts() = 0;
+    virtual void saveTempFastResumeData() = 0;
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -86,6 +88,9 @@ public:
     void configureSession() { FORWARD(configureSession()); }
     void enableIPFilter(const QString &filter_path, bool force=false) {
         FORWARD(enableIPFilter(filter_path, force)); }
+    void readAlerts() { FORWARD(readAlerts()); }
+    void saveTempFastResumeData() { FORWARD(saveTempFastResumeData()); }
+
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 };
 

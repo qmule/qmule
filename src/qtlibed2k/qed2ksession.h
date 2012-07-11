@@ -88,7 +88,10 @@ public:
     QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
     void setDownloadRateLimit(long rate);
     void setUploadRateLimit(long rate);
-    bool hasActiveTransfers() const;
+    bool hasActiveTransfers() const;   
+    virtual void saveTempFastResumeData();
+    virtual void readAlerts();
+    virtual void saveFastResumeData();
 
     libed2k::session* delegate() const;
 
@@ -101,7 +104,8 @@ private:
 public slots:
 	void startUpTransfers();
 	void configureSession();
-	void enableIPFilter(const QString &filter_path, bool force=false);
+	void enableIPFilter(const QString &filter_path, bool force=false);	
+
 
 	/**
 	  * number parameters were ignored on zero value
@@ -127,9 +131,6 @@ public slots:
 	void searchMoreResults();
 
     libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
-
-private slots:
-    void readAlerts();
 
 signals:
     void serverNameResolved(QString strName);

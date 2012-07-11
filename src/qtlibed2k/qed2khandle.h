@@ -100,6 +100,7 @@ public:
     void queue_position_bottom() const;
     void super_seeding(bool ss) const;
     void set_sequential_download(bool sd) const;
+    void save_resume_data() const;
 
 private:
     libed2k::transfer_handle m_delegate;

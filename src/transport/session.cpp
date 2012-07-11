@@ -20,6 +20,14 @@ void Session::drop()
     m_instance = NULL;
 }
 
+Session::~Session()
+{
+    m_periodic_resume->stop();
+    m_alerts_reading->stop();
+    m_btSession.saveFastResumeData();
+    m_edSession.saveFastResumeData();
+}
+
 Session::Session()
 {
     start();
@@ -59,6 +67,15 @@ Session::Session()
             this, SIGNAL(newConsoleMessage(QString)));
     connect(&m_btSession, SIGNAL(newBanMessage(QString)),
             this, SIGNAL(newBanMessage(QString)));
+
+    // periodic save temp fast resume data
+    m_alerts_reading.reset(new QTimer(this));
+    m_periodic_resume.reset(new QTimer(this));
+    connect(m_alerts_reading.data(), SIGNAL(timeout()), SLOT(readAlerts()));
+    connect(m_periodic_resume.data(), SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
+
+    m_alerts_reading->start(1000);
+    m_periodic_resume->start(170000);   // 3 min
 
     // libed2k signals
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
@@ -259,3 +276,15 @@ void Session::on_trackerAuthenticationRequired(const QTorrentHandle& h) {
     emit trackerAuthenticationRequired(Transfer(h));
 }
 void Session::on_savePathChanged(const QTorrentHandle& h) { emit savePathChanged(Transfer(h)); }
+
+void Session::saveTempFastResumeData()
+{
+    m_btSession.saveTempFastResumeData();
+    m_edSession.saveTempFastResumeData();
+}
+
+void Session::readAlerts()
+{
+    m_btSession.readAlerts();
+    m_edSession.readAlerts();
+}
