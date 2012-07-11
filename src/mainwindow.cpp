@@ -1698,7 +1698,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     QDomNode node = root.firstChild();
     int authResult      = -1;
     int authMessageType = -1;
-    int authTimeout     = -1;
+
     QString authMessage;
     QString authFilter;
     QString authServer;

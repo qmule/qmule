@@ -11,7 +11,6 @@ HEADERS += $$PWD/abstractcatalogdataprovider.h \
     $$PWD/3rdparty/lineedit/filterlineedit.h \
     $$PWD/folder.h \
     $$PWD/foldermodel.h \
-    $$PWD/loadhelper.h \
     $$PWD/reportdialog.h \
     $$PWD/3rdparty/sdtp/sdtp.h \
     $$PWD/sdtpcatalogdataprovider.h \
@@ -26,7 +25,6 @@ SOURCES += $$PWD/abstractcatalogdataprovider.cpp \
     $$PWD/3rdparty/lineedit/filterlineedit.cpp \
     $$PWD/folder.cpp \
     $$PWD/foldermodel.cpp \
-    $$PWD/loadhelper.cpp \
     $$PWD/reportdialog.cpp \
     $$PWD/3rdparty/sdtp/sdtp.cpp \
     $$PWD/sdtpcatalogdataprovider.cpp \

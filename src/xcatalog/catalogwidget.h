@@ -21,7 +21,6 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QWidget>
 #include <QtGui/QItemSelection>
-#include "loadhelper.h"
 
 class XCatalog;
 class XFolder;
@@ -74,7 +73,6 @@ protected:
     void setFileDetails( const XFile *file );
     bool eventFilter( QObject *obj, QEvent *event );
 
-    LoadHelper m_loadHelper;
     Ui::XCatalogWidget *ui;
     XCatalog *m_catalog;
     QString m_templateFileInfo;

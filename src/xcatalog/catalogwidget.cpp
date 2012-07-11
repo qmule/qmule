@@ -16,6 +16,7 @@
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <QtCore/QSettings>
+#include <QtCore/QTextCodec>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QMenu>
@@ -26,7 +27,6 @@
 #include <ActiveQt/QAxFactory>
 #endif
 
-#include "loadhelper.h"
 #include "catalogwidget.h"
 #include "catalog.h"
 #include "foldermodel.h"
@@ -50,6 +50,7 @@ XCatalogWidget::XCatalogWidget( QWidget *parent ) :
     m_catalog(new XCatalog(this)),
     m_searchMode(false)
 {
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8")); // TODO - it is really need? test on windows
     ui->setupUi(this);
     setWindowTitle( tr("xCatalog v%1").arg(XCFG_VERSION) );
 
