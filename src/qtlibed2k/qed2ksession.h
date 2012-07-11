@@ -83,22 +83,24 @@ public:
     QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
     void setDownloadRateLimit(long rate);
     void setUploadRateLimit(long rate);
-    bool hasActiveTransfers() const;
+    bool hasActiveTransfers() const;   
     virtual void saveTempFastResumeData();
-    libed2k::session* delegate() const;
-
     virtual void readAlerts();
     virtual void saveFastResumeData();
+
+    libed2k::session* delegate() const;
 
 private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
     QScopedPointer<QTimer> m_alerts_timer;
+
 public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);	
+
 
 	/**
 	  * number parameters were ignored on zero value

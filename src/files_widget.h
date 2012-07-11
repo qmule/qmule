@@ -60,6 +60,7 @@ private slots:
     void exchangeSubdir();
     void notExchangeDir();
     void notExchangeSubdir();
+    void applyChanges();
 };
 
 #endif // FILES_WIDGET_H

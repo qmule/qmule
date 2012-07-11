@@ -6,8 +6,8 @@
 #include <libed2k/search.hpp>
 #include <libed2k/error_code.hpp>
 #include "qed2ksession.h"
-#include "libed2k/alert_types.hpp"
 #include "libed2k/transfer_handle.hpp"
+#include "libed2k/alert_types.hpp"
 #include "preferences.h"
 
 #include <QMessageBox>
@@ -177,8 +177,6 @@ QED2KSession::QED2KSession()
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_hostname = "che-s-amd1";
-	m_settings.server_keep_alive_timeout = -1;
-    m_settings.server_reconnect_timeout = -1;
     m_settings.listen_port = pref.getListenPort();
     m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
