@@ -174,10 +174,9 @@ QED2KSession::QED2KSession()
     Preferences pref;
 
     m_alerts_timer.reset(new QTimer(this));
-    m_periodic_resume.reset(new QTimer(this));
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
-    m_settings.server_hostname = "emule.is74.ru";
+    m_settings.server_hostname = "che-s-amd1";
 	m_settings.server_keep_alive_timeout = -1;
     m_settings.server_reconnect_timeout = -1;
     m_settings.listen_port = pref.getListenPort();
@@ -186,9 +185,7 @@ QED2KSession::QED2KSession()
     m_session->set_alert_mask(alert::all_categories);
 
     connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
-    connect(m_periodic_resume.data(), SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
     m_alerts_timer->start(500);
-    m_periodic_resume->start(170000); // 3min
 }
 
 QED2KSession::~QED2KSession()

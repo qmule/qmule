@@ -23,6 +23,8 @@ public:
     static Session* instance();
     static void drop();
 
+    virtual ~Session();
+
     QBtSession* get_torrent_session();
     QED2KSession* get_ed2k_session();
 
@@ -101,6 +103,8 @@ private slots:
     void on_torrentFinishedChecking(const QTorrentHandle& h);
     void on_trackerAuthenticationRequired(const QTorrentHandle& h);
     void on_savePathChanged(const QTorrentHandle& h);
+    void saveTempFastResumeData();
+    void readAlerts();
 
 private:
     Session();
@@ -114,6 +118,8 @@ private:
     QED2KSession m_edSession;
 
     QScopedPointer<TorrentSpeedMonitor> m_speedMonitor;
+    QScopedPointer<QTimer>  m_periodic_resume;
+    QScopedPointer<QTimer>  m_alerts_reading;
 };
 
 #endif

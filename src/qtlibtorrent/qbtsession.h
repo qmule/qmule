@@ -101,6 +101,9 @@ public:
   inline bool isPexEnabled() const { return PeXEnabled; }
   inline bool isQueueingEnabled() const { return queueingEnabled; }
 
+  virtual void saveTempFastResumeData();
+  virtual void readAlerts();
+
 public slots:
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
   QTorrentHandle addMagnetUri(QString magnet_uri, bool resumed=false);
@@ -176,10 +179,8 @@ private:
 
 private slots:
   void addTorrentsFromScanFolder(QStringList&);
-  void readAlerts();
   void processBigRatios();
-  void exportTorrentFiles(QString path);
-  void saveTempFastResumeData();
+  void exportTorrentFiles(QString path);  
   void sendNotificationEmail(const QTorrentHandle &h);
   void autoRunExternalProgram(const QTorrentHandle &h, bool async=true);
   void cleanUpAutoRunProcess(int);
@@ -215,7 +216,6 @@ signals:
 private:
   // Bittorrent
   libtorrent::session *s;
-  QPointer<QTimer> timerAlerts;
   QPointer<BandwidthScheduler> bd_scheduler;
   QMap<QUrl, QPair<QString, QString> > savepathLabel_fromurl; // Use QMap for compatibility with Qt < 4.7: qHash(QUrl)
   QHash<QString, QHash<QString, TrackerInfos> > trackersInfos;

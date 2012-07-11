@@ -84,21 +84,21 @@ public:
     void setDownloadRateLimit(long rate);
     void setUploadRateLimit(long rate);
     bool hasActiveTransfers() const;
-
+    virtual void saveTempFastResumeData();
     libed2k::session* delegate() const;
+
+    virtual void readAlerts();
+    virtual void saveFastResumeData();
 
 private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
     QScopedPointer<QTimer> m_alerts_timer;
-    QScopedPointer<QTimer> m_periodic_resume;
-
 public slots:
 	void startUpTransfers();
 	void configureSession();
-	void enableIPFilter(const QString &filter_path, bool force=false);
-	void saveFastResumeData();
+	void enableIPFilter(const QString &filter_path, bool force=false);	
 
 	/**
 	  * number parameters were ignored on zero value
@@ -124,10 +124,6 @@ public slots:
 	void searchMoreResults();
 
     libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
-
-private slots:
-    void readAlerts();
-    void saveTempFastResumeData();
 
 signals:
     void serverNameResolved(QString strName);

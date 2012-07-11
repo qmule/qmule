@@ -33,9 +33,10 @@ public:
     virtual void startUpTransfers() = 0;
     virtual void configureSession() = 0;
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
-
     // implemented methods
     qreal getRealRatio(const QString& hash) const;
+    virtual void readAlerts() = 0;
+    virtual void saveTempFastResumeData() = 0;
 };
 
 #endif

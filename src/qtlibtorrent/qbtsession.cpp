@@ -144,10 +144,8 @@ QBtSession::QBtSession()
   } else {
     PeXEnabled = false;
   }
-  s->add_extension(&create_smart_ban_plugin);
-  timerAlerts = new QTimer(this);
-  connect(timerAlerts, SIGNAL(timeout()), SLOT(readAlerts()));
-  timerAlerts->start(1000);
+
+  s->add_extension(&create_smart_ban_plugin);  
   appendLabelToSavePath = pref.appendTorrentLabel();
   appendqBExtension = pref.useIncompleteFilesExtension();
   connect(m_scanFolders, SIGNAL(torrentsAdded(QStringList&)), SLOT(addTorrentsFromScanFolder(QStringList&)));
@@ -157,9 +155,6 @@ QBtSession::QBtSession()
   downloader = new DownloadThread(this);
   connect(downloader, SIGNAL(downloadFinished(QString, QString)), SLOT(processDownloadedFile(QString, QString)));
   connect(downloader, SIGNAL(downloadFailure(QString, QString)), SLOT(handleDownloadFailure(QString, QString)));
-  // Regular saving of fastresume data
-  connect(&resumeDataTimer, SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
-  resumeDataTimer.start(170000); // 3min
   qDebug("* BTSession constructed");
 }
 
@@ -171,8 +166,7 @@ QBtSession::~QBtSession() {
   saveFastResumeData();
   // Delete our objects
   if (m_tracker)
-    delete m_tracker;
-  delete timerAlerts;
+    delete m_tracker;  
   if (BigRatioTimer)
     delete BigRatioTimer;
   if (filterParser)
@@ -1580,9 +1574,6 @@ void QBtSession::saveTempFastResumeData() {
 // Called on exit
 void QBtSession::saveFastResumeData() {
   qDebug("Saving fast resume data...");
-  // Stop listening for alerts
-  resumeDataTimer.stop();
-  timerAlerts->stop();
   int num_resume_data = 0;
   // Pause session
   s->pause();
