@@ -43,7 +43,6 @@
 #include "qtorrenthandle.h"
 #include "transfer_list.h"
 
-class QBtSession;
 class downloadFromURL;
 //class SearchEngine;
 #ifdef RSS_ENABLE

@@ -22,6 +22,8 @@ void Session::drop()
 
 Session::Session()
 {
+    start();
+
     // libtorrent signals
     connect(&m_btSession, SIGNAL(addedTorrent(QTorrentHandle)),
             this, SLOT(on_addedTorrent(QTorrentHandle)));
@@ -70,14 +72,8 @@ Session::Session()
     m_speedMonitor->start();
 }
 
-QBtSession* Session::get_torrent_session()
-{
-	return &m_btSession;
-}
-
-QED2KSession* Session::get_ed2k_session() {
-    return &m_edSession;
-}
+QBtSession* Session::get_torrent_session() { return &m_btSession; }
+QED2KSession* Session::get_ed2k_session() { return &m_edSession; }
 
 SessionBase* Session::delegate(const QString& hash) const {
     QByteArray raw = hash.toAscii();
@@ -98,6 +94,21 @@ std::vector<SessionBase*> Session::delegates() const {
     sessions.push_back(const_cast<QBtSession*>(&m_btSession));
     sessions.push_back(const_cast<QED2KSession*>(&m_edSession));
     return sessions;
+}
+
+void Session::start()
+{
+    std::vector<SessionBase*> sessions = delegates();
+    for(std::vector<SessionBase*>::iterator si = sessions.begin();
+        si != sessions.end(); ++si)
+    {
+        (*si)->start();
+    }
+}
+
+bool Session::started() const
+{
+    return (*delegates().begin())->started();
 }
 
 Transfer Session::getTransfer(const QString& hash) const {

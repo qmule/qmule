@@ -57,6 +57,9 @@ struct QED2KPeerOptions
     QED2KPeerOptions(const libed2k::misc_options& mo, const libed2k::misc_options2& mo2);
 };
 
+namespace aux
+{
+
 class QED2KSession: public QObject, public SessionBase
 {
     Q_OBJECT
@@ -64,6 +67,8 @@ class QED2KSession: public QObject, public SessionBase
 
 public:
     QED2KSession();
+    void start();
+    bool started() const;
     virtual ~QED2KSession();
 
     Transfer getTransfer(const QString& hash) const;
@@ -178,5 +183,9 @@ signals:
     void deletedTransfer(QString hash);
     void transferAboutToBeRemoved(Transfer t);
 };
+
+}
+
+typedef NullSessionProxy<aux::QED2KSession> QED2KSession;
 
 #endif //__QED2KSESSION_

@@ -65,6 +65,9 @@ class DNSUpdater;
 
 const int MAX_LOG_MESSAGES = 100;
 
+namespace aux
+{
+
 class QBtSession : public QObject, public SessionBase {
   Q_OBJECT
   Q_DISABLE_COPY(QBtSession)
@@ -75,7 +78,10 @@ private:
 
 public:
   explicit QBtSession();
+  void start();
+  bool started() const;
   ~QBtSession();
+
   QTorrentHandle getTorrentHandle(const QString &hash) const;
   std::vector<libtorrent::torrent_handle> getTorrents() const;
   Transfer getTransfer(const QString& hash) const;
@@ -268,5 +274,9 @@ private:
   // DynDNS
   DNSUpdater *m_dynDNSUpdater;
 };
+
+}
+
+typedef NullSessionProxy<aux::QBtSession> QBtSession;
 
 #endif

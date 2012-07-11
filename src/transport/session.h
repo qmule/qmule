@@ -26,6 +26,9 @@ public:
     QBtSession* get_torrent_session();
     QED2KSession* get_ed2k_session();
 
+    void start();
+    bool started() const;
+
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
     qlonglong getETA(const QString& hash) const;

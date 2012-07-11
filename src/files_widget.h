@@ -28,7 +28,7 @@ class files_widget : public QWidget, public Ui::files_widget
     QScopedPointer<QStandardItemModel> model;
     QFileIconProvider provider;
 
-    QMap<QString, QList<QString>> dirRules;
+    QMap<QString, QList<QString> > dirRules;
     QList<QString> fileRules;
 
     QMenu*   filesMenu;

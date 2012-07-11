@@ -96,9 +96,12 @@ static libtorrent::sha1_hash QStringToSha1(const QString& s) {
   return ret;
 }
 
+namespace aux
+{
+
 // Main constructor
 QBtSession::QBtSession()
-  : m_scanFolders(ScanFoldersModel::instance(this)),
+  : s(NULL), m_scanFolders(ScanFoldersModel::instance(this)),
     preAllocateAll(false), addInPause(false), global_ratio_limit(-1),
     LSDEnabled(false),
     DHTEnabled(false), current_dht_port(0), queueingEnabled(false),
@@ -108,6 +111,9 @@ QBtSession::QBtSession()
   #endif
   , m_tracker(0), m_shutdownAct(NO_SHUTDOWN),
     m_upnp(0), m_natpmp(0), m_dynDNSUpdater(0)
+{}
+
+void QBtSession::start()
 {
   BigRatioTimer = new QTimer(this);
   BigRatioTimer->setInterval(10000);
@@ -162,6 +168,8 @@ QBtSession::QBtSession()
   resumeDataTimer.start(170000); // 3min
   qDebug("* BTSession constructed");
 }
+
+bool QBtSession::started() const { return s != NULL; }
 
 // Main destructor
 QBtSession::~QBtSession() {
@@ -2793,4 +2801,6 @@ entry QBtSession::generateFilePriorityResumeData(boost::intrusive_ptr<torrent_in
   entry ret(rd);
   Q_ASSERT(ret.type() == entry::dictionary_t);
   return ret;
+}
+
 }

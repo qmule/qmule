@@ -130,7 +130,14 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
     m_bLargeFiles       = mo2.support_large_files();
 }
 
+namespace aux
+{
+
 QED2KSession::QED2KSession()
+{
+}
+
+void QED2KSession::start()
 {
     Preferences pref;
 
@@ -146,6 +153,8 @@ QED2KSession::QED2KSession()
     connect(m_alerts_timer.data(), SIGNAL(timeout()), SLOT(readAlerts()));
     m_alerts_timer->start(500);
 }
+
+bool QED2KSession::started() const { return !m_session.isNull(); }
 
 QED2KSession::~QED2KSession()
 {
@@ -393,4 +402,6 @@ void QED2KSession::readAlerts()
 
         a = m_session->pop_alert();
     }
+}
+
 }

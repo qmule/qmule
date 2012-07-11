@@ -42,8 +42,6 @@ class TorrentImportDlg;
 }
 QT_END_NAMESPACE
 
-class QBtSession;
-
 class TorrentImportDlg : public QDialog
 {
   Q_OBJECT
