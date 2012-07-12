@@ -503,8 +503,6 @@ QString files_widget::getDirPath(QTreeWidgetItem* item)
 
 void files_widget::applyChanges()
 {
-    Session::instance()->get_ed2k_session()->delegate()->begin_share_transaction();
-
     QString curParentDir = dirRules.begin().key() + "!";
     QString basePath;
     QMap<QString, QList<QString> >::iterator iter;
@@ -531,8 +529,6 @@ void files_widget::applyChanges()
 
     for (filesIter = fileRules.begin(); filesIter != fileRules.end(); ++filesIter)
         Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toStdString());
-
-    Session::instance()->get_ed2k_session()->delegate()->end_share_transaction();
 }
 
 void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
