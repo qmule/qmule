@@ -64,5 +64,6 @@
         <file>newmule.ico</file>
         <file>newmule.png</file>
         <file>Preferences.png</file>
+        <file>files/SharedFolderOvl.png</file>
     </qresource>
 </RCC>

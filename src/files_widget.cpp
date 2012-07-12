@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QDir>
 #include <QStandardItemModel>
+#include <QPainter>
 
 #include "misc.h"
 #include "files_widget.h"
@@ -14,6 +15,25 @@ files_widget::files_widget(QWidget *parent)
     setupUi(this);
 
     labelIcon->setPixmap(QIcon(":/emule/files/SharedFilesList.ico").pixmap(16, 16));
+    QIcon overlay(":/emule/files/SharedFolderOvl.png");
+    emuleFolder = provider.icon(QFileIconProvider::Folder);
+
+    QSize size = emuleFolder.availableSizes()[0];
+    QImage img(size, QImage::Format_ARGB32);
+    QPainter painter;
+
+    painter.begin(&img);
+
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+
+    painter.drawPixmap(0, 0, emuleFolder.pixmap(size));
+    painter.drawPixmap(0, 0, overlay.pixmap(size));
+
+    painter.end();
+
+    emuleFolder = QIcon(QPixmap::fromImage(img));
 
     QList<int> sizes;
     sizes.append(100);
@@ -39,11 +59,17 @@ files_widget::files_widget(QWidget *parent)
 
     QFileInfoList drivesList = QDir::drives();
 
+    usualFont = treeFiles->font();
+    boldFont = treeFiles->font();
+    boldFont.setBold(true);
     QFileInfoList::const_iterator iter;
     for (iter = drivesList.begin(); iter != drivesList.end(); ++iter)
     {
         QTreeWidgetItem* item = new QTreeWidgetItem(allDirs);
-        item->setText(0, iter->absolutePath().replace(":/", ":"));
+        QString path = iter->absolutePath();
+        if (partOfSharedPath(path))
+            item->setFont(0, boldFont);
+        item->setText(0, path.replace(":/", ":"));
         item->setIcon(0, provider.icon(QFileIconProvider::Folder));
         item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
     }
@@ -118,7 +144,17 @@ void files_widget::itemExpanded(QTreeWidgetItem* item)
         {
             QTreeWidgetItem* newItem = new QTreeWidgetItem(item);
             newItem->setText(0, iter->fileName());
-            newItem->setIcon(0, provider.icon(QFileIconProvider::Folder));
+
+            QString strPath = getDirPath(newItem);
+            if (dirRules.contains(strPath))
+                setExchangeStatus(newItem, true);
+            else
+            {
+                newItem->setIcon(0, provider.icon(QFileIconProvider::Folder));
+                if (item->font(0) == boldFont)
+                    if (partOfSharedPath(strPath))
+                        newItem->setFont(0, boldFont); 
+            }
 
             QDir dirInfo(iter->absoluteFilePath());
             QFileInfoList dirList = dirInfo.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -215,12 +251,24 @@ void files_widget::tableItemChanged(QStandardItem* item)
         if (item->checkState() == Qt::Checked)
         {
             if (!fileRules.contains(filePath))
+            {
                 fileRules.push_back(filePath);
+                curItem->setFont(0, boldFont);
+                while (curItem->parent() != allDirs)
+                {
+                    curItem = curItem->parent();
+                    curItem->setFont(0, boldFont);
+                }
+            }
+
         }
         else
         {
             if (fileRules.contains(filePath))
+            {
                 fileRules.removeOne(filePath);
+                checkExchangeParentStatus(curItem);
+            }
         }
     }
     else
@@ -301,7 +349,13 @@ void files_widget::exchangeDir()
     {
         QList<QString> filesList;
         dirRules.insert(strPath, filesList);
+        setExchangeStatus(curItem, true);
         generatedSharedTree();
+        while (curItem->parent() != allDirs)
+        {
+            curItem = curItem->parent();
+            curItem->setFont(0, boldFont);
+        }
     }
 }
 
@@ -316,8 +370,14 @@ void files_widget::exchangeSubdir()
     {
         QList<QString> filesList;
         dirRules.insert(strPath, filesList);
+        setChildExchangeStatus(curItem, true);
+        while (curItem->parent() != allDirs)
+        {
+            curItem = curItem->parent();
+            curItem->setFont(0, boldFont);
+        }
     }
-    exchangeSubdir(fileList);
+    exchangeSubdir(fileList);    
 
     generatedSharedTree();
 }
@@ -352,6 +412,9 @@ void files_widget::notExchangeDir()
 
     dirRules.erase(dirRules.find(strPath));
 
+    setExchangeStatus(curItem, false);
+    checkExchangeParentStatus(curItem);
+
     generatedSharedTree();
 }
 
@@ -369,7 +432,29 @@ void files_widget::notExchangeSubdir()
             ++iter;
     }
 
+    setChildExchangeStatus(curItem, false);
+    checkExchangeParentStatus(curItem);
+
     generatedSharedTree();
+}
+
+void files_widget::checkExchangeParentStatus(QTreeWidgetItem* curItem)
+{
+    QString strPath = getDirPath(curItem);
+    if (partOfSharedPath(strPath))
+        curItem->setFont(0, boldFont);
+    else
+        curItem->setFont(0, usualFont);
+
+    while (curItem->parent() != allDirs)
+    {
+        curItem = curItem->parent();
+        strPath = getDirPath(curItem);
+        if (dirRules.contains(strPath))
+            break;
+        if (!partOfSharedPath(strPath))
+            curItem->setFont(0, usualFont);
+    }
 }
 
 bool files_widget::isDirTreeItem(QTreeWidgetItem* item)
@@ -448,4 +533,44 @@ void files_widget::applyChanges()
         Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toStdString());
 
     Session::instance()->get_ed2k_session()->delegate()->end_share_transaction();
+}
+
+void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
+{
+    if (status)
+    {
+        item->setFont(0, boldFont);
+        item->setIcon(0, emuleFolder);
+    }
+    else
+    {
+        item->setFont(0, usualFont);
+        item->setIcon(0, provider.icon(QFileIconProvider::Folder));
+    }
+}
+
+bool files_widget::partOfSharedPath(QString path)
+{
+    QMap<QString, QList<QString> >::iterator iter;
+    for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
+        if (iter.key().startsWith(path))
+            return true;
+
+    QList<QString>::iterator filesIter;
+    for (filesIter = fileRules.begin(); filesIter != fileRules.end(); ++filesIter)
+        if (filesIter->startsWith(path))
+            return true;
+
+    return false;
+}
+
+void files_widget::setChildExchangeStatus(QTreeWidgetItem* item, bool status)
+{
+    setExchangeStatus(item, status);
+
+    int childCnt = item->childCount();
+    for (int ii = 0; ii < childCnt; ii++)
+    {
+        setChildExchangeStatus(item->child(ii), status);
+    }
 }

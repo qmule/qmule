@@ -37,6 +37,10 @@ class files_widget : public QWidget, public Ui::files_widget
     QAction* filesNotExchDir;
     QAction* filesNotExchSubdir;
 
+    QFont usualFont;
+    QFont boldFont;
+    QIcon emuleFolder;
+
     bool bProcessFiles;
 
 public:
@@ -49,6 +53,10 @@ private:
     QString getDirPath(QTreeWidgetItem* item);
     void    generatedSharedTree();
     void    exchangeSubdir(QFileInfoList& fileList);
+    bool    partOfSharedPath(QString path);
+    void    setExchangeStatus(QTreeWidgetItem* item, bool status);
+    void    setChildExchangeStatus(QTreeWidgetItem* item, bool status);
+    void    checkExchangeParentStatus(QTreeWidgetItem* curItem);
 
 private slots:
     void itemExpanded(QTreeWidgetItem* item);
