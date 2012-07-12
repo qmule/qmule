@@ -277,6 +277,6 @@ private:
 
 }
 
-typedef NullSessionProxy<aux::QBtSession> QBtSession;
+typedef DeferredSessionProxy<aux::QBtSession> QBtSession;
 
 #endif

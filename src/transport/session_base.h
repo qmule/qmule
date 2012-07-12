@@ -5,6 +5,7 @@
 #include <QHash>
 
 #include <vector>
+#include <queue>
 #include <libtorrent/session_status.hpp>
 
 #include <transport/transfer.h>
@@ -51,18 +52,43 @@ public:
     virtual qreal getRealRatio(const QString& hash) const;
 };
 
-#define FORWARD(call)                           \
-    if (!S::started()) return;                  \
-    else S::call
+#define DEFER0(call)                                            \
+    if (!S::started())                                          \
+        m_deferred.push(boost::bind(&S::call, this));           \
+    else S::call()
+
+#define DEFER1(call, arg1)                                              \
+    if (!S::started())                                                  \
+        m_deferred.push(boost::bind(&S::call, this, arg1));             \
+    else S::call(arg1)
+
+#define DEFER2(call, arg1, arg2)                                        \
+    if (!S::started())                                                  \
+        m_deferred.push(boost::bind(&S::call, this, arg1, arg2));       \
+    else S::call(arg1, arg2)
+
+#define DEFER3(call, arg1, arg2, arg3)                                  \
+    if (!S::started())                                                  \
+        m_deferred.push(boost::bind(&S::call, this, arg1, arg2, arg3)); \
+    else S::call(arg1, arg2, arg3)
 
 #define FORWARD_RETURN(call, def)               \
     if (!S::started()) return def;              \
     else return S::call
 
 template <typename S>
-class NullSessionProxy : public S
+class DeferredSessionProxy : public S
 {
 public:
+    void start()
+    {
+        S::start();
+        while(!m_deferred.empty()) {
+            m_deferred.front()();
+            m_deferred.pop();
+        }
+    }
+
     Transfer getTransfer(const QString& hash) const {
         FORWARD_RETURN(getTransfer(hash), Transfer()); }
     std::vector<Transfer> getTransfers() const {
@@ -75,31 +101,34 @@ public:
         FORWARD_RETURN(getSessionStatus(), SessionStatus()); }
     void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) {
-        FORWARD(changeLabelInSavePath(t, old_label, new_label)); }
-    void pauseTransfer(const QString& hash) { FORWARD(pauseTransfer(hash)); }
-    void resumeTransfer(const QString& hash) { FORWARD(resumeTransfer(hash)); }
+        DEFER3(changeLabelInSavePath, t, old_label, new_label); }
+    void pauseTransfer(const QString& hash) { DEFER1(pauseTransfer, hash); }
+    void resumeTransfer(const QString& hash) { DEFER1(resumeTransfer, hash); }
     void deleteTransfer(const QString& hash, bool delete_files) {
-        FORWARD(deleteTransfer(hash, delete_files)); }
-    void recheckTransfer(const QString& hash) { FORWARD(recheckTransfer(hash)); }
-    void setDownloadLimit(const QString& hash, long limit) { FORWARD(setDownloadLimit(hash, limit)); }
-    void setUploadLimit(const QString& hash, long limit) { FORWARD(setUploadLimit(hash, limit)); }
+        DEFER2(deleteTransfer, hash, delete_files); }
+    void recheckTransfer(const QString& hash) { DEFER1(recheckTransfer, hash); }
+    void setDownloadLimit(const QString& hash, long limit) { DEFER2(setDownloadLimit, hash, limit); }
+    void setUploadLimit(const QString& hash, long limit) { DEFER2(setUploadLimit, hash, limit); }
     void setMaxRatioPerTransfer(const QString& hash, qreal ratio) {
-        FORWARD(setMaxRatioPerTransfer(hash, ratio)); }
-    void removeRatioPerTransfer(const QString& hash) { FORWARD(removeRatioPerTransfer(hash)); }
-    void banIP(QString ip) { FORWARD(banIP(ip)); }
+        DEFER2(setMaxRatioPerTransfer, hash, ratio); }
+    void removeRatioPerTransfer(const QString& hash) { DEFER1(removeRatioPerTransfer, hash); }
+    void banIP(QString ip) { DEFER1(banIP, ip); }
     QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const {
         FORWARD_RETURN(getTrackersInfo(hash), (QHash<QString, TrackerInfos>())); }
-    void setDownloadRateLimit(long rate) { FORWARD(setDownloadRateLimit(rate)); }
-    void setUploadRateLimit(long rate) { FORWARD(setUploadRateLimit(rate)); }
+    void setDownloadRateLimit(long rate) { DEFER1(setDownloadRateLimit, rate); }
+    void setUploadRateLimit(long rate) { DEFER1(setUploadRateLimit, rate); }
     bool hasActiveTransfers() const { FORWARD_RETURN(hasActiveTransfers(), false); }
-    void startUpTransfers() { FORWARD(startUpTransfers()); }
-    void configureSession() { FORWARD(configureSession()); }
+    void startUpTransfers() { DEFER0(startUpTransfers); }
+    void configureSession() { DEFER0(configureSession); }
     void enableIPFilter(const QString &filter_path, bool force=false) {
-        FORWARD(enableIPFilter(filter_path, force)); }
-    void readAlerts() { FORWARD(readAlerts()); }
-    void saveTempFastResumeData() { FORWARD(saveTempFastResumeData()); }
+        DEFER2(enableIPFilter, filter_path, force); }
+    void readAlerts() { DEFER0(readAlerts); }
+    void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
 
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
+
+private:
+    std::queue<boost::function<void()> > m_deferred;
 };
 
 #endif
