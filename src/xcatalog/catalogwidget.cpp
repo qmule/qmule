@@ -88,7 +88,7 @@ XCatalogWidget::XCatalogWidget( QWidget *parent ) :
              this, SLOT(onError(int,void*)) );
 
     connect(m_catalog, SIGNAL(allFoldersFetched(XFolder*)),
-            this, SLOT(onAllFoldersFetched(XFolder*)), Qt::QueuedConnection );
+            this, SLOT(onAllFoldersFetched(XFolder*)), Qt::QueuedConnection );    
 
     ui->filesView->installEventFilter(this);
 
@@ -127,7 +127,7 @@ XCatalogWidget::XCatalogWidget( QWidget *parent ) :
             this, SLOT(execSearch()) );
 
     connect(ui->searchButton, SIGNAL(clicked()),
-            this, SLOT(execSearch()) );
+            this, SLOT(execSearch()) );   
 
     // file list menu
     QMenu *flMenu = new QMenu(ui->fileListButton);
@@ -294,7 +294,7 @@ void XCatalogWidget::setFileDetails( const XFile *file )
         html.replace("%XTOPICID%", QString("%1").arg(file->parent()->id()) );
         html.replace("%XPOSTID%", QString("%1").arg(file->id()) );
 
-#ifdef _WINDLL
+//#ifdef _WINDLL
         QRegExp rx("<a href=\"(http://fake\\.link/\\?link=[A-Za-z0-9/+=]+)\">(.*)</a>");
         rx.setMinimal(true); // non greeeeedy
         int pos = 0;
@@ -347,7 +347,7 @@ void XCatalogWidget::setFileDetails( const XFile *file )
             previewTemplate.replace("%ED2KLINK%", url.toString());
             html.replace("<!--PREVIEW-->", previewTemplate);
         }
-#endif
+//#endif
         ui->fileDesc->setHtml(html);
     }
 }
@@ -362,20 +362,20 @@ void XCatalogWidget::onLinkClicked( const QUrl &link )
         QByteArray data = QByteArray::fromPercentEncoding ( QByteArray::fromBase64( link.queryItemValue("link").toAscii() ) );
         QString realLink = QString::fromUtf8(data.constData());
 
-#ifdef _WINDLL
+//#ifdef _WINDLL
         if ( realLink.startsWith("ed2k://") ) {
             emit ed2kLinkEvent(realLink);
         } else {
             Util::openUrl(realLink);
         }
-#else
-        Util::openUrl(realLink);
-#endif
+//#else
+//        Util::openUrl(realLink);
+//#endif
 
         return;
     }
 
-#ifdef _WINDLL
+//#ifdef _WINDLL
     // preview link
     if ( action == "preview.link" )
     {
@@ -387,7 +387,7 @@ void XCatalogWidget::onLinkClicked( const QUrl &link )
 
         return;
     }
-#endif
+//#endif
 
     // abuse report link
     else if ( action == "report.link" )

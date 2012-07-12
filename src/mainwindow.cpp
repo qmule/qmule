@@ -250,6 +250,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
+  // load from catalog link, temporary without deferred proxy
+  connect(catalog, SIGNAL(ed2kLinkEvent(QString)), Session::instance()->get_ed2k_session(), SLOT(loadED2KLink(QString)));
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));

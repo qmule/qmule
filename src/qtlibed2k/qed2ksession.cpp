@@ -252,7 +252,26 @@ void QED2KSession::startUpTransfers()
     loadFastResumeData();
 }
 void QED2KSession::configureSession() {}
-void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/) {}
+void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
+
+void QED2KSession::loadED2KLink(QString strLink)
+{
+    qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
+
+    libed2k::emule_collection_entry ece = libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+
+    if (ece.defined())
+    {
+        qDebug("Link is correct, add transfer");
+        QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+        libed2k::add_transfer_params atp;
+        atp.file_hash = ece.m_filehash;
+        atp.file_path = filepath.toUtf8();
+        atp.file_size = ece.m_filesize;
+        delegate()->add_transfer(atp);
+    }
+}
+
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
 
 void QED2KSession::searchFiles(const QString& strQuery,
