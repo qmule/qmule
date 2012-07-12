@@ -192,6 +192,6 @@ signals:
 
 }
 
-typedef NullSessionProxy<aux::QED2KSession> QED2KSession;
+typedef DeferredSessionProxy<aux::QED2KSession> QED2KSession;
 
 #endif //__QED2KSESSION_

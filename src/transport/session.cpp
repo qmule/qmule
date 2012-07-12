@@ -34,8 +34,6 @@ Session::Session()
     m_sessions.push_back(&m_btSession);
     m_sessions.push_back(&m_edSession);
 
-    start();
-
     // libtorrent signals
     connect(&m_btSession, SIGNAL(addedTorrent(QTorrentHandle)),
             this, SLOT(on_addedTorrent(QTorrentHandle)));
