@@ -254,7 +254,7 @@ void QED2KSession::startUpTransfers()
 void QED2KSession::configureSession() {}
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
-void QED2KSession::loadED2KLink(QString strLink)
+Transfer QED2KSession::addLink(QString strLink, bool resumed)
 {
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
@@ -268,8 +268,10 @@ void QED2KSession::loadED2KLink(QString strLink)
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8();
         atp.file_size = ece.m_filesize;
-        delegate()->add_transfer(atp);
+        return QED2KHandle(delegate()->add_transfer(atp));
     }
+
+    return QED2KHandle();
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }

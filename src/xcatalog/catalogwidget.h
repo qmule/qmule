@@ -47,7 +47,7 @@ public:
     ~XCatalogWidget();
 
 signals:
-    void ed2kLinkEvent( QString ed2kLink );
+    void ed2kLinkEvent( QString ed2kLink, bool resumed = false);
     void filePreviewEvent( QString ed2kLink );
 
 private slots:

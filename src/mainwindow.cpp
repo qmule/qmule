@@ -251,7 +251,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
   // load from catalog link, temporary without deferred proxy
-  connect(catalog, SIGNAL(ed2kLinkEvent(QString)), Session::instance()->get_ed2k_session(), SLOT(loadED2KLink(QString)));
+  connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
@@ -999,7 +999,7 @@ void MainWindow::dropEvent(QDropEvent *event) {
         torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
         dialog->showLoadMagnetURI(file);
       } else {
-        Session::instance()->addMagnetUri(file);	// TODO - check it fir using only in torrent
+        Session::instance()->addLink(file);	// TODO - check it fir using only in torrent
       }
       continue;
     }
@@ -1010,7 +1010,7 @@ void MainWindow::dropEvent(QDropEvent *event) {
         file = QUrl(file).toLocalFile();
       dialog->showLoad(file);
     }else{
-      Session::instance()->addTorrent(file);	// TODO - possibly it is torrent only
+      Session::instance()->addLink(file);	// TODO - possibly it is torrent only
     }
   }
 }
@@ -1213,7 +1213,7 @@ void MainWindow::processParams(const QStringList& params) {
           torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
           dialog->showLoadMagnetURI(param);
         } else {
-          Session::instance()->addMagnetUri(param);
+          Session::instance()->addLink(param);
         }
       } else {
         if (useTorrentAdditionDialog) {
@@ -1433,7 +1433,7 @@ void MainWindow::downloadFromURLList(const QStringList& url_list) {
         torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
         dialog->showLoadMagnetURI(url);
       } else {
-        Session::instance()->addMagnetUri(url);
+        Session::instance()->addLink(url);
       }
     } else {
       Session::instance()->downloadFromUrl(url);

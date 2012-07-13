@@ -695,13 +695,13 @@ void torrentAdditionDialog::on_OkButton_clicked() {
   if (!is_magnet && t->num_files() > 1)
     savePiecesPriorities();
   // Add to download list
-  QTorrentHandle h;
+  Transfer th;
   if (is_magnet)
-    h = Session::instance()->addMagnetUri(from_url, false);
+    th = Session::instance()->addLink(from_url, false);
   else
-    h = Session::instance()->addTorrent(filePath, false, from_url);
-  if (addInPause->isChecked() && h.is_valid()) {
-    h.pause();
+    th = Session::instance()->addTorrent(filePath, false, from_url);
+  if (addInPause->isChecked() && th.is_valid()) {
+    th.pause();
   }
   // Close the dialog
   qDebug("Closing torrent addition dialog...");

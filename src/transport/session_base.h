@@ -47,6 +47,7 @@ public:
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
     virtual void readAlerts() = 0;
     virtual void saveTempFastResumeData() = 0;
+    virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -75,6 +76,10 @@ public:
 #define FORWARD_RETURN(call, def)               \
     if (!S::started()) return def;              \
     else return S::call
+
+#define FORWARD_RETURN2(call, arg1, arg2, def)  \
+    if (!S::started()) return def;              \
+    else return S::call(arg1, arg2)
 
 template <typename S>
 class DeferredSessionProxy : public S
@@ -124,6 +129,7 @@ public:
         DEFER2(enableIPFilter, filter_path, force); }
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
+    Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
 
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 

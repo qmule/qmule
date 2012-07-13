@@ -40,8 +40,7 @@ public:
     SessionStatus getSessionStatus() const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);
     QTorrentHandle addTorrent(const QString& path, bool fromScanDir = false,
-                              QString from_url = QString(), bool resumed = false);
-    QTorrentHandle addMagnetUri(const QString& url, bool resumed=false);
+                              QString from_url = QString(), bool resumed = false);    
     QED2KHandle addTransfer(const libed2k::add_transfer_params& params);
     void downloadFromUrl(const QString& url);
     void processDownloadedFile(const QString& url, const QString& path);
@@ -73,6 +72,7 @@ public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);
+    virtual Transfer addLink(QString strLink, bool resumed = false);
 
 signals:
     void addedTransfer(Transfer t);

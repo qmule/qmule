@@ -163,9 +163,6 @@ QTorrentHandle Session::addTorrent(const QString& path, bool fromScanDir/* = fal
                                    QString from_url /*= QString()*/, bool resumed/* = false*/) {
     return m_btSession.addTorrent(path, fromScanDir, from_url, resumed);
 }
-QTorrentHandle Session::addMagnetUri(const QString& url, bool resumed/*=false*/) {
-    return m_btSession.addMagnetUri(url, resumed);
-}
 QED2KHandle Session::addTransfer(const libed2k::add_transfer_params& params) {
     return QED2KHandle(m_edSession.delegate()->add_transfer(params));
 }
@@ -247,6 +244,16 @@ void Session::configureSession()
 void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
 {
     for_each(boost::bind(&SessionBase::enableIPFilter, _1, filter_path, force));
+}
+
+Transfer Session::addLink(QString strLink, bool resumed)
+{
+   if (strLink.startsWith("ed2k://"))
+   {
+       return m_edSession.addLink(strLink, resumed);
+   }
+
+   return m_btSession.addLink(strLink, resumed);
 }
 
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }

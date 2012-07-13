@@ -110,7 +110,7 @@ public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);	
-    void loadED2KLink(QString strLink);
+    virtual Transfer addLink(QString strLink, bool resumed = false);
 
 	/**
 	  * number parameters were ignored on zero value

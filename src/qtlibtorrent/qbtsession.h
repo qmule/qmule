@@ -112,7 +112,7 @@ public:
 
 public slots:
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
-  QTorrentHandle addMagnetUri(QString magnet_uri, bool resumed=false);
+  Transfer addLink(QString strLink, bool resumed=false);
   void loadSessionState();
   void saveSessionState();
   void downloadFromUrl(const QString &url);

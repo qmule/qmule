@@ -889,11 +889,12 @@ void QBtSession::loadTorrentSettings(QTorrentHandle& h) {
 #endif
 }
 
-QTorrentHandle QBtSession::addMagnetUri(QString magnet_uri, bool resumed) {
+Transfer QBtSession::addLink(QString strLink, bool resumed)
+{
   QTorrentHandle h;
-  const QString hash(misc::magnetUriToHash(magnet_uri));
+  const QString hash(misc::magnetUriToHash(strLink));
   if (hash.isEmpty()) {
-    addConsoleMessage(tr("'%1' is not a valid magnet URI.").arg(magnet_uri));
+    addConsoleMessage(tr("'%1' is not a valid magnet URI.").arg(strLink));
     return h;
   }
   const QDir torrentBackup(misc::BTBackupLocation());
@@ -904,12 +905,12 @@ QTorrentHandle QBtSession::addMagnetUri(QString magnet_uri, bool resumed) {
       return addTorrent(torrent_path, false, QString::null, true);
   }
   qDebug("Adding a magnet URI: %s", qPrintable(hash));
-  Q_ASSERT(magnet_uri.startsWith("magnet:", Qt::CaseInsensitive));
+  Q_ASSERT(strLink.startsWith("magnet:", Qt::CaseInsensitive));
 
   // Check for duplicate torrent
   if (s->find_torrent(QStringToSha1(hash)).is_valid()) {
     qDebug("/!\\ Torrent is already in download list");
-    addConsoleMessage(tr("'%1' is already in download list.", "e.g: 'xxx.avi' is already in download list.").arg(magnet_uri));
+    addConsoleMessage(tr("'%1' is already in download list.", "e.g: 'xxx.avi' is already in download list.").arg(strLink));
     return h;
   }
 
@@ -932,11 +933,11 @@ QTorrentHandle QBtSession::addMagnetUri(QString magnet_uri, bool resumed) {
     qDebug("addMagnetURI: using save_path: %s", qPrintable(savePath));
   }
 
-  qDebug("Adding magnet URI: %s", qPrintable(magnet_uri));
+  qDebug("Adding magnet URI: %s", qPrintable(strLink));
 
   // Adding torrent to Bittorrent session
   try {
-    h =  QTorrentHandle(add_magnet_uri(*s, magnet_uri.toStdString(), p));
+    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toStdString(), p));
   }catch(std::exception e) {
     qDebug("Error: %s", e.what());
   }
@@ -965,7 +966,7 @@ QTorrentHandle QBtSession::addMagnetUri(QString magnet_uri, bool resumed) {
     h.resume();
   }
   // Send torrent addition signal
-  addConsoleMessage(tr("'%1' added to download list.", "'/home/y/xxx.torrent' was added to download list.").arg(magnet_uri));
+  addConsoleMessage(tr("'%1' added to download list.", "'/home/y/xxx.torrent' was added to download list.").arg(strLink));
   emit addedTorrent(h);
   return h;
 }
@@ -2620,7 +2621,7 @@ void QBtSession::downloadFromURLList(const QStringList& urls) {
 }
 
 void QBtSession::addMagnetSkipAddDlg(QString uri) {
-  addMagnetUri(uri, false);
+  addLink(uri, false);
 }
 
 void QBtSession::downloadUrlAndSkipDialog(QString url, QString save_path, QString label) {
@@ -2721,7 +2722,7 @@ void QBtSession::startUpTransfers() {
       torrent_queue.pop();
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash)) {
-        addMagnetUri(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true);
       } else {
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
       }
@@ -2731,7 +2732,7 @@ void QBtSession::startUpTransfers() {
     foreach (const QString &hash, known_torrents) {
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash))
-        addMagnetUri(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true);
       else
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
     }
