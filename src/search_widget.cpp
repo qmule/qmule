@@ -196,10 +196,6 @@ search_widget::search_widget(QWidget *parent)
             SIGNAL(peerSharedDirectoryFiles(const libed2k::net_identifier&, const QString&, const QString&, const std::vector<QED2KSearchResultEntry>&)),
             this, SLOT(processUserFiles(const libed2k::net_identifier&, const QString&, const QString&, const std::vector<QED2KSearchResultEntry>&)));
 
-    void processUserFiles(const libed2k::net_identifier& np, const QString& hash,
-                          const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
-
-
     userMenu = new QMenu(this);
     userMenu->setObjectName(QString::fromUtf8("userMenu"));
     userMenu->setTitle(tr("Clients"));
@@ -253,6 +249,7 @@ search_widget::search_widget(QWidget *parent)
     connect(treeResult, SIGNAL(expanded(const QModelIndex&)), this, SLOT(itemExpanded(const QModelIndex&)));
     connect(treeResult, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(itemCollapsed(const QModelIndex&)));
     connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(sortChanged(int, Qt::SortOrder)));
+    connect(treeResult, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(download()));
     
     btnDownload->setEnabled(false);
     // sort by name ascending
