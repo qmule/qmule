@@ -852,7 +852,10 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
                                            searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS))
         btnDownload->setEnabled(false);
     else
-        btnDownload->setEnabled(!sel.indexes().empty());
+    {
+        QModelIndexList selected = treeResult->selectionModel()->selectedIndexes();
+        btnDownload->setEnabled(selected.size());
+    }
 }
 
 void search_widget::download()

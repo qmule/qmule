@@ -8,6 +8,7 @@
 
 QT_BEGIN_NAMESPACE
 class QStandardItemModel;
+class QSortFilterProxyModel;
 class QStandardItem;
 QT_END_NAMESPACE
 
@@ -26,6 +27,7 @@ class files_widget : public QWidget, public Ui::files_widget
     QTreeWidgetItem* allDirs;
     QTreeWidgetItem* sharedDirs;
     QScopedPointer<QStandardItemModel> model;
+    QScopedPointer<QSortFilterProxyModel> filterModel;
     QFileIconProvider provider;
 
     QMap<QString, QList<QString> > dirRules;
@@ -51,12 +53,13 @@ private:
     bool    isDirTreeItem(QTreeWidgetItem* item);
     bool    isSharedDirTreeItem(QTreeWidgetItem* item);
     QString getDirPath(QTreeWidgetItem* item);
-    void    generatedSharedTree();
+    void    generateSharedTree();
     void    exchangeSubdir(QFileInfoList& fileList);
     bool    partOfSharedPath(QString path);
     void    setExchangeStatus(QTreeWidgetItem* item, bool status);
     void    setChildExchangeStatus(QTreeWidgetItem* item, bool status);
     void    checkExchangeParentStatus(QTreeWidgetItem* curItem);
+    void    shareDir(QString dirPath, bool bShare);
 
 private slots:
     void itemExpanded(QTreeWidgetItem* item);

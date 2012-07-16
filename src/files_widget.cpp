@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QDir>
 #include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 #include <QPainter>
 
 #include "misc.h"
@@ -77,8 +78,17 @@ files_widget::files_widget(QWidget *parent)
     model.reset(new QStandardItemModel(0, FW_COLUMNS_NUM));
     model->setHeaderData(FW_NAME, Qt::Horizontal,           tr("File Name"));
     model->setHeaderData(FW_SIZE, Qt::Horizontal,           tr("File Size"));
-    tableFiles->setModel(model.data());
+
+    filterModel.reset(new QSortFilterProxyModel());
+    filterModel.data()->setDynamicSortFilter(true);
+    filterModel.data()->setSourceModel(model.data());
+    filterModel.data()->setFilterKeyColumn(FW_NAME);
+    filterModel.data()->setFilterRole(Qt::DisplayRole);
+    filterModel.data()->setSortCaseSensitivity(Qt::CaseInsensitive);
+
+    tableFiles->setModel(filterModel.data());
     tableFiles->setColumnWidth(0, 250);
+    tableFiles->header()->setSortIndicator(FW_NAME, Qt::AscendingOrder);
 
     connect(treeFiles, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(itemExpanded(QTreeWidgetItem*)));
     connect(treeFiles, SIGNAL(itemCollapsed(QTreeWidgetItem*)), this, SLOT(itemCollapsed(QTreeWidgetItem*)));
@@ -121,6 +131,8 @@ files_widget::files_widget(QWidget *parent)
     connect(filesExchSubdir,  SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(filesNotExchDir,  SIGNAL(triggered()), this, SLOT(notExchangeDir()));
     connect(filesNotExchSubdir,  SIGNAL(triggered()), this, SLOT(notExchangeSubdir()));
+
+    tabWidget->hide();
 }
 
 files_widget::~files_widget()
@@ -174,6 +186,27 @@ void files_widget::itemCollapsed(QTreeWidgetItem* item)
 
 void files_widget::itemClicked(QTreeWidgetItem* item, int column)
 {
+    for (int ii = model->rowCount()-1; ii >= 0; --ii)
+        model->removeRow(ii);
+
+    if (item == allFiles)
+    {
+        std::vector<Transfer> transfers = Session::instance()->get_ed2k_session()->getTransfers();
+        std::vector<Transfer>::const_iterator iter;
+        for (iter = transfers.begin(); iter != transfers.end(); ++iter)
+        {
+            model->insertRow(0);
+            model->setData(model->index(0, FW_NAME), iter->name());
+            model->setData(model->index(0, FW_SIZE), misc::friendlyUnit(iter->actual_size()));
+
+            QFileInfo info(iter->save_path() + "/" + iter->name());
+            QStandardItem* listItem = model->item(0, FW_NAME);
+            listItem->setIcon(provider.icon(info));
+        }
+
+        return;
+    }
+
     bool isDir = isDirTreeItem(item);
     if (!isDir && !isSharedDirTreeItem(item))
         return;
@@ -189,9 +222,6 @@ void files_widget::itemClicked(QTreeWidgetItem* item, int column)
     QDir dir(dirPath);
     QFileInfoList fileList = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::Files);
 
-    for (int ii = model->rowCount()-1; ii >= 0; --ii)
-        model->removeRow(ii);
-
     QFileInfoList::const_iterator iter;
     int row = 0;
     for (iter = fileList.begin(); iter != fileList.end(); ++iter)
@@ -201,7 +231,7 @@ void files_widget::itemClicked(QTreeWidgetItem* item, int column)
         model->setData(model->index(row, FW_SIZE), misc::friendlyUnit(iter->size()));
         QStandardItem* listItem = model->item(row, FW_NAME);
         listItem->setIcon(provider.icon(*iter));
-        listItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        listItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
         if (isDir && !dirRules.contains(dirPath))
         {
@@ -253,6 +283,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             if (!fileRules.contains(filePath))
             {
                 fileRules.push_back(filePath);
+                Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toStdString());
                 curItem->setFont(0, boldFont);
                 while (curItem->parent() != allDirs)
                 {
@@ -267,6 +298,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             if (fileRules.contains(filePath))
             {
                 fileRules.removeOne(filePath);
+                Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toStdString());
                 checkExchangeParentStatus(curItem);
             }
         }
@@ -283,7 +315,8 @@ void files_widget::tableItemChanged(QStandardItem* item)
         {
             if (!files.contains(fileName))
                 files.push_back(fileName);
-        }        
+        }
+        shareDir(dirPath, true);
     }
 }
 
@@ -300,10 +333,13 @@ void files_widget::displayTreeMenu(const QPoint&)
     filesMenu->exec(QCursor::pos());
 }
 
-void files_widget::generatedSharedTree()
+void files_widget::generateSharedTree()
 {
     QList<QTreeWidgetItem*> children = sharedDirs->takeChildren();
     children.erase(children.begin(), children.end());
+
+    if (!dirRules.size())
+        return;
 
     QMap<QString, QList<QString> >::iterator iter;
     QVector<QString> stackDirs;
@@ -349,13 +385,16 @@ void files_widget::exchangeDir()
     {
         QList<QString> filesList;
         dirRules.insert(strPath, filesList);
+        shareDir(strPath, true);
+
         setExchangeStatus(curItem, true);
-        generatedSharedTree();
+        generateSharedTree();
+        itemClicked(curItem, 0);
         while (curItem->parent() != allDirs)
         {
             curItem = curItem->parent();
             curItem->setFont(0, boldFont);
-        }
+        }        
     }
 }
 
@@ -370,7 +409,10 @@ void files_widget::exchangeSubdir()
     {
         QList<QString> filesList;
         dirRules.insert(strPath, filesList);
+        shareDir(strPath, true);
+
         setChildExchangeStatus(curItem, true);
+        itemClicked(curItem, 0);
         while (curItem->parent() != allDirs)
         {
             curItem = curItem->parent();
@@ -379,7 +421,7 @@ void files_widget::exchangeSubdir()
     }
     exchangeSubdir(fileList);    
 
-    generatedSharedTree();
+    generateSharedTree();
 }
 
 void files_widget::exchangeSubdir(QFileInfoList& fileList)
@@ -398,7 +440,10 @@ void files_widget::exchangeSubdir(QFileInfoList& fileList)
             QDir dir(strPath);
             QFileInfoList subList = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllDirs);
             if (!dirRules.contains(strPath))
+            {
                 dirRules.insert(strPath, filesList);
+                shareDir(strPath, true);
+            }
 
             exchangeSubdir(subList);
         }
@@ -410,12 +455,15 @@ void files_widget::notExchangeDir()
     QTreeWidgetItem* curItem = treeFiles->currentItem();
     QString strPath = getDirPath(curItem);
 
+    shareDir(strPath, false);
     dirRules.erase(dirRules.find(strPath));
 
     setExchangeStatus(curItem, false);
     checkExchangeParentStatus(curItem);
 
-    generatedSharedTree();
+    itemClicked(curItem, 0);
+
+    generateSharedTree();
 }
 
 void files_widget::notExchangeSubdir()
@@ -424,6 +472,11 @@ void files_widget::notExchangeSubdir()
     QString strPath = getDirPath(curItem);
 
     QMap<QString, QList<QString> >::iterator iter = dirRules.begin();
+    for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
+        if (iter.key().startsWith(strPath))
+            shareDir(iter.key(), false);
+
+    iter = dirRules.begin();
     while (iter != dirRules.end())
     {
         if (iter.key().startsWith(strPath))
@@ -434,8 +487,9 @@ void files_widget::notExchangeSubdir()
 
     setChildExchangeStatus(curItem, false);
     checkExchangeParentStatus(curItem);
+    itemClicked(curItem, 0);
 
-    generatedSharedTree();
+    generateSharedTree();
 }
 
 void files_widget::checkExchangeParentStatus(QTreeWidgetItem* curItem)
@@ -498,11 +552,14 @@ QString files_widget::getDirPath(QTreeWidgetItem* item)
         path = itemIter->text(0) + "/" + path;
     }
 
+    path.replace("//","/");
     return path;
 }
 
 void files_widget::applyChanges()
 {
+/*    Session::instance()->get_ed2k_session()->delegate()->begin_share_transaction();
+
     QString curParentDir = dirRules.begin().key() + "!";
     QString basePath;
     QMap<QString, QList<QString> >::iterator iter;
@@ -515,12 +572,13 @@ void files_widget::applyChanges()
         if (!dirPath.startsWith(curParentDir))
         {
             curParentDir = dirPath;
-            if (dirPath.lastIndexOf('/') == (dirPath.length() - 1))
-                basePath = dirPath.left(dirPath.length() - 1);
+            basePath = dirPath;
+            if (basePath.lastIndexOf('/') == (basePath.length() - 1))
+                basePath = basePath.left(basePath.length() - 1);
             basePath = basePath.left(basePath.lastIndexOf('/'));
         }
         files.clear();
-        QList<QString>& dirFiles = dirRules[dirPath];
+        QList<QString>& dirFiles = dirRules.value(dirPath);
         for (filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
             files.push_back(filesIter->toStdString());
 
@@ -529,6 +587,48 @@ void files_widget::applyChanges()
 
     for (filesIter = fileRules.begin(); filesIter != fileRules.end(); ++filesIter)
         Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toStdString());
+
+    Session::instance()->get_ed2k_session()->delegate()->end_share_transaction();*/
+}
+
+void files_widget::shareDir(QString dirPath, bool bShare)
+{
+    QMap<QString, QList<QString> >::iterator iter;
+    QList<QString>::const_iterator filesIter;
+    std::deque<std::string> files;
+
+    QString basePath;
+    for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
+    {
+        if (dirPath.startsWith(iter.key()))
+        {
+            basePath = iter.key();
+            if (basePath.lastIndexOf('/') == (basePath.length() - 1))
+                basePath = basePath.left(basePath.length() - 1);
+            basePath = basePath.left(basePath.lastIndexOf('/'));
+            break;
+        }
+    }
+
+    if (!basePath.length())
+    {
+        basePath = dirPath;
+        if (basePath.lastIndexOf('/') == (basePath.length() - 1))
+            basePath = basePath.left(basePath.length() - 1);
+        basePath = basePath.left(basePath.lastIndexOf('/'));
+    }
+
+    const QList<QString> dirFiles = dirRules.value(dirPath);
+    if (dirPath.lastIndexOf('/') == (dirPath.length() - 1))
+        dirPath = dirPath.left(dirPath.length() - 1);
+
+    for (filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
+        files.push_back(filesIter->toStdString());
+
+    if (bShare)
+        Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toStdString(), dirPath.toStdString(), files);
+    else
+        Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toStdString(), dirPath.toStdString(), files);
 }
 
 void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
