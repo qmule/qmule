@@ -127,7 +127,7 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTableView" name="tableFiles">
+        <widget class="QTreeView" name="tableFiles">
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -143,21 +143,15 @@
            <height>16</height>
           </size>
          </property>
-         <property name="gridStyle">
-          <enum>Qt::NoPen</enum>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
          </property>
-         <attribute name="verticalHeaderVisible">
+         <property name="itemsExpandable">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>17</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>17</number>
-         </attribute>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -172,6 +166,7 @@
           <attribute name="title">
            <string>Tab 1</string>
           </attribute>
+          <zorder>tableFiles</zorder>
          </widget>
          <widget class="QWidget" name="tab_2">
           <attribute name="title">
