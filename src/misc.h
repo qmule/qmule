@@ -169,6 +169,22 @@ public:
   static QList<bool> boolListfromStringList(const QStringList &l);
 
   static bool isValidTorrentFile(const QString &path);
+
+  /**
+    * eMule migration functions
+    * helpers for quiet migration
+   */
+#ifdef Q_WS_WIN32
+  static QString emuleConfig(const QString& filename);
+  static QStringList getFileLines(const QString& filename);
+  static QStringList emuleSharedFiles();
+  static QStringList emuleSharedDirs();
+  static QString emuleIncomingDir();
+  static int emulePort();
+  static QString emuleNick();
+  static QString emuleKeyFile();
+#endif
+
 };
 
 //  Trick to get a portable sleep() function

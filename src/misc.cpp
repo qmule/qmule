@@ -818,9 +818,11 @@ QString misc::getUserIDString() {
   QString uid = "0";
 #ifdef Q_WS_WIN
   char buffer[UNLEN+1] = {0};
-  DWORD buffer_len = UNLEN + 1;
-  if (!GetUserNameA(buffer, &buffer_len))
-    uid = QString(buffer);
+  DWORD buffer_len = UNLEN + 1;  
+  if (GetUserNameA(buffer, &buffer_len))
+  {
+        uid = QString::fromLocal8Bit(buffer,  buffer_len);
+  }
 #else
   uid = QString::number(getuid());
 #endif
@@ -972,3 +974,90 @@ QString misc::parseHtmlLinks(const QString &raw_text)
 
   return result;
 }
+
+#ifdef Q_WS_WIN32
+
+QString misc::emuleConfig(const QString& filename)
+{
+    return QDir::home().filePath(QString("config") + QDir::separator() + filename);
+}
+
+QStringList misc::getFileLines(const QString& filename)
+{
+    QStringList slist;
+    QFile textFile(filename);
+
+    if (!textFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return slist;
+    }
+
+
+    QTextStream textStream(&textFile);
+    textStream.setCodec("UTF-8");
+    textStream.setAutoDetectUnicode(true);
+
+    while (true)
+    {
+        QString line = textStream.readLine();
+        if (line.isNull()) break;
+        slist.append(line);
+    }
+
+    return slist;
+}
+
+QStringList misc::emuleSharedFiles()
+{
+    return getFileLines(emuleConfig("sharedfiles.dat"));
+}
+
+QStringList misc::emuleSharedDirs()
+{
+    return getFileLines(emuleConfig("shareddir.dat"));
+}
+
+QString misc::emuleIncomingDir()
+{
+    QStringList sl = getFileLines(emuleConfig("preferences.ini")).filter(QRegExp("^IncomingDir"));
+
+    if (sl.empty())
+    {
+        return QString();
+    }
+
+    QStringList sres = sl.at(0).split(QRegExp("="));
+
+    if (sres.size() > 1)
+    {
+        return sres[1];
+    }
+
+    return QString();
+}
+
+int misc::emulePort()
+{
+    QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
+    return qs.value("eMule/Port", 4668).toInt();
+}
+
+QString misc::emuleNick()
+{
+    QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
+    return qs.value("eMule/Nick", QString("")).toString();
+}
+
+QString misc::emuleKeyFile()
+{
+    QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
+
+    if (QFile::exists(filename))
+    {
+        return (filename);
+    }
+
+    return (QString());
+}
+
+#endif
