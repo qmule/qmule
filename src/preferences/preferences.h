@@ -38,6 +38,7 @@
 #include <QList>
 #include <QDebug>
 #include <libtorrent/version.hpp>
+#include <libed2k/is_crypto.hpp>
 
 #ifndef DISABLE_GUI
 #include <QApplication>
@@ -194,16 +195,12 @@ public:
 
   QString getISLogin() const
   {
-      QString strISLogin = value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
-      // on windows attempt to extract login
-#ifdef Q_WS_WIN
-      if (strISLogin.isEmpty())
+      if (isMigrationStage())
       {
-          eMuleReg er;
-          strISLogin = er.getAuthLogin();
+        return misc::migrationAuthLogin();
       }
-#endif
-      return strISLogin;
+
+      return value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
   }
 
   void setISLogin(const QString& strISLogin)
@@ -213,26 +210,17 @@ public:
 
   QString getISPassword() const
   {
-      QString strISPassword = value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString();
-
-      if (!strISPassword.isEmpty())
+      if (isMigrationStage())
       {
-          // decode pass
+          return misc::migrationAuthPassword();
       }
-      else
-      {
-#ifdef Q_WS_WIN
 
-#endif
-      }
-      return strISPassword;
-
+      return QString::fromStdString(is_crypto::DecryptPasswd(value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString().toStdString(), misc::ED2KKeyFile().toStdString()));
   }
 
   void setISPassword(const QString& strISPassword)
-  {
-      // encode password
-      setValue("Preferences/General/ISPassword", strISPassword);
+  {      
+      setValue("Preferences/General/ISPassword",  QString::fromStdString(is_crypto::EncryptPasswd(strISPassword.toStdString(), misc::ED2KKeyFile().toStdString())));
   }
 
 
@@ -484,20 +472,10 @@ public:
     setValue("Preferences/Connection/alt_speeds_on", enabled);
   }
 
-  // ED2K settings
-
-  int getListenPort() const
-  {
-      return value(QString::fromUtf8("Preferences/Connection/ListenPort"), 4662).toInt();
-  }
-
-  void setListenPort(int nListenPort)
-  {
-      setValue("Preferences/Connection/ListenPort", nListenPort);
-  }
+  // ED2K options
 
   int serverPort()
-  {
+  {            
       return value(QString::fromUtf8("Preferences/Connection/ServerPort"), 4661).toInt();
   }
 
@@ -729,6 +707,17 @@ public:
 
   //LIBED2K options
 
+  // in first time we have migration status true
+  bool isMigrationStage() const
+  {
+      return value(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), true).toBool();
+  }
+
+  void leaveMigrationStage()
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), false);
+  }
+
   bool isShowSharedFilesEnabled() const
   {
       return value(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), true).toBool();
@@ -748,6 +737,133 @@ public:
   {
       setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedDirectories"), bShowSharedDirs);
   }
+
+  void saveSharedDirs(const shared_entry& se)
+  {
+      int index = 0;
+
+      beginWriteArray("Preferences/eDonkey/SharedDirectories");
+      remove("Preferences/eDonkey/SharedDirectories");
+
+      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      {
+          setArrayIndex(index);
+          setValue("SD", itr.key());
+          ++index;
+      }
+
+      endArray();
+
+      // generate directory excludes
+      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      {
+          if (!itr.value().empty())
+          {
+              QString key = itr.key();
+              key.remove(QRegExp("[:\\/]"));
+
+              if (!key.isEmpty())
+              {
+                  index = 0;
+                  remove(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
+                  beginWriteArray(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
+
+                  for (int n = 0; n < itr.value().size(); ++n)
+                  {
+                      setArrayIndex(n);
+                      setValue("ExcludeFile", itr.value().at(n));
+                  }
+
+                  endArray();
+              }
+          }
+      }
+  }
+
+  shared_entry loadSharedDirs()
+  {
+      if (isMigrationStage())
+      {
+          return misc::migrationShareds();
+      }
+
+      shared_entry se;
+      int size = beginReadArray("Preferences/eDonkey/SharedDirectories");
+
+      for (int i = 0; i < size; ++i)
+      {
+          setArrayIndex(i);
+          shared_entry::iterator itr = se.insert(value("SD").toString(), QList<QString>());
+      }
+
+      endArray();
+
+      // restore exclude files for each directory
+      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      {
+          QString key = itr.key();
+          key.remove(QRegExp("[:\\/]"));
+
+          size = beginReadArray(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
+
+          for (int i = 0; i < size; ++i)
+          {
+              setArrayIndex(i);
+              itr.value().append(value("ExcludeFile").toString());
+          }
+
+          endArray();
+      }
+
+
+      return se;
+  }
+
+  int listenPort() const
+  {
+      if (isMigrationStage())
+      {
+        return misc::migrationPort();
+      }
+
+      return value(QString::fromUtf8("Preferences/eDonkey/ListenPort"), 4662).toBool();
+  }
+
+  void setListenPort(int nListenPort)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/ListenPort"), nListenPort);
+  }
+
+  QString nick() const
+  {
+      if (isMigrationStage())
+      {
+        return misc::migrationNick();
+      }
+
+      return value(QString::fromUtf8("Preferences/eDonkey/Nick"), "").toString();
+  }
+
+  void setNick(const QString& nick)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/Nick"), nick);
+  }
+
+  QString incomingDirectory() const
+  {
+      if (isMigrationStage())
+      {
+          return misc::migrationIncomingDir();
+      }
+
+      return value(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), "").toString();
+  }
+
+  void setIncomingDirectory(const QString& dir)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), dir);
+  }
+
 
   // IP Filter
   bool isFilteringEnabled() const {

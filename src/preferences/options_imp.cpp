@@ -766,7 +766,7 @@ void options_imp::loadOptions() {
   editLogin->setText(pref.getISLogin());
   editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.getClientName());
-  editPort->setText(QString::number(pref.getListenPort()));
+  editPort->setText(QString::number(pref.listenPort()));
 
   // Random stuff
   srand(time(0));
@@ -1254,7 +1254,7 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Italian: return QString::fromUtf8("Italiano");
   case QLocale::Dutch: return QString::fromUtf8("Nederlands");
   case QLocale::Spanish: return QString::fromUtf8("Español");
-  case QLocale::Catalan: return QString::fromUtf8("Català");
+  case QLocale::Catalan: return QString::fromUtf8("Catal� ");
   case QLocale::Galician: return QString::fromUtf8("Galego");
   case QLocale::Portuguese: {
     if (country == "br")
@@ -1277,10 +1277,10 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Danish: return QString::fromUtf8("Dansk");
   case QLocale::Bulgarian: return QString::fromUtf8("Български");
   case QLocale::Ukrainian: return QString::fromUtf8("Українська");
-  case QLocale::Russian: return QString::fromUtf8("Русский");
+  case QLocale::Russian: return QString::fromUtf8("� усский");
   case QLocale::Japanese: return QString::fromUtf8("日本語");
   case QLocale::Arabic: return QString::fromUtf8("عربي");
-  case QLocale::Georgian: return QString::fromUtf8("ქართული");
+  case QLocale::Georgian: return QString::fromUtf8("ქა� თული");
   case QLocale::Byelorussian: return QString::fromUtf8("Беларуская");
   case QLocale::Basque: return QString::fromUtf8("Euskara");
   case QLocale::Chinese: {

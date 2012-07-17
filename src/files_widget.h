@@ -1,10 +1,11 @@
 #ifndef FILES_WIDGET_H
 #define FILES_WIDGET_H
 
+#include <libed2k/file.hpp>
 #include <QWidget>
 #include <QFileIconProvider>
 #include "ui_files_widget.h"
-#include "libed2k/file.hpp"
+#include "misc.h"
 
 QT_BEGIN_NAMESPACE
 class QStandardItemModel;
@@ -30,7 +31,7 @@ class files_widget : public QWidget, public Ui::files_widget
     QScopedPointer<QSortFilterProxyModel> filterModel;
     QFileIconProvider provider;
 
-    QMap<QString, QList<QString> > dirRules;
+    shared_entry dirRules;
     QList<QString> fileRules;
 
     QMenu*   filesMenu;

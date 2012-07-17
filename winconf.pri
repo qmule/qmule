@@ -10,6 +10,7 @@ INCLUDEPATH += $$(LIBTORRENT_ROOT)/zlib
 INCLUDEPATH += $$(OPENSSL_ROOT)/include
 #Point this to the ed2klib include folder
 INCLUDEPATH += $$(LIBED2K_ROOT)/include
+INCLUDEPATH += $$(CRYPTOPP_ROOT)
 
 #Point this to the openssl lib folder
 LIBS += -L$$(OPENSSL_ROOT)/lib/VC

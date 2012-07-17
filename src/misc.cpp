@@ -72,6 +72,8 @@ const int UNLEN = 256;
 #include <winbase.h>
 #endif
 
+#include <libed2k/is_crypto.hpp>
+
 #ifndef DISABLE_GUI
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
 #include <QDBusInterface>
@@ -609,6 +611,16 @@ QString misc::ED2KBackupLocation()
     return location;
 }
 
+QString misc::ED2KKeyFile()
+{
+    const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
+                                               + QDir::separator() + "ED2K_key");
+
+    QDir locationDir(QDesktopServicesDataLocation());
+    if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
+    return (location + QDir::separator() + QString("key.rnd"));
+}
+
 QString misc::cacheLocation() {
   QString location = QDir::cleanPath(QDesktopServicesCacheLocation());
   QDir locationDir(location);
@@ -1017,7 +1029,19 @@ QStringList misc::emuleSharedDirs()
     return getFileLines(emuleConfig("shareddir.dat"));
 }
 
-QString misc::emuleIncomingDir()
+QString misc::emuleKeyFile()
+{
+    QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
+
+    if (QFile::exists(filename))
+    {
+        return (filename);
+    }
+
+    return (QString());
+}
+
+QString misc::migrationIncomingDir()
 {
     QStringList sl = getFileLines(emuleConfig("preferences.ini")).filter(QRegExp("^IncomingDir"));
 
@@ -1036,28 +1060,85 @@ QString misc::emuleIncomingDir()
     return QString();
 }
 
-int misc::emulePort()
+int misc::migrationPort()
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
     return qs.value("eMule/Port", 4668).toInt();
 }
 
-QString misc::emuleNick()
+QString misc::migrationNick()
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
     return qs.value("eMule/Nick", QString("")).toString();
 }
 
-QString misc::emuleKeyFile()
+QString misc::migrationAuthLogin()
 {
-    QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
+    QSettings qs(QString("HKEY_CURRENT_USER\\Software\\eMule IS Mod"), QSettings::NativeFormat);
+    return qs.value("AuthLogin", QString("")).toString();
+}
 
-    if (QFile::exists(filename))
+QString misc::migrationAuthPassword()
+{
+    QSettings qs(QString("HKEY_CURRENT_USER\\Software\\eMule IS Mod"), QSettings::NativeFormat);
+    return QString::fromStdString(is_crypto::DecryptPasswd(qs.value("AuthPassword", QString("")).toString().toStdString(), emuleKeyFile().toStdString()));
+}
+
+shared_entry misc::migrationShareds()
+{
+    shared_entry se;
+    QStringList minus_f =
+            emuleSharedFiles().filter(QRegExp("^-")).replaceInStrings(QRegExp("^-"), "");
+    QDir dir;
+
+    foreach(dir, emuleSharedDirs())
     {
-        return (filename);
+        shared_entry::iterator itr = se.insert(dir.path(), QList<QString>());
+        QFileInfo fi;
+
+        foreach(fi, minus_f)
+        {
+            qDebug() << "dir: " << dir.path() << " : " << fi.dir().path();
+            if (fi.exists() && (dir == fi.dir()))
+            {
+                itr.value().append(fi.fileName());
+            }
+        }
     }
 
-    return (QString());
+    return se;
+}
+#else
+
+QString misc::migrationIncomingDir()
+{
+    return QString();
+}
+
+int misc::migrationPort()
+{
+   return 0;
+}
+
+QString misc::migrationNick()
+{
+    return QString();
+}
+
+QString misc::migrationAuthLogin()
+{
+    return QString();
+}
+
+QString misc::migrationAuthPassword()
+{
+    return QString();
+}
+
+shared_entry misc::migrationShareds()
+{
+    return shared_entry();
 }
 
 #endif
+

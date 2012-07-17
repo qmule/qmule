@@ -22,5 +22,6 @@ CONFIG(debug, debug|release) {
 		  ssleay32MD.lib
 }
 
-LIBS += advapi32.lib shell32.lib cryptopp.lib cryptlib.lib
+LIBS += advapi32.lib shell32.lib cryptlib.lib
+#cryptopp.lib
 LIBS += PowrProf.lib

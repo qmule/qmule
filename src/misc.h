@@ -49,6 +49,8 @@
 
 const qlonglong MAX_ETA = 8640000;
 
+typedef QMap<QString, QList<QString> > shared_entry;
+
 /*  Miscellaneaous functions that can be useful */
 class misc : public QObject{
   Q_OBJECT
@@ -143,6 +145,7 @@ public:
   static QString searchEngineLocation();
   static QString BTBackupLocation();
   static QString ED2KBackupLocation();
+  static QString ED2KKeyFile();
   static QString cacheLocation();
   static long long freeDiskSpaceOnPath(QString path);
   // return best userfriendly storage unit (B, KiB, MiB, GiB, TiB)
@@ -179,11 +182,15 @@ public:
   static QStringList getFileLines(const QString& filename);
   static QStringList emuleSharedFiles();
   static QStringList emuleSharedDirs();
-  static QString emuleIncomingDir();
-  static int emulePort();
-  static QString emuleNick();
   static QString emuleKeyFile();
 #endif
+
+  static QString migrationIncomingDir();
+  static int     migrationPort();
+  static QString migrationNick();
+  static QString migrationAuthLogin();
+  static QString migrationAuthPassword();
+  static shared_entry migrationShareds();
 
 };
 

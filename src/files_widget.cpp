@@ -5,7 +5,6 @@
 #include <QSortFilterProxyModel>
 #include <QPainter>
 
-#include "misc.h"
 #include "files_widget.h"
 #include "libed2k/types.hpp"
 #include "transport/session.h"
@@ -341,7 +340,7 @@ void files_widget::generateSharedTree()
     if (!dirRules.size())
         return;
 
-    QMap<QString, QList<QString> >::iterator iter;
+    shared_entry::iterator iter;
     QVector<QString> stackDirs;
     QString curParentDir = dirRules.begin().key() + "!";
     QTreeWidgetItem* curParentNode = sharedDirs;
@@ -471,7 +470,7 @@ void files_widget::notExchangeSubdir()
     QTreeWidgetItem* curItem = treeFiles->currentItem();
     QString strPath = getDirPath(curItem);
 
-    QMap<QString, QList<QString> >::iterator iter = dirRules.begin();
+    shared_entry::iterator iter = dirRules.begin();
     for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
         if (iter.key().startsWith(strPath))
             shareDir(iter.key(), false);
@@ -562,7 +561,7 @@ void files_widget::applyChanges()
 
     QString curParentDir = dirRules.begin().key() + "!";
     QString basePath;
-    QMap<QString, QList<QString> >::iterator iter;
+    shared_entry::iterator iter;
     QList<QString>::iterator filesIter;
     std::deque<std::string> files;
 
@@ -593,7 +592,7 @@ void files_widget::applyChanges()
 
 void files_widget::shareDir(QString dirPath, bool bShare)
 {
-    QMap<QString, QList<QString> >::iterator iter;
+    shared_entry::iterator iter;
     QList<QString>::const_iterator filesIter;
     std::deque<std::string> files;
 
@@ -647,7 +646,7 @@ void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
 
 bool files_widget::partOfSharedPath(QString path)
 {
-    QMap<QString, QList<QString> >::iterator iter;
+    shared_entry::iterator iter;
     for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
         if (iter.key().startsWith(path))
             return true;
