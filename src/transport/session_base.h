@@ -3,6 +3,7 @@
 #define __SESSION_BASE_H__
 
 #include <QHash>
+#include <QDebug>
 
 #include <vector>
 #include <queue>
@@ -19,6 +20,8 @@ public:
     static const qreal MAX_RATIO;
 
     virtual void start() = 0;
+    virtual void stop()  = 0;
+
     virtual bool started() const = 0;
     virtual ~SessionBase() {};
 
@@ -47,6 +50,7 @@ public:
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
     virtual void readAlerts() = 0;
     virtual void saveTempFastResumeData() = 0;
+    virtual void saveFastResumeData() = 0;
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
 
     // implemented methods
@@ -129,6 +133,8 @@ public:
         DEFER2(enableIPFilter, filter_path, force); }
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
+    void saveFastResumeData() { DEFER0(saveFastResumeData); }
+
     Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
 
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }

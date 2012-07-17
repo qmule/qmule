@@ -21,11 +21,7 @@ void Session::drop()
 }
 
 Session::~Session()
-{
-    m_periodic_resume->stop();
-    m_alerts_reading->stop();
-    m_btSession.saveFastResumeData();
-    m_edSession.saveFastResumeData();
+{    
 }
 
 Session::Session()
@@ -113,6 +109,14 @@ void Session::start()
     if (!started())
     {
         for_each(std::mem_fun(&SessionBase::start));
+    }
+}
+
+void Session::stop()
+{
+    if (started())
+    {
+        for_each(std::mem_fun(&SessionBase::stop));
     }
 }
 
@@ -283,4 +287,12 @@ void Session::saveTempFastResumeData()
 void Session::readAlerts()
 {
     for_each(std::mem_fun(&SessionBase::readAlerts));
+}
+
+void Session::saveFastResumeData()
+{
+    m_periodic_resume->stop();
+    m_alerts_reading->stop();
+    m_btSession.saveFastResumeData();
+    m_edSession.saveFastResumeData();
 }

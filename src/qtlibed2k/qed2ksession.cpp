@@ -180,6 +180,7 @@ void QED2KSession::start()
     m_settings.server_keep_alive_timeout = -1;
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
+    m_settings.m_collections_directory = QDir::homePath().toStdString();
 #else
     m_settings.server_hostname = "emule.is74.ru";
 #endif
@@ -189,12 +190,21 @@ void QED2KSession::start()
     m_session->set_alert_mask(alert::all_categories);
 }
 
+void QED2KSession::stop()
+{
+    saveFastResumeData();
+}
+
 bool QED2KSession::started() const { return !m_session.isNull(); }
 
 QED2KSession::~QED2KSession()
 {
-    saveFastResumeData();
+    if (started())
+    {
+        stop();
+    }
 }
+
 
 Transfer QED2KSession::getTransfer(const QString &hash) const
 {

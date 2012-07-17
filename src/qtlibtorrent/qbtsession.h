@@ -79,6 +79,7 @@ private:
 public:
   explicit QBtSession();
   void start();
+  void stop();
   bool started() const;
   ~QBtSession();
 
@@ -127,7 +128,7 @@ public slots:
   void resumeAllTorrents();
   /* End Web UI */
   void preAllocateAllFiles(bool b);
-  void saveFastResumeData();
+  virtual void saveFastResumeData();
   void enableIPFilter(const QString &filter_path, bool force=false);
   void disableIPFilter();
   void setQueueingEnabled(bool enable);

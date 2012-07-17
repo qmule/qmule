@@ -167,35 +167,44 @@ void QBtSession::start()
 bool QBtSession::started() const { return s != NULL; }
 
 // Main destructor
-QBtSession::~QBtSession() {
-  qDebug("BTSession destructor IN");
-  // Do some BT related saving
-  saveSessionState();
-  saveFastResumeData();
-  // Delete our objects
-  if (m_tracker)
-    delete m_tracker;  
-  if (BigRatioTimer)
-    delete BigRatioTimer;
-  if (filterParser)
-    delete filterParser;
-  delete downloader;
-  if (bd_scheduler)
-    delete bd_scheduler;
-#ifdef RSS_ENABLE
-  // HTTP Server
-  if (httpServer)
-    delete httpServer;
-#endif
-  qDebug("Deleting the session");
-  delete s;
-  qDebug("BTSession destructor OUT");
-#ifndef DISABLE_GUI
-  if (m_shutdownAct != NO_SHUTDOWN) {
-    qDebug() << "Sending computer shutdown/suspend signal...";
-    misc::shutdownComputer(m_shutdownAct == SUSPEND_COMPUTER);
-  }
-#endif
+QBtSession::~QBtSession()
+{
+    if (started())
+    {
+        stop();
+    }
+}
+
+void QBtSession::stop()
+{
+    qDebug("BTSession destructor IN");
+    // Do some BT related saving
+    saveSessionState();
+    saveFastResumeData();
+    // Delete our objects
+    if (m_tracker)
+      delete m_tracker;
+    if (BigRatioTimer)
+      delete BigRatioTimer;
+    if (filterParser)
+      delete filterParser;
+    delete downloader;
+    if (bd_scheduler)
+      delete bd_scheduler;
+  #ifdef RSS_ENABLE
+    // HTTP Server
+    if (httpServer)
+      delete httpServer;
+  #endif
+    qDebug("Deleting the session");
+    delete s;
+    qDebug("BTSession destructor OUT");
+  #ifndef DISABLE_GUI
+    if (m_shutdownAct != NO_SHUTDOWN) {
+      qDebug() << "Sending computer shutdown/suspend signal...";
+      misc::shutdownComputer(m_shutdownAct == SUSPEND_COMPUTER);
+    }
+  #endif
 }
 
 void QBtSession::preAllocateAllFiles(bool b) {

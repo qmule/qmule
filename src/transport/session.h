@@ -27,6 +27,7 @@ public:
     QED2KSession* get_ed2k_session();
 
     void start();
+    void stop();
     bool started() const;
 
     Transfer getTransfer(const QString& hash) const;
@@ -106,6 +107,7 @@ private slots:
     void on_savePathChanged(const QTorrentHandle& h);
     void saveTempFastResumeData();
     void readAlerts();
+    virtual void saveFastResumeData();
 
 private:
     Session();

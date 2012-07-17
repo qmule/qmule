@@ -68,6 +68,7 @@ class QED2KSession: public QObject, public SessionBase
 public:
     QED2KSession();
     void start();
+    virtual void stop();
     bool started() const;
     virtual ~QED2KSession();
 
