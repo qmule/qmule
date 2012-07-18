@@ -16,9 +16,9 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp
-INCLUDEPATH += D:\\work\\libed2k\\include $$(CRYPTOPP_ROOT)
+INCLUDEPATH += $$(LIBED2K_ROOT)\\include $$(CRYPTOPP_ROOT)
 LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 
-LIBS += -LD:\\work\\libed2k\\win32\\debug libed2kd.lib advapi32.lib  cryptlib.lib shell32.lib
+LIBS += -L$$(LIBED2K_ROOT)\\win32\\debug libed2kd.lib advapi32.lib  cryptlib.lib shell32.lib
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += BOOST_ASIO_HASH_MAP_BUCKETS=1021
 DEFINES += BOOST_EXCEPTION_DISABLE

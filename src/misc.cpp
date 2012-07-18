@@ -1000,7 +1000,7 @@ QString ShellGetFolderPath(int iCSIDL)
     return str;
 }
 
-QString emuleConfig(const QString& filename)
+QString misc::emuleConfig(const QString& filename)
 {
     QString res;
     static QList<QDir> dl = QList<QDir>()
@@ -1058,12 +1058,12 @@ QString misc::emuleKeyFile()
 {
     QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
 
-    if (QFile::exists(filename))
+    if (!QFile::exists(filename))
     {
-        return (filename);
+        filename.clear();
     }
 
-    return (QString());
+    return (filename);
 }
 
 QString misc::migrationIncomingDir()

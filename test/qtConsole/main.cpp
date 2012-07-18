@@ -29,11 +29,6 @@ QString getUserIDString()
   return uid;
 }
 
-//QString emuleConfig(const QString& filename)
-//{
-//    return QDir::home().filePath(QString("config") + QDir::separator() + filename);
-//}
-
 QString ShellGetFolderPath(int iCSIDL)
 {
     QString str;
@@ -56,12 +51,11 @@ QString emuleConfig(const QString& filename)
     QList<QDir>::iterator itr = std::find_if(dl.begin(), dl.end(), std::mem_fun_ref(static_cast<bool (QDir::*)() const>(&QDir::exists)));
 
     if (itr != dl.end())
-    {
-        qDebug() << itr->path();
+    {        
         res = (*itr).filePath(filename);
     }
 
-    qDebug() << "emule config " << res;
+    qDebug() << "emuleConfig result:  " << res;
     return res;
 }
 
@@ -69,13 +63,12 @@ QString emuleKeyFile()
 {
     QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
 
-    qDebug() << "f::  " << filename;
-    if (QFile::exists(filename))
+    if (!QFile::exists(filename))
     {
-        return (filename);
+        filename.clear();
     }
 
-    return (QString());
+    return (filename);
 }
 
 QStringList getFileLines(const QString& filename)
@@ -263,20 +256,14 @@ QString emuleAuthPassword()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    qDebug("Home dir is: %s", qPrintable(QDir::homePath().toAscii()));
-
-    qDebug() << QDir::home().filePath(QString("config") + QDir::separator() + QString("preferences.ini"));
-    if (QDir::home().exists(QString("config") + QDir::separator() + QString("preferences.ini")))
-    {
-        qDebug() << "exists" ;
-    }
 
     qDebug() << "nick: " << emuleNick()
              << " idir: " << emuleIncomingDir()
              << " port: " << emulePort()
              << " auth login: " << emuleAuthLogin()
              << " auth pwd: " << emuleAuthPassword()
-             << "key " << emuleKeyFile();
+             << "key " << emuleKeyFile()
+                << " key file " << emuleKeyFile();
 
     qDebug() << emuleSharedFiles();
     qDebug() << emuleSharedDirs();
@@ -284,18 +271,18 @@ int main(int argc, char *argv[])
     QString qPwd = QString::fromStdString(is_crypto::DecryptPasswd(emuleAuthPassword().toStdString(), emuleKeyFile().toStdString()));
     //QString qEPwd = QString::fromStdString(is_crypto::EncryptPasswd(qPwd.toStdString(), emuleKeyFile().toStdString()));
 
-    qDebug() << "PAsswd " << qPwd << " enc " << qEPwd;
+    qDebug() << "Decrypted password: " << qPwd << " enc "; // << qEPwd;
     qDebug() << " ==== shared files ======";
     qDebug() << getSharedFiles();
 
     qDebug() << "===== sf ================";
     qDebug() << emuleSharedFiles().filter(QRegExp("^[^-]"));
-    saveSharedDirs(getSharedFiles());
-    qDebug() << " ==== load shared dirs ==== ";
-    qDebug() << loadSharedDirs();
+    //saveSharedDirs(getSharedFiles());
+    //qDebug() << " ==== load shared dirs ==== ";
+    //qDebug() << loadSharedDirs();
     qDebug() << "CSIDL_LOCAL_APPDATA " << ShellGetFolderPath(CSIDL_LOCAL_APPDATA);
-    qDebug() << "CSIDL_LOCAL_APPDATA " << ShellGetFolderPath(CSIDL_APPDATA);
-    qDebug() << "CSIDL_LOCAL_APPDATA " << ShellGetFolderPath(CSIDL_PERSONAL);
+    qDebug() << "CSIDL_APPDATA " << ShellGetFolderPath(CSIDL_APPDATA);
+    qDebug() << "CSIDL_PERSONAL " << ShellGetFolderPath(CSIDL_PERSONAL);
 
     return a.exec();
 }
