@@ -501,6 +501,9 @@ MainWindow::~MainWindow() {
   m_pwr->setActivityState(false);
   qDebug("Deleting Session::instance()");
   Session::drop();
+
+  // leave ED2K migration state - temporary in main window destructor
+  Preferences().leaveMigrationStage();
   qDebug("Exiting GUI destructor...");
 }
 

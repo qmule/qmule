@@ -191,6 +191,7 @@ public:
   static QString migrationAuthLogin();
   static QString migrationAuthPassword();
   static shared_map migrationShareds();
+  static QStringList migrationSharedFiles();
 
 };
 

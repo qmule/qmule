@@ -1108,6 +1108,12 @@ shared_map misc::migrationShareds()
 
     return se;
 }
+
+QStringList misc::migrationSharedFiles()
+{
+    return emuleSharedFiles().filter(QRegExp("^[^-]"));
+}
+
 #else
 
 QString misc::migrationIncomingDir()
@@ -1139,6 +1145,11 @@ shared_map misc::migrationShareds()
 {
     return shared_map();
 }
+
+ QStringList misc::migrationSharedFiles()
+ {
+     return QStringList();
+ }
 
 #endif
 

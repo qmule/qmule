@@ -715,7 +715,7 @@ public:
 
   void leaveMigrationStage()
   {
-      setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), false);
+      setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
   }
 
   bool isShowSharedFilesEnabled() const
@@ -742,8 +742,8 @@ public:
   {
       int index = 0;
 
-      beginWriteArray("Preferences/eDonkey/SharedDirectories");
       remove("Preferences/eDonkey/SharedDirectories");
+      beginWriteArray("Preferences/eDonkey/SharedDirectories");      
 
       for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
@@ -817,6 +817,52 @@ public:
 
 
       return se;
+  }
+
+  void saveSharedFiles(const QList<QString>& sl)
+  {
+      // TODO - test remove behaviour
+      remove("Preferences/eDonkey/SharedFiles"); // do not append new elements
+      beginWriteArray("Preferences/eDonkey/SharedFiles");
+
+      int index = 0;
+      for (QList<QString>::const_iterator itr = sl.begin(); itr != sl.end(); ++itr)
+      {
+          setArrayIndex(index);
+          setValue("SFile", *itr);
+          ++index;
+      }
+
+      endArray();
+  }
+
+  QList<QString> loadSharedFiles()
+  {
+      QList<QString> sl;
+
+      if (isMigrationStage())
+      {
+        QStringList s = misc::migrationSharedFiles();
+
+        foreach(const QString str, s)
+        {
+            sl.append(str);
+        }
+
+        return sl;
+      }
+
+      int size = beginReadArray("Preferences/eDonkey/SharedFiles");
+
+      for (int i = 0; i < size; ++i)
+      {
+          setArrayIndex(i);
+          sl.append(value("SFile").toString());
+      }
+
+      endArray();
+
+      return sl;
   }
 
   int listenPort() const
