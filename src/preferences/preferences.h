@@ -862,7 +862,7 @@ public:
         return misc::migrationPort();
       }
 
-      return value(QString::fromUtf8("Preferences/eDonkey/ListenPort"), 4662).toBool();
+      return value(QString::fromUtf8("Preferences/eDonkey/ListenPort"), 4662).toInt();
   }
 
   void setListenPort(int nListenPort)
