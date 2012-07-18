@@ -745,7 +745,7 @@ public:
       beginWriteArray("Preferences/eDonkey/SharedDirectories");
       remove("Preferences/eDonkey/SharedDirectories");
 
-      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           setArrayIndex(index);
           setValue("SD", itr.key());
@@ -755,7 +755,7 @@ public:
       endArray();
 
       // generate directory excludes
-      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           if (!itr.value().empty())
           {
@@ -793,7 +793,7 @@ public:
       for (int i = 0; i < size; ++i)
       {
           setArrayIndex(i);
-          shared_entry::iterator itr = se.insert(value("SD").toString(), QList<QString>());
+          se.insert(value("SD").toString(), QList<QString>());
       }
 
       endArray();
