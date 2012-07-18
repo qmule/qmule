@@ -738,14 +738,14 @@ public:
       setValue(QString::fromUtf8("Preferences/eDonkey/ShowSharedDirectories"), bShowSharedDirs);
   }
 
-  void saveSharedDirs(const shared_entry& se)
+  void saveSharedDirs(const shared_map& se)
   {
       int index = 0;
 
       beginWriteArray("Preferences/eDonkey/SharedDirectories");
       remove("Preferences/eDonkey/SharedDirectories");
 
-      for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
+      for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           setArrayIndex(index);
           setValue("SD", itr.key());
@@ -755,7 +755,7 @@ public:
       endArray();
 
       // generate directory excludes
-      for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
+      for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           if (!itr.value().empty())
           {
@@ -780,14 +780,14 @@ public:
       }
   }
 
-  shared_entry loadSharedDirs()
+  shared_map loadSharedDirs()
   {
       if (isMigrationStage())
       {
           return misc::migrationShareds();
       }
 
-      shared_entry se;
+      shared_map se;
       int size = beginReadArray("Preferences/eDonkey/SharedDirectories");
 
       for (int i = 0; i < size; ++i)
@@ -799,7 +799,7 @@ public:
       endArray();
 
       // restore exclude files for each directory
-      for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+      for (shared_map::iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           QString key = itr.key();
           key.remove(QRegExp("[:\\/]"));

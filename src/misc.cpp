@@ -1084,16 +1084,16 @@ QString misc::migrationAuthPassword()
     return QString::fromStdString(is_crypto::DecryptPasswd(qs.value("AuthPassword", QString("")).toString().toStdString(), emuleKeyFile().toStdString()));
 }
 
-shared_entry misc::migrationShareds()
+shared_map misc::migrationShareds()
 {
-    shared_entry se;
+    shared_map se;
     QStringList minus_f =
             emuleSharedFiles().filter(QRegExp("^-")).replaceInStrings(QRegExp("^-"), "");
     QDir dir;
 
     foreach(dir, emuleSharedDirs())
     {
-        shared_entry::iterator itr = se.insert(dir.path(), QList<QString>());
+        shared_map::iterator itr = se.insert(dir.path(), QList<QString>());
         QFileInfo fi;
 
         foreach(fi, minus_f)
@@ -1135,9 +1135,9 @@ QString misc::migrationAuthPassword()
     return QString();
 }
 
-shared_entry misc::migrationShareds()
+shared_map misc::migrationShareds()
 {
-    return shared_entry();
+    return shared_map();
 }
 
 #endif

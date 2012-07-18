@@ -340,7 +340,7 @@ void files_widget::generateSharedTree()
     if (!dirRules.size())
         return;
 
-    shared_entry::iterator iter;
+    shared_map::iterator iter;
     QVector<QString> stackDirs;
     QString curParentDir = dirRules.begin().key() + "!";
     QTreeWidgetItem* curParentNode = sharedDirs;
@@ -470,7 +470,7 @@ void files_widget::notExchangeSubdir()
     QTreeWidgetItem* curItem = treeFiles->currentItem();
     QString strPath = getDirPath(curItem);
 
-    shared_entry::iterator iter = dirRules.begin();
+    shared_map::iterator iter = dirRules.begin();
     for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
         if (iter.key().startsWith(strPath))
             shareDir(iter.key(), false);
@@ -561,7 +561,7 @@ void files_widget::applyChanges()
 
     QString curParentDir = dirRules.begin().key() + "!";
     QString basePath;
-    shared_entry::iterator iter;
+    shared_map::iterator iter;
     QList<QString>::iterator filesIter;
     std::deque<std::string> files;
 
@@ -592,7 +592,7 @@ void files_widget::applyChanges()
 
 void files_widget::shareDir(QString dirPath, bool bShare)
 {
-    shared_entry::iterator iter;
+    shared_map::iterator iter;
     QList<QString>::const_iterator filesIter;
     std::deque<std::string> files;
 
@@ -646,7 +646,7 @@ void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
 
 bool files_widget::partOfSharedPath(QString path)
 {
-    shared_entry::iterator iter;
+    shared_map::iterator iter;
     for (iter = dirRules.begin(); iter != dirRules.end(); ++iter)
         if (iter.key().startsWith(path))
             return true;

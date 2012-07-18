@@ -184,7 +184,7 @@ void QED2KSession::start()
 #else
     m_settings.server_hostname = "emule.is74.ru";
 #endif
-    m_settings.listen_port = pref.getListenPort();
+    m_settings.listen_port = pref.listenPort();
     m_settings.client_name = pref.getClientName().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);

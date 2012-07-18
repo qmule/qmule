@@ -31,7 +31,7 @@ class files_widget : public QWidget, public Ui::files_widget
     QScopedPointer<QSortFilterProxyModel> filterModel;
     QFileIconProvider provider;
 
-    shared_entry dirRules;
+    shared_map dirRules;
     QList<QString> fileRules;
 
     QMenu*   filesMenu;

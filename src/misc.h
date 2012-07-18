@@ -49,7 +49,7 @@
 
 const qlonglong MAX_ETA = 8640000;
 
-typedef QMap<QString, QList<QString> > shared_entry;
+typedef QMap<QString, QList<QString> > shared_map;
 
 /*  Miscellaneaous functions that can be useful */
 class misc : public QObject{
@@ -190,7 +190,7 @@ public:
   static QString migrationNick();
   static QString migrationAuthLogin();
   static QString migrationAuthPassword();
-  static shared_entry migrationShareds();
+  static shared_map migrationShareds();
 
 };
 
