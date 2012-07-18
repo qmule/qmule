@@ -183,16 +183,6 @@ public:
 
   // ED2K settings
 
-  QString getClientName() const
-  {
-      return value(QString::fromUtf8("Preferences/General/ClientName"), QString("qMule")).toString();
-  }
-
-  void setClientName(const QString& strClientName)
-  {
-      setValue("Preferences/General/ClientName", strClientName);
-  }
-
   QString getISLogin() const
   {
       if (isMigrationStage())
@@ -887,7 +877,7 @@ public:
         return misc::migrationNick();
       }
 
-      return value(QString::fromUtf8("Preferences/eDonkey/Nick"), "").toString();
+      return value(QString::fromUtf8("Preferences/eDonkey/Nick"), "qMule user").toString();
   }
 
   void setNick(const QString& nick)

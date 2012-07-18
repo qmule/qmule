@@ -501,7 +501,7 @@ void options_imp::saveOptions() {
   // Emule
   pref.setISLogin(editLogin->text());
   pref.setISPassword(editPassword->text());
-  pref.setClientName(editUserName->text());
+  pref.setNick(editUserName->text());
   pref.setListenPort(editPort->text().toInt());
   // End Emule
   // End preferences
@@ -765,7 +765,7 @@ void options_imp::loadOptions() {
   //Emule
   editLogin->setText(pref.getISLogin());
   editPassword->setText(pref.getISPassword());
-  editUserName->setText(pref.getClientName());
+  editUserName->setText(pref.nick());
   editPort->setText(QString::number(pref.listenPort()));
 
   // Random stuff
