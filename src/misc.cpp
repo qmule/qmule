@@ -991,7 +991,20 @@ QString misc::parseHtmlLinks(const QString &raw_text)
 
 QString misc::emuleConfig(const QString& filename)
 {
-    return QDir::home().filePath(QString("config") + QDir::separator() + filename);
+    QString res;
+    static QList<QDir> dl = QList<QDir>()
+            << QDir::home().filePath("Local Settings\\Application Data\\eMule IS Mod\\config")
+            << QDir::home().filePath("AppData\\Local\\eMule IS Mod\\config")
+            << QDir::home().filePath("\\config");
+
+    QList<QDir>::iterator itr = std::find_if(dl.begin(), dl.end(), std::mem_fun_ref(static_cast<bool (QDir::*)() const>(&QDir::exists)));
+
+    if (itr != dl.end())
+    {
+        res = (*itr).filePath(filename);
+    }
+
+    return res;
 }
 
 QStringList misc::getFileLines(const QString& filename)
