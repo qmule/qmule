@@ -989,9 +989,34 @@ QString misc::parseHtmlLinks(const QString &raw_text)
 
 #ifdef Q_WS_WIN32
 
+QString ShellGetFolderPath(int iCSIDL)
+{
+    QString str;
+    TCHAR szPath[MAX_PATH];
+
+    if ( SHGetFolderPath(NULL, iCSIDL, NULL, SHGFP_TYPE_CURRENT, szPath) == S_OK )
+        str = QString::fromWCharArray(szPath);
+
+    return str;
+}
+
 QString misc::emuleConfig(const QString& filename)
 {
-    return QDir::home().filePath(QString("config") + QDir::separator() + filename);
+    QString res;
+    static QList<QDir> dl = QList<QDir>()
+            << QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("eMule IS Mod\\config")
+            << QDir(ShellGetFolderPath(CSIDL_APPDATA)).filePath("eMule IS Mod\\config")
+            << QDir(ShellGetFolderPath(CSIDL_PERSONAL)).filePath("eMule IS Mod\\config");
+
+    QList<QDir>::iterator itr = std::find_if(dl.begin(), dl.end(), std::mem_fun_ref(static_cast<bool (QDir::*)() const>(&QDir::exists)));
+
+    if (itr != dl.end())
+    {
+        res = (*itr).filePath(filename);
+    }
+
+    qDebug() << "emule config " << res;
+    return res;
 }
 
 QStringList misc::getFileLines(const QString& filename)
@@ -1033,12 +1058,12 @@ QString misc::emuleKeyFile()
 {
     QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
 
-    if (QFile::exists(filename))
+    if (!QFile::exists(filename))
     {
-        return (filename);
+        filename.clear();
     }
 
-    return (QString());
+    return (filename);
 }
 
 QString misc::migrationIncomingDir()
@@ -1047,7 +1072,7 @@ QString misc::migrationIncomingDir()
 
     if (sl.empty())
     {
-        return QString();
+        return QDir::homePath();
     }
 
     QStringList sres = sl.at(0).split(QRegExp("="));
@@ -1069,7 +1094,7 @@ int misc::migrationPort()
 QString misc::migrationNick()
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Nick", QString("")).toString();
+    return qs.value("eMule/Nick", QString("qMule")).toString();
 }
 
 QString misc::migrationAuthLogin()

@@ -503,7 +503,7 @@ void options_imp::saveOptions() {
   // Emule
   pref.setISLogin(editLogin->text());
   pref.setISPassword(editPassword->text());
-  pref.setClientName(editUserName->text());
+  pref.setNick(editUserName->text());
   pref.setListenPort(editPort->text().toInt());
   pref.setIncomingDirectory(editExchaneDir->text());
   pref.setShowSharedFiles(checkExchange->isChecked());
@@ -771,7 +771,7 @@ void options_imp::loadOptions() {
   //Emule
   editLogin->setText(pref.getISLogin());
   editPassword->setText(pref.getISPassword());
-  editUserName->setText(pref.getClientName());
+  editUserName->setText(pref.nick());
   editPort->setText(QString::number(pref.listenPort()));
   editExchaneDir->setText(pref.getIncomingDirectory());
   checkExchange->setChecked(pref.isShowSharedDirectories());
