@@ -895,7 +895,7 @@ public:
       setValue(QString::fromUtf8("Preferences/eDonkey/Nick"), nick);
   }
 
-  QString incomingDirectory() const
+  QString getIncomingDirectory() const
   {
       if (isMigrationStage())
       {

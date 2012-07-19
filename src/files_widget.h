@@ -61,6 +61,10 @@ private:
     void    setChildExchangeStatus(QTreeWidgetItem* item, bool status);
     void    checkExchangeParentStatus(QTreeWidgetItem* curItem);
     void    shareDir(QString dirPath, bool bShare);
+    void    checkBaseAdd(QString dirPath);
+    void    checkBaseRemove(QString dirPath);
+    void    removeLastSlash(QString& dirPath);
+    void    applyExchangeStatus(QString strPath, bool recursive);
 
 private slots:
     void itemExpanded(QTreeWidgetItem* item);

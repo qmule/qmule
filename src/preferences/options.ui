@@ -285,6 +285,25 @@
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox_10">
+          <property name="title">
+           <string>Exchange files</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_32">
+           <item>
+            <widget class="QLineEdit" name="editExchaneDir"/>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkExchange">
+             <property name="text">
+              <string>Show own exchange files/directories</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -656,7 +675,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
+             <width>404</width>
              <height>835</height>
             </rect>
            </property>
@@ -1116,7 +1135,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
+             <width>365</width>
              <height>463</height>
             </rect>
            </property>
@@ -1560,7 +1579,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
+             <width>315</width>
              <height>407</height>
             </rect>
            </property>
@@ -1972,7 +1991,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
+             <width>430</width>
              <height>455</height>
             </rect>
            </property>
@@ -2383,7 +2402,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
+             <width>333</width>
              <height>494</height>
             </rect>
            </property>
@@ -2760,8 +2779,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>480</width>
-             <height>316</height>
+             <width>62</width>
+             <height>18</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>

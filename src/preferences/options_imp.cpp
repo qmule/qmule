@@ -247,6 +247,8 @@ options_imp::options_imp(QWidget *parent):
   connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editPort, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(editExchaneDir, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+  connect(checkExchange, SIGNAL(stateChanged(int)), SLOT(enableApplyButton()));
   // Disable apply Button
   applyButton->setEnabled(false);
   // Tab selection mecanism
@@ -503,6 +505,10 @@ void options_imp::saveOptions() {
   pref.setISPassword(editPassword->text());
   pref.setClientName(editUserName->text());
   pref.setListenPort(editPort->text().toInt());
+  pref.setIncomingDirectory(editExchaneDir->text());
+  pref.setShowSharedFiles(checkExchange->isChecked());
+  pref.setShowSharedDirectories(checkExchange->isChecked());
+
   // End Emule
   // End preferences
   // Save advanced settings
@@ -767,6 +773,8 @@ void options_imp::loadOptions() {
   editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.getClientName());
   editPort->setText(QString::number(pref.listenPort()));
+  editExchaneDir->setText(pref.getIncomingDirectory());
+  checkExchange->setChecked(pref.isShowSharedDirectories());
 
   // Random stuff
   srand(time(0));
@@ -1254,11 +1262,11 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Italian: return QString::fromUtf8("Italiano");
   case QLocale::Dutch: return QString::fromUtf8("Nederlands");
   case QLocale::Spanish: return QString::fromUtf8("Español");
-  case QLocale::Catalan: return QString::fromUtf8("Catal� ");
+  case QLocale::Catalan: return QString::fromUtf8("Catal ");
   case QLocale::Galician: return QString::fromUtf8("Galego");
   case QLocale::Portuguese: {
     if (country == "br")
-      return QString::fromUtf8("Português brasileiro");
+      return QString::fromUtf8("Portugu�ês brasileiro");
     return QString::fromUtf8("Português");
   }
   case QLocale::Polish: return QString::fromUtf8("Polski");
@@ -1277,10 +1285,10 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Danish: return QString::fromUtf8("Dansk");
   case QLocale::Bulgarian: return QString::fromUtf8("Български");
   case QLocale::Ukrainian: return QString::fromUtf8("Українська");
-  case QLocale::Russian: return QString::fromUtf8("� усский");
+  case QLocale::Russian: return QString::fromUtf8(" �усский");
   case QLocale::Japanese: return QString::fromUtf8("日本語");
   case QLocale::Arabic: return QString::fromUtf8("عربي");
-  case QLocale::Georgian: return QString::fromUtf8("ქა� თული");
+  case QLocale::Georgian: return QString::fromUtf8("ქა �თული");
   case QLocale::Byelorussian: return QString::fromUtf8("Беларуская");
   case QLocale::Basque: return QString::fromUtf8("Euskara");
   case QLocale::Chinese: {
