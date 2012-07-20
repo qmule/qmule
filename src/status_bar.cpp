@@ -2,6 +2,8 @@
 
 #include <QStatusBar>
 
+#include "misc.h"
+
 status_bar::status_bar(QWidget *parent, QStatusBar *bar)
     : QWidget(parent) , m_bar(bar)
 {
@@ -48,14 +50,10 @@ void status_bar::setConnected(bool conn)
 
 void status_bar::setUpDown(unsigned long nUp, unsigned long nDown)
 {
-    double up_speed = nUp / 1024;
-    double down_speed = nDown / 1024;
-    QString upload = tr("Upload:");
-    QString downpload = tr(" Download:");
-
     QIcon icon = nUp > 0 ? (nDown > 0 ? Up1Down1 : Up1Down0) : (nDown > 0 ? Up0Down1 : Up0Down0);
     labelSpeedImg->setPixmap(icon.pixmap(16, 16));
-    labelSpeed->setText(upload + QString("%1").arg(up_speed, 0, 'g', 1) + downpload + QString("%1").arg(down_speed, 0, 'g', 1));
+    labelSpeed->setText(tr("Upload:") + QString(" %1, ").arg(misc::friendlyUnit(nUp)) +
+                        tr("Download:") + QString(" %2").arg(misc::friendlyUnit(nDown)));
 }
 
 void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)

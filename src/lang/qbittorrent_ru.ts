@@ -6389,8 +6389,8 @@ However, those plugins were disabled.</source>
         <translation type="unfinished">Отдача:</translation>
     </message>
     <message>
-        <source> Download:</source>
-        <translation type="unfinished"></translation>
+        <source>Download:</source>
+        <translation type="unfinished">Приём:</translation>
     </message>
     <message>
         <source>Clients: </source>

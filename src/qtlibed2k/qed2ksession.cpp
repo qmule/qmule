@@ -225,7 +225,7 @@ std::vector<Transfer> QED2KSession::getTransfers() const
 
 qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const { return 0; }
 bool QED2KSession::isFilePreviewPossible(const QString& hash) const { return false; }
-    SessionStatus QED2KSession::getSessionStatus() const { return SessionStatus(); }
+    SessionStatus QED2KSession::getSessionStatus() const { return m_session->status(); }
 void QED2KSession::changeLabelInSavePath(
     const Transfer& t, const QString& old_label,const QString& new_label) {}
 void QED2KSession::pauseTransfer(const QString& hash) { getTransfer(hash).pause(); }
