@@ -150,6 +150,7 @@ public:
   static QString BTBackupLocation();
   static QString ED2KBackupLocation();
   static QString ED2KKeyFile();
+  static QString ED2KCollectionLocation();
   static QString XCatalogCacheLocation();
   static QString cacheLocation();
   static long long freeDiskSpaceOnPath(QString path);

@@ -178,9 +178,9 @@ void QED2KSession::start()
     Preferences pref;
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
+    m_settings.m_collections_directory = misc::ED2KCollectionLocation().toStdString();
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
-    m_settings.m_collections_directory = QDir::homePath().toStdString();
 #else
     m_settings.server_hostname = "emule.is74.ru";
 #endif
@@ -273,7 +273,7 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
     if (ece.defined())
     {
         qDebug("Link is correct, add transfer");
-        QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+        QString filepath = QDir(Preferences().getIncomingDirectory()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8();

@@ -630,6 +630,15 @@ QString misc::ED2KKeyFile()
     return (locationDir.filePath(QString("key.rnd")));
 }
 
+QString misc::ED2KCollectionLocation()
+{
+    const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
+                                               + QDir::separator() + "ED2K_collections");
+    QDir locationDir(location);
+    if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
+    return location;
+}
+
 QString misc::cacheLocation() {
   QString location = QDir::cleanPath(QDesktopServicesCacheLocation());
   QDir locationDir(location);

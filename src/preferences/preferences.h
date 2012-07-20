@@ -904,7 +904,7 @@ public:
       }
 
       if (res.isEmpty())
-          res = misc::QDesktopServicesDataLocation();
+          res = misc::QDesktopServicesDownloadLocation();
 
       return res;
   }
