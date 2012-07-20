@@ -2746,8 +2746,8 @@ void QBtSession::startUpTransfers() {
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
     }
   }
-  QIniSettings settings("qBittorrent", "qBittorrent");
-  settings.setValue("ported_to_new_savepath_system", true);
+
+  Preferences().setValue("ported_to_new_savepath_system", true);
   qDebug("Unfinished torrents resumed");
 }
 

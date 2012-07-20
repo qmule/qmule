@@ -34,7 +34,7 @@
 
 #include "torrentimportdlg.h"
 #include "ui_torrentimportdlg.h"
-#include "qinisettings.h"
+#include "preferences.h"
 #include "torrentpersistentdata.h"
 #include "iconprovider.h"
 #include "transport/session.h"
@@ -61,7 +61,7 @@ TorrentImportDlg::~TorrentImportDlg()
 
 void TorrentImportDlg::on_browseTorrentBtn_clicked()
 {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   const QString default_dir = settings.value(QString::fromUtf8("MainWindowLastDir"), QDir::homePath()).toString();
   // Ask for a torrent file
   m_torrentPath = QFileDialog::getOpenFileName(this, tr("Torrent file to import"), default_dir, tr("Torrent files (*.torrent)"));
@@ -74,7 +74,7 @@ void TorrentImportDlg::on_browseTorrentBtn_clicked()
 
 void TorrentImportDlg::on_browseContentBtn_clicked()
 {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   const QString default_dir = settings.value(QString::fromUtf8("TorrentImport/LastContentDir"), QDir::homePath()).toString();
   if (t->num_files() == 1) {
     // Single file torrent
@@ -211,7 +211,7 @@ void TorrentImportDlg::importTorrent()
     qDebug("Adding the torrent to the session...");
     Session::instance()->addTorrent(torrent_path);
     // Remember the last opened folder
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+    Preferences settings;
     settings.setValue(QString::fromUtf8("MainWindowLastDir"), torrent_path);
     settings.setValue("TorrentImport/LastContentDir", content_path);
     return;
@@ -277,15 +277,13 @@ bool TorrentImportDlg::skipFileChecking() const
 }
 
 void TorrentImportDlg::loadSettings()
-{
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  restoreGeometry(settings.value("TorrentImportDlg/dimensions").toByteArray());
+{  
+    restoreGeometry(Preferences().value("TorrentImportDlg/dimensions").toByteArray());
 }
 
 void TorrentImportDlg::saveSettings()
-{
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  settings.setValue("TorrentImportDlg/dimensions", saveGeometry());
+{  
+    Preferences().setValue("TorrentImportDlg/dimensions", saveGeometry());
 }
 
 void TorrentImportDlg::closeEvent(QCloseEvent *event)

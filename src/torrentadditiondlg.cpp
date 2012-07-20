@@ -49,7 +49,6 @@
 #include "torrentcontentmodel.h"
 #include "preferences.h"
 #include "transferlistwidget.h"
-#include "qinisettings.h"
 #include "misc.h"
 #include "proplistdelegate.h"
 #include "torrentpersistentdata.h"
@@ -105,7 +104,7 @@ torrentAdditionDialog::torrentAdditionDialog(QWidget *parent) :
     //addInPause->setEnabled(false);
   }
   // Load custom labels
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   settings.beginGroup(QString::fromUtf8("TransferListFilters"));
   const QStringList customLabels = settings.value("customLabels", QStringList()).toStringList();
   comboLabel->addItem("");
@@ -132,7 +131,7 @@ void torrentAdditionDialog::closeEvent(QCloseEvent *event)
 void torrentAdditionDialog::readSettings() {
   // The window should NOT be shown before calling this method
   Q_ASSERT(!isVisible());
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   QString mode = m_showContentList ? "Full" : "Short";
   qDebug() << Q_FUNC_INFO << "mode:" << mode;
   if (!restoreGeometry(settings.value("TorrentAdditionDlg/geometry" + mode).toByteArray())) {
@@ -150,13 +149,15 @@ void torrentAdditionDialog::readSettings() {
   }
 }
 
-void torrentAdditionDialog::saveSettings() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  QString mode = m_showContentList ? "Full" : "Short";
-  settings.setValue("TorrentAdditionDlg/geometry" + mode, saveGeometry());
-  if (m_showContentList) {
-    settings.setValue("TorrentAdditionDlg/ContentHeaderState", torrentContentList->header()->saveState());
-  }
+void torrentAdditionDialog::saveSettings()
+{
+    Preferences settings;
+    QString mode = m_showContentList ? "Full" : "Short";
+    settings.setValue("TorrentAdditionDlg/geometry" + mode, saveGeometry());
+    if (m_showContentList)
+    {
+        settings.setValue("TorrentAdditionDlg/ContentHeaderState", torrentContentList->header()->saveState());
+    }
 }
 
 void torrentAdditionDialog::limitDialogWidth() {
@@ -781,7 +782,7 @@ QString torrentAdditionDialog::getTruncatedSavePath(QString save_path, QString* 
 }
 
 void torrentAdditionDialog::saveTruncatedPathHistory() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   const QString current_save_path = getCurrentTruncatedSavePath();
   // Get current history
   QStringList history = settings.value("TorrentAdditionDlg/save_path_history").toStringList();
@@ -801,7 +802,7 @@ void torrentAdditionDialog::saveTruncatedPathHistory() {
 }
 
 void torrentAdditionDialog::loadSavePathHistory() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   // Load save path history
   QStringList raw_path_history = settings.value("TorrentAdditionDlg/save_path_history").toStringList();
   foreach (const QString &sp, raw_path_history) {

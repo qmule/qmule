@@ -112,7 +112,8 @@ HEADERS += misc.h \
            scannedfoldersmodel.h \
            qinisettings.h \
            smtp.h \
-           dnsupdater.h
+           dnsupdater.h \
+    mgrwisard.h
 
 
 SOURCES += main.cpp \
@@ -120,7 +121,8 @@ SOURCES += main.cpp \
            scannedfoldersmodel.cpp \
            misc.cpp \
            smtp.cpp \
-           dnsupdater.cpp
+           dnsupdater.cpp \
+    mgrwisard.cpp
 
 nox {
   HEADERS += headlessloader.h
@@ -263,3 +265,6 @@ TRANSLATIONS = $$LANG_PATH/qbittorrent_fr.ts \
                $$LANG_PATH/qbittorrent_ka.ts \
                $$LANG_PATH/qbittorrent_be.ts \
                $$LANG_PATH/qbittorrent_eu.ts
+
+FORMS += \
+    mgrwisard.ui

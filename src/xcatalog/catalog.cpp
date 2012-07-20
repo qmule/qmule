@@ -24,6 +24,7 @@
 #include "constants.h"
 #include "catalog.h"
 #include "sdtpcatalogdataprovider.h"
+#include "misc.h"
 
 XCatalog::XCatalog( QObject *parent ) :
     QObject(parent),
@@ -52,8 +53,7 @@ XCatalog::XCatalog( QObject *parent ) :
     connect(this, SIGNAL(queueFetch(int,void*)),
             m_dataProvider, SLOT(fetch(int,void*)) );
 
-    m_imageCachePath = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + QLatin1String("/images");
-    m_imageCachePath = QDir::toNativeSeparators(m_imageCachePath);
+    m_imageCachePath = misc::XCatalogCacheLocation();
 }
 
 XCatalog::~XCatalog()
@@ -200,12 +200,6 @@ void XCatalog::onDataFetched(int type, void *param, void *data)
 
             if ( file->thumbnail().isNull() )
                 return;
-
-            // store to cache
-            QDir dirHelper;
-            if( !dirHelper.exists(m_imageCachePath) ) {
-                dirHelper.mkpath(m_imageCachePath);
-            }
 
             QString imgFile = cachedThumbnail(file);
             if ( !file->thumbnail().save(imgFile, XCFG_THUMB_FORMAT) ) {

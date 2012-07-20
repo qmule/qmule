@@ -45,13 +45,13 @@
 class TorrentTempData {
 public:
   static bool hasTempData(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     return all_data.contains(hash);
   }
 
   static void deleteTempData(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     if (all_data.contains(hash)) {
       all_data.remove(hash);
@@ -60,7 +60,7 @@ public:
   }
 
   static void setFilesPriority(QString hash,  const std::vector<int> &pp) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     std::vector<int>::const_iterator pp_it = pp.begin();
@@ -75,7 +75,7 @@ public:
   }
 
   static void setFilesPath(QString hash, const QStringList &path_list) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["files_path"] = path_list;
@@ -84,7 +84,7 @@ public:
   }
 
   static void setSavePath(QString hash, QString save_path) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["save_path"] = save_path;
@@ -93,7 +93,7 @@ public:
   }
 
   static void setLabel(QString hash, QString label) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     qDebug("Saving label %s to tmp data", label.toLocal8Bit().data());
@@ -103,7 +103,7 @@ public:
   }
 
   static void setSequential(QString hash, bool sequential) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["sequential"] = sequential;
@@ -112,14 +112,14 @@ public:
   }
 
   static bool isSequential(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("sequential", false).toBool();
   }
 
   static void setSeedingMode(QString hash,bool seed) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["seeding"] = seed;
@@ -128,28 +128,28 @@ public:
   }
 
   static bool isSeedingMode(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("seeding", false).toBool();
   }
 
   static QString getSavePath(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("save_path").toString();
   }
 
   static QStringList getFilesPath(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("files_path").toStringList();
   }
 
   static QString getLabel(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     qDebug("Got label %s from tmp data", data.value("label", "").toString().toLocal8Bit().data());
@@ -157,7 +157,7 @@ public:
   }
 
   static void getFilesPriority(QString hash, std::vector<int> &fp) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents-tmp").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     const QList<int> list_var = misc::intListfromStringList(data.value("files_priority").toStringList());
@@ -176,19 +176,19 @@ public:
 
 public:
   static bool isKnownTorrent(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     return all_data.contains(hash);
   }
 
   static QStringList knownTorrents() {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     return all_data.keys();
   }
 
   static void setRatioLimit(const QString &hash, qreal ratio) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["max_ratio"] = ratio;
@@ -197,14 +197,14 @@ public:
   }
 
   static qreal getRatioLimit(const QString &hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("max_ratio", USE_GLOBAL_RATIO).toReal();
   }
 
   static bool hasPerTorrentRatioLimit() {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant>::ConstIterator it;
     for (it = all_data.constBegin(); it != all_data.constEnd(); it++) {
@@ -216,7 +216,7 @@ public:
   }
 
   static void setAddedDate(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     if (!data.contains("add_date")) {
@@ -227,7 +227,7 @@ public:
   }
 
   static QDateTime getAddedDate(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     QDateTime dt = data.value("add_date").toDateTime();
@@ -239,7 +239,7 @@ public:
   }
 
   static void setErrorState(QString hash, bool has_error) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["has_error"] = has_error;
@@ -248,14 +248,14 @@ public:
   }
 
   static bool hasError(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("has_error", false).toBool();
   }
 
   static void setRootFolder(QString hash, QString root_folder) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["root_folder"] = root_folder;
@@ -264,14 +264,14 @@ public:
   }
 
   static QString getRootFolder(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("root_folder").toString();
   }
 
   static void setPreviousSavePath(QString hash, QString previous_path) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["previous_path"] = previous_path;
@@ -280,14 +280,14 @@ public:
   }
 
   static QString getPreviousPath(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("previous_path").toString();
   }
   
   static void saveSeedDate(const QTorrentHandle &h) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data[h.hash()].toHash();
     if (h.is_seed())
@@ -299,14 +299,14 @@ public:
   }
 
   static QDateTime getSeedDate(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("seed_date").toDateTime();
   }
 
   static void deletePersistentData(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     if (all_data.contains(hash)) {
       all_data.remove(hash);
@@ -318,7 +318,7 @@ public:
     Q_ASSERT(h.is_valid());
     qDebug("Saving persistent data for %s", qPrintable(h.hash()));
     // Save persistent data
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(h.hash()).toHash();
     data["is_magnet"] = is_magnet;
@@ -351,7 +351,7 @@ public:
   static void saveSavePath(QString hash, QString save_path) {
     Q_ASSERT(!hash.isEmpty());
     qDebug("TorrentPersistentData::saveSavePath(%s)", qPrintable(save_path));
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["save_path"] = save_path;
@@ -362,7 +362,7 @@ public:
 
   static void saveLabel(QString hash, QString label) {
     Q_ASSERT(!hash.isEmpty());
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["label"] = label;
@@ -372,7 +372,7 @@ public:
 
   static void saveName(QString hash, QString name) {
     Q_ASSERT(!hash.isEmpty());
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data.value(hash).toHash();
     data["name"] = name;
@@ -381,7 +381,7 @@ public:
   }
 
   static void savePriority(const QTorrentHandle &h) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data[h.hash()].toHash();
     data["priority"] = h.queue_position();
@@ -390,7 +390,7 @@ public:
   }
 
   static void saveSeedStatus(const QTorrentHandle &h) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     QHash<QString, QVariant> data = all_data[h.hash()].toHash();
     bool was_seed = data.value("seed", false).toBool();
@@ -407,7 +407,7 @@ public:
 
   // Getters
   static QString getSavePath(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     //qDebug("TorrentPersistentData: getSavePath %s", data["save_path"].toString().toLocal8Bit().data());
@@ -415,42 +415,42 @@ public:
   }
 
   static QString getLabel(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("label", "").toString();
   }
 
   static QString getName(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("name", "").toString();
   }
 
   static int getPriority(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("priority", -1).toInt();
   }
 
   static bool isSeed(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("seed", false).toBool();
   }
 
   static bool isMagnet(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     return data.value("is_magnet", false).toBool();
   }
 
   static QString getMagnetUri(QString hash) {
-    QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent-resume"));
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
     const QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
     const QHash<QString, QVariant> data = all_data.value(hash).toHash();
     Q_ASSERT(data.value("is_magnet", false).toBool());

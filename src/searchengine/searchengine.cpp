@@ -53,7 +53,6 @@
 #include "misc.h"
 #include "preferences.h"
 #include "searchlistdelegate.h"
-#include "qinisettings.h"
 #include "mainwindow.h"
 #include "iconprovider.h"
 #include "transport/session.h"
@@ -261,15 +260,15 @@ void SearchEngine::on_enginesButton_clicked() {
 }
 
 // get the last searchs from a QIniSettings to a QStringList
-void SearchEngine::startSearchHistory() {
-  QIniSettings settings("qBittorrent", "qBittorrent");
-  searchHistory.setStringList(settings.value("Search/searchHistory",QStringList()).toStringList());
+void SearchEngine::startSearchHistory()
+{
+    searchHistory.setStringList(Preferences().value("Search/searchHistory",QStringList()).toStringList());
 }
 
 // Save the history list into the QIniSettings for the next session
-void SearchEngine::saveSearchHistory() {
-  QIniSettings settings("qBittorrent", "qBittorrent");
-  settings.setValue("Search/searchHistory",searchHistory.stringList());
+void SearchEngine::saveSearchHistory()
+{
+    Preferences().setValue("Search/searchHistory",searchHistory.stringList());
 }
 
 void SearchEngine::searchTextEdited(QString) {
@@ -375,7 +374,7 @@ void SearchEngine::propagateSectionResized(int index, int , int newsize) {
 void SearchEngine::saveResultsColumnsWidth() {
   if (all_tab.size() > 0) {
     QTreeView* treeview = all_tab.first()->getCurrentTreeView();
-    QIniSettings settings("qBittorrent", "qBittorrent");
+    Preferences settings;
     QStringList width_list;
     QStringList new_width_list;
     short nbColumns = all_tab.first()->getCurrentSearchListModel()->columnCount();
@@ -569,7 +568,7 @@ void SearchEngine::searchFinished(int exitcode,QProcess::ExitStatus){
 /*  if(searchTimeout->isActive()) {
     searchTimeout->stop();
   }
-  QIniSettings settings("qBittorrent", "qBittorrent");
+  Preferences settings;
   bool useNotificationBalloons = settings.value("Preferences/General/NotificationBaloons", true).toBool();
   if(useNotificationBalloons && mp_mainWindow->getCurrentTabWidget() != this) {
     mp_mainWindow->showNotificationBaloon(tr("Search Engine"), tr("Search has finished"));

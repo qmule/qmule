@@ -36,6 +36,7 @@
 #include "tools.h"
 #include "config.h"
 #include "ui_catalogwidget.h"
+#include "preferences/preferences.h"
 
 #ifdef _WINDLL
 QAXFACTORY_BEGIN("{64468e37-9ecc-4042-8bda-3e06b9a85999}",
@@ -54,8 +55,8 @@ XCatalogWidget::XCatalogWidget( QWidget *parent ) :
     ui->setupUi(this);
     setWindowTitle( tr("xCatalog v%1").arg(XCFG_VERSION) );
 
-    // load settings, restore window geometry/position
-    QSettings settings(XCFG_APPNAME_CFG, XCFG_APPNAME);
+    // load settings, restore window geometry/position from main config
+    Preferences settings;
     restoreGeometry(settings.value(XCFG_WINDOW_GEOMETRY).toByteArray());
     ui->splitter->restoreState(settings.value(XCFG_WINDOW_STATE).toByteArray());
     int sortRole = settings.value(XCFG_FILES_SORT_ROLE, FileModel::DateRole).toInt();
@@ -178,7 +179,7 @@ XCatalogWidget::XCatalogWidget( QWidget *parent ) :
 
 XCatalogWidget::~XCatalogWidget()
 {
-    QSettings settings(XCFG_APPNAME_CFG, XCFG_APPNAME);
+    Preferences settings;
     settings.setValue(XCFG_WINDOW_GEOMETRY, saveGeometry());
     settings.setValue(XCFG_WINDOW_STATE, ui->splitter->saveState());
 

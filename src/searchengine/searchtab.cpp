@@ -38,7 +38,7 @@
 #include "searchlistdelegate.h"
 #include "misc.h"
 #include "searchengine.h"
-#include "qinisettings.h"
+#include "preferences.h"
 
 SearchTab::SearchTab(SearchEngine *parent) : QWidget(), parent(parent)
 {
@@ -106,7 +106,7 @@ QHeaderView* SearchTab::header() const {
 }
 
 bool SearchTab::loadColWidthResultsList() {
-  QIniSettings settings("qBittorrent", "qBittorrent");
+  Preferences settings;
   QString line = settings.value("SearchResultsColsWidth", QString()).toString();
   if (line.isEmpty())
     return false;

@@ -52,7 +52,7 @@
 #include "mainwindow.h"
 #include "downloadedpiecesbar.h"
 #include "pieceavailabilitybar.h"
-#include "qinisettings.h"
+#include "preferences.h"
 #include "proptabbar.h"
 #include "iconprovider.h"
 #include "lineedit.h"
@@ -272,7 +272,7 @@ void PropertiesWidget::loadTorrentInfos(const Transfer& _h) {
 }
 
 void PropertiesWidget::readSettings() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   // Restore splitter sizes
   QStringList sizes_str = settings.value(QString::fromUtf8("TorrentProperties/SplitterSizes"), QString()).toString().split(",");
   if (sizes_str.size() == 2) {
@@ -292,7 +292,7 @@ void PropertiesWidget::readSettings() {
 }
 
 void PropertiesWidget::saveSettings() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   settings.setValue("TorrentProperties/Visible", state==VISIBLE);
   // Splitter sizes
   QSplitter *hSplitter = static_cast<QSplitter*>(parentWidget());

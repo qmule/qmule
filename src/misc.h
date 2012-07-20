@@ -51,6 +51,10 @@ const qlonglong MAX_ETA = 8640000;
 
 typedef QMap<QString, QList<QString> > shared_map;
 
+#define COMPANY_NAME "intersvyaz"
+#define PRODUCT_NAME "qMule"
+
+
 /*  Miscellaneaous functions that can be useful */
 class misc : public QObject{
   Q_OBJECT
@@ -146,6 +150,7 @@ public:
   static QString BTBackupLocation();
   static QString ED2KBackupLocation();
   static QString ED2KKeyFile();
+  static QString XCatalogCacheLocation();
   static QString cacheLocation();
   static long long freeDiskSpaceOnPath(QString path);
   // return best userfriendly storage unit (B, KiB, MiB, GiB, TiB)
@@ -176,6 +181,7 @@ public:
   /**
     * eMule migration functions
     * helpers for quiet migration
+    * migration functions must return empty values or 0!
    */
 #ifdef Q_WS_WIN32
   static QString emuleConfig(const QString& filename);

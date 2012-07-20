@@ -611,14 +611,23 @@ QString misc::ED2KBackupLocation()
     return location;
 }
 
+QString misc::XCatalogCacheLocation()
+{
+    const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
+                                               + QDir::separator() + "XCatalog");
+    QDir locationDir(location);
+    if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
+    return location;
+}
+
 QString misc::ED2KKeyFile()
 {
     const QString location = QDir::cleanPath(QDesktopServicesDataLocation()
                                                + QDir::separator() + "ED2K_key");
 
-    QDir locationDir(QDesktopServicesDataLocation());
+    QDir locationDir(location);
     if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
-    return (location + QDir::separator() + QString("key.rnd"));
+    return (locationDir.filePath(QString("key.rnd")));
 }
 
 QString misc::cacheLocation() {
@@ -1088,13 +1097,13 @@ QString misc::migrationIncomingDir()
 int misc::migrationPort()
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Port", 4668).toInt();
+    return qs.value("eMule/Port", 0).toInt();
 }
 
 QString misc::migrationNick()
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Nick", QString("qMule")).toString();
+    return qs.value("eMule/Nick", QString("")).toString();
 }
 
 QString misc::migrationAuthLogin()

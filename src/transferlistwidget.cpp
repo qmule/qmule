@@ -58,7 +58,6 @@
 #include "torrentmodel.h"
 #include "deletionconfirmationdlg.h"
 #include "propertieswidget.h"
-#include "qinisettings.h"
 #include "iconprovider.h"
 
 using namespace libtorrent;
@@ -179,9 +178,9 @@ inline QModelIndex TransferListWidget::mapFromSource(const QModelIndex &index) c
 }
 
 
-QStringList TransferListWidget::getCustomLabels() const {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  return settings.value("TransferListFilters/customLabels", QStringList()).toStringList();
+QStringList TransferListWidget::getCustomLabels() const
+{
+    return Preferences().value("TransferListFilters/customLabels", QStringList()).toStringList();
 }
 
 void TransferListWidget::torrentDoubleClicked(const QModelIndex& index) {
@@ -895,13 +894,12 @@ void TransferListWidget::applyStatusFilter(int f) {
 
 void TransferListWidget::saveSettings()
 {
-  QIniSettings settings("qBittorrent", "qBittorrent");
-  settings.setValue("TransferList/HeaderState", header()->saveState());
+    Preferences().setValue("TransferList/HeaderState", header()->saveState());
 }
 
 bool TransferListWidget::loadSettings()
 {
-  QIniSettings settings("qBittorrent", "qBittorrent");
+  Preferences settings;
   bool ok = header()->restoreState(settings.value("TransferList/HeaderState").toByteArray());
   if (!ok) {
     header()->resizeSection(0, 200); // Default

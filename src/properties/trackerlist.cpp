@@ -40,7 +40,7 @@
 #include "propertieswidget.h"
 #include "trackersadditiondlg.h"
 #include "iconprovider.h"
-#include "qinisettings.h"
+#include "preferences.h"
 #include "misc.h"
 #include "transport/session.h"
 
@@ -350,15 +350,16 @@ void TrackerList::showTrackerListMenu(QPoint) {
   }
 }
 
-void TrackerList::loadSettings() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  if (!header()->restoreState(settings.value("TorrentProperties/Trackers/TrackerListState").toByteArray())) {
-    setColumnWidth(0, 30);
-    setColumnWidth(1, 300);
-  }
+void TrackerList::loadSettings()
+{
+    if (!header()->restoreState(Preferences().value("TorrentProperties/Trackers/TrackerListState").toByteArray()))
+    {
+        setColumnWidth(0, 30);
+        setColumnWidth(1, 300);
+    }
 }
 
-void TrackerList::saveSettings() const {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
-  settings.setValue("TorrentProperties/Trackers/TrackerListState", header()->saveState());
+void TrackerList::saveSettings() const
+{
+    Preferences().setValue("TorrentProperties/Trackers/TrackerListState", header()->saveState());
 }

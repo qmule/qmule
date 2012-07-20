@@ -48,7 +48,6 @@
 #include "misc.h"
 #include "advancedsettings.h"
 #include "scannedfoldersmodel.h"
-#include "qinisettings.h"
 #include "transport/session.h"
 #include "iconprovider.h"
 #include "dnsupdater.h"
@@ -301,7 +300,7 @@ void options_imp::changePage(QListWidgetItem *current, QListWidgetItem *previous
 }
 
 void options_imp::loadWindowState() {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   resize(settings.value(QString::fromUtf8("Preferences/State/size"), sizeFittingScreen()).toSize());
   QPoint p = settings.value(QString::fromUtf8("Preferences/State/pos"), QPoint()).toPoint();
   if (!p.isNull())
@@ -321,7 +320,7 @@ void options_imp::loadWindowState() {
 }
 
 void options_imp::saveWindowState() const {
-  QIniSettings settings(QString::fromUtf8("qBittorrent"), QString::fromUtf8("qBittorrent"));
+  Preferences settings;
   settings.setValue(QString::fromUtf8("Preferences/State/size"), size());
   settings.setValue(QString::fromUtf8("Preferences/State/pos"), pos());
   // Splitter size
