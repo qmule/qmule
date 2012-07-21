@@ -72,6 +72,25 @@ public:
   }
 
 public:
+
+  /**
+    * this method executes migrate - write options from orignal eMule to our options
+   */
+  void migrate()
+  {
+      if (isMigrationStage())
+      {
+          setISLogin(misc::migrationAuthLogin());
+          setISPassword(misc::migrationAuthPassword());
+          saveSharedDirs(misc::migrationShareds());
+          saveSharedFiles(misc::migrationSharedFiles());
+          setListenPort(misc::migrationPort(4662));
+          setNick(misc::migrationNick(misc::getUserIDString()));
+          setIncomingDirectory(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
+          setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
+      }
+  }
+
   // General options
   QString getLocale() const {
     return value(QString::fromUtf8("Preferences/General/Locale"), "").toString();
@@ -186,14 +205,7 @@ public:
 
   QString getISLogin() const
   {
-      QString res = value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
-
-      if (res.isEmpty() && isMigrationStage())
-      {
-        res = misc::migrationAuthLogin();
-      }
-
-      return res;
+      return value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
   }
 
   void setISLogin(const QString& strISLogin)
@@ -203,14 +215,7 @@ public:
 
   QString getISPassword() const
   {
-      QString res = QString::fromStdString(is_crypto::DecryptPasswd(value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString().toStdString(), misc::ED2KKeyFile().toStdString()));
-
-      if (res.isEmpty() && isMigrationStage())
-      {
-          res = misc::migrationAuthPassword();
-      }
-
-      return res;
+      return QString::fromStdString(is_crypto::DecryptPasswd(value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString().toStdString(), misc::ED2KKeyFile().toStdString()));
   }
 
   void setISPassword(const QString& strISPassword)
@@ -708,11 +713,6 @@ public:
       return value(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), true).toBool();
   }
 
-  void leaveMigrationStage()
-  {
-      setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
-  }
-
   bool isShowSharedFilesEnabled() const
   {
       return value(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), true).toBool();
@@ -805,11 +805,6 @@ public:
           endArray();
       }
 
-      if (se.isEmpty() && isMigrationStage())
-      {
-          se = misc::migrationShareds();
-      }
-
       return se;
   }
 
@@ -844,29 +839,12 @@ public:
 
       endArray();
 
-      if (sl.isEmpty() && isMigrationStage())
-      {
-          sl = misc::migrationSharedFiles();
-      }
-
       return sl;
   }
 
   int listenPort() const
   {
-      int port = value(QString::fromUtf8("Preferences/eDonkey/ListenPort"), 0).toInt();
-
-      if ((port == 0) && isMigrationStage())
-      {
-        port = misc::migrationPort();
-      }
-
-      if (port == 0)
-      {
-          port = 4662;
-      }
-
-      return port;
+      return value(QString::fromUtf8("Preferences/eDonkey/ListenPort"), 4662).toInt();
   }
 
   void setListenPort(int nListenPort)
@@ -876,17 +854,7 @@ public:
 
   QString nick() const
   {
-      QString res = value(QString::fromUtf8("Preferences/eDonkey/Nick"), "qMule").toString();
-
-      if (res.isEmpty() && isMigrationStage())
-      {
-        res = misc::migrationNick();
-      }
-
-      if (res.isEmpty())
-          res = "qMule";
-
-      return res;
+      return value(QString::fromUtf8("Preferences/eDonkey/Nick"), misc::getUserIDString()).toString();
   }
 
   void setNick(const QString& nick)
@@ -896,17 +864,7 @@ public:
 
   QString getIncomingDirectory() const
   {
-      QString res = value(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), "").toString();
-
-      if (res.isEmpty() && isMigrationStage())
-      {
-           res = misc::migrationIncomingDir();
-      }
-
-      if (res.isEmpty())
-          res = misc::QDesktopServicesDownloadLocation();
-
-      return res;
+      return value(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), misc::QDesktopServicesDownloadLocation()).toString();
   }
 
   void setIncomingDirectory(const QString& dir)

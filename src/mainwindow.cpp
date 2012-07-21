@@ -117,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   setupUi(this);
 
   Preferences pref;
+  pref.migrate();
   ui_locked = pref.isUILocked();
   setWindowTitle(tr("qBittorrent %1", "e.g: qBittorrent v0.x").arg(QString::fromUtf8(VERSION)));
   displaySpeedInTitle = pref.speedInTitleBar();
@@ -500,10 +501,7 @@ MainWindow::~MainWindow() {
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
   qDebug("Deleting Session::instance()");
-  Session::drop();
-
-  // leave ED2K migration state - temporary in main window destructor
-  Preferences().leaveMigrationStage();
+  Session::drop();    
   qDebug("Exiting GUI destructor...");
 }
 

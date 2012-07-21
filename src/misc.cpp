@@ -1084,35 +1084,34 @@ QString misc::emuleKeyFile()
     return (filename);
 }
 
-QString misc::migrationIncomingDir()
+QString misc::migrationIncomingDir(const QString& dir)
 {
+    QString res = dir;
     QStringList sl = getFileLines(emuleConfig("preferences.ini")).filter(QRegExp("^IncomingDir"));
 
-    if (sl.empty())
+    if (!sl.empty())
     {
-        return QDir::homePath();
+        QStringList sres = sl.at(0).split(QRegExp("="));
+
+        if (sres.size() > 1)
+        {
+            res = sres[1];
+        }
     }
 
-    QStringList sres = sl.at(0).split(QRegExp("="));
-
-    if (sres.size() > 1)
-    {
-        return sres[1];
-    }
-
-    return QString();
+    return res;
 }
 
-int misc::migrationPort()
+int misc::migrationPort(int port)
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Port", 0).toInt();
+    return qs.value("eMule/Port", port).toInt();
 }
 
-QString misc::migrationNick()
+QString misc::migrationNick(const QString& nick)
 {
     QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Nick", QString("")).toString();
+    return qs.value("eMule/Nick", nick).toString();
 }
 
 QString misc::migrationAuthLogin()
@@ -1159,19 +1158,19 @@ QStringList misc::migrationSharedFiles()
 
 #else
 
-QString misc::migrationIncomingDir()
+QString misc::migrationIncomingDir(const QString& dir)
 {
-    return QString();
+    return dir;
 }
 
-int misc::migrationPort()
+int misc::migrationPort(int port)
 {
-   return 0;
+   return port;
 }
 
-QString misc::migrationNick()
+QString misc::migrationNick(const QString& nick)
 {
-    return QString();
+    return nick;
 }
 
 QString misc::migrationAuthLogin()

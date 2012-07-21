@@ -192,9 +192,9 @@ public:
   static QString emuleKeyFile();
 #endif
 
-  static QString migrationIncomingDir();
-  static int     migrationPort();
-  static QString migrationNick();
+  static QString migrationIncomingDir(const QString& dir);
+  static int     migrationPort(int port);
+  static QString migrationNick(const QString& nick);
   static QString migrationAuthLogin();
   static QString migrationAuthPassword();
   static shared_map migrationShareds();
