@@ -4,6 +4,55 @@
 
 using namespace libtorrent;
 
+SessionStatus operator + (const SessionStatus& s1, const SessionStatus& s2){
+    SessionStatus s = s1;
+
+    s.has_incoming_connections = s1.has_incoming_connections || s2.has_incoming_connections;
+
+    s.upload_rate += s2.upload_rate;
+    s.download_rate += s2.download_rate;
+    s.total_download += s2.total_download;
+    s.total_upload += s2.total_upload;
+
+    s.payload_upload_rate += s2.payload_upload_rate;
+    s.payload_download_rate += s2.payload_download_rate;
+    s.total_payload_download += s2.total_payload_download;
+    s.total_payload_upload += s2.total_payload_upload;
+
+    s.ip_overhead_upload_rate += s2.ip_overhead_upload_rate;
+    s.ip_overhead_download_rate += s2.ip_overhead_download_rate;
+    s.total_ip_overhead_download += s2.total_ip_overhead_download;
+    s.total_ip_overhead_upload += s2.total_ip_overhead_upload;
+
+    s.dht_upload_rate += s2.dht_upload_rate;
+    s.dht_download_rate += s2.dht_download_rate;
+    s.total_dht_download += s2.total_dht_download;
+    s.total_dht_upload += s2.total_dht_upload;
+
+    s.tracker_upload_rate += s2.tracker_upload_rate;
+    s.tracker_download_rate += s2.tracker_download_rate;
+    s.total_tracker_download += s2.total_tracker_download;
+    s.total_tracker_upload += s2.total_tracker_upload;
+
+    s.total_redundant_bytes += s2.total_redundant_bytes;
+    s.total_failed_bytes += s2.total_failed_bytes;
+
+    s.num_peers += s2.num_peers;
+    s.num_unchoked += s2.num_unchoked;
+    s.allowed_upload_slots += s2.allowed_upload_slots;
+
+    s.up_bandwidth_queue += s2.up_bandwidth_queue;
+    s.down_bandwidth_queue += s2.down_bandwidth_queue;
+
+    s.up_bandwidth_bytes_queue += s2.up_bandwidth_bytes_queue;
+    s.down_bandwidth_bytes_queue += s2.down_bandwidth_bytes_queue;
+
+    s.optimistic_unchoke_counter += s2.optimistic_unchoke_counter;
+    s.unchoke_counter += s2.unchoke_counter;
+
+    return s;
+}
+
 Session* Session::m_instance = NULL;
 
 Session* Session::instance()
@@ -161,8 +210,9 @@ void Session::changeLabelInSavePath(
 }
 QStringList Session::getConsoleMessages() const { return m_btSession.getConsoleMessages(); }
 QStringList Session::getPeerBanMessages() const { return m_btSession.getPeerBanMessages(); }
-SessionStatus Session::getSessionStatus() const { return m_btSession.getSessionStatus(); }
-
+SessionStatus Session::getSessionStatus() const {
+    return m_edSession.getSessionStatus() + m_btSession.getSessionStatus();
+}
 QTorrentHandle Session::addTorrent(const QString& path, bool fromScanDir/* = false*/,
                                    QString from_url /*= QString()*/, bool resumed/* = false*/) {
     return m_btSession.addTorrent(path, fromScanDir, from_url, resumed);

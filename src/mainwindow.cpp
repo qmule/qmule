@@ -1363,8 +1363,7 @@ void MainWindow::trackerAuthenticationRequired(const Transfer& h) {
 // Check connection status and display right icon
 void MainWindow::updateGUI() {
     // FIXME: there's should be summary session status
-    SessionStatus btStatus = Session::instance()->get_torrent_session()->getSessionStatus();
-    SessionStatus edStatus = Session::instance()->get_ed2k_session()->getSessionStatus();
+    SessionStatus status = Session::instance()->getSessionStatus();
   // update global informations
   if (systrayIcon) {
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
@@ -1374,32 +1373,32 @@ void MainWindow::updateGUI() {
     html += "<div style='vertical-align: baseline; height: 18px;'>";
     html += "<img src=':/Icons/skin/download.png'/>&nbsp;" +
         tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s")
-        .arg(QString::number(btStatus.payload_download_rate/1024., 'f', 1));
+        .arg(QString::number(status.payload_download_rate/1024., 'f', 1));
     html += "</div>";
     html += "<div style='vertical-align: baseline; height: 18px;'>";
     html += "<img src=':/Icons/skin/seeding.png'/>&nbsp;" +
         tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s")
-        .arg(QString::number(btStatus.payload_upload_rate/1024., 'f', 1));
+        .arg(QString::number(status.payload_upload_rate/1024., 'f', 1));
     html += "</div>";
 #else
     // OSes such as Windows do not support html here
     QString html =tr("DL speed: %1 KiB/s", "e.g: Download speed: 10 KiB/s")
-        .arg(QString::number(btStatus.payload_download_rate/1024., 'f', 1));
+        .arg(QString::number(status.payload_download_rate/1024., 'f', 1));
     html += "\n";
     html += tr("UP speed: %1 KiB/s", "e.g: Upload speed: 10 KiB/s")
-        .arg(QString::number(btStatus.payload_upload_rate/1024., 'f', 1));
+        .arg(QString::number(status.payload_upload_rate/1024., 'f', 1));
 #endif
     systrayIcon->setToolTip(html); // tray icon
   }
   if (displaySpeedInTitle) {
     setWindowTitle(
         tr("[D: %1/s, U: %2/s] qBittorrent %3", "D = Download; U = Upload; %3 is qBittorrent version")
-        .arg(misc::friendlyUnit(btStatus.payload_download_rate))
-        .arg(misc::friendlyUnit(btStatus.payload_upload_rate))
+        .arg(misc::friendlyUnit(status.payload_download_rate))
+        .arg(misc::friendlyUnit(status.payload_upload_rate))
         .arg(QString::fromUtf8(VERSION)));
   }
 
-  statusBar->setUpDown(edStatus.payload_upload_rate, edStatus.payload_download_rate);
+  statusBar->setUpDown(status.payload_upload_rate, status.payload_download_rate);
 }
 
 void MainWindow::showNotificationBaloon(QString title, QString msg) const {
