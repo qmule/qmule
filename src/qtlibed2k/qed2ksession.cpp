@@ -232,6 +232,7 @@ void QED2KSession::pauseTransfer(const QString& hash) { getTransfer(hash).pause(
 void QED2KSession::resumeTransfer(const QString& hash) { getTransfer(hash).resume(); }
 void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {
     const Transfer t = getTransfer(hash);
+
     if (!t.is_valid())
     {
         return;
@@ -242,6 +243,11 @@ void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {
     m_session->remove_transfer(
         t.ed2kHandle().delegate(),
         delete_files ? libed2k::session::delete_files : libed2k::session::none);
+
+    if (QFile::remove(QDir(misc::ED2KBackupLocation()).absoluteFilePath(hash +".fastresume")))
+    {
+        qDebug() << "Also deleted temp fast resume data: " << hash;
+    }
 
     emit deletedTransfer(hash);
 }
