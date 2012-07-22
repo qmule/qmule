@@ -184,9 +184,10 @@ public:
     * helpers for quiet migration
     * migration functions must return empty values or 0!
    */
-#ifdef Q_WS_WIN32
-  static QString emuleConfig(const QString& filename);
   static QStringList getFileLines(const QString& filename);
+  static QString emuleConfig(const QString& filename);
+
+#ifdef Q_WS_WIN32
   static QStringList emuleSharedFiles();
   static QStringList emuleSharedDirs();
   static QString emuleKeyFile();

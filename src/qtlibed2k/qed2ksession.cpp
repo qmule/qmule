@@ -179,6 +179,7 @@ void QED2KSession::start()
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toStdString();
+    m_settings.m_known_file = pref.knownFile().toUtf8().constData();
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else

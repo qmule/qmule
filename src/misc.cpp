@@ -1005,6 +1005,32 @@ QString misc::parseHtmlLinks(const QString &raw_text)
   return result;
 }
 
+
+QStringList misc::getFileLines(const QString& filename)
+{
+    QStringList slist;
+    QFile textFile(filename);
+
+    if (!textFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return slist;
+    }
+
+
+    QTextStream textStream(&textFile);
+    textStream.setCodec("UTF-8");
+    textStream.setAutoDetectUnicode(true);
+
+    while (true)
+    {
+        QString line = textStream.readLine();
+        if (line.isNull()) break;
+        slist.append(line);
+    }
+
+    return slist;
+}
+
 #ifdef Q_WS_WIN32
 
 QString ShellGetFolderPath(int iCSIDL)
@@ -1035,31 +1061,6 @@ QString misc::emuleConfig(const QString& filename)
 
     qDebug() << "emule config " << res;
     return res;
-}
-
-QStringList misc::getFileLines(const QString& filename)
-{
-    QStringList slist;
-    QFile textFile(filename);
-
-    if (!textFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        return slist;
-    }
-
-
-    QTextStream textStream(&textFile);
-    textStream.setCodec("UTF-8");
-    textStream.setAutoDetectUnicode(true);
-
-    while (true)
-    {
-        QString line = textStream.readLine();
-        if (line.isNull()) break;
-        slist.append(line);
-    }
-
-    return slist;
 }
 
 QStringList misc::emuleSharedFiles()
@@ -1158,19 +1159,39 @@ QStringList misc::migrationSharedFiles()
 
 #else
 
-QString misc::migrationIncomingDir(const QString& dir)
+QString misc::emuleConfig(const QString& filename)
 {
-    return dir;
+    return QDir(QDir::home().filePath(".aMule")).filePath(filename);
+}
+
+QString misc::migrationIncomingDir(const QString& dir)
+{       
+    QString res = dir;
+    QStringList sl = getFileLines(emuleConfig("amule.conf")).filter(QRegExp("^IncomingDir"));
+
+    if (!sl.empty())
+    {
+        QStringList sres = sl.at(0).split(QRegExp("="));
+
+        if (sres.size() > 1)
+        {
+            res = sres[1];
+        }
+    }
+
+    return res;
 }
 
 int misc::migrationPort(int port)
 {
-   return port;
+    QSettings qs(emuleConfig("amule.conf"), QSettings::IniFormat);
+    return qs.value("eMule/Port", port).toInt();
 }
 
 QString misc::migrationNick(const QString& nick)
 {
-    return nick;
+    QSettings qs(emuleConfig("amule.conf"), QSettings::IniFormat);
+    return qs.value("eMule/Nick", nick).toString();
 }
 
 QString misc::migrationAuthLogin()

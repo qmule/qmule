@@ -87,6 +87,7 @@ public:
           setListenPort(misc::migrationPort(4662));
           setNick(misc::migrationNick(misc::getUserIDString()));
           setIncomingDirectory(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
+          setKnownFile(misc::emuleConfig("known.met"));
           setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
       }
   }
@@ -711,6 +712,26 @@ public:
   bool isMigrationStage() const
   {
       return value(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), true).toBool();
+  }
+
+  void setKnownFile(const QString& filename)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/KnownFile"), filename);
+  }
+
+  /**
+    * this method immediately erase option value from file - it will be used only one time
+   */
+  QString knownFile()
+  {
+      QString res = value(QString::fromUtf8("Preferences/eDonkey/KnownFile"), "").toString();
+
+      if (!res.isEmpty())
+      {
+          setKnownFile("");
+      }
+
+      return (res);
   }
 
   bool isShowSharedFilesEnabled() const
