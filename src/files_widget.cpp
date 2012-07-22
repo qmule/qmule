@@ -642,9 +642,9 @@ void files_widget::shareDir(QString dirPath, bool bShare)
         files.push_back(filesIter->toStdString());
 
     if (bShare)
-        Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toStdString(), dirPath.toStdString(), files);
+        Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
     else
-        Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toStdString(), dirPath.toStdString(), files);
+        Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
 }
 
 void files_widget::checkBaseAdd(QString dirPath)
@@ -675,8 +675,8 @@ void files_widget::checkBaseAdd(QString dirPath)
                 for (QList<QString>::const_iterator filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
                     files.push_back(filesIter->toStdString());
                 removeLastSlash(curDirPath);
-                Session::instance()->get_ed2k_session()->delegate()->unshare_dir(curBase.toStdString(), curDirPath.toStdString(), files);
-                Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toStdString(), curDirPath.toStdString(), files);
+                Session::instance()->get_ed2k_session()->delegate()->unshare_dir(curBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+                Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
             }
             else
                 break;
@@ -720,8 +720,8 @@ void files_widget::checkBaseRemove(QString dirPath)
             for (QList<QString>::const_iterator filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
                 files.push_back(filesIter->toStdString());
             removeLastSlash(curDirPath);
-            Session::instance()->get_ed2k_session()->delegate()->unshare_dir(oldBase.toStdString(), curDirPath.toStdString(), files);
-            Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toStdString(), curDirPath.toStdString(), files);
+            Session::instance()->get_ed2k_session()->delegate()->unshare_dir(oldBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+            Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
         }
     }
 }

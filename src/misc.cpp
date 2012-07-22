@@ -1063,6 +1063,11 @@ QString misc::emuleConfig(const QString& filename)
     return res;
 }
 
+QString misc::emuleConfigFilename()
+{
+    return QString("preferences.ini");
+}
+
 QStringList misc::emuleSharedFiles()
 {
     return getFileLines(emuleConfig("sharedfiles.dat"));
@@ -1083,36 +1088,6 @@ QString misc::emuleKeyFile()
     }
 
     return (filename);
-}
-
-QString misc::migrationIncomingDir(const QString& dir)
-{
-    QString res = dir;
-    QStringList sl = getFileLines(emuleConfig("preferences.ini")).filter(QRegExp("^IncomingDir"));
-
-    if (!sl.empty())
-    {
-        QStringList sres = sl.at(0).split(QRegExp("="));
-
-        if (sres.size() > 1)
-        {
-            res = sres[1];
-        }
-    }
-
-    return res;
-}
-
-int misc::migrationPort(int port)
-{
-    QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Port", port).toInt();
-}
-
-QString misc::migrationNick(const QString& nick)
-{
-    QSettings qs(QDir::home().filePath(emuleConfig("preferences.ini")), QSettings::IniFormat);
-    return qs.value("eMule/Nick", nick).toString();
 }
 
 QString misc::migrationAuthLogin()
@@ -1159,39 +1134,14 @@ QStringList misc::migrationSharedFiles()
 
 #else
 
+QString misc::emuleConfigFilename()
+{
+    return QString("amule.conf");
+}
+
 QString misc::emuleConfig(const QString& filename)
 {
     return QDir(QDir::home().filePath(".aMule")).filePath(filename);
-}
-
-QString misc::migrationIncomingDir(const QString& dir)
-{       
-    QString res = dir;
-    QStringList sl = getFileLines(emuleConfig("amule.conf")).filter(QRegExp("^IncomingDir"));
-
-    if (!sl.empty())
-    {
-        QStringList sres = sl.at(0).split(QRegExp("="));
-
-        if (sres.size() > 1)
-        {
-            res = sres[1];
-        }
-    }
-
-    return res;
-}
-
-int misc::migrationPort(int port)
-{
-    QSettings qs(emuleConfig("amule.conf"), QSettings::IniFormat);
-    return qs.value("eMule/Port", port).toInt();
-}
-
-QString misc::migrationNick(const QString& nick)
-{
-    QSettings qs(emuleConfig("amule.conf"), QSettings::IniFormat);
-    return qs.value("eMule/Nick", nick).toString();
 }
 
 QString misc::migrationAuthLogin()
@@ -1215,4 +1165,46 @@ shared_map misc::migrationShareds()
  }
 
 #endif
+
+ QString misc::migrationIncomingDir(const QString& dir)
+ {
+     QString res = dir;
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^IncomingDir"));
+
+     if (!sl.empty())
+     {
+         QStringList sres = sl.at(0).split(QRegExp("="));
+
+         if (sres.size() > 1)
+         {
+             res = sres[1];
+         }
+     }
+
+     return res;
+ }
+
+ int misc::migrationPort(int port)
+ {
+     QSettings qs(emuleConfig(emuleConfigFilename()), QSettings::IniFormat);
+     return qs.value("eMule/Port", port).toInt();
+ }
+
+ QString misc::migrationNick(const QString& nick)
+ {
+     QString res = nick;
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^Nick"));
+
+     if (!sl.empty())
+     {
+         QStringList sres = sl.at(0).split(QRegExp("="));
+
+         if (sres.size() > 1)
+         {
+             res = sres[1];
+         }
+     }
+
+     return res;
+ }
 

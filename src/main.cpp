@@ -204,6 +204,7 @@ int main(int argc, char *argv[]) {
   }
 
   qDebug("Program locale: %s", qPrintable(locale));
+  setlocale(LC_CTYPE, ""); // TODO - need attention
 
   //locale = "ru.ts";
 

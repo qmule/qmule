@@ -78,12 +78,12 @@ public:
     return QString::fromLocal8Bit(str);
   }
 
-  static inline QString toQStringU(const std::string &str) {
+  static inline QString toQStringU(const std::string& str) {
     return QString::fromUtf8(str.c_str());
   }
 
   static inline QString toQStringU(const char* str) {
-    return QString::fromUtf8(str);
+      return QString::fromUtf8(str);
   }
 
   static inline QString toQString(const libtorrent::sha1_hash &hash) {
@@ -186,6 +186,7 @@ public:
    */
   static QStringList getFileLines(const QString& filename);
   static QString emuleConfig(const QString& filename);
+  static QString emuleConfigFilename();
 
 #ifdef Q_WS_WIN32
   static QStringList emuleSharedFiles();
