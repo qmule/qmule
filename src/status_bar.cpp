@@ -40,11 +40,13 @@ void status_bar::setConnected(bool conn)
     {
         labelNetImg->setPixmap(imgConnected.pixmap(16, 16));
         labelNet->setText(tr("eD2K:Connected"));
+        labelNet->setToolTip(tr("eD2K:Connected"));
     }
     else
     {
         labelNetImg->setPixmap(imgDisconnected.pixmap(16, 16));
         labelNet->setText(tr("eD2K:Disconnected"));
+        labelNet->setToolTip(tr("eD2K:Disconnected"));
     }
 }
 
@@ -52,8 +54,10 @@ void status_bar::setUpDown(unsigned long nUp, unsigned long nDown)
 {
     QIcon icon = nUp > 0 ? (nDown > 0 ? Up1Down1 : Up1Down0) : (nDown > 0 ? Up0Down1 : Up0Down0);
     labelSpeedImg->setPixmap(icon.pixmap(16, 16));
-    labelSpeed->setText(tr("Upload:") + QString(" %1, ").arg(misc::friendlyUnit(nUp)) +
-                        tr("Download:") + QString(" %2").arg(misc::friendlyUnit(nDown)));
+    QString text = tr("Upload:") + QString(" %1/%2, ").arg(misc::friendlyUnit(nUp)).arg(tr("s")) +
+                   tr("Download:") + QString(" %1/%2").arg(misc::friendlyUnit(nDown)).arg(tr("s"));
+    labelSpeed->setText(text);
+    labelSpeed->setToolTip(text);
 }
 
 void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)
@@ -64,12 +68,15 @@ void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)
     strClients.setNum(nClients);
     strFiles.setNum(nFiles);
 
-    labelInfo->setText(tr("Clients: ") + strClients + tr("|Files: ") + strFiles);
+    QString text = tr("Clients: ") + strClients + tr("|Files: ") + strFiles;
+    labelInfo->setText(text);
+    labelInfo->setToolTip(text);
 }
 
 void status_bar::setStatusMsg(QString strMsg)
 {
     labelServer->setText(strMsg);
+    labelServer->setToolTip(strMsg);
 }
 
 void status_bar::reset()

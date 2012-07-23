@@ -428,6 +428,8 @@ void files_widget::exchangeSubdir()
 
     QDir dir(strPath);
     QFileInfoList fileList = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllDirs);
+
+    setChildExchangeStatus(curItem, true);
     if (!dirRules.contains(strPath))
     {
         QList<QString> filesList;
@@ -435,7 +437,6 @@ void files_widget::exchangeSubdir()
         dirRules.insert(strPath, filesList);
         shareDir(strPath, true);
 
-        setChildExchangeStatus(curItem, true);
         itemClicked(curItem, 0);
         while (curItem->parent() != allDirs)
         {
