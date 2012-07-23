@@ -859,6 +859,30 @@ QString misc::getUserIDString() {
   return uid;
 }
 
+QString misc::getUserName()
+{
+    QString res;
+    QStringList un = QProcess::systemEnvironment().filter(QRegExp("^USER"));
+
+    if (!un.isEmpty())
+    {
+        QStringList sres = un.at(0).split(QRegExp("="));
+
+        if (sres.size() > 1)
+        {
+            res = sres[1];
+        }
+    }
+
+    // attempt get name from id
+    if (res.isEmpty())
+    {
+        res = getUserIDString();
+    }
+
+    return res;
+}
+
 QStringList misc::toStringList(const QList<bool> &l) {
   QStringList ret;
   foreach (const bool &b, l) {
@@ -1080,7 +1104,7 @@ QStringList misc::emuleSharedDirs()
 
 QString misc::emuleKeyFile()
 {
-    QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
+    QString filename = emuleConfig(getUserName() + QString(".rnd"));
 
     if (!QFile::exists(filename))
     {
