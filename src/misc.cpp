@@ -861,26 +861,18 @@ QString misc::getUserIDString() {
 
 QString misc::getUserName()
 {
+#ifdef Q_WS_WIN
+    return getUserIDString();
+#else
     QString res;
-    QStringList un = QProcess::systemEnvironment().filter(QRegExp("^USER"));
-
-    if (!un.isEmpty())
+    const char* pchUserName = getenv("USER");
+    if (pchUserName)
     {
-        QStringList sres = un.at(0).split(QRegExp("="));
-
-        if (sres.size() > 1)
-        {
-            res = sres[1];
-        }
-    }
-
-    // attempt get name from id
-    if (res.isEmpty())
-    {
-        res = getUserIDString();
+        res = QString::fromLocal8Bit(pchUserName);
     }
 
     return res;
+#endif
 }
 
 QStringList misc::toStringList(const QList<bool> &l) {
