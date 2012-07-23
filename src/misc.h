@@ -171,6 +171,7 @@ public:
   // time duration like "1d 2h 10m".
   static QString userFriendlyDuration(qlonglong seconds, int type = 0);
   static QString getUserIDString();
+  static QString getUserName();
 
   // Convert functions
   static QStringList toStringList(const QList<bool> &l);

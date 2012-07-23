@@ -859,6 +859,22 @@ QString misc::getUserIDString() {
   return uid;
 }
 
+QString misc::getUserName()
+{
+#ifdef Q_WS_WIN
+    return getUserIDString();
+#else
+    QString res;
+    const char* pchUserName = getenv("USER");
+    if (pchUserName)
+    {
+        res = QString::fromLocal8Bit(pchUserName);
+    }
+
+    return res;
+#endif
+}
+
 QStringList misc::toStringList(const QList<bool> &l) {
   QStringList ret;
   foreach (const bool &b, l) {
@@ -1080,7 +1096,7 @@ QStringList misc::emuleSharedDirs()
 
 QString misc::emuleKeyFile()
 {
-    QString filename = emuleConfig(getUserIDString() + QString(".rnd"));
+    QString filename = emuleConfig(getUserName() + QString(".rnd"));
 
     if (!QFile::exists(filename))
     {

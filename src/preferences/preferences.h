@@ -85,7 +85,7 @@ public:
           saveSharedDirs(misc::migrationShareds());
           saveSharedFiles(misc::migrationSharedFiles());
           setListenPort(misc::migrationPort(4662));
-          setNick(misc::migrationNick(misc::getUserIDString()));
+          setNick(misc::migrationNick(misc::getUserName()));
           setIncomingDirectory(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
           setKnownFile(misc::emuleConfig("known.met"));
           setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
