@@ -1,4 +1,4 @@
-RC_FILE = qbittorrent.rc
+RC_FILE = qmule.rc
 
 # Enable Wide characters
 DEFINES += TORRENT_USE_WPATH

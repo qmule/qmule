@@ -24,11 +24,11 @@ os2 {
 
 nox {
   QT -= gui
-  TARGET = qbittorrent-nox
+  TARGET = qmule-nox
   DEFINES += DISABLE_GUI
 } else {
   QT += xml
-  TARGET = qbittorrent
+  TARGET = qmule 
 }
 QT += network
 QT += webkit
@@ -155,7 +155,7 @@ nox {
               login_dlg.h \
               search_widget_delegate.h \
               search_filter.h \
-	      messages_widget.h \
+	          messages_widget.h \
               add_friend.h \
               files_widget.h \
               status_bar.h 
@@ -210,7 +210,7 @@ nox {
 	       status_widget.ui \
 	       search_widget.ui \
            login_dlg.ui \
-	   messages_widget.ui \
+	       messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
            status_bar.ui
@@ -226,39 +226,5 @@ OTHER_FILES += ../winconf-mingw.pri ../winconf-msvc.pri
 OTHER_FILES += ../version.pri
 
 # Translations
-TRANSLATIONS = $$LANG_PATH/qbittorrent_fr.ts \
-               $$LANG_PATH/qbittorrent_zh.ts \
-               $$LANG_PATH/qbittorrent_zh_TW.ts \
-               $$LANG_PATH/qbittorrent_en.ts \
-               $$LANG_PATH/qbittorrent_ca.ts \
-               $$LANG_PATH/qbittorrent_es.ts \
-               $$LANG_PATH/qbittorrent_pl.ts \
-               $$LANG_PATH/qbittorrent_ko.ts \
-               $$LANG_PATH/qbittorrent_de.ts \
-               $$LANG_PATH/qbittorrent_nl.ts \
-               $$LANG_PATH/qbittorrent_tr.ts \
-               $$LANG_PATH/qbittorrent_sv.ts \
-               $$LANG_PATH/qbittorrent_el.ts \
-               $$LANG_PATH/qbittorrent_ru.ts \
-               $$LANG_PATH/qbittorrent_uk.ts \
-               $$LANG_PATH/qbittorrent_bg.ts \
-               $$LANG_PATH/qbittorrent_it.ts \
-               $$LANG_PATH/qbittorrent_sk.ts \
-               $$LANG_PATH/qbittorrent_ro.ts \
-               $$LANG_PATH/qbittorrent_pt.ts \
-               $$LANG_PATH/qbittorrent_nb.ts \
-               $$LANG_PATH/qbittorrent_fi.ts \
-               $$LANG_PATH/qbittorrent_da.ts \
-               $$LANG_PATH/qbittorrent_ja.ts \
-               $$LANG_PATH/qbittorrent_hu.ts \
-               $$LANG_PATH/qbittorrent_pt_BR.ts \
-               $$LANG_PATH/qbittorrent_cs.ts \
-               $$LANG_PATH/qbittorrent_sr.ts \
-               $$LANG_PATH/qbittorrent_ar.ts \
-               $$LANG_PATH/qbittorrent_hr.ts \
-               $$LANG_PATH/qbittorrent_gl.ts \
-               $$LANG_PATH/qbittorrent_hy.ts \
-               $$LANG_PATH/qbittorrent_lt.ts \
-               $$LANG_PATH/qbittorrent_ka.ts \
-               $$LANG_PATH/qbittorrent_be.ts \
-               $$LANG_PATH/qbittorrent_eu.ts
+TRANSLATIONS = $$LANG_PATH/qmule_en.ts \
+               $$LANG_PATH/qmule_ru.ts 

@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   Preferences pref;
   pref.migrate();
   ui_locked = pref.isUILocked();
-  setWindowTitle(tr("qBittorrent %1", "e.g: qBittorrent v0.x").arg(QString::fromUtf8(VERSION)));
+  setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
   displaySpeedInTitle = pref.speedInTitleBar();
   // Clean exit on log out
   connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteBTSession()));
@@ -398,7 +398,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 #ifdef Q_WS_WIN
   if (!pref.neverCheckFileAssoc() && (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet())) {
     if (QMessageBox::question(0, tr("Torrent file association"),
-                             tr("qBittorrent is not the default application to open torrent files or Magnet links.\nDo you want to associate qBittorrent to torrent files and Magnet links?"),
+                             tr("qMule is not the default application to open torrent files or Magnet links.\nDo you want to associate qMule to torrent files and Magnet links?"),
                              QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
       Preferences::setTorrentFileAssoc(true);
       Preferences::setMagnetLinkAssoc(true);
@@ -574,15 +574,15 @@ void MainWindow::updateNbTorrents() {
 }
 
 void MainWindow::on_actionWebsite_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://www.qbittorrent.org")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://www.is74.ru")));
 }
 
 void MainWindow::on_actionDocumentation_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://doc.qbittorrent.org")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://is74.ru")));
 }
 
 void MainWindow::on_actionBugReport_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://bugs.qbittorrent.org")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://is74.ru")));
 }
 
 void MainWindow::tab_changed(int new_tab) {
@@ -877,8 +877,8 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     if (e->spontaneous() || force_exit) {
       if (!isVisible())
         show();
-      QMessageBox confirmBox(QMessageBox::Question, tr("Exiting qBittorrent"),
-                             tr("Some files are currently transferring.\nAre you sure you want to quit qBittorrent?"),
+      QMessageBox confirmBox(QMessageBox::Question, tr("Exiting qMule"),
+                             tr("Some files are currently transferring.\nAre you sure you want to quit qMule?"),
                              QMessageBox::NoButton, this);
       QPushButton *noBtn = confirmBox.addButton(tr("No"), QMessageBox::NoRole);
       QPushButton *yesBtn = confirmBox.addButton(tr("Yes"), QMessageBox::YesRole);
@@ -1366,7 +1366,7 @@ void MainWindow::updateGUI() {
   if (systrayIcon) {
 #if defined(Q_WS_X11) || defined(Q_WS_MAC)
     QString html = "<div style='background-color: #678db2; color: #fff;height: 18px; font-weight: bold; margin-bottom: 5px;'>";
-    html += tr("qBittorrent");
+    html += tr("qMule");
     html += "</div>";
     html += "<div style='vertical-align: baseline; height: 18px;'>";
     html += "<img src=':/Icons/skin/download.png'/>&nbsp;" +
@@ -1390,7 +1390,7 @@ void MainWindow::updateGUI() {
   }
   if (displaySpeedInTitle) {
     setWindowTitle(
-        tr("[D: %1/s, U: %2/s] qBittorrent %3", "D = Download; U = Upload; %3 is qBittorrent version")
+        tr("[D: %1/s, U: %2/s] qMule %3", "D = Download; U = Upload; %3 is qMule version")
         .arg(misc::friendlyUnit(status.payload_download_rate))
         .arg(misc::friendlyUnit(status.payload_upload_rate))
         .arg(QString::fromUtf8(VERSION)));
@@ -1407,8 +1407,8 @@ void MainWindow::showNotificationBaloon(QString title, QString msg) const {
                                                 QDBusConnection::sessionBus());
   if (notifications.isValid()) {
     QVariantMap hints;
-    hints["desktop-entry"] = "qBittorrent";
-    QDBusPendingReply<uint> reply = notifications.Notify("qBittorrent", 0, "qbittorrent", title,
+    hints["desktop-entry"] = "qMule";
+    QDBusPendingReply<uint> reply = notifications.Notify("qMule", 0, "qMule", title,
                                                          msg, QStringList(), hints, -1);
     reply.waitForFinished();
     if (!reply.isError())
@@ -1540,7 +1540,7 @@ void MainWindow::on_actionSpeed_in_title_bar_triggered() {
   if (displaySpeedInTitle)
     updateGUI();
   else
-    setWindowTitle(tr("qBittorrent %1", "e.g: qBittorrent v0.x").arg(QString::fromUtf8(VERSION)));
+    setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
 }
 
 void MainWindow::on_actionRSS_Reader_triggered() {
@@ -1581,7 +1581,7 @@ void MainWindow::handleUpdateCheckFinished(bool update_available, QString new_ve
 {
   if (update_available) {
     if (QMessageBox::question(this, tr("A newer version is available"),
-                             tr("A newer version of qBittorrent is available on Sourceforge.\nWould you like to update qBittorrent to version %1?").arg(new_version),
+                             tr("A newer version of qMule is available on Sourceforge.\nWould you like to update qMule to version %1?").arg(new_version),
                              QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
       // The user want to update, let's download the update
       ProgramUpdater* updater = dynamic_cast<ProgramUpdater*>(sender());
@@ -1596,7 +1596,7 @@ void MainWindow::handleUpdateCheckFinished(bool update_available, QString new_ve
 void MainWindow::handleUpdateInstalled(QString error_msg)
 {
   if (!error_msg.isEmpty()) {
-    QMessageBox::critical(this, tr("Impossible to update qBittorrent"), tr("qBittorrent failed to update, reason: %1").arg(error_msg));
+    QMessageBox::critical(this, tr("Impossible to update qMule"), tr("qMule failed to update, reason: %1").arg(error_msg));
   }
 }
 

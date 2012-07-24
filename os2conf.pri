@@ -9,7 +9,7 @@ LIBS += -ltorrent-rasterbar \
         -lboost_filesystem \
         -lssl -lcrypto -lidn -lpthread
 
-RC_FILE = qbittorrent_os2.rc
+RC_FILE = qmule_os2.rc
 
 # LIBTORRENT DEFINES
 DEFINES += WITH_SHIPPED_GEOIP_H

@@ -74,47 +74,8 @@ public:
 #ifndef DISABLE_GUI
     std::cout << '\t' << prg_name << " --no-splash: " << qPrintable(tr("disable splash screen")) << std::endl;
 #endif
-    std::cout << '\t' << prg_name << " --help: " << qPrintable(tr("displays this help message")) << std::endl;
-    std::cout << '\t' << prg_name << " --webui-port=x: " << qPrintable(tr("changes the webui port (current: %1)").arg(QString::number(Preferences().getWebUiPort()))) << std::endl;
+    std::cout << '\t' << prg_name << " --help: " << qPrintable(tr("displays this help message")) << std::endl;    
     std::cout << '\t' << prg_name << " " << qPrintable(tr("[files or urls]: downloads the torrents passed by the user (optional)")) << std::endl;
-  }
-};
-
-class LegalNotice: public QObject {
-  Q_OBJECT
-
-public:
-  static bool userAgreesWithNotice() {
-    Preferences settings;
-    if (settings.value(QString::fromUtf8("LegalNotice/Accepted"), false).toBool()) // Already accepted once
-      return true;
-#ifdef DISABLE_GUI
-    std::cout << std::endl << "*** " << qPrintable(tr("Legal Notice")) << " ***" << std::endl;
-    std::cout << qPrintable(tr("qBittorrent is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.\n\nNo further notices will be issued.")) << std::endl << std::endl;
-    std::cout << qPrintable(tr("Press %1 key to accept and continue...").arg("'y'")) << std::endl;
-    char ret = getchar(); // Read pressed key
-    if (ret == 'y' || ret == 'Y') {
-      // Save the answer
-      settings.setValue(QString::fromUtf8("LegalNotice/Accepted"), true);
-      return true;
-    }
-    return false;
-#else
-    QMessageBox msgBox;
-    msgBox.setText(tr("qBittorrent is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.\n\nNo further notices will be issued."));
-    msgBox.setWindowTitle(tr("Legal notice"));
-    msgBox.addButton(tr("Cancel"), QMessageBox::RejectRole);
-    QAbstractButton *agree_button = msgBox.addButton(tr("I Agree"), QMessageBox::AcceptRole);
-    msgBox.show(); // Need to be shown or to moveToCenter does not work
-    msgBox.move(misc::screenCenter(&msgBox));
-    msgBox.exec();
-    if (msgBox.clickedButton() == agree_button) {
-      // Save the answer
-      settings.setValue(QString::fromUtf8("LegalNotice/Accepted"), true);
-      return true;
-    }
-    return false;
-#endif
   }
 };
 
@@ -127,26 +88,29 @@ void sigintHandler(int) {
   qApp->exit();
 }
 
-void sigtermHandler(int) {
+void sigtermHandler(int)
+{
   signal(SIGTERM, 0);
   qDebug("Catching SIGTERM, exiting cleanly");
   qApp->exit();
 }
+
 void sigsegvHandler(int) {
   signal(SIGABRT, 0);
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
-  std::cerr << "Catching SIGSEGV, please report a bug at http://bug.qbittorrent.org\nand provide the following backtrace:\n";
-  std::cerr << "qBittorrent version: " << VERSION << std::endl;
+  std::cerr << "Catching SIGSEGV, please report a bug at http://www.is74.ru provide the following backtrace:\n";
+  std::cerr << "qMule version: " << VERSION << std::endl;
   print_stacktrace();
   raise(SIGSEGV);
 }
+
 void sigabrtHandler(int) {
   signal(SIGABRT, 0);
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
-  std::cerr << "Catching SIGABRT, please report a bug at http://bug.qbittorrent.org\nand provide the following backtrace:\n";
-  std::cerr << "qBittorrent version: " << VERSION << std::endl;
+  std::cerr << "Catching SIGABRT, please report a bug at http://www.is74.ru provide the following backtrace:\n";
+  std::cerr << "qMule version: " << VERSION << std::endl;
   print_stacktrace();
   raise(SIGABRT);
 }
@@ -157,14 +121,14 @@ int main(int argc, char *argv[]) {
   // Create Application
   QString uid = misc::getUserIDString();
 #ifdef DISABLE_GUI
-  QtSingleCoreApplication app("qBittorrent-"+uid, argc, argv);
+  QtSingleCoreApplication app("qMule-"+uid, argc, argv);
 #else
-  SessionApplication app("eMule-"+uid, argc, argv);
+  SessionApplication app("qMule-"+uid, argc, argv);
 #endif
 
-  // Check if qBittorrent is already running for this user
+  // Check if qMule is already running for this user
   if (app.isRunning()) {
-    qDebug("qBittorrent is already running for this user.");
+    qDebug("qMule is already running for this user.");
     //Pass program parameters if any
     QString message;
     for (int a = 1; a < argc; ++a) {
@@ -216,7 +180,7 @@ int main(int argc, char *argv[]) {
     qDebug("Qt %s locale unrecognized, using default (en_GB).", qPrintable(locale));
   }
   app.installTranslator(&qtTranslator);
-  if (translator.load(QString::fromUtf8(":/lang/qbittorrent_") + locale)) {
+  if (translator.load(QString::fromUtf8(":/lang/qmule_") + locale)) {
     qDebug("%s locale recognized, using translation.", qPrintable(locale));
   }else{
     qDebug("%s locale unrecognized, using default (en_GB).", qPrintable(locale));
@@ -230,12 +194,12 @@ int main(int argc, char *argv[]) {
     app.setLayoutDirection(Qt::LeftToRight);
   }
 #endif
-  app.setApplicationName(QString::fromUtf8("qBittorrent"));
+  app.setApplicationName(QString::fromUtf8("qMule"));
 
   // Check for executable parameters
   if (argc > 1) {
     if (QString::fromLocal8Bit(argv[1]) == QString::fromUtf8("--version")) {
-      std::cout << "qBittorrent " << VERSION << '\n';
+      std::cout << "qMule " << VERSION << '\n';
       return 0;
     }
     if (QString::fromLocal8Bit(argv[1]) == QString::fromUtf8("--help")) {
@@ -273,7 +237,7 @@ int main(int argc, char *argv[]) {
   if (!no_splash) {
     QPixmap splash_img(":/Icons/skin/Logo.png");
     QPainter painter(&splash_img);
-    QString prog_name = "eMule - qBittorrent";
+    QString prog_name = "eMule - qMule";
     QString version = "v0.01";
     painter.setPen(QPen(Qt::black));
     painter.setFont(QFont("Arial", 22, QFont::Black));
@@ -287,7 +251,7 @@ int main(int argc, char *argv[]) {
   }
 #endif
   // Set environment variable
-  if (qputenv("QBITTORRENT", QByteArray(VERSION))) {
+  if (qputenv("QMULE", QByteArray(VERSION))) {
     std::cerr << "Couldn't set environment variable...\n";
   }
 
@@ -295,9 +259,6 @@ int main(int argc, char *argv[]) {
   app.setStyleSheet("QStatusBar::item { border-width: 0; }");
 #endif
 
-  if (!LegalNotice::userAgreesWithNotice()) {
-    return 0;
-  }
 #ifndef DISABLE_GUI
   app.setQuitOnLastWindowClosed(false);
 #endif

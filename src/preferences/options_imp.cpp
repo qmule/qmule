@@ -272,9 +272,9 @@ void options_imp::initializeLanguageCombo()
 {
   // List language files
   const QDir lang_dir(":/lang");
-  const QStringList lang_files = lang_dir.entryList(QStringList() << "qbittorrent_*.qm", QDir::Files);
+  const QStringList lang_files = lang_dir.entryList(QStringList() << "qmule_*.qm", QDir::Files);
   foreach (QString lang_file, lang_files) {
-    QString localeStr = lang_file.mid(12); // remove "qbittorrent_"
+    QString localeStr = lang_file.mid(6); // remove "qmule_"
     localeStr.chop(3); // Remove ".qm"
     QLocale locale(localeStr);
     const QString country = locale.name().split("_").last().toLower();

@@ -23,7 +23,7 @@ document_icon.path = Contents/Resources
 document_icon.files = Icons/qBitTorrentDocument.icns
 
 QMAKE_BUNDLE_DATA += document_icon
-ICON = Icons/qbittorrent_mac.icns
+ICON = Icons/qmule_mac.icns
 QMAKE_INFO_PLIST = Info.plist
 
 DEFINES += WITH_GEOIP_EMBEDDED

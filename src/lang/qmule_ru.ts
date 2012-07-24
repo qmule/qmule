@@ -4,8 +4,8 @@
 <context>
     <name>AboutDlg</name>
     <message>
-        <source>About qBittorrent</source>
-        <translation>О qBittorrent</translation>
+        <source>About qMule</source>
+        <translation>О qMule</translation>
     </message>
     <message>
         <source>About</source>
@@ -44,8 +44,8 @@
         <translation>Лицензия</translation>
     </message>
     <message>
-        <source>&lt;h3&gt;&lt;b&gt;qBittorrent&lt;/b&gt;&lt;/h3&gt;</source>
-        <translation>&lt;h3&gt;&lt;b&gt;qBittorrent&lt;/b&gt;&lt;/h3&gt;</translation>
+        <source>&lt;h3&gt;&lt;b&gt;qMule&lt;/b&gt;&lt;/h3&gt;</source>
+        <translation>&lt;h3&gt;&lt;b&gt;qMule&lt;/b&gt;&lt;/h3&gt;</translation>
     </message>
     <message>
         <source>chris@qbittorrent.org</source>
@@ -92,8 +92,8 @@ p, li { white-space: pre-wrap; }
         <translation>Библиотеки</translation>
     </message>
     <message>
-        <source>This version of qBittorrent was built against the following libraries:</source>
-        <translation>Эта версия qBittorrent была создана с использованием следующих библиотек:</translation>
+        <source>This version of qMule was built against the following libraries:</source>
+        <translation>Эта версия qMule была создана с использованием следующих библиотек:</translation>
     </message>
     <message>
         <source>Qt:</source>
@@ -416,9 +416,9 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">%1 достиг установленного вами максимального соотношения.</translation>
     </message>
     <message>
-        <source>qBittorrent is bound to port: TCP/%1</source>
-        <comment>e.g: qBittorrent is bound to port: 6881</comment>
-        <translation type="obsolete">qBittorrent привязан к порту: TCP/%1</translation>
+        <source>qMule is bound to port: TCP/%1</source>
+        <comment>e.g: qMule is bound to port: 6881</comment>
+        <translation type="obsolete">qMule привязан к порту: TCP/%1</translation>
     </message>
     <message>
         <source>UPnP support [ON]</source>
@@ -555,7 +555,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Restart is required to toggle PeX support</source>
-        <translation type="obsolete">Необходимо перезапустить qBittorrent для включения настройки PeX</translation>
+        <translation type="obsolete">Необходимо перезапустить qMule для включения настройки PeX</translation>
     </message>
     <message>
         <source>The Web UI is listening on port %1</source>
@@ -615,12 +615,12 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Торрент был скачен за %1.</translation>
     </message>
     <message>
-        <source>Thank you for using qBittorrent.</source>
-        <translation type="obsolete">Спасибо за использование qBittorrent.</translation>
+        <source>Thank you for using qMule.</source>
+        <translation type="obsolete">Спасибо за использование qMule.</translation>
     </message>
     <message>
-        <source>[qBittorrent] %1 has finished downloading</source>
-        <translation type="obsolete">[qBittorrent] скачивание %1 завершено</translation>
+        <source>[qMule] %1 has finished downloading</source>
+        <translation type="obsolete">[qMule] скачивание %1 завершено</translation>
     </message>
 </context>
 <context>
@@ -634,8 +634,8 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Заблокированные IP</translation>
     </message>
     <message>
-        <source>qBittorrent log viewer</source>
-        <translation type="obsolete">Просмотрщик журнала qBittorrent</translation>
+        <source>qMule log viewer</source>
+        <translation type="obsolete">Просмотрщик журнала qMule</translation>
     </message>
 </context>
 <context>
@@ -681,8 +681,8 @@ You should get this information from your Web browser preferences.</source>
         <translation>Ошибка Dynamic DNS: Неверное имя пользователя/пароль.</translation>
     </message>
     <message>
-        <source>Dynamic DNS error: qBittorrent was blacklisted by the service, please report a bug at http://bugs.qbittorrent.org.</source>
-        <translation>Ошибка Dynamic DNS: qBittorrent внесён службой в чёрный список. Пожалуйста, сообщите об ошибке на  http://bugs.qbittorrent.org.</translation>
+        <source>Dynamic DNS error: qMule was blacklisted by the service, please report a bug at http://bugs.qbittorrent.org.</source>
+        <translation>Ошибка Dynamic DNS: qMule внесён службой в чёрный список. Пожалуйста, сообщите об ошибке на  http://bugs.qbittorrent.org.</translation>
     </message>
     <message>
         <source>Dynamic DNS error: %1 was returned by the service, please report a bug at http://bugs.qbittorrent.org.</source>
@@ -1058,8 +1058,8 @@ You should get this information from your Web browser preferences.</source>
 <context>
     <name>GUI</name>
     <message>
-        <source>qBittorrent</source>
-        <translation type="obsolete">qBittorrent</translation>
+        <source>qMule</source>
+        <translation type="obsolete">qMule</translation>
     </message>
     <message>
         <source>Open Torrent Files</source>
@@ -1074,9 +1074,9 @@ You should get this information from your Web browser preferences.</source>
         <translation type="obsolete">Передачи</translation>
     </message>
     <message>
-        <source>qBittorrent %1</source>
-        <comment>e.g: qBittorrent v0.x</comment>
-        <translation type="obsolete">qBittorrent %1</translation>
+        <source>qMule %1</source>
+        <comment>e.g: qMule v0.x</comment>
+        <translation type="obsolete">qMule %1</translation>
     </message>
     <message>
         <source>DL speed: %1 KiB/s</source>
@@ -1138,8 +1138,8 @@ You should get this information from your Web browser preferences.</source>
     </message>
     <message>
         <source>Some files are currently transferring.
-Are you sure you want to quit qBittorrent?</source>
-        <translation type="obsolete">Есть активные торренты. Вы уверены что хотите выйти из qBittorrent?</translation>
+Are you sure you want to quit qMule?</source>
+        <translation type="obsolete">Есть активные торренты. Вы уверены что хотите выйти из qMule?</translation>
     </message>
     <message>
         <source>Alt+2</source>
@@ -1160,9 +1160,9 @@ Are you sure you want to quit qBittorrent?</source>
         <translation type="obsolete">Глобальное ограничение скорости закачки</translation>
     </message>
     <message>
-        <source>qBittorrent %1 (Down: %2/s, Up: %3/s)</source>
-        <comment>%1 is qBittorrent version</comment>
-        <translation type="obsolete">qBittorrent %1 (Скач: %2/с, Отд: %3/с)</translation>
+        <source>qMule %1 (Down: %2/s, Up: %3/s)</source>
+        <comment>%1 is qMule version</comment>
+        <translation type="obsolete">qMule %1 (Скач: %2/с, Отд: %3/с)</translation>
     </message>
     <message>
         <source>Recursive download confirmation</source>
@@ -1183,11 +1183,11 @@ Are you sure you want to quit qBittorrent?</source>
         <translation type="obsolete">Привязки торрент-файлов</translation>
     </message>
     <message>
-        <source>qBittorrent is not the default application to open torrent files or Magnet links.
-Do you want to associate qBittorrent to torrent files and Magnet links?</source>
-        <translatorcomment>Может лучше наоборот, ссылки с файлами к qBittorrent привязывать?</translatorcomment>
-        <translation type="obsolete">qBittorrent сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
-Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qBittorrent?</translation>
+        <source>qMule is not the default application to open torrent files or Magnet links.
+Do you want to associate qMule to torrent files and Magnet links?</source>
+        <translatorcomment>Может лучше наоборот, ссылки с файлами к qMule привязывать?</translatorcomment>
+        <translation type="obsolete">qMule сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
+Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qMule?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -1206,9 +1206,9 @@ Do you want to associate qBittorrent to torrent files and Magnet links?</source>
         <translation type="obsolete">Всегда</translation>
     </message>
     <message>
-        <source>Exiting qBittorrent</source>
+        <source>Exiting qMule</source>
         <translatorcomment>Или Завершаю работу будет правильнее?</translatorcomment>
-        <translation type="obsolete">Завершение работы qBittorrent</translation>
+        <translation type="obsolete">Завершение работы qMule</translation>
     </message>
     <message>
         <source>Set the password...</source>
@@ -1243,18 +1243,18 @@ Do you want to associate qBittorrent to torrent files and Magnet links?</source>
         <translation type="obsolete">Новая версия доступна</translation>
     </message>
     <message>
-        <source>A newer version of qBittorrent is available on Sourceforge.
-Would you like to update qBittorrent to version %1?</source>
-        <translation type="obsolete">Новая версия qBittorrent доступна на Sourceforge.
-Хотите обновить qBittorrent до версии %1?</translation>
+        <source>A newer version of qMule is available on Sourceforge.
+Would you like to update qMule to version %1?</source>
+        <translation type="obsolete">Новая версия qMule доступна на Sourceforge.
+Хотите обновить qMule до версии %1?</translation>
     </message>
     <message>
-        <source>Impossible to update qBittorrent</source>
-        <translation type="obsolete">Невозможно обновить qBittorrent</translation>
+        <source>Impossible to update qMule</source>
+        <translation type="obsolete">Невозможно обновить qMule</translation>
     </message>
     <message>
-        <source>qBittorrent failed to update, reason: %1</source>
-        <translation type="obsolete">qBitttorrent не может быть обновлен. Причина: %1</translation>
+        <source>qMule failed to update, reason: %1</source>
+        <translation type="obsolete">qMule не может быть обновлен. Причина: %1</translation>
     </message>
 </context>
 <context>
@@ -1519,8 +1519,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation type="obsolete">Информация</translation>
     </message>
     <message>
-        <source>To control qBittorrent, access the Web UI at http://localhost:%1</source>
-        <translation type="obsolete">Чтобы управлять qBittorrent откройте браузер по адресу http://localhost:%1</translation>
+        <source>To control qMule, access the Web UI at http://localhost:%1</source>
+        <translation type="obsolete">Чтобы управлять qMule откройте браузер по адресу http://localhost:%1</translation>
     </message>
     <message>
         <source>The Web UI administrator user name is: %1</source>
@@ -1619,8 +1619,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation type="obsolete">Максимальное число слотов раздачи на торрент должно быть больше 0 или отключено.</translation>
     </message>
     <message>
-        <source>Unable to save program preferences, qBittorrent is probably unreachable.</source>
-        <translation type="obsolete">Не возможно сохранить настройки, qBittorrent возможно недоступен.</translation>
+        <source>Unable to save program preferences, qMule is probably unreachable.</source>
+        <translation type="obsolete">Не возможно сохранить настройки, qMule возможно недоступен.</translation>
     </message>
     <message>
         <source>Language</source>
@@ -1652,8 +1652,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation type="obsolete">Сохранить</translation>
     </message>
     <message>
-        <source>qBittorrent client is not reachable</source>
-        <translation type="obsolete">клиент qBittorrent недоступен</translation>
+        <source>qMule client is not reachable</source>
+        <translation type="obsolete">клиент qMule недоступен</translation>
     </message>
     <message>
         <source>HTTP Server</source>
@@ -1691,10 +1691,10 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Я согласен</translation>
     </message>
     <message>
-        <source>qBittorrent is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.
+        <source>qMule is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.
 
 No further notices will be issued.</source>
-        <translation>qBittorrent - программа для обмена файлами. Когда вы запускаете торрент, данные становятся доступными другим участникам обмена для отдачи. Конечно, любые данные которые вы отдаете на обмен только ваша ответственность.
+        <translation>qMule - программа для обмена файлами. Когда вы запускаете торрент, данные становятся доступными другим участникам обмена для отдачи. Конечно, любые данные которые вы отдаете на обмен только ваша ответственность.
 
 Больше это уведомление не будет показано.</translation>
     </message>
@@ -1823,7 +1823,7 @@ No further notices will be issued.</source>
     <message>
         <source>&amp;About</source>
         <translatorcomment>Посмотрел в Firefox - там не обезличенное &apos;О программе&apos; а более тёплое &apos;О Mozilla Firefox&apos;. Или может лучше как в Kate - &apos;О программе Kate&apos;?</translatorcomment>
-        <translation>&amp;О qBittorrent</translation>
+        <translation>&amp;О qMule</translation>
     </message>
     <message>
         <source>&amp;Pause</source>
@@ -1864,8 +1864,8 @@ No further notices will be issued.</source>
         <translation type="obsolete">Просмотрщик лога</translation>
     </message>
     <message>
-        <source>Lock qBittorrent</source>
-        <translation>Заблокировать qBittorrent</translation>
+        <source>Lock qMule</source>
+        <translation>Заблокировать qMule</translation>
     </message>
     <message>
         <source>Ctrl+L</source>
@@ -1884,8 +1884,8 @@ No further notices will be issued.</source>
         <translation>Воз&amp;обновить все</translation>
     </message>
     <message>
-        <source>Shutdown qBittorrent when downloads complete</source>
-        <translation type="obsolete">Выключить qBittorrent когда загрузки будут завершены</translation>
+        <source>Shutdown qMule when downloads complete</source>
+        <translation type="obsolete">Выключить qMule когда загрузки будут завершены</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -1901,13 +1901,13 @@ No further notices will be issued.</source>
         <translation>Пожертвовать деньги</translation>
     </message>
     <message>
-        <source>If you like qBittorrent, please donate!</source>
-        <translation>Если вам нравится qBittorrent, пожалуйста - пожертвуйте!</translation>
+        <source>If you like qMule, please donate!</source>
+        <translation>Если вам нравится qMule, пожалуйста - пожертвуйте!</translation>
     </message>
     <message>
-        <source>qBittorrent %1</source>
-        <comment>e.g: qBittorrent v0.x</comment>
-        <translation>qBittorrent %1</translation>
+        <source>qMule %1</source>
+        <comment>e.g: qMule v0.x</comment>
+        <translation>qMule %1</translation>
     </message>
     <message>
         <source>Set the password...</source>
@@ -1922,10 +1922,10 @@ No further notices will be issued.</source>
         <translation>Привязки торрент-файлов</translation>
     </message>
     <message>
-        <source>qBittorrent is not the default application to open torrent files or Magnet links.
-Do you want to associate qBittorrent to torrent files and Magnet links?</source>
-        <translation>qBittorrent сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
-Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qBittorrent?</translation>
+        <source>qMule is not the default application to open torrent files or Magnet links.
+Do you want to associate qMule to torrent files and Magnet links?</source>
+        <translation>qMule сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
+Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qMule?</translation>
     </message>
     <message>
         <source>UI lock password</source>
@@ -2042,13 +2042,13 @@ Do you want to associate qBittorrent to torrent files and Magnet links?</source>
         <translation>Этот пароль не верен</translation>
     </message>
     <message>
-        <source>Exiting qBittorrent</source>
-        <translation>Завершение работы qBittorrent</translation>
+        <source>Exiting qMule</source>
+        <translation>Завершение работы qMule</translation>
     </message>
     <message>
         <source>Some files are currently transferring.
-Are you sure you want to quit qBittorrent?</source>
-        <translation>Есть активные торренты. Вы уверены что хотите выйти из qBittorrent?</translation>
+Are you sure you want to quit qMule?</source>
+        <translation>Есть активные торренты. Вы уверены что хотите выйти из qMule?</translation>
     </message>
     <message>
         <source>Always</source>
@@ -2067,8 +2067,8 @@ Are you sure you want to quit qBittorrent?</source>
         <translation>Настройки были успешно сохранены.</translation>
     </message>
     <message>
-        <source>qBittorrent</source>
-        <translation>qBittorrent</translation>
+        <source>qMule</source>
+        <translation>qMule</translation>
     </message>
     <message>
         <source>DL speed: %1 KiB/s</source>
@@ -2081,27 +2081,27 @@ Are you sure you want to quit qBittorrent?</source>
         <translation>Отдача.: %1 КиБ/с</translation>
     </message>
     <message>
-        <source>qBittorrent %1 (Down: %2/s, Up: %3/s)</source>
-        <comment>%1 is qBittorrent version</comment>
-        <translation type="obsolete">qBittorrent %1 (Скач: %2/с, Отд: %3/с)</translation>
+        <source>qMule %1 (Down: %2/s, Up: %3/s)</source>
+        <comment>%1 is qMule version</comment>
+        <translation type="obsolete">qMule %1 (Скач: %2/с, Отд: %3/с)</translation>
     </message>
     <message>
         <source>A newer version is available</source>
         <translation>Доступна новая версия</translation>
     </message>
     <message>
-        <source>A newer version of qBittorrent is available on Sourceforge.
-Would you like to update qBittorrent to version %1?</source>
-        <translation>Новая версия qBittorrent доступна на Sourceforge.
-Хотите обновить qBittorrent до версии %1?</translation>
+        <source>A newer version of qMule is available on Sourceforge.
+Would you like to update qMule to version %1?</source>
+        <translation>Новая версия qMule доступна на Sourceforge.
+Хотите обновить qMule до версии %1?</translation>
     </message>
     <message>
-        <source>Impossible to update qBittorrent</source>
-        <translation>Невозможно обновить qBittorrent</translation>
+        <source>Impossible to update qMule</source>
+        <translation>Невозможно обновить qMule</translation>
     </message>
     <message>
-        <source>qBittorrent failed to update, reason: %1</source>
-        <translation>qBitttorrent не может быть обновлен. Причина: %1</translation>
+        <source>qMule failed to update, reason: %1</source>
+        <translation>qMule не может быть обновлен. Причина: %1</translation>
     </message>
     <message>
         <source>&amp;Add torrent file...</source>
@@ -2128,8 +2128,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation type="obsolete">Выключение по завершении загрузок</translation>
     </message>
     <message>
-        <source>Exit qBittorrent</source>
-        <translation>Выйти из qBittorrent</translation>
+        <source>Exit qMule</source>
+        <translation>Выйти из qMule</translation>
     </message>
     <message>
         <source>Suspend system</source>
@@ -2156,9 +2156,9 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Скрыть</translation>
     </message>
     <message>
-        <source>[D: %1/s, U: %2/s] qBittorrent %3</source>
-        <comment>D = Download; U = Upload; %3 is qBittorrent version</comment>
-        <translation>[Скач: %1/с, Отд: %2/с] qBittorrent %3</translation>
+        <source>[D: %1/s, U: %2/s] qMule %3</source>
+        <comment>D = Download; U = Upload; %3 is qMule version</comment>
+        <translation>[Скач: %1/с, Отд: %2/с] qMule %3</translation>
     </message>
     <message>
         <source>Import</source>
@@ -2293,8 +2293,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation type="obsolete">Пир не может быть добавлен к этому torrent.</translation>
     </message>
     <message>
-        <source>Are you sure? -- qBittorrent</source>
-        <translation>Вы уверены? -- qBittorrent</translation>
+        <source>Are you sure? -- qMule</source>
+        <translation>Вы уверены? -- qMule</translation>
     </message>
     <message>
         <source>Are you sure you want to ban permanently the selected peers?</source>
@@ -2658,24 +2658,24 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Показать заставку при загрузке</translation>
     </message>
     <message>
-        <source>Start qBittorrent minimized</source>
-        <translation>Запускать qBittorrent свернутым</translation>
+        <source>Start qMule minimized</source>
+        <translation>Запускать qMule свернутым</translation>
     </message>
     <message>
-        <source>Show qBittorrent icon in notification area</source>
+        <source>Show qMule icon in notification area</source>
         <translatorcomment>А может лучше &apos;в трее&apos;?</translatorcomment>
-        <translation type="obsolete">Показывать значок qBittorrent в области уведомлений</translation>
+        <translation type="obsolete">Показывать значок qMule в области уведомлений</translation>
     </message>
     <message>
-        <source>Minimize qBittorrent to notification area</source>
+        <source>Minimize qMule to notification area</source>
         <translatorcomment>А может лучше &apos;в трей&apos;? // не думаю, в том же KDE это именно уведомлений. А трей суть калька</translatorcomment>
-        <translation>Сворачивать qBittorrent в область уведомлений</translation>
+        <translation>Сворачивать qMule в область уведомлений</translation>
     </message>
     <message>
-        <source>Close qBittorrent to notification area</source>
+        <source>Close qMule to notification area</source>
         <comment>i.e: The systray tray icon will still be visible when closing the main window.</comment>
         <translatorcomment>Коряво, коряво...</translatorcomment>
-        <translation>Закрывать qBittorrent в облать уведомлений</translation>
+        <translation>Закрывать qMule в облать уведомлений</translation>
     </message>
     <message>
         <source>Do not start the download automatically</source>
@@ -2922,8 +2922,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Список передач</translation>
     </message>
     <message>
-        <source>Show qBittorrent in notification area</source>
-        <translation>Показывать qBittorrent в области уведомлений</translation>
+        <source>Show qMule in notification area</source>
+        <translation>Показывать qMule в области уведомлений</translation>
     </message>
     <message>
         <source>Hard Disk</source>
@@ -3042,12 +3042,12 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Привязка файлов</translation>
     </message>
     <message>
-        <source>Use qBittorrent for .torrent files</source>
-        <translation>Использовать qBittorrent для .torrent файлов</translation>
+        <source>Use qMule for .torrent files</source>
+        <translation>Использовать qMule для .torrent файлов</translation>
     </message>
     <message>
-        <source>Use qBittorrent for magnet links</source>
-        <translation>Использовать qBittorrent для magnet ссылок</translation>
+        <source>Use qMule for magnet links</source>
+        <translation>Использовать qMule для magnet ссылок</translation>
     </message>
     <message>
         <source>Do not count slow torrents in these limits</source>
@@ -3223,8 +3223,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>URL нового раздающего:</translation>
     </message>
     <message>
-        <source>qBittorrent</source>
-        <translation>qBittorrent</translation>
+        <source>qMule</source>
+        <translation>qMule</translation>
     </message>
     <message>
         <source>This url seed is already in the list.</source>
@@ -3406,9 +3406,9 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Приостановка торрента %1...</translation>
     </message>
     <message>
-        <source>qBittorrent is bound to port: TCP/%1</source>
-        <comment>e.g: qBittorrent is bound to port: 6881</comment>
-        <translation>qBittorrent привязан к порту: TCP/%1</translation>
+        <source>qMule is bound to port: TCP/%1</source>
+        <comment>e.g: qMule is bound to port: 6881</comment>
+        <translation>qMule привязан к порту: TCP/%1</translation>
     </message>
     <message>
         <source>UPnP support [ON]</source>
@@ -3452,7 +3452,7 @@ Would you like to update qBittorrent to version %1?</source>
     </message>
     <message>
         <source>Restart is required to toggle PeX support</source>
-        <translation>Необходимо перезапустить qBittorrent для включения настройки PeX</translation>
+        <translation>Необходимо перезапустить qMule для включения настройки PeX</translation>
     </message>
     <message>
         <source>Local Peer Discovery [ON]</source>
@@ -3581,12 +3581,12 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Торрент был скачен за %1.</translation>
     </message>
     <message>
-        <source>Thank you for using qBittorrent.</source>
-        <translation>Спасибо за использование qBittorrent.</translation>
+        <source>Thank you for using qMule.</source>
+        <translation>Спасибо за использование qMule.</translation>
     </message>
     <message>
-        <source>[qBittorrent] %1 has finished downloading</source>
-        <translation>[qBittorrent] скачивание %1 завершено</translation>
+        <source>[qMule] %1 has finished downloading</source>
+        <translation>[qMule] скачивание %1 завершено</translation>
     </message>
     <message>
         <source>An I/O error occured, &apos;%1&apos; paused.</source>
@@ -3671,8 +3671,8 @@ Would you like to update qBittorrent to version %1?</source>
         <translation>Сейчас компьютер будет отключён, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
-        <source>qBittorrent will now exit unless you cancel within the next 15 seconds...</source>
-        <translation>Сейчас qBittorrent будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
+        <source>qMule will now exit unless you cancel within the next 15 seconds...</source>
+        <translation>Сейчас qMule будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
         <source>Anonymous mode [ON]</source>
@@ -3799,8 +3799,8 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">URL потока:</translation>
     </message>
     <message>
-        <source>Are you sure? -- qBittorrent</source>
-        <translation type="obsolete">Вы уверены? -- qBittorrent</translation>
+        <source>Are you sure? -- qMule</source>
+        <translation type="obsolete">Вы уверены? -- qMule</translation>
     </message>
     <message>
         <source>&amp;Yes</source>
@@ -3811,8 +3811,8 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">&amp;Нет</translation>
     </message>
     <message>
-        <source>qBittorrent</source>
-        <translation type="obsolete">qBittorrent</translation>
+        <source>qMule</source>
+        <translation type="obsolete">qMule</translation>
     </message>
     <message>
         <source>This rss feed is already in the list.</source>
@@ -4230,8 +4230,8 @@ Do you want to install it now?</source>
         <translation type="obsolete">Отдача: %1Б/с - Перед: %2</translation>
     </message>
     <message>
-        <source>Offline. This usually means that qBittorrent failed to listen on the selected port for incoming connections.</source>
-        <translation>Отключен. Обычно это означает, что qBittorrent не может прослушивать выбранный порт для входящих соединений.</translation>
+        <source>Offline. This usually means that qMule failed to listen on the selected port for incoming connections.</source>
+        <translation>Отключен. Обычно это означает, что qMule не может прослушивать выбранный порт для входящих соединений.</translation>
     </message>
     <message>
         <source>Click to disable alternative speed limits</source>
@@ -4242,12 +4242,12 @@ Do you want to install it now?</source>
         <translation type="obsolete">Нажмите для включения альтернативных лимитов скорости</translation>
     </message>
     <message>
-        <source>qBittorrent needs to be restarted</source>
-        <translation>qBittorrent надо перезапустить</translation>
+        <source>qMule needs to be restarted</source>
+        <translation>qMule надо перезапустить</translation>
     </message>
     <message>
-        <source>qBittorrent was just updated and needs to be restarted for the changes to be effective.</source>
-        <translation>qBittorrent был обновлен и нуждается в перезапуске, чтобы изменение вступили в силу.</translation>
+        <source>qMule was just updated and needs to be restarted for the changes to be effective.</source>
+        <translation>qMule был обновлен и нуждается в перезапуске, чтобы изменение вступили в силу.</translation>
     </message>
     <message>
         <source>Click to switch to alternative speed limits</source>
@@ -4368,7 +4368,7 @@ Do you want to install it now?</source>
         <translation>Импортировать торрент</translation>
     </message>
     <message>
-        <source>This assistant will help you share with qBittorrent a torrent that you have already downloaded.</source>
+        <source>This assistant will help you share with qMule a torrent that you have already downloaded.</source>
         <translatorcomment>dont understand phrase</translatorcomment>
         <translation>Помошник поможет вам настроить раздачу торрента, который вы уже скачали.</translation>
     </message>
@@ -5024,16 +5024,16 @@ Do you want to install it now?</source>
 <context>
     <name>about</name>
     <message>
-        <source>qBittorrent</source>
-        <translation>qBittorrent</translation>
+        <source>qMule</source>
+        <translation>qMule</translation>
     </message>
     <message>
-        <source>I would like to thank the following people who volunteered to translate qBittorrent:</source>
-        <translation>Я хочу поблагодарить следующих людей, кто вызвался перевести qBittorrent:</translation>
+        <source>I would like to thank the following people who volunteered to translate qMule:</source>
+        <translation>Я хочу поблагодарить следующих людей, кто вызвался перевести qMule:</translation>
     </message>
     <message>
-        <source>Please contact me if you would like to translate qBittorrent into your own language.</source>
-        <translation>Пожалуйста, свяжитесь со мной, если хотите перевести qBittorrent на свой язык.</translation>
+        <source>Please contact me if you would like to translate qMule into your own language.</source>
+        <translation>Пожалуйста, свяжитесь со мной, если хотите перевести qMule на свой язык.</translation>
     </message>
 </context>
 <context>
@@ -5245,8 +5245,8 @@ Do you want to install it now?</source>
 <context>
     <name>confirmDeletionDlg</name>
     <message>
-        <source>Deletion confirmation - qBittorrent</source>
-        <translation>Подтверждение удаления - qBittorrent</translation>
+        <source>Deletion confirmation - qMule</source>
+        <translation>Подтверждение удаления - qMule</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the selected torrents from the transfer list?</source>
@@ -5620,10 +5620,10 @@ Do you want to install it now?</source>
         <translation>Предупреждение об удалении</translation>
     </message>
     <message>
-        <source>Some plugins could not be uninstalled because they are included in qBittorrent.
+        <source>Some plugins could not be uninstalled because they are included in qMule.
  Only the ones you added yourself can be uninstalled.
 However, those plugins were disabled.</source>
-        <translation>Некоторые плагины не могут быть удалены, так как включены в qBittorrent.
+        <translation>Некоторые плагины не могут быть удалены, так как включены в qMule.
 Удалены могут быть лишь те, что вы установили сами.
 Но все равно, эти плагины будут отключены.</translation>
     </message>
@@ -5636,16 +5636,16 @@ However, those plugins were disabled.</source>
         <translation>Выбрать поисковые движки</translation>
     </message>
     <message>
-        <source>qBittorrent search plugins</source>
-        <translation>Плагин поиска qBittorrent</translation>
+        <source>qMule search plugins</source>
+        <translation>Плагин поиска qMule</translation>
     </message>
     <message>
         <source>Search plugin install</source>
         <translation>Установка поискового плагина</translation>
     </message>
     <message>
-        <source>qBittorrent</source>
-        <translation>qBittorrent</translation>
+        <source>qMule</source>
+        <translation>qMule</translation>
     </message>
     <message>
         <source>A more recent version of %1 search engine plugin is already installed.</source>
@@ -5915,8 +5915,8 @@ However, those plugins were disabled.</source>
         <translation>%1д%2ч</translation>
     </message>
     <message>
-        <source>qBittorrent will shutdown the computer now because all downloads are complete.</source>
-        <translation>qBittorent сейчас выключит компьютер, потому что все загрузки завершены.</translation>
+        <source>qMule will shutdown the computer now because all downloads are complete.</source>
+        <translation>qMule сейчас выключит компьютер, потому что все загрузки завершены.</translation>
     </message>
     <message>
         <source>Downloads</source>
