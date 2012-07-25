@@ -3081,6 +3081,14 @@ Would you like to update qMule to version %1?</source>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
+    <message>
+        <source>Exchange files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show own exchange files/directories</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviewSelect</name>
@@ -3395,20 +3403,20 @@ Would you like to update qMule to version %1?</source>
     <name>QBtSession</name>
     <message>
         <source>%1 reached the maximum ratio you set.</source>
-        <translation>%1 достиг установленного вами максимального соотношения.</translation>
+        <translation type="obsolete">%1 достиг установленного вами максимального соотношения.</translation>
     </message>
     <message>
         <source>Removing torrent %1...</source>
-        <translation>Удаление торрента %1...</translation>
+        <translation type="obsolete">Удаление торрента %1...</translation>
     </message>
     <message>
         <source>Pausing torrent %1...</source>
-        <translation>Приостановка торрента %1...</translation>
+        <translation type="obsolete">Приостановка торрента %1...</translation>
     </message>
     <message>
         <source>qMule is bound to port: TCP/%1</source>
         <comment>e.g: qMule is bound to port: 6881</comment>
-        <translation>qMule привязан к порту: TCP/%1</translation>
+        <translation type="obsolete">qMule привязан к порту: TCP/%1</translation>
     </message>
     <message>
         <source>UPnP support [ON]</source>
@@ -3428,7 +3436,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>HTTP user agent is %1</source>
-        <translation>Браузер %1</translation>
+        <translation type="obsolete">Браузер %1</translation>
     </message>
     <message>
         <source>Using a disk cache size of %1 MiB</source>
@@ -3436,23 +3444,23 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>DHT support [ON], port: UDP/%1</source>
-        <translation>Поддержка DHT [Вкл.], порт: UDP/%1</translation>
+        <translation type="obsolete">Поддержка DHT [Вкл.], порт: UDP/%1</translation>
     </message>
     <message>
         <source>DHT support [OFF]</source>
-        <translation>Поддержка DHT [Выкл]</translation>
+        <translation type="obsolete">Поддержка DHT [Выкл]</translation>
     </message>
     <message>
         <source>PeX support [ON]</source>
-        <translation>Поддержка PeX [Вкл]</translation>
+        <translation type="obsolete">Поддержка PeX [Вкл]</translation>
     </message>
     <message>
         <source>PeX support [OFF]</source>
-        <translation>Поддержка PeX [Выкл]</translation>
+        <translation type="obsolete">Поддержка PeX [Выкл]</translation>
     </message>
     <message>
         <source>Restart is required to toggle PeX support</source>
-        <translation>Необходимо перезапустить qMule для включения настройки PeX</translation>
+        <translation type="obsolete">Необходимо перезапустить qMule для включения настройки PeX</translation>
     </message>
     <message>
         <source>Local Peer Discovery [ON]</source>
@@ -3460,194 +3468,194 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Local Peer Discovery support [OFF]</source>
-        <translation>Обнаружение локальных пиров [Выкл]</translation>
+        <translation type="obsolete">Обнаружение локальных пиров [Выкл]</translation>
     </message>
     <message>
         <source>Encryption support [ON]</source>
-        <translation>Поддержка шифрования [Вкл]</translation>
+        <translation type="obsolete">Поддержка шифрования [Вкл]</translation>
     </message>
     <message>
         <source>Encryption support [FORCED]</source>
-        <translation>Поддержка шифрования [Принудительно]</translation>
+        <translation type="obsolete">Поддержка шифрования [Принудительно]</translation>
     </message>
     <message>
         <source>Encryption support [OFF]</source>
-        <translation>Поддержка шифрования [Выкл]</translation>
+        <translation type="obsolete">Поддержка шифрования [Выкл]</translation>
     </message>
     <message>
         <source>Embedded Tracker [ON]</source>
-        <translation>Встроенный трекер [Вкл]</translation>
+        <translation type="obsolete">Встроенный трекер [Вкл]</translation>
     </message>
     <message>
         <source>Failed to start the embedded tracker!</source>
-        <translation>Не удалось запустить встроенный трекер!</translation>
+        <translation type="obsolete">Не удалось запустить встроенный трекер!</translation>
     </message>
     <message>
         <source>Embedded Tracker [OFF]</source>
-        <translation>Встроенный трекер [Выкл]</translation>
+        <translation type="obsolete">Встроенный трекер [Выкл]</translation>
     </message>
     <message>
         <source>The Web UI is listening on port %1</source>
-        <translation>Web интерфейс прослушивает порт %1</translation>
+        <translation type="obsolete">Web интерфейс прослушивает порт %1</translation>
     </message>
     <message>
         <source>Web User Interface Error - Unable to bind Web UI to port %1</source>
-        <translation>Ошибка Web интерфейса - Не могу привязаться к порту %1</translation>
+        <translation type="obsolete">Ошибка Web интерфейса - Не могу привязаться к порту %1</translation>
     </message>
     <message>
         <source>&apos;%1&apos; was removed from transfer list and hard disk.</source>
         <comment>&apos;xxx.avi&apos; was removed...</comment>
-        <translation>&apos;%1&apos; был удален из списка передач и с жесткого диска.</translation>
+        <translation type="obsolete">&apos;%1&apos; был удален из списка передач и с жесткого диска.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; was removed from transfer list.</source>
         <comment>&apos;xxx.avi&apos; was removed...</comment>
-        <translation>&apos;%1&apos; был удален из списка передач.</translation>
+        <translation type="obsolete">&apos;%1&apos; был удален из списка передач.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; is not a valid magnet URI.</source>
-        <translation>&apos;%1&apos; не является magnet URI.</translation>
+        <translation type="obsolete">&apos;%1&apos; не является magnet URI.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; is already in download list.</source>
         <comment>e.g: &apos;xxx.avi&apos; is already in download list.</comment>
-        <translation>&apos;%1&apos; уже присутствует в списке закачек.</translation>
+        <translation type="obsolete">&apos;%1&apos; уже присутствует в списке закачек.</translation>
     </message>
     <message>
         <source>&apos;%1&apos; resumed. (fast resume)</source>
         <comment>&apos;/home/y/xxx.torrent&apos; was resumed. (fast resume)</comment>
-        <translation>%1 возобновлен. (быстрое возобновление)</translation>
+        <translation type="obsolete">%1 возобновлен. (быстрое возобновление)</translation>
     </message>
     <message>
         <source>&apos;%1&apos; added to download list.</source>
         <comment>&apos;/home/y/xxx.torrent&apos; was added to download list.</comment>
-        <translation>&apos;%1&apos; добавлен в список закачек.</translation>
+        <translation type="obsolete">&apos;%1&apos; добавлен в список закачек.</translation>
     </message>
     <message>
         <source>Unable to decode torrent file: &apos;%1&apos;</source>
         <comment>e.g: Unable to decode torrent file: &apos;/home/y/xxx.torrent&apos;</comment>
-        <translation>Не удалось декодировать torrent файл: &apos;%1&apos;</translation>
+        <translation type="obsolete">Не удалось декодировать torrent файл: &apos;%1&apos;</translation>
     </message>
     <message>
         <source>This file is either corrupted or this isn&apos;t a torrent.</source>
-        <translation>Этот файл либо поврежден, либо это не торрент-файл.</translation>
+        <translation type="obsolete">Этот файл либо поврежден, либо это не торрент-файл.</translation>
     </message>
     <message>
         <source>Error: The torrent %1 does not contain any file.</source>
-        <translation>Ошибка: Торрент %1 не содержит никаких файлов.</translation>
+        <translation type="obsolete">Ошибка: Торрент %1 не содержит никаких файлов.</translation>
     </message>
     <message>
         <source>Note: new trackers were added to the existing torrent.</source>
-        <translation>Примечание: новые трекеры были добавлены к существующему торренту.</translation>
+        <translation type="obsolete">Примечание: новые трекеры были добавлены к существующему торренту.</translation>
     </message>
     <message>
         <source>Note: new URL seeds were added to the existing torrent.</source>
-        <translation>Примечание: новые URL сидов были добавлены к существующему торренту.</translation>
+        <translation type="obsolete">Примечание: новые URL сидов были добавлены к существующему торренту.</translation>
     </message>
     <message>
         <source>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;was blocked due to your IP filter&lt;/i&gt;</source>
         <comment>x.y.z.w was blocked</comment>
-        <translation>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован в соответствии с вашим IP фильтром&lt;/i&gt;</translation>
+        <translation type="obsolete">&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован в соответствии с вашим IP фильтром&lt;/i&gt;</translation>
     </message>
     <message>
         <source>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;was banned due to corrupt pieces&lt;/i&gt;</source>
         <comment>x.y.z.w was banned</comment>
-        <translation>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован из-за поврежденных кусочков&lt;/i&gt;</translation>
+        <translation type="obsolete">&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован из-за поврежденных кусочков&lt;/i&gt;</translation>
     </message>
     <message>
         <source>Recursive download of file %1 embedded in torrent %2</source>
         <comment>Recursive download of test.torrent embedded in torrent test2</comment>
-        <translation>Рекурсивная загрузка файла %1 встроенна в торрент %2</translation>
+        <translation type="obsolete">Рекурсивная загрузка файла %1 встроенна в торрент %2</translation>
     </message>
     <message>
         <source>Unable to decode %1 torrent file.</source>
-        <translation>Не удалось декодировать %1 torrent файл.</translation>
+        <translation type="obsolete">Не удалось декодировать %1 torrent файл.</translation>
     </message>
     <message>
         <source>Torrent name: %1</source>
-        <translation>Имя торрента: %1</translation>
+        <translation type="obsolete">Имя торрента: %1</translation>
     </message>
     <message>
         <source>Torrent size: %1</source>
-        <translation>Размер торрента: %1</translation>
+        <translation type="obsolete">Размер торрента: %1</translation>
     </message>
     <message>
         <source>Save path: %1</source>
-        <translation>Путь для сохранения: %1</translation>
+        <translation type="obsolete">Путь для сохранения: %1</translation>
     </message>
     <message>
         <source>The torrent was downloaded in %1.</source>
         <comment>The torrent was downloaded in 1 hour and 20 seconds</comment>
-        <translation>Торрент был скачен за %1.</translation>
+        <translation type="obsolete">Торрент был скачен за %1.</translation>
     </message>
     <message>
         <source>Thank you for using qMule.</source>
-        <translation>Спасибо за использование qMule.</translation>
+        <translation type="obsolete">Спасибо за использование qMule.</translation>
     </message>
     <message>
         <source>[qMule] %1 has finished downloading</source>
-        <translation>[qMule] скачивание %1 завершено</translation>
+        <translation type="obsolete">[qMule] скачивание %1 завершено</translation>
     </message>
     <message>
         <source>An I/O error occured, &apos;%1&apos; paused.</source>
-        <translation>Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
+        <translation type="obsolete">Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
     </message>
     <message>
         <source>Reason: %1</source>
-        <translation>Причина: %1</translation>
+        <translation type="obsolete">Причина: %1</translation>
     </message>
     <message>
         <source>UPnP/NAT-PMP: Port mapping failure, message: %1</source>
-        <translation>Распределение портов UPnP/NAT-PMP не удалось с сообщением: %1</translation>
+        <translation type="obsolete">Распределение портов UPnP/NAT-PMP не удалось с сообщением: %1</translation>
     </message>
     <message>
         <source>UPnP/NAT-PMP: Port mapping successful, message: %1</source>
-        <translation>Распределение портов UPnP/NAT-PMP прошло успешно: %1</translation>
+        <translation type="obsolete">Распределение портов UPnP/NAT-PMP прошло успешно: %1</translation>
     </message>
     <message>
         <source>File sizes mismatch for torrent %1, pausing it.</source>
-        <translation>Несовпадение размеров файлов для торрента %1, приостанавливаю его.</translation>
+        <translation type="obsolete">Несовпадение размеров файлов для торрента %1, приостанавливаю его.</translation>
     </message>
     <message>
         <source>Fast resume data was rejected for torrent %1, checking again...</source>
-        <translation>Быстрое восстановление данных для torrentа %1 было невозможно, проверка заново...</translation>
+        <translation type="obsolete">Быстрое восстановление данных для torrentа %1 было невозможно, проверка заново...</translation>
     </message>
     <message>
         <source>Url seed lookup failed for url: %1, message: %2</source>
-        <translation>Поиск раздающего Url не удался: %1, сообщение: %2</translation>
+        <translation type="obsolete">Поиск раздающего Url не удался: %1, сообщение: %2</translation>
     </message>
     <message>
         <source>Downloading &apos;%1&apos;, please wait...</source>
         <comment>e.g: Downloading &apos;xxx.torrent&apos;, please wait...</comment>
-        <translation>Скачивание &apos;%1&apos;, подождите...</translation>
+        <translation type="obsolete">Скачивание &apos;%1&apos;, подождите...</translation>
     </message>
     <message>
         <source>The network interface defined is invalid: %1</source>
-        <translation>Указанный сетевой интерфейс ошибочен: %1</translation>
+        <translation type="obsolete">Указанный сетевой интерфейс ошибочен: %1</translation>
     </message>
     <message>
         <source>Trying any other network interface available instead.</source>
-        <translation>Пробуем другой достпуный сетевой интерфейс.</translation>
+        <translation type="obsolete">Пробуем другой достпуный сетевой интерфейс.</translation>
     </message>
     <message>
         <source>Listening on IP address %1 on network interface %2...</source>
-        <translation>Слушаем на IP адресе %1 на сетевом интерфейсе %2...</translation>
+        <translation type="obsolete">Слушаем на IP адресе %1 на сетевом интерфейсе %2...</translation>
     </message>
     <message>
         <source>Failed to listen on network interface %1</source>
-        <translation>Не возможно слушать сетевой интерфейс %1</translation>
+        <translation type="obsolete">Не возможно слушать сетевой интерфейс %1</translation>
     </message>
     <message>
         <source>UPnP / NAT-PMP support [ON]</source>
-        <translation>Поддержка UPnP / NAT-PMP [Вкл]</translation>
+        <translation type="obsolete">Поддержка UPnP / NAT-PMP [Вкл]</translation>
     </message>
     <message>
         <source>UPnP / NAT-PMP support [OFF]</source>
-        <translation>Поддержка UPnP / NAT-PMP [Выкл]</translation>
+        <translation type="obsolete">Поддержка UPnP / NAT-PMP [Выкл]</translation>
     </message>
     <message>
         <source>Local Peer Discovery support [ON]</source>
-        <translation>Обнаружение локальных пиров [Вкл]</translation>
+        <translation type="obsolete">Обнаружение локальных пиров [Вкл]</translation>
     </message>
     <message>
         <source>Successfuly parsed the provided IP filter: %1 rules were applied.</source>
@@ -3656,32 +3664,27 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Error: Failed to parse the provided IP filter.</source>
-        <translation>Ошибка: Не возможно разобрать фильтр IP.</translation>
+        <translation type="obsolete">Ошибка: Не возможно разобрать фильтр IP.</translation>
     </message>
     <message>
         <source>Reporting IP address %1 to trackers...</source>
-        <translation>Сообщаю IP адрес %1 трекерам...</translation>
+        <translation type="obsolete">Сообщаю IP адрес %1 трекерам...</translation>
     </message>
     <message>
         <source>The computer will now go to sleep mode unless you cancel within the next 15 seconds...</source>
-        <translation>Сейчас компьютер перейдёт в спящий режим, если вы не отмените это в течение следующих 15 секунд...</translation>
+        <translation type="obsolete">Сейчас компьютер перейдёт в спящий режим, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
         <source>The computer will now be switched off unless you cancel within the next 15 seconds...</source>
-        <translation>Сейчас компьютер будет отключён, если вы не отмените это в течение следующих 15 секунд...</translation>
+        <translation type="obsolete">Сейчас компьютер будет отключён, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
         <source>qMule will now exit unless you cancel within the next 15 seconds...</source>
-        <translation>Сейчас qMule будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
+        <translation type="obsolete">Сейчас qMule будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
         <source>Anonymous mode [ON]</source>
-        <translation>Анонимный режим [Вкл]</translation>
-    </message>
-    <message>
-        <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
-        <comment>%1 is a number</comment>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Анонимный режим [Вкл]</translation>
     </message>
 </context>
 <context>
@@ -5205,6 +5208,270 @@ Do you want to install it now?</source>
     </message>
 </context>
 <context>
+    <name>aux::QBtSession</name>
+    <message>
+        <source>%1 reached the maximum ratio you set.</source>
+        <translation type="unfinished">%1 достиг установленного вами максимального соотношения.</translation>
+    </message>
+    <message>
+        <source>Removing torrent %1...</source>
+        <translation type="unfinished">Удаление торрента %1...</translation>
+    </message>
+    <message>
+        <source>Pausing torrent %1...</source>
+        <translation type="unfinished">Приостановка торрента %1...</translation>
+    </message>
+    <message>
+        <source>qBittorrent is bound to port: TCP/%1</source>
+        <comment>e.g: qBittorrent is bound to port: 6881</comment>
+        <translation type="unfinished">qBittorrent привязан к порту: TCP/%1</translation>
+    </message>
+    <message>
+        <source>UPnP / NAT-PMP support [ON]</source>
+        <translation type="unfinished">Поддержка UPnP / NAT-PMP [Вкл]</translation>
+    </message>
+    <message>
+        <source>UPnP / NAT-PMP support [OFF]</source>
+        <translation type="unfinished">Поддержка UPnP / NAT-PMP [Выкл]</translation>
+    </message>
+    <message>
+        <source>HTTP user agent is %1</source>
+        <translation type="unfinished">Браузер %1</translation>
+    </message>
+    <message>
+        <source>Anonymous mode [ON]</source>
+        <translation type="unfinished">Анонимный режим [Вкл]</translation>
+    </message>
+    <message>
+        <source>Reporting IP address %1 to trackers...</source>
+        <translation type="unfinished">Сообщаю IP адрес %1 трекерам...</translation>
+    </message>
+    <message>
+        <source>DHT support [ON], port: UDP/%1</source>
+        <translation type="unfinished">Поддержка DHT [Вкл.], порт: UDP/%1</translation>
+    </message>
+    <message>
+        <source>DHT support [OFF]</source>
+        <translation type="unfinished">Поддержка DHT [Выкл]</translation>
+    </message>
+    <message>
+        <source>PeX support [ON]</source>
+        <translation type="unfinished">Поддержка PeX [Вкл]</translation>
+    </message>
+    <message>
+        <source>PeX support [OFF]</source>
+        <translation type="unfinished">Поддержка PeX [Выкл]</translation>
+    </message>
+    <message>
+        <source>Restart is required to toggle PeX support</source>
+        <translation type="unfinished">Необходимо перезапустить qBittorrent для включения настройки PeX</translation>
+    </message>
+    <message>
+        <source>Local Peer Discovery support [ON]</source>
+        <translation type="unfinished">Обнаружение локальных пиров [Вкл]</translation>
+    </message>
+    <message>
+        <source>Local Peer Discovery support [OFF]</source>
+        <translation type="unfinished">Обнаружение локальных пиров [Выкл]</translation>
+    </message>
+    <message>
+        <source>Encryption support [ON]</source>
+        <translation type="unfinished">Поддержка шифрования [Вкл]</translation>
+    </message>
+    <message>
+        <source>Encryption support [FORCED]</source>
+        <translation type="unfinished">Поддержка шифрования [Принудительно]</translation>
+    </message>
+    <message>
+        <source>Encryption support [OFF]</source>
+        <translation type="unfinished">Поддержка шифрования [Выкл]</translation>
+    </message>
+    <message>
+        <source>Embedded Tracker [ON]</source>
+        <translation type="unfinished">Встроенный трекер [Вкл]</translation>
+    </message>
+    <message>
+        <source>Failed to start the embedded tracker!</source>
+        <translation type="unfinished">Не удалось запустить встроенный трекер!</translation>
+    </message>
+    <message>
+        <source>Embedded Tracker [OFF]</source>
+        <translation type="unfinished">Встроенный трекер [Выкл]</translation>
+    </message>
+    <message>
+        <source>The Web UI is listening on port %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web User Interface Error - Unable to bind Web UI to port %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; was removed from transfer list and hard disk.</source>
+        <comment>&apos;xxx.avi&apos; was removed...</comment>
+        <translation type="unfinished">&apos;%1&apos; был удален из списка передач и с жесткого диска.</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; was removed from transfer list.</source>
+        <comment>&apos;xxx.avi&apos; was removed...</comment>
+        <translation type="unfinished">&apos;%1&apos; был удален из списка передач.</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not a valid magnet URI.</source>
+        <translation type="unfinished">&apos;%1&apos; не является magnet URI.</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is already in download list.</source>
+        <comment>e.g: &apos;xxx.avi&apos; is already in download list.</comment>
+        <translation type="unfinished">&apos;%1&apos; уже присутствует в списке закачек.</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; added to download list.</source>
+        <comment>&apos;/home/y/xxx.torrent&apos; was added to download list.</comment>
+        <translation type="unfinished">&apos;%1&apos; добавлен в список закачек.</translation>
+    </message>
+    <message>
+        <source>Unable to decode torrent file: &apos;%1&apos;</source>
+        <comment>e.g: Unable to decode torrent file: &apos;/home/y/xxx.torrent&apos;</comment>
+        <translation type="unfinished">Не удалось декодировать torrent файл: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>This file is either corrupted or this isn&apos;t a torrent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: The torrent %1 does not contain any file.</source>
+        <translation type="unfinished">Ошибка: Торрент %1 не содержит никаких файлов.</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; resumed. (fast resume)</source>
+        <comment>&apos;/home/y/xxx.torrent&apos; was resumed. (fast resume)</comment>
+        <translation type="unfinished">%1 возобновлен. (быстрое возобновление)</translation>
+    </message>
+    <message>
+        <source>Note: new trackers were added to the existing torrent.</source>
+        <translation type="unfinished">Примечание: новые трекеры были добавлены к существующему торренту.</translation>
+    </message>
+    <message>
+        <source>Note: new URL seeds were added to the existing torrent.</source>
+        <translation type="unfinished">Примечание: новые URL сидов были добавлены к существующему торренту.</translation>
+    </message>
+    <message>
+        <source>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;was blocked due to your IP filter&lt;/i&gt;</source>
+        <comment>x.y.z.w was blocked</comment>
+        <translation type="unfinished">&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован в соответствии с вашим IP фильтром&lt;/i&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;was banned due to corrupt pieces&lt;/i&gt;</source>
+        <comment>x.y.z.w was banned</comment>
+        <translation type="unfinished">&lt;font color=&apos;red&apos;&gt;%1&lt;/font&gt; &lt;i&gt;был заблокирован из-за поврежденных кусочков&lt;/i&gt;</translation>
+    </message>
+    <message>
+        <source>The network interface defined is invalid: %1</source>
+        <translation type="unfinished">Указанный сетевой интерфейс ошибочен: %1</translation>
+    </message>
+    <message>
+        <source>Trying any other network interface available instead.</source>
+        <translation type="unfinished">Пробуем другой достпуный сетевой интерфейс.</translation>
+    </message>
+    <message>
+        <source>Listening on IP address %1 on network interface %2...</source>
+        <translation type="unfinished">Слушаем на IP адресе %1 на сетевом интерфейсе %2...</translation>
+    </message>
+    <message>
+        <source>Failed to listen on network interface %1</source>
+        <translation type="unfinished">Не возможно слушать сетевой интерфейс %1</translation>
+    </message>
+    <message>
+        <source>Recursive download of file %1 embedded in torrent %2</source>
+        <comment>Recursive download of test.torrent embedded in torrent test2</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Torrent name: %1</source>
+        <translation type="unfinished">Имя торрента: %1</translation>
+    </message>
+    <message>
+        <source>Torrent size: %1</source>
+        <translation type="unfinished">Размер торрента: %1</translation>
+    </message>
+    <message>
+        <source>Save path: %1</source>
+        <translation type="unfinished">Путь для сохранения: %1</translation>
+    </message>
+    <message>
+        <source>The torrent was downloaded in %1.</source>
+        <comment>The torrent was downloaded in 1 hour and 20 seconds</comment>
+        <translation type="unfinished">Торрент был скачен за %1.</translation>
+    </message>
+    <message>
+        <source>Thank you for using qBittorrent.</source>
+        <translation type="unfinished">Спасибо за использование qBittorrent.</translation>
+    </message>
+    <message>
+        <source>[qBittorrent] %1 has finished downloading</source>
+        <translation type="unfinished">[qBittorrent] скачивание %1 завершено</translation>
+    </message>
+    <message>
+        <source>Unable to decode %1 torrent file.</source>
+        <translation type="unfinished">Не удалось декодировать %1 torrent файл.</translation>
+    </message>
+    <message>
+        <source>The computer will now go to sleep mode unless you cancel within the next 15 seconds...</source>
+        <translation type="unfinished">Сейчас компьютер перейдёт в спящий режим, если вы не отмените это в течение следующих 15 секунд...</translation>
+    </message>
+    <message>
+        <source>The computer will now be switched off unless you cancel within the next 15 seconds...</source>
+        <translation type="unfinished">Сейчас компьютер будет отключён, если вы не отмените это в течение следующих 15 секунд...</translation>
+    </message>
+    <message>
+        <source>qBittorrent will now exit unless you cancel within the next 15 seconds...</source>
+        <translation type="unfinished">Сейчас qBittorrent будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
+    </message>
+    <message>
+        <source>An I/O error occured, &apos;%1&apos; paused.</source>
+        <translation type="unfinished">Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
+    </message>
+    <message>
+        <source>Reason: %1</source>
+        <translation type="unfinished">Причина: %1</translation>
+    </message>
+    <message>
+        <source>UPnP/NAT-PMP: Port mapping failure, message: %1</source>
+        <translation type="unfinished">Распределение портов UPnP/NAT-PMP не удалось с сообщением: %1</translation>
+    </message>
+    <message>
+        <source>UPnP/NAT-PMP: Port mapping successful, message: %1</source>
+        <translation type="unfinished">Распределение портов UPnP/NAT-PMP прошло успешно: %1</translation>
+    </message>
+    <message>
+        <source>File sizes mismatch for torrent %1, pausing it.</source>
+        <translation type="unfinished">Несовпадение размеров файлов для торрента %1, приостанавливаю его.</translation>
+    </message>
+    <message>
+        <source>Fast resume data was rejected for torrent %1, checking again...</source>
+        <translation type="unfinished">Быстрое восстановление данных для torrentа %1 было невозможно, проверка заново...</translation>
+    </message>
+    <message>
+        <source>Url seed lookup failed for url: %1, message: %2</source>
+        <translation type="unfinished">Поиск раздающего Url не удался: %1, сообщение: %2</translation>
+    </message>
+    <message>
+        <source>Downloading &apos;%1&apos;, please wait...</source>
+        <comment>e.g: Downloading &apos;xxx.torrent&apos;, please wait...</comment>
+        <translation type="unfinished">Скачивание &apos;%1&apos;, подождите...</translation>
+    </message>
+    <message>
+        <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
+        <comment>%1 is a number</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Failed to parse the provided IP filter.</source>
+        <translation type="unfinished">Ошибка: Не возможно разобрать фильтр IP.</translation>
+    </message>
+</context>
+<context>
     <name>captcha</name>
     <message>
         <source>Type symbols on the picture</source>
@@ -5721,10 +5988,6 @@ However, those plugins were disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PushButton</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tab 1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5747,6 +6010,38 @@ However, those plugins were disabled.</source>
     <message>
         <source>File Size</source>
         <translation type="unfinished">Размер</translation>
+    </message>
+    <message>
+        <source>Exchange Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchange folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchange files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchange dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchange with subdirs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t exchange dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t exchange with subdirs</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6378,27 +6673,31 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>eD2K:Connected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">eD2K:Соединен</translation>
     </message>
     <message>
         <source>eD2K:Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>eD2K:Отсоединен</translation>
     </message>
     <message>
         <source>Upload:</source>
-        <translation type="unfinished">Отдача:</translation>
+        <translation>Отдача:</translation>
     </message>
     <message>
         <source>Download:</source>
-        <translation type="unfinished">Приём:</translation>
+        <translation>Приём:</translation>
     </message>
     <message>
         <source>Clients: </source>
-        <translation type="unfinished"></translation>
+        <translation>Клиенты: </translation>
     </message>
     <message>
         <source>|Files: </source>
-        <translation type="unfinished"></translation>
+        <translation>|Файлы: </translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation>с</translation>
     </message>
 </context>
 <context>

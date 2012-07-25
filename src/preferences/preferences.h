@@ -804,7 +804,11 @@ public:
       for (int i = 0; i < size; ++i)
       {
           setArrayIndex(i);
-          se.insert(value("SD").toString(), QList<QString>());
+          QString dirName = value("SD").toString();
+          if (dirName.lastIndexOf("/") != (dirName.length() - 1))
+              dirName += "/";
+
+          se.insert(dirName, QList<QString>());
       }
 
       endArray();
