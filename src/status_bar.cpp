@@ -70,7 +70,7 @@ void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)
     strClients.setNum(nClients);
     strFiles.setNum(nFiles);
 
-    QString text = tr("Clients: Clients: Clients: Clients: ") + strClients + tr("|Files: ") + strFiles;
+    QString text = tr("Clients: ") + strClients + tr("|Files: ") + strFiles;
     labelInfo->setText(text);
     labelInfo->setToolTip(text);
 }
