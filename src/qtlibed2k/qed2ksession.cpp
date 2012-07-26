@@ -35,6 +35,34 @@ QED2KSearchResultEntry::QED2KSearchResultEntry() :
 {
 }
 
+QED2KSearchResultEntry::QED2KSearchResultEntry(const Preferences& pref)
+{
+    m_nFilesize = pref.value("Filesize", 0).toULongLong();
+    m_nSources  = pref.value("Sources", 0).toULongLong();
+    m_nCompleteSources  = pref.value("CompleteSources", 0).toULongLong();
+    m_nMediaBitrate     = pref.value("MediaBitrate", 0).toULongLong();
+    m_nMediaLength      = pref.value("MediaLength", 0).toULongLong();
+    m_hFile             = pref.value("File", QString()).toString();
+    m_strFilename       = pref.value("Filename", QString()).toString();
+    m_strMediaCodec     = pref.value("MediaCodec", QString()).toString();
+    m_network_point.m_nIP = pref.value("IP", 0).toUInt();
+    m_network_point.m_nPort = pref.value("Port", 0).toUInt();
+}
+
+void QED2KSearchResultEntry::save(Preferences& pref) const
+{
+    pref.setValue("Filesize",       m_nFilesize);
+    pref.setValue("Sources",        m_nSources);
+    pref.setValue("CompleteSources",m_nCompleteSources);
+    pref.setValue("MediaBitrate",   m_nMediaBitrate);
+    pref.setValue("MediaLength",    m_nMediaLength);
+    pref.setValue("File",           m_hFile);
+    pref.setValue("Filename",       m_strFilename);
+    pref.setValue("MediaCodec",     m_strMediaCodec);
+    pref.setValue("IP",             m_network_point.m_nIP);
+    pref.setValue("Port",           m_network_point.m_nPort);
+}
+
 // static
 QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k::shared_file_entry& sf)
 {
