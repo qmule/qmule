@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "ui_messages_widget.h"
+#include "preferences.h"
 
 #include "qtlibed2k/qed2ksession.h"
 
@@ -15,6 +16,9 @@ struct USER
 {
     QString                 strName;
     libed2k::net_identifier netPoint;
+    USER();
+    USER(const Preferences& pref);
+    void save(Preferences& pref) const;
 };
 
 class messages_widget : public QWidget, public Ui::messages_widget
@@ -44,6 +48,8 @@ public:
     messages_widget(QWidget *parent = 0);
     ~messages_widget();
     void setNewMessageImg(int state);
+    void save() const;
+    void load();
 
 protected:
     //virtual void showEvent(QShowEvent* e);
