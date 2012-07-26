@@ -309,7 +309,6 @@ void messages_widget::addFriend()
         new_friend.netPoint.m_nIP = address2int(ip::address::from_string(dlg.getIP().toUtf8().constData()));
         new_friend.netPoint.m_nPort = dlg.getPort().toInt();
 
-        model->appendRow();
         int row = model->rowCount();
         model->insertRow(row);
         model->setData(model->index(row, 0), new_friend.strName);
