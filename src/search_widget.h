@@ -25,11 +25,13 @@ enum RESULT_TYPE
 struct UserDir
 {
     UserDir() : bExpanded(false), bFilled(false), dirPath("") {}
+    UserDir(Preferences& pref);
 
     bool    bExpanded;
     bool    bFilled;
     QString dirPath;
     std::vector<QED2KSearchResultEntry> vecFiles;
+    void save(Preferences& pref) const;
 };
 
 struct SearchResult
@@ -38,12 +40,14 @@ struct SearchResult
         strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(), netPoint() {}
     SearchResult(QString request, RESULT_TYPE type, const std::vector<QED2KSearchResultEntry>& vRes, const std::vector<UserDir> userDirs, const libed2k::net_identifier& np) : 
         strRequest(request), resultType(type), vecResults(vRes), vecUserDirs(userDirs), netPoint(np) {}
+    SearchResult(Preferences& pref);
 
     QString strRequest;
     RESULT_TYPE resultType;
     std::vector<QED2KSearchResultEntry> vecResults;
     std::vector<UserDir> vecUserDirs;
-    libed2k::net_identifier netPoint;    
+    libed2k::net_identifier netPoint;
+    void save(Preferences& pref) const;
 };
 
 class search_widget : public QWidget , private Ui::search_widget
@@ -95,6 +99,8 @@ private:
 
 public:
     search_widget(QWidget *parent = 0);
+    void load();
+    void save() const;
     ~search_widget();
 
 private:

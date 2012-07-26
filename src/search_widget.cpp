@@ -15,6 +15,102 @@
 
 using namespace libed2k;
 
+UserDir::UserDir(Preferences& pref)
+{
+    bExpanded = pref.value("Expanded", false).toBool();
+    bFilled   = pref.value("Filled", false).toBool();
+    dirPath   = pref.value("DirPath", QString()).toString();
+
+    int size =  pref.beginReadArray("SearchResults");
+    vecFiles.reserve(size);
+
+    for (int i = 0; i < size; ++i)
+    {
+        pref.setArrayIndex(i);
+        vecFiles.push_back(QED2KSearchResultEntry(pref));
+    }
+
+    pref.endArray();
+}
+
+void UserDir::save(Preferences& pref) const
+{
+    pref.setValue("Expanded", bExpanded);
+    pref.setValue("Filled", bFilled);
+    pref.setValue("DirPath", dirPath);
+    pref.beginWriteArray("SearchResults", vecFiles.size());
+
+    int i = 0;
+    foreach(const QED2KSearchResultEntry& sre, vecFiles)
+    {
+        pref.setArrayIndex(i);
+        sre.save(pref);
+        ++i;
+    }
+
+    pref.endArray();
+}
+
+SearchResult::SearchResult(Preferences& pref)
+{
+    strRequest  = pref.value("Request", QString()).toString();
+    resultType  = (RESULT_TYPE)(pref.value("ResultType", QString()).toInt());
+
+    int size = pref.beginReadArray("Results");
+
+    for (int i = 0; i < size; ++i)
+    {
+        pref.setArrayIndex(i);
+        vecResults.push_back(QED2KSearchResultEntry(pref));
+    }
+
+    pref.endArray();
+
+    size = pref.beginReadArray("UserDir");
+
+    for (int i = 0; i < size; ++i)
+    {
+        pref.setArrayIndex(i);
+        vecUserDirs.push_back(UserDir(pref));
+    }
+
+    pref.endArray();
+
+    netPoint.m_nIP  = pref.value("IP", 0).toUInt();
+    netPoint.m_nPort= pref.value("Port", 0).toUInt();
+}
+
+void SearchResult::save(Preferences& pref) const
+{
+    pref.setValue("Request", strRequest);
+    pref.setValue("ResultType", resultType);
+    pref.beginWriteArray("Results", vecResults.size());
+
+    int i = 0;
+    foreach(const QED2KSearchResultEntry& e, vecResults)
+    {
+        pref.setArrayIndex(i);
+        e.save(pref);
+        ++i;
+    }
+
+    pref.endArray();
+
+    pref.beginWriteArray("UserDir", vecUserDirs.size());
+    i = 0;
+    foreach(const UserDir& ud, vecUserDirs)
+    {
+        pref.setArrayIndex(i);
+        ud.save(pref);
+        ++i;
+    }
+
+    pref.endArray();
+
+    pref.setValue("IP", netPoint.m_nIP);
+    pref.setValue("Port", netPoint.m_nPort);
+}
+
 int selected_row(QAbstractItemView* view)
 {
     QModelIndex index = view->currentIndex();
@@ -254,11 +350,59 @@ search_widget::search_widget(QWidget *parent)
     btnDownload->setEnabled(false);
     // sort by name ascending
     treeResult->header()->setSortIndicator(SWDelegate::SW_NAME, Qt::AscendingOrder);
+    load();
+}
+
+void search_widget::load()
+{
+    Preferences pref;
+    pref.beginGroup("SearchWidget");
+    nCurTabSearch = pref.value("CurrentTab", 0).toInt();
+
+    int size = pref.beginReadArray("SearchResults");
+
+    for (int i = 0; i < size; ++i)
+    {
+        QString title = pref.value("Title", QString()).toString();
+        pref.setArrayIndex(i);
+        searchItems.push_back(SearchResult(pref));
+        nCurTabSearch = tabSearch->addTab(iconSerachActive, title);
+    }
+
+    if (size > 0)
+    {
+        tabSearch->setCurrentIndex(nCurTabSearch);
+        tabSearch->show();
+        searchFilter->show();
+    }
+
+    pref.endArray();
+    pref.endGroup();
+}
+
+void search_widget::save() const
+{
+    Preferences pref;
+    pref.beginGroup("SearchWidget");
+    pref.setValue("CurrentTab", tabSearch->currentIndex());
+    pref.beginWriteArray("SearchResults", searchItems.size());
+    int i = 0;
+
+    foreach(const SearchResult& sr,  searchItems)
+    {
+        pref.setValue("Title", tabSearch->tabText(i));
+        pref.setArrayIndex(i);
+        sr.save(pref);
+        ++i;
+    }
+
+    pref.endArray();
+    pref.endGroup();
 }
 
 search_widget::~search_widget()
 {
-
+    save();
 }
 
 void search_widget::addCondRow()

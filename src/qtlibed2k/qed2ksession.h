@@ -19,6 +19,7 @@
 #include <libed2k/session_settings.hpp>
 #include "qed2khandle.h"
 #include "trackerinfos.h"
+#include "preferences.h"
 
 struct QED2KSearchResultEntry
 {
@@ -33,7 +34,9 @@ struct QED2KSearchResultEntry
     libed2k::net_identifier m_network_point; 
 	bool isCorrect() const;
 	QED2KSearchResultEntry();
+    QED2KSearchResultEntry(const Preferences& pref);
 	static QED2KSearchResultEntry fromSharedFileEntry(const libed2k::shared_file_entry& sf);
+    void save(Preferences& pref) const;
 };
 
 struct QED2KPeerOptions

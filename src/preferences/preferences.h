@@ -757,87 +757,72 @@ public:
   void saveSharedDirs(const shared_map& se)
   {
       int index = 0;
-
-      remove("Preferences/eDonkey/SharedDirectories");
-      beginWriteArray("Preferences/eDonkey/SharedDirectories");      
+      beginGroup("MuleSharedDirectories");
+      beginWriteArray("SharedDirectories");
 
       for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
-          setArrayIndex(index);
-          setValue("SD", itr.key());
-          ++index;
+          QString key = itr.key();
+          qDebug() << "save shared dirs " << key;
+          //key.remove(QRegExp("[:\\/]"));
+
+          if (!key.isEmpty())
+          {
+            setArrayIndex(index);
+            setValue("SharedDirectory", key);
+            beginWriteArray("ExcludeFiles", itr.value().size());
+
+            for (int n = 0; n < itr.value().size(); ++n)
+            {
+                setArrayIndex(n);
+                setValue("ExcludeFile", itr.value().at(n));
+            }
+
+            endArray();
+            ++index;
+          }
       }
 
       endArray();
-
-      // generate directory excludes
-      for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
-      {
-          if (!itr.value().empty())
-          {
-              QString key = itr.key();
-              key.remove(QRegExp("[:\\/]"));
-
-              if (!key.isEmpty())
-              {
-                  index = 0;
-                  remove(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
-                  beginWriteArray(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
-
-                  for (int n = 0; n < itr.value().size(); ++n)
-                  {
-                      setArrayIndex(n);
-                      setValue("ExcludeFile", itr.value().at(n));
-                  }
-
-                  endArray();
-              }
-          }
-      }
+      endGroup();
   }
 
   shared_map loadSharedDirs()
   {
-      shared_map se;
-      int size = beginReadArray("Preferences/eDonkey/SharedDirectories");
+      beginGroup("MuleSharedDirectories");
+      shared_map se;      
+      int size = beginReadArray("SharedDirectories");
 
       for (int i = 0; i < size; ++i)
       {
           setArrayIndex(i);
-          QString dirName = value("SD").toString();
+          QString dirName = value("SharedDirectory").toString();
+
           if (dirName.lastIndexOf("/") != (dirName.length() - 1))
               dirName += "/";
 
-          se.insert(dirName, QList<QString>());
-      }
+          shared_map::iterator itr = se.insert(dirName, QList<QString>());
+          int sub_size = beginReadArray(QString("ExcludeFiles"));
 
-      endArray();
-
-      // restore exclude files for each directory
-      for (shared_map::iterator itr = se.begin(); itr != se.end(); ++itr)
-      {
-          QString key = itr.key();
-          key.remove(QRegExp("[:\\/]"));
-
-          size = beginReadArray(QString("Preferences/eDonkey/SharedDirectoryKeys/" + key));
-
-          for (int i = 0; i < size; ++i)
+          for (int j = 0; j < sub_size; ++j)
           {
-              setArrayIndex(i);
+              setArrayIndex(j);
               itr.value().append(value("ExcludeFile").toString());
           }
 
           endArray();
       }
 
+      endArray();
+      endGroup();
       return se;
   }
 
   void saveSharedFiles(const QList<QString>& sl)
   {
       // TODO - test remove behaviour
-      remove("Preferences/eDonkey/SharedFiles"); // do not append new elements
-      beginWriteArray("Preferences/eDonkey/SharedFiles");
+      beginGroup("MuleSharedFiles");
+      beginWriteArray("SharedFiles");
 
       int index = 0;
       for (QList<QString>::const_iterator itr = sl.begin(); itr != sl.end(); ++itr)
@@ -848,13 +833,15 @@ public:
       }
 
       endArray();
+      endGroup();
   }
 
   QList<QString> loadSharedFiles()
   {
       QList<QString> sl;
 
-      int size = beginReadArray("Preferences/eDonkey/SharedFiles");
+      beginGroup("MuleSharedFiles");
+      int size = beginReadArray("SharedFiles");
 
       for (int i = 0; i < size; ++i)
       {
@@ -863,6 +850,7 @@ public:
       }
 
       endArray();
+      endGroup();
 
       return sl;
   }

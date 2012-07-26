@@ -13,6 +13,24 @@
 
 using namespace libed2k;
 
+USER::USER()
+{
+}
+
+USER::USER(const Preferences& pref)
+{
+    strName = pref.value("Username", QString()).toString();
+    netPoint.m_nIP = pref.value("IP", 0).toUInt();
+    netPoint.m_nPort = pref.value("Port", 0).toUInt();
+}
+
+void USER::save(Preferences& pref) const
+{
+    pref.setValue("Username", strName);
+    pref.setValue("IP", netPoint.m_nIP);
+    pref.setValue("Port", netPoint.m_nPort);
+}
+
 messages_widget::messages_widget(QWidget *parent)
     : QWidget(parent)
 {
@@ -108,10 +126,12 @@ messages_widget::messages_widget(QWidget *parent)
     textMsg->installEventFilter(this);
 
     setFocusPolicy(Qt::StrongFocus);
+    load();
 }
 
 messages_widget::~messages_widget()
 {
+    save();
     lastMessageTab = -1;
     int nSize = tabWidget->count();
     for (int ii = 0; ii < nSize; ii++)
@@ -372,6 +392,41 @@ void messages_widget::setNewMessageImg(int state)
             break;
         }
     }
+}
+
+void messages_widget::save() const
+{
+    Preferences pref;
+    pref.beginGroup("ED2KFriends");
+    pref.beginWriteArray("Friends", friends.size());
+
+    int i = 0;
+    foreach(const USER& u, friends)
+    {
+        pref.setArrayIndex(i);
+        u.save(pref);
+        ++i;
+    }
+
+    pref.endArray();
+    pref.endGroup();
+}
+
+void messages_widget::load()
+{
+    Preferences pref;
+    pref.beginGroup("ED2KFriends");
+    int size = pref.beginReadArray("Friends");
+
+    for(int i = 0; i < size; ++i)
+    {
+        pref.setArrayIndex(i);
+        friends.push_back(USER(pref));
+        model->appendRow(new QStandardItem(QIcon(":/emule/users/Friends1.ico"), friends.back().strName));
+    }
+
+    pref.endArray();
+    pref.endGroup();
 }
 
 bool messages_widget::event(QEvent* e)
