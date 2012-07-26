@@ -27,6 +27,8 @@ status_bar::status_bar(QWidget *parent, QStatusBar *bar)
 
     labelInfoImg->setPixmap(QIcon(":/emule/common/User.ico").pixmap(16,16));
 
+    connect(labelMsg, SIGNAL(doubleClicked()), this, SLOT(doubleClickNewMsg()));
+
     reset();
 }
 
@@ -68,7 +70,7 @@ void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)
     strClients.setNum(nClients);
     strFiles.setNum(nFiles);
 
-    QString text = tr("Clients: ") + strClients + tr("|Files: ") + strFiles;
+    QString text = tr("Clients: Clients: Clients: Clients: ") + strClients + tr("|Files: ") + strFiles;
     labelInfo->setText(text);
     labelInfo->setToolTip(text);
 }
@@ -106,4 +108,9 @@ void status_bar::setNewMessageImg(int state)
             break;
         }
     }
+}
+
+void status_bar::doubleClickNewMsg()
+{
+    emit stopMessageNotification();
 }

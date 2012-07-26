@@ -295,7 +295,7 @@ void QBtSession::configureSession() {
   if (old_listenPort != new_listenPort) {
     qDebug("Session port changes in program preferences: %d -> %d", old_listenPort, new_listenPort);
     setListeningPort(new_listenPort);
-    addConsoleMessage(tr("qBittorrent is bound to port: TCP/%1", "e.g: qBittorrent is bound to port: 6881").arg(QString::number(getListenPort())));
+    addConsoleMessage(tr("qMule is bound to port: TCP/%1", "e.g: qBittorrent is bound to port: 6881").arg(QString::number(getListenPort())));
   }
 
   // Downloads
@@ -388,7 +388,7 @@ void QBtSession::configureSession() {
   }
   // * Session settings
   session_settings sessionSettings = s->settings();
-  sessionSettings.user_agent = "qBittorrent "VERSION;
+  sessionSettings.user_agent = "qMule "VERSION;
   std::cout << "HTTP user agent is " << sessionSettings.user_agent << std::endl;
   addConsoleMessage(tr("HTTP user agent is %1").arg(misc::toQString(sessionSettings.user_agent)));
 
@@ -2108,16 +2108,8 @@ void QBtSession::autoRunExternalProgram(const QTorrentHandle &h, bool async) {
   }
 }
 
-void QBtSession::sendNotificationEmail(const QTorrentHandle &h) {
-  // Prepare mail content
-  QString content = tr("Torrent name: %1").arg(h.name()) + "\n";
-  content += tr("Torrent size: %1").arg(misc::friendlyUnit(h.actual_size())) + "\n";
-  content += tr("Save path: %1").arg(TorrentPersistentData::getSavePath(h.hash())) + "\n\n";
-  content += tr("The torrent was downloaded in %1.", "The torrent was downloaded in 1 hour and 20 seconds").arg(misc::userFriendlyDuration(h.active_time())) + "\n\n\n";
-  content += tr("Thank you for using qBittorrent.") + "\n";
-  // Send the notification email
-  Smtp *sender = new Smtp(this);
-  sender->sendMail("notification@qbittorrent.org", Preferences().getMailNotificationEmail(), tr("[qBittorrent] %1 has finished downloading").arg(h.name()), content);
+void QBtSession::sendNotificationEmail(const QTorrentHandle &h) 
+{
 }
 
 // Read alerts sent by the Bittorrent session

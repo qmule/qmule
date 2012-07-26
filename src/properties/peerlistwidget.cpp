@@ -203,7 +203,7 @@ void PeerListWidget::showPeerListMenu(const QPoint&)
 void PeerListWidget::banSelectedPeers(const QStringList& peer_ips)
 {
   // Confirm first
-  int ret = QMessageBox::question(this, tr("Are you sure? -- qBittorrent"), tr("Are you sure you want to ban permanently the selected peers?"),
+  int ret = QMessageBox::question(this, tr("Are you sure? -- qMule"), tr("Are you sure you want to ban permanently the selected peers?"),
                                   tr("&Yes"), tr("&No"),
                                   QString(), 0, 1);
   if (ret)

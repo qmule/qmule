@@ -2,6 +2,7 @@
 #define FILES_WIDGET_H
 
 #include <libed2k/file.hpp>
+#include <transport/transfer.h>
 #include <QWidget>
 #include <QFileIconProvider>
 #include "ui_files_widget.h"
@@ -33,6 +34,7 @@ class files_widget : public QWidget, public Ui::files_widget
 
     shared_map dirRules;
     QList<QString> fileRules;
+    QMap<QString, QString> transferPath;
 
     QMenu*   filesMenu;
     QAction* filesExchDir;
@@ -69,7 +71,7 @@ private:
 private slots:
     void itemExpanded(QTreeWidgetItem* item);
     void itemCollapsed(QTreeWidgetItem* item);
-    void itemClicked(QTreeWidgetItem* item, int column);
+    void currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* olditem);
     void tableItemChanged(QStandardItem* item);
     void displayTreeMenu(const QPoint&);
     void exchangeDir();
@@ -77,6 +79,8 @@ private slots:
     void notExchangeDir();
     void notExchangeSubdir();
     void applyChanges();
+    void addedTransfer(Transfer transfer);
+    void deletedTransfer(QString hash);
 };
 
 #endif // FILES_WIDGET_H

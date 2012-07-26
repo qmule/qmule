@@ -181,7 +181,7 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
 
         lastMessageTab = nTab;
 
-        if (!this->isActiveWindow() || nTab != tabWidget->currentIndex())
+        if (!this->isActiveWindow() || !this->isVisible() || nTab != tabWidget->currentIndex())
         {
             tabWidget->setTabFontColor(nTab, QColor(Qt::darkRed));
             emit newMessage();
@@ -199,7 +199,7 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
         edit->append(msg);
 
         lastMessageTab = nTab;
-        if (!this->isActiveWindow())
+        if (!this->isActiveWindow() || !this->isVisible())
         {
             tabWidget->setTabFontColor(nTab, QColor(Qt::darkRed));
             emit newMessage();

@@ -64,7 +64,6 @@
 #include "rss_imp.h"
 #include "rsssettings.h"
 #endif
-#include "about_imp.h"
 #include "trackerlogin.h"
 #include "options_imp.h"
 #include "speedlimitdlg.h"
@@ -74,7 +73,6 @@
 #include "torrentpersistentdata.h"
 #include "transferlistfilterswidget.h"
 #include "propertieswidget.h"
-#include "statusbar.h"
 #include "hidabletabwidget.h"
 #include "qinisettings.h"
 #include "torrentimportdlg.h"
@@ -153,7 +151,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionSet_global_upload_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/seeding.png")));
   actionSet_global_download_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/download.png")));
   actionCreate_torrent->setIcon(IconProvider::instance()->getIcon("document-edit"));
-  actionAbout->setIcon(IconProvider::instance()->getIcon("help-about"));
   actionBugReport->setIcon(IconProvider::instance()->getIcon("tools-report-bug"));
   actionDecreasePriority->setIcon(IconProvider::instance()->getIcon("go-down"));
   actionDelete->setIcon(IconProvider::instance()->getIcon("list-remove"));
@@ -236,6 +233,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   catalog = new XCatalogWidget(this);
   messages = new messages_widget(this);
   files = new files_widget(this);
+  statusBar = new status_bar(this, QMainWindow::statusBar());
+
 
   vboxLayout->addWidget(dock);
   vboxLayout->addWidget(status);
@@ -256,6 +255,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
+  connect(statusBar, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
   flickerTimer = new QTimer(this);
   connect(flickerTimer, SIGNAL(timeout()), SLOT(on_flickerTimer()));
 
@@ -321,8 +321,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   // Accept drag 'n drops
   setAcceptDrops(true);
   createKeyboardShortcuts();
-  // Create status bar
-  statusBar = new status_bar(this, QMainWindow::statusBar());
 
 #ifdef Q_WS_MAC
   setUnifiedTitleAndToolBarOnMac(true);
@@ -475,8 +473,6 @@ MainWindow::~MainWindow() {
     delete createTorrentDlg;
   if (m_executionLog)
     delete m_executionLog;
-  if (aboutDlg)
-    delete aboutDlg;
   if (options)
     delete options;
   if (downloadFromURLDialog)
@@ -829,21 +825,12 @@ void MainWindow::toggleVisibility(QSystemTrayIcon::ActivationReason e) {
       }
       raise();
       activateWindow();
+      stopMessageFlickering();
     }else{
       hide();
     }
   }
   actionToggleVisibility->setText(isVisible() ? tr("Hide") : tr("Show"));
-}
-
-// Display About Dialog
-void MainWindow::on_actionAbout_triggered() {
-  //About dialog
-  if (aboutDlg) {
-    aboutDlg->setFocus();
-  } else {
-    aboutDlg = new about(this);
-  }
 }
 
 void MainWindow::showEvent(QShowEvent *e) {
@@ -920,48 +907,56 @@ void MainWindow::on_actionCreate_torrent_triggered() {
 }
 
 bool MainWindow::event(QEvent * e) {
-  switch(e->type()) {
-  case QEvent::WindowStateChange: {
-    qDebug("Window change event");
-    //Now check to see if the window is minimised
-    if (isMinimized()) {
-      qDebug("minimisation");
-      if (systrayIcon && Preferences().minimizeToTray()) {
-        qDebug("Has active window: %d", (int)(qApp->activeWindow() != 0));
-        // Check if there is a modal window
-        bool has_modal_window = false;
-        foreach (QWidget *widget, QApplication::allWidgets()) {
-          if (widget->isModal()) {
-            has_modal_window = true;
+    switch(e->type()) 
+    {
+        case QEvent::WindowStateChange: 
+        {
+            qDebug("Window change event");
+            //Now check to see if the window is minimised
+            if (isMinimized()) 
+            {
+                qDebug("minimisation");
+                if (systrayIcon && Preferences().minimizeToTray()) 
+                {
+                    qDebug("Has active window: %d", (int)(qApp->activeWindow() != 0));
+                    // Check if there is a modal window
+                    bool has_modal_window = false;
+                    foreach (QWidget *widget, QApplication::allWidgets()) 
+                    {
+                        if (widget->isModal()) 
+                        {
+                            has_modal_window = true;
+                            break;
+                        }
+                    }
+                    // Iconify if there is no modal window
+                    if (!has_modal_window) 
+                    {
+                        qDebug("Minimize to Tray enabled, hiding!");
+                        e->accept();
+                        QTimer::singleShot(0, this, SLOT(hide()));
+                        return true;
+                    }
+                }
+            }
             break;
-          }
         }
-        // Iconify if there is no modal window
-        if (!has_modal_window) {
-          qDebug("Minimize to Tray enabled, hiding!");
-          e->accept();
-          QTimer::singleShot(0, this, SLOT(hide()));
-          return true;
-        }
-      }
-    }
-    break;
-  }
 #ifdef Q_WS_MAC
-  case QEvent::ToolBarChange: {
-    qDebug("MAC: Received a toolbar change event!");
-    bool ret = QMainWindow::event(e);
+        case QEvent::ToolBarChange: 
+        {
+            qDebug("MAC: Received a toolbar change event!");
+            bool ret = QMainWindow::event(e);
 
-    qDebug("MAC: new toolbar visibility is %d", !actionTop_tool_bar->isChecked());
-    actionTop_tool_bar->toggle();
-    Preferences().setToolbarDisplayed(actionTop_tool_bar->isChecked());
-    return ret;
-  }
+            qDebug("MAC: new toolbar visibility is %d", !actionTop_tool_bar->isChecked());
+            actionTop_tool_bar->toggle();
+            Preferences().setToolbarDisplayed(actionTop_tool_bar->isChecked());
+            return ret;
+        }
 #endif
-  default:
-    break;
-  }
-  return QMainWindow::event(e);
+        default:
+            break;
+    }
+    return QMainWindow::event(e);
 }
 
 // Action executed when a file is dropped
@@ -1062,32 +1057,32 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionStatus_triggerd()
 {
-    selectWidget(1);
+    selectWidget(wStatus);
 }
 
 void MainWindow::on_actionCatalog_triggerd()
 {
-    selectWidget(2);
+    selectWidget(wCatalog);
 }
 
 void MainWindow::on_actionTransfer_triggerd()
 {
-    selectWidget(3);
+    selectWidget(wTransfer);
 }
 
 void MainWindow::on_actionSearch_triggerd()
 {
-    selectWidget(4);
+    selectWidget(wSearch);
 }
 
 void MainWindow::on_actionMessages_triggerd()
 {
-    selectWidget(5);
+    selectWidget(wMessages);
 }
 
 void MainWindow::on_actionFiles_triggerd()
 {
-    selectWidget(6);
+    selectWidget(wFiles);
 }
 
 void MainWindow::on_auth_result(const std::string& strRes, const boost::system::error_code& ec)
@@ -1103,7 +1098,7 @@ void MainWindow::on_auth_result(const std::string& strRes, const boost::system::
     emit signalAuth(QString::fromUtf8(strRes.c_str(), strRes.size()), strError);
 }
 
-void MainWindow::selectWidget(int num)
+void MainWindow::selectWidget(Widgets wNum)
 {
     actionCatalog->setChecked(false);
     actionTransfer->setChecked(false);
@@ -1116,37 +1111,37 @@ void MainWindow::selectWidget(int num)
     messages->hide();
     files->hide();
 
-    switch (num)
+    switch (wNum)
     {
-        case 1://status
+        case wStatus:
         {
             status->show();
             break;
         }
-        case 2://catalog
+        case wCatalog:
         {
             actionCatalog->setChecked(true);
             catalog->show();
             break;
         }
-        case 3://transfer
+        case wTransfer:
         {
             actionTransfer->setChecked(true);
             dock->show();
             break;
         }
-        case 4://search
+        case wSearch:
         {
             actionSearch->setChecked(true);
             search->show();
             break;
         }
-        case 5://messages
+        case wMessages:
         {
             messages->show();
             break;
         }
-        case 6://files
+        case wFiles:
         {
             files->show();
             break;
@@ -1943,14 +1938,19 @@ void MainWindow::on_flickerTimer()
 
 void MainWindow::stopMessageFlickering()
 {
-    icon_CurTray = icon_TrayConn;
-    if (systrayIcon) {
-        systrayIcon->setIcon(getSystrayIcon());
-    }
-    statusBar->setNewMessageImg(0);
-    messages->setNewMessageImg(0);
+    if (flickerTimer->isActive())
+    {
+        icon_CurTray = icon_TrayConn;
+        if (systrayIcon) {
+            systrayIcon->setIcon(getSystrayIcon());
+        }
+        statusBar->setNewMessageImg(0);
+        messages->setNewMessageImg(0);
 
-    flickerTimer->stop();
+        flickerTimer->stop();
+
+        selectWidget(wMessages);
+    }
 }
 
 void MainWindow::setDisconnectedStatus()

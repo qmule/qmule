@@ -99,7 +99,7 @@ void TorrentCreatorThread::sendProgressSignal(int progress) {
 
 void TorrentCreatorThread::run() {
   emit updateProgress(0);
-  QString creator_str("qBittorrent "VERSION);
+  QString creator_str("qMule "VERSION);
   try {
     file_storage fs;
     // Adding files to the torrent
@@ -118,7 +118,7 @@ void TorrentCreatorThread::run() {
     // calculate the hash for all pieces
     const QString parent_path = misc::branchPath(input_path);
     set_piece_hashes(t, parent_path.toUtf8().constData(), boost::bind<void>(&sendProgressUpdateSignal, _1, t.num_pieces(), this));
-    // Set qBittorrent as creator and add user comment to
+    // Set qMule as creator and add user comment to
     // torrent_info structure
     t.set_creator(creator_str.toUtf8().constData());
     t.set_comment(comment.toUtf8().constData());
