@@ -31,6 +31,12 @@ public:
     void setStatusMsg(QString strMsg);
     void setNewMessageImg(int state);
     void reset();
+
+private slots:
+    void doubleClickNewMsg();
+
+signals:
+    void stopMessageNotification();
 };
 
 #endif // STATUS_BAR_H

@@ -361,7 +361,7 @@ void misc::shutdownComputer(bool sleep) {
   if (sleep)
     SetSuspendState(false, false, false);
   else
-    InitiateSystemShutdownA(0, tr("qBittorrent will shutdown the computer now because all downloads are complete.").toLocal8Bit().data(), 10, true, false);
+    InitiateSystemShutdownA(0, tr("qMule will shutdown the computer now because all downloads are complete.").toLocal8Bit().data(), 10, true, false);
 
   // Disable shutdown privilege.
   tkp.Privileges[0].Attributes = 0;

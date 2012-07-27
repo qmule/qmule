@@ -48,14 +48,12 @@ class downloadFromURL;
 #ifdef RSS_ENABLE
 class RSSImp;
 #endif
-class about;
 class options_imp;
 class TransferListWidget;
 class TransferListFiltersWidget;
 class PropertiesWidget;
 class status_bar;
 class consoleDlg;
-class about;
 class TorrentCreatorDlg;
 class downloadFromURL;
 class HidableTabWidget;
@@ -92,6 +90,16 @@ public:
       csConnected    = 3
   };
 
+  enum Widgets
+  {
+      wStatus       = 1,
+      wCatalog      = 2,
+      wTransfer     = 3,
+      wSearch       = 4,
+      wMessages     = 5,
+      wFiles        = 6
+  };
+
   // Construct / Destruct
   MainWindow(QWidget *parent=0, QStringList torrentCmdLine=QStringList());
   ~MainWindow();
@@ -117,7 +125,6 @@ protected slots:
   void dropEvent(QDropEvent *event);
   void dragEnterEvent(QDragEnterEvent *event);
   void toggleVisibility(QSystemTrayIcon::ActivationReason e = QSystemTrayIcon::Trigger);
-  void on_actionAbout_triggered();
   void on_actionCreate_torrent_triggered();
   void on_actionWebsite_triggered() const;
   void on_actionBugReport_triggered() const;
@@ -182,7 +189,7 @@ protected:
 
 private:
   QIcon getSystrayIcon() const;
-  void selectWidget(int num);
+  void selectWidget(Widgets wNum);
 
 private:
   QFileSystemWatcher *executable_watcher;
@@ -195,7 +202,6 @@ private:
   status_bar* statusBar;
   QPointer<options_imp> options;
   QPointer<consoleDlg> console;
-  QPointer<about> aboutDlg;
   QPointer<TorrentCreatorDlg> createTorrentDlg;
   QPointer<downloadFromURL> downloadFromURLDialog;
   QPointer<QSystemTrayIcon> systrayIcon;

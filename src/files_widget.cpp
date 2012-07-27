@@ -97,7 +97,7 @@ files_widget::files_widget(QWidget *parent)
 
     connect(treeFiles, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(itemExpanded(QTreeWidgetItem*)));
     connect(treeFiles, SIGNAL(itemCollapsed(QTreeWidgetItem*)), this, SLOT(itemCollapsed(QTreeWidgetItem*)));
-    connect(treeFiles, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(itemClicked(QTreeWidgetItem*, int)));
+    connect(treeFiles, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 
     treeFiles->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(treeFiles, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayTreeMenu(const QPoint&)));
@@ -136,6 +136,9 @@ files_widget::files_widget(QWidget *parent)
     connect(filesExchSubdir,  SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(filesNotExchDir,  SIGNAL(triggered()), this, SLOT(notExchangeDir()));
     connect(filesNotExchSubdir,  SIGNAL(triggered()), this, SLOT(notExchangeSubdir()));
+
+    connect(Session::instance(), SIGNAL(addedTransfer(Transfer)), this, SLOT(addedTransfer(Transfer)));
+    connect(Session::instance(), SIGNAL(deletedTransfer(QString)), this, SLOT(deletedTransfer(QString)));
 
     tabWidget->hide();
 }
@@ -194,7 +197,7 @@ void files_widget::itemCollapsed(QTreeWidgetItem* item)
     }
 }
 
-void files_widget::itemClicked(QTreeWidgetItem* item, int column)
+void files_widget::currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* olditem)
 {
     for (int ii = model->rowCount()-1; ii >= 0; --ii)
         model->removeRow(ii);
@@ -319,14 +322,21 @@ void files_widget::tableItemChanged(QStandardItem* item)
         if (item->checkState() == Qt::Checked)
         {
             if (files.contains(fileName))
+            {
+                shareDir(dirPath, false);
                 files.removeOne(fileName);
+                shareDir(dirPath, true);
+            }
         }
         else
         {
             if (!files.contains(fileName))
+            {
+                shareDir(dirPath, false);
                 files.push_back(fileName);
-        }
-        shareDir(dirPath, true);
+                shareDir(dirPath, true);
+            }
+        }        
     }
 }
 
@@ -412,7 +422,7 @@ void files_widget::exchangeDir()
 
         setExchangeStatus(curItem, true);
         generateSharedTree();
-        itemClicked(curItem, 0);
+        currentItemChanged(curItem, NULL);
         while (curItem->parent() != allDirs)
         {
             curItem = curItem->parent();
@@ -437,7 +447,7 @@ void files_widget::exchangeSubdir()
         dirRules.insert(strPath, filesList);
         shareDir(strPath, true);
 
-        itemClicked(curItem, 0);
+        currentItemChanged(curItem, NULL);
         while (curItem->parent() != allDirs)
         {
             curItem = curItem->parent();
@@ -493,7 +503,7 @@ void files_widget::notExchangeDir()
     {
         setExchangeStatus(curItem, false);
         checkExchangeParentStatus(curItem);
-        itemClicked(curItem, 0);
+        currentItemChanged(curItem, NULL);
     }
     else if (isSharedDirTreeItem(curItem))
     {
@@ -530,7 +540,7 @@ void files_widget::notExchangeSubdir()
     {
         setChildExchangeStatus(curItem, false);
         checkExchangeParentStatus(curItem);
-        itemClicked(curItem, 0);
+        currentItemChanged(curItem, NULL);
     }
     else if (isSharedDirTreeItem(curItem))
     {
@@ -806,4 +816,53 @@ void files_widget::removeLastSlash(QString& dirPath)
 {
     if (dirPath.lastIndexOf('/') == (dirPath.length() - 1))
         dirPath = dirPath.left(dirPath.length() - 1);
+}
+
+void files_widget::addedTransfer(Transfer transfer)
+{
+    transferPath.insert(transfer.hash(), transfer.absolute_files_path().at(0));
+}
+
+void files_widget::deletedTransfer(QString hash)
+{
+    QTreeWidgetItem* curItem = treeFiles->currentItem();
+
+    if (!curItem || curItem == allDirs)
+        return;
+
+    if (curItem == allFiles)
+    {
+        currentItemChanged(curItem, NULL);
+        return;
+    }
+
+    if (!transferPath.contains(hash))
+        return;
+
+    QString filePath = transferPath.value(hash);
+    transferPath.remove(hash);
+
+    if (fileRules.contains(filePath))
+    {
+        fileRules.removeOne(filePath);
+        applyExchangeStatus(filePath, false);
+    }
+    else
+    {
+        QFileInfo file(filePath);
+        if (file.exists())
+        {
+            QString dirPath = file.absolutePath();
+            if (dirPath.lastIndexOf('/') != (dirPath.length() - 1))
+                dirPath += "/";
+            if (dirRules.contains(dirPath))
+            {
+                shareDir(dirPath, false);
+                dirRules[dirPath].append(file.fileName());
+                shareDir(dirPath, true);
+            }
+        }
+    }
+
+    currentItemChanged(curItem, NULL);
 }

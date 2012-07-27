@@ -68,7 +68,6 @@ INCLUDEPATH += $$PWD
 # Resource files
 RESOURCES += icons.qrc \
             lang.qrc \
-            about.qrc \
             Icons/emule/emule.qrc
 
 # Source code
@@ -97,8 +96,6 @@ include(qtlibed2k/qtlibed2k.pri)
 !nox {
   include(lineedit/lineedit.pri)
   include(properties/properties.pri)
-  include(searchengine/searchengine.pri)
-  #include(rss/rss.pri)
   include(torrentcreator/torrentcreator.pri)
   include(geoip/geoip.pri)
   include(powermanagement/powermanagement.pri)
@@ -136,7 +133,6 @@ nox {
               reverseresolution.h \
               ico.h \
               speedlimitdlg.h \
-              about_imp.h \
               previewselect.h \
               previewlistdelegate.h \
               downloadfromurldlg.h \
@@ -155,7 +151,7 @@ nox {
               login_dlg.h \
               search_widget_delegate.h \
               search_filter.h \
-	          messages_widget.h \
+	      messages_widget.h \
               add_friend.h \
               files_widget.h \
               status_bar.h 
@@ -197,7 +193,6 @@ nox {
   }
 
   FORMS += mainwindow.ui \
-           about.ui \
            preview.ui \
            login.ui \
            downloadfromurldlg.ui \
@@ -210,7 +205,7 @@ nox {
 	       status_widget.ui \
 	       search_widget.ui \
            login_dlg.ui \
-	       messages_widget.ui \
+	   messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
            status_bar.ui
