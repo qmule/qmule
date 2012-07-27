@@ -99,7 +99,7 @@ void ProgramUpdater::rssDownloadFinished(QNetworkReply *reply)
 {
   // Disconnect SIGNAL/SLOT
   disconnect(mp_manager, 0, this, 0);
-  qDebug("Finished downloading the new qBittorrent updates RSS");
+  qDebug("Finished downloading the new qMule updates RSS");
   QString new_version;
   if (!reply->error()) {
     qDebug("No download error, good.");

@@ -20,7 +20,7 @@ LIBS += -lboost_filesystem-mt
 LIBS += -framework Carbon -framework IOKit
 
 document_icon.path = Contents/Resources
-document_icon.files = Icons/qBitTorrentDocument.icns
+document_icon.files = Icons/qMuleDocument.icns
 
 QMAKE_BUNDLE_DATA += document_icon
 ICON = Icons/qmule_mac.icns
