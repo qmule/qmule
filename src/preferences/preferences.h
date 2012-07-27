@@ -762,25 +762,18 @@ public:
 
       for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
-          QString key = itr.key();
-          qDebug() << "save shared dirs " << key;
-          //key.remove(QRegExp("[:\\/]"));
+          setArrayIndex(index);
+          setValue("SharedDirectory", itr.key());
+          beginWriteArray("ExcludeFiles", itr.value().size());
 
-          if (!key.isEmpty())
+          for (int n = 0; n < itr.value().size(); ++n)
           {
-            setArrayIndex(index);
-            setValue("SharedDirectory", key);
-            beginWriteArray("ExcludeFiles", itr.value().size());
-
-            for (int n = 0; n < itr.value().size(); ++n)
-            {
-                setArrayIndex(n);
-                setValue("ExcludeFile", itr.value().at(n));
-            }
-
-            endArray();
-            ++index;
+              setArrayIndex(n);
+              setValue("ExcludeFile", itr.value().at(n));
           }
+
+          endArray();
+          ++index;
       }
 
       endArray();
