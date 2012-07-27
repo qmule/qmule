@@ -129,7 +129,6 @@ nox {
               torrentcontentmodelitem.h \
               torrentcontentfiltermodel.h \
               deletionconfirmationdlg.h \
-              statusbar.h \
               reverseresolution.h \
               ico.h \
               speedlimitdlg.h \
@@ -151,10 +150,11 @@ nox {
               login_dlg.h \
               search_widget_delegate.h \
               search_filter.h \
-	      messages_widget.h \
+	          messages_widget.h \
               add_friend.h \
               files_widget.h \
-              status_bar.h 
+              status_bar.h \
+			  clicked_label.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
