@@ -76,17 +76,6 @@
       </property>
       <item>
        <property name="text">
-        <string notr="true">eMule</string>
-       </property>
-       <property name="toolTip">
-        <string notr="true">eMule</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-       </property>
-      </item>
-      <item>
-       <property name="text">
         <string>Behavior</string>
        </property>
        <property name="toolTip">
@@ -134,6 +123,17 @@
       </item>
       <item>
        <property name="text">
+        <string notr="true">eMule</string>
+       </property>
+       <property name="toolTip">
+        <string notr="true">eMule</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>BitTorrent</string>
        </property>
        <property name="textAlignment">
@@ -168,156 +168,8 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
-      <widget class="QWidget" name="tabEmuleOption">
-       <layout class="QVBoxLayout" name="verticalLayout_30">
-        <item>
-         <widget class="QGroupBox" name="Username">
-          <property name="title">
-           <string>User name</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_31">
-           <item>
-            <widget class="QLineEdit" name="editUserName"/>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_8">
-          <property name="title">
-           <string>Authentication</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_13">
-           <item row="0" column="2">
-            <widget class="QLineEdit" name="editLogin"/>
-           </item>
-           <item row="1" column="2">
-            <widget class="QLineEdit" name="editPassword">
-             <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_24">
-             <property name="text">
-              <string>Password</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_23">
-             <property name="text">
-              <string>Login</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <spacer name="horizontalSpacer_16">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Minimum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_17">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Minimum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_9">
-          <property name="title">
-           <string>Connection settings</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_15">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_25">
-             <property name="text">
-              <string>Port</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QLineEdit" name="editPort"/>
-           </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_15">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_10">
-          <property name="title">
-           <string>Exchange files</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_32">
-           <item>
-            <widget class="QLineEdit" name="editExchaneDir"/>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkExchange">
-             <property name="text">
-              <string>Show own exchange files/directories</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
@@ -336,8 +188,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
-             <height>578</height>
+             <width>486</width>
+             <height>685</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -608,14 +460,21 @@
                      <item>
                       <widget class="QCheckBox" name="checkAssociateTorrents">
                        <property name="text">
-                        <string>Use qBittorrent for .torrent files</string>
+                        <string>Use qMule for .torrent files</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QCheckBox" name="checkAssociateMagnetLinks">
                        <property name="text">
-                        <string>Use qBittorrent for magnet links</string>
+                        <string>Use qMule for magnet links</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="checkAssociateecolls">
+                       <property name="text">
+                        <string>Use qMule for cmule collections</string>
                        </property>
                       </widget>
                      </item>
@@ -675,8 +534,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>404</width>
-             <height>835</height>
+             <width>500</width>
+             <height>930</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -1135,8 +994,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>365</width>
-             <height>463</height>
+             <width>486</width>
+             <height>522</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1579,8 +1438,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>315</width>
-             <height>407</height>
+             <width>486</width>
+             <height>456</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -1979,6 +1838,182 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabEmuleOption">
+       <layout class="QVBoxLayout" name="verticalLayout_30">
+        <item>
+         <widget class="QScrollArea" name="scrollArea_5">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_5">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>504</width>
+             <height>412</height>
+            </rect>
+           </property>
+           <widget class="QGroupBox" name="Username">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>10</y>
+              <width>461</width>
+              <height>63</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>User name</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_31">
+             <item>
+              <widget class="QLineEdit" name="editUserName"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_10">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>240</y>
+              <width>461</width>
+              <height>91</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Exchange files</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_32">
+             <item>
+              <widget class="QLineEdit" name="editExchaneDir"/>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkExchange">
+               <property name="text">
+                <string>Show own exchange files/directories</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_9">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>170</y>
+              <width>461</width>
+              <height>63</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Connection settings</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_15">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>Port</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLineEdit" name="editPort"/>
+             </item>
+             <item row="0" column="1">
+              <spacer name="horizontalSpacer_15">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_8">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>70</y>
+              <width>461</width>
+              <height>96</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Authentication</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="2">
+              <widget class="QLineEdit" name="editLogin"/>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLineEdit" name="editPassword">
+               <property name="echoMode">
+                <enum>QLineEdit::Password</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_24">
+               <property name="text">
+                <string>Password</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_23">
+               <property name="text">
+                <string>Login</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <spacer name="horizontalSpacer_16">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="1">
+              <spacer name="horizontalSpacer_17">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabOptionPage4">
        <layout class="QVBoxLayout" name="verticalLayout_15">
         <item>
@@ -1991,8 +2026,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>430</width>
-             <height>455</height>
+             <width>540</width>
+             <height>520</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2391,6 +2426,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabOptionPage7">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <layout class="QVBoxLayout">
         <item>
          <widget class="QScrollArea" name="scrollArea_7">
@@ -2402,8 +2440,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>333</width>
-             <height>494</height>
+             <width>486</width>
+             <height>551</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -2779,8 +2817,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>62</width>
-             <height>18</height>
+             <width>504</width>
+             <height>412</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>

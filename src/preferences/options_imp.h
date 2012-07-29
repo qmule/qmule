@@ -46,7 +46,7 @@ QT_END_NAMESPACE
 class options_imp : public QDialog, private Ui_Preferences {
   Q_OBJECT
 private:
-  enum Tabs {TAB_EMULE, TAB_UI, TAB_DOWNLOADS, TAB_CONNECTION, TAB_SPEED, TAB_BITTORRENT, TAB_WEBUI, TAB_ADVANCED};
+  enum Tabs {TAB_UI, TAB_DOWNLOADS, TAB_CONNECTION, TAB_SPEED, TAB_EMULE, TAB_BITTORRENT, TAB_WEBUI, TAB_ADVANCED};
 
 public:
   // Contructor / Destructor
