@@ -394,13 +394,18 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   qDebug("GUI Built");
 #ifdef Q_WS_WIN
-  if (!pref.neverCheckFileAssoc() && (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet())) {
+  if (!pref.neverCheckFileAssoc() &&
+          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
+  {
     if (QMessageBox::question(0, tr("Torrent file association"),
-                             tr("qMule is not the default application to open torrent files or Magnet links.\nDo you want to associate qMule to torrent files and Magnet links?"),
+                             tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
                              QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
       Preferences::setTorrentFileAssoc(true);
       Preferences::setMagnetLinkAssoc(true);
-    } else {
+      Preferences::setEmuleFileAssoc(true);
+    }
+    else
+    {
       pref.setNeverCheckFileAssoc();
     }
   }

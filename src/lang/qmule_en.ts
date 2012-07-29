@@ -1236,8 +1236,8 @@ No further notices will be issued.</source>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="290"/>
-        <source>qMule is not the default application to open torrent files or Magnet links.
-Do you want to associate qMule to torrent files and Magnet links?</source>
+        <source>qMule is not the default application to open torrent files, Magnet links or eMule collections.
+Do you want to associate qMule to torrent files, Magnet links and eMule collections?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

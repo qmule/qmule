@@ -1183,11 +1183,11 @@ Are you sure you want to quit qMule?</source>
         <translation type="obsolete">Привязки торрент-файлов</translation>
     </message>
     <message>
-        <source>qMule is not the default application to open torrent files or Magnet links.
-Do you want to associate qMule to torrent files and Magnet links?</source>
+        <source>qMule is not the default application to open torrent files, Magnet links or eMule collections.
+Do you want to associate qMule to torrent files, Magnet links and eMule collections?</source>
         <translatorcomment>Может лучше наоборот, ссылки с файлами к qMule привязывать?</translatorcomment>
-        <translation type="obsolete">qMule сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
-Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qMule?</translation>
+        <translation type="obsolete">qMule сейчас не является приложением по умолчанию для открытия торрент-файлов, Magnet-ссылок или eMule коллекций.
+Хотите ли вы открывать торрент-файлы, Magnet-ссылки и eMule коллекции с помощью qMule?</translation>
     </message>
     <message>
         <source>Yes</source>
