@@ -1192,31 +1192,54 @@ void MainWindow::processParams(const QString& params_str) {
   processParams(params_str.split("|", QString::SkipEmptyParts));
 }
 
-void MainWindow::processParams(const QStringList& params) {
-  Preferences pref;
+void MainWindow::processParams(const QStringList& params)
+{
+  Preferences pref;    
   const bool useTorrentAdditionDialog = pref.useAdditionDialog();
-  foreach (QString param, params) {
+
+  foreach (QString param, params)
+  {
     param = param.trimmed();
-    if (misc::isUrl(param)) {
+
+    if (misc::isUrl(param))
+    {
       Session::instance()->downloadFromUrl(param);
-    }else{
-      if (param.startsWith("bc://bt/", Qt::CaseInsensitive)) {
+    }
+    else
+    {
+      if (param.startsWith("bc://bt/", Qt::CaseInsensitive))
+      {
         qDebug("Converting bc link to magnet link");
         param = misc::bcLinkToMagnet(param);
       }
-      if (param.startsWith("magnet:", Qt::CaseInsensitive)) {
-        if (useTorrentAdditionDialog) {
+
+      if (param.startsWith("magnet:", Qt::CaseInsensitive))
+      {
+        if (useTorrentAdditionDialog)
+        {
           torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
           dialog->showLoadMagnetURI(param);
-        } else {
+        }
+        else
+        {
           Session::instance()->addLink(param);
         }
-      } else {
-        if (useTorrentAdditionDialog) {
-          torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
-          dialog->showLoad(param);
-        }else{
-          Session::instance()->addTorrent(param);
+      }
+      else if (param.startsWith("ed2k://", Qt::CaseInsensitive))
+      {
+          Session::instance()->addLink(param);
+      }
+      else
+      {
+        // for torrent we run dialog when it option activated
+        if (useTorrentAdditionDialog && !param.endsWith(".emulecollection"))
+        {
+            torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
+            dialog->showLoad(param);
+        }
+        else
+        {
+          Session::instance()->addTransferFromFile(param);
         }
       }
     }

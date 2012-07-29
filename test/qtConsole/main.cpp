@@ -4,12 +4,12 @@
 #include <QDir>
 #include <QSettings>
 #include <QFileInfo>
-#include <shlobj.h>
-#include <windows.h>
-#include <PowrProf.h>
 #include <libed2k/is_crypto.hpp>
+#ifdef Q_WS_WIN
+#include <PowrProf.h>
 #include "windows.h"
 #include "Shlobj.h"
+#endif
 
 QString getUserIDString()
 {
@@ -29,14 +29,21 @@ QString getUserIDString()
   return uid;
 }
 
+#ifndef Q_WS_WIN
+const int CSIDL_LOCAL_APPDATA = 1;
+const int CSIDL_APPDATA = 2;
+const int CSIDL_PERSONAL = 3;
+#endif
+
 QString ShellGetFolderPath(int iCSIDL)
 {
     QString str;
+#ifdef Q_WS_WIN
     TCHAR szPath[MAX_PATH];
 
     if ( SHGetFolderPath(NULL, iCSIDL, NULL, SHGFP_TYPE_CURRENT, szPath) == S_OK )
         str = QString::fromWCharArray(szPath);
-
+#endif
     return str;
 }
 
@@ -141,7 +148,7 @@ void saveSharedDirs(const shared_entry& se)
 
     settings.beginWriteArray("Preferences/eDonkey/SharedDirectories");
     settings.remove("Preferences/eDonkey/SharedDirectories");
-    for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+    for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
     {
         settings.setArrayIndex(index);
         settings.setValue("SD", itr.key());
@@ -151,7 +158,7 @@ void saveSharedDirs(const shared_entry& se)
     settings.endArray();
 
     // generate directory excludes
-    for (shared_entry::iterator itr = se.begin(); itr != se.end(); ++itr)
+    for (shared_entry::const_iterator itr = se.begin(); itr != se.end(); ++itr)
     {
         if (!itr.value().empty())
         {
@@ -256,6 +263,15 @@ QString emuleAuthPassword()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QStringList al = a.arguments();
+    al.removeFirst();
+
+    if (!al.filter(QRegExp("^-+help$")).isEmpty())
+    {
+        qDebug() << " this is help message";
+    }
+
+    qDebug() << al.filter(QRegExp("^[^--]"));
 
     qDebug() << "nick: " << emuleNick()
              << " idir: " << emuleIncomingDir()

@@ -73,7 +73,12 @@ public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);
+
+    /**
+      * select appropriate session and run command on it
+     */
     virtual Transfer addLink(QString strLink, bool resumed = false);
+    virtual void addTransferFromFile(const QString& filename);
 
 signals:
     void addedTransfer(Transfer t);

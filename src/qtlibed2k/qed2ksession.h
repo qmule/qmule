@@ -115,6 +115,7 @@ public slots:
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);	
     virtual Transfer addLink(QString strLink, bool resumed = false);
+    virtual void addTransferFromFile(const QString& filename);
 
 	/**
 	  * number parameters were ignored on zero value

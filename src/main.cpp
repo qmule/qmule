@@ -126,23 +126,22 @@ int main(int argc, char *argv[]) {
   SessionApplication app("qMule-"+uid, argc, argv);
 #endif
 
+  QStringList al = app.arguments();
+  al.removeFirst();
+  QStringList dataList = al.filter(QRegExp("^[^-]"));
+
   // Check if qMule is already running for this user
-  if (app.isRunning()) {
+  if (app.isRunning())
+  {
     qDebug("qMule is already running for this user.");
-    //Pass program parameters if any
-    QString message;
-    for (int a = 1; a < argc; ++a) {
-      QString p = QString::fromLocal8Bit(argv[a]);
-      if (p.startsWith("--")) continue;
-      message += p;
-      if (a < argc-1)
-        message += "|";
-    }
-    if (!message.isEmpty()) {
+
+    if (!dataList.isEmpty())
+    {
       qDebug("Passing program parameters to running instance...");
-      qDebug("Message: %s", qPrintable(message));
-      app.sendMessage(message);
+      qDebug() << dataList;
+      app.sendMessage(dataList.join("|"));
     }
+
     return 0;
   }
 
@@ -196,43 +195,28 @@ int main(int argc, char *argv[]) {
 #endif
   app.setApplicationName(QString::fromUtf8("qMule"));
 
-  // Check for executable parameters
-  if (argc > 1) {
-    if (QString::fromLocal8Bit(argv[1]) == QString::fromUtf8("--version")) {
-      std::cout << "qMule " << VERSION << '\n';
-      return 0;
-    }
-    if (QString::fromLocal8Bit(argv[1]) == QString::fromUtf8("--help")) {
+  if (!al.filter(QRegExp("^-+help$")).isEmpty())
+  {
       UsageDisplay::displayUsage(argv[0]);
       return 0;
-    }
+  }
 
-    for (int i=1; i<argc; ++i) {
-#ifndef DISABLE_GUI
-      if (QString::fromLocal8Bit(argv[i]) == QString::fromUtf8("--no-splash")) {
-        no_splash = true;
-      } else {
-#endif
-        if (QString::fromLocal8Bit(argv[i]).startsWith("--webui-port=")) {
-          QStringList parts = QString::fromLocal8Bit(argv[i]).split("=");
-          if (parts.size() == 2) {
-            bool ok = false;
-            int new_port = parts.last().toInt(&ok);
-            if (ok && new_port > 0 && new_port <= 65535) {
-              Preferences().setWebUiPort(new_port);
-            }
-          }
-        }
-#ifndef DISABLE_GUI
-      }
-#endif
-    }
+  if (!al.filter(QRegExp("^-+version$")).isEmpty())
+  {
+      std::cout << "qMule " << VERSION << '\n';
+      return 0;
   }
 
 #ifndef DISABLE_GUI
-  if (pref.isSlashScreenDisabled()) {
+  no_splash = !al.filter(QRegExp("^-+no-splash$")).isEmpty();
+#endif
+
+#ifndef DISABLE_GUI
+  if (pref.isSlashScreenDisabled())
+  {
     no_splash = true;
   }
+
   QSplashScreen *splash = 0;
   if (!no_splash) {
     QPixmap splash_img(":/Icons/skin/Logo.png");
@@ -268,24 +252,15 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, sigintHandler);
   signal(SIGSEGV, sigsegvHandler);
 #endif
-  // Read torrents given on command line
-  QStringList torrentCmdLine = app.arguments();
-  // Remove first argument (program name)
-  torrentCmdLine.removeFirst();
-#ifndef QT_NO_DEBUG_OUTPUT
-  foreach (const QString &argument, torrentCmdLine) {
-    qDebug() << "Command line argument:" << argument;
-  }
-#endif
 
 #ifndef DISABLE_GUI
-  MainWindow window(0, torrentCmdLine);
+  MainWindow window(0, dataList);
   QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
-                   &window, SLOT(processParams(const QString&)));
+                   &window, SLOT(processParams(const QString&)));  
   app.setActivationWindow(&window);
 #else
   // Load Headless class
-  HeadlessLoader loader(torrentCmdLine);
+  HeadlessLoader loader(dataList);
   QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
                    &loader, SLOT(processParams(const QString&)));
 #endif

@@ -112,6 +112,7 @@ public:
   virtual void readAlerts();
 
 public slots:
+  void addTransferFromFile(const QString& filename);
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
   Transfer addLink(QString strLink, bool resumed=false);
   void loadSessionState();

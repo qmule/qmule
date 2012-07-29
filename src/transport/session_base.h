@@ -52,6 +52,7 @@ public:
     virtual void saveTempFastResumeData() = 0;
     virtual void saveFastResumeData() = 0;
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
+    virtual void addTransferFromFile(const QString& filename) = 0;
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -136,6 +137,7 @@ public:
     void saveFastResumeData() { DEFER0(saveFastResumeData); }
 
     Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
+    void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
 
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 

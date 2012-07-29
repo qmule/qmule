@@ -321,6 +321,25 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
     return QED2KHandle();
 }
 
+void QED2KSession::addTransferFromFile(const QString& filename)
+{
+    if (QFile::exists(filename))
+    {
+        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(filename.toLocal8Bit().constData());
+
+        foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
+        {
+            QString filepath = QDir(Preferences().getIncomingDirectory()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+            qDebug() << "add transfer " << filepath;
+            libed2k::add_transfer_params atp;
+            atp.file_hash = ece.m_filehash;
+            atp.file_path = filepath.toUtf8();
+            atp.file_size = ece.m_filesize;
+            delegate()->add_transfer(atp);
+        }
+    }
+}
+
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
 
 void QED2KSession::searchFiles(const QString& strQuery,

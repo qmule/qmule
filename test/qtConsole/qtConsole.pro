@@ -16,9 +16,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp
-INCLUDEPATH += $$(LIBED2K_ROOT)\\include $$(CRYPTOPP_ROOT)
-LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 
-LIBS += -L$$(LIBED2K_ROOT)\\win32\\debug libed2kd.lib advapi32.lib  cryptlib.lib shell32.lib
+win32{
+  	INCLUDEPATH += $$(LIBED2K_ROOT)\\include $$(CRYPTOPP_ROOT)
+	LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 
+	LIBS += -L$$(LIBED2K_ROOT)\\win32\\debug libed2kd.lib advapi32.lib  cryptlib.lib shell32.lib
+}
+
+unix:!macx {
+    INCLUDEPATH += $$(LIBED2K_ROOT)/include
+	LIBS += -L$$(LIBED2K_ROOT)/lib -led2k -lcrypto++
+  }
+
+win32{
+
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += BOOST_ASIO_HASH_MAP_BUCKETS=1021
 DEFINES += BOOST_EXCEPTION_DISABLE
@@ -38,3 +48,4 @@ DEFINES += _WIN32_WINNT=0x0500
 DEFINES += _WIN32_IE=0x0500
 DEFINES += __USE_W32_SOCKETS
 DEFINES += WITH_SHIPPED_GEOIP_H
+}

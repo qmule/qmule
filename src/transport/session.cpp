@@ -310,6 +310,18 @@ Transfer Session::addLink(QString strLink, bool resumed)
    return m_btSession.addLink(strLink, resumed);
 }
 
+void Session::addTransferFromFile(const QString& filename)
+{
+    if (filename.endsWith(".emulecollection"))
+    {
+        m_edSession.addTransferFromFile(filename);
+    }
+    else
+    {
+        m_btSession.addTransferFromFile(filename);
+    }
+}
+
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }
 void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Transfer(h)); }
 void Session::on_resumedTorrent(const QTorrentHandle& h) { emit resumedTransfer(Transfer(h)); }

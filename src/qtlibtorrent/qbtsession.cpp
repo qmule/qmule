@@ -980,6 +980,11 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
   return h;
 }
 
+void QBtSession::addTransferFromFile(const QString& filename)
+{
+    addTorrent(filename);
+}
+
 // Add a torrent to the Bittorrent session
 QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString from_url, bool resumed) {
   QTorrentHandle h;
