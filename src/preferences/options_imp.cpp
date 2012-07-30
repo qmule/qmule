@@ -246,9 +246,11 @@ options_imp::options_imp(QWidget *parent):
   connect(editLogin, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(editPort, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editExchaneDir, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(checkExchange, SIGNAL(stateChanged(int)), SLOT(enableApplyButton()));
+
+  //eMule tab
+  connect(emuleSpinPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   // Disable apply Button
   applyButton->setEnabled(false);
   // Tab selection mecanism
@@ -505,7 +507,24 @@ void options_imp::saveOptions() {
   pref.setISLogin(editLogin->text());
   pref.setISPassword(editPassword->text());
   pref.setNick(editUserName->text());
-  pref.setListenPort(editPort->text().toInt());
+
+  // temporary hack - emule port can't be equal torrent port
+  int nCorrect = 0;
+  if (emuleSpinPort->value() == spinPort->value())
+  {
+      if (emuleSpinPort->value() == emuleSpinPort->maximum())
+      {
+          nCorrect = -1;
+      }
+      else
+      {
+        nCorrect = 1;
+      }
+  }
+
+  int nEmuleSpinPort = emuleSpinPort->value() + nCorrect;
+
+  pref.setListenPort(nEmuleSpinPort);
   pref.setIncomingDirectory(editExchaneDir->text());
   pref.setShowSharedFiles(checkExchange->isChecked());
   pref.setShowSharedDirectories(checkExchange->isChecked());
@@ -774,7 +793,7 @@ void options_imp::loadOptions() {
   editLogin->setText(pref.getISLogin());
   editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.nick());
-  editPort->setText(QString::number(pref.listenPort()));
+  emuleSpinPort->setValue(pref.listenPort());
   editExchaneDir->setText(pref.getIncomingDirectory());
   checkExchange->setChecked(pref.isShowSharedDirectories());
 
@@ -788,9 +807,33 @@ int options_imp::getPort() const {
   return spinPort->value();
 }
 
-void options_imp::on_randomButton_clicked() {
-  // Range [1024: 65535]
-  spinPort->setValue(rand() % 64512 + 1024);
+int options_imp::getEmulePort() const
+{
+    return emuleSpinPort->value();
+}
+
+void options_imp::on_randomButton_clicked()
+{
+    int nPort = emuleSpinPort->value();
+
+    while(nPort == emuleSpinPort->value())
+    {
+        nPort = rand() % 64512 + 1024;
+    }
+
+    spinPort->setValue(nPort);
+}
+
+void options_imp::on_emuleRandomButton_clicked()
+{
+    // Range [1024: 65535]
+    int nPort = spinPort->value();
+    while(nPort == spinPort->value())
+    {
+        nPort = rand() % 64512 + 1024;
+    }
+
+    emuleSpinPort->setValue(nPort);
 }
 
 int options_imp::getEncryptionSetting() const {
