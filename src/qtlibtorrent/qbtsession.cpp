@@ -295,7 +295,7 @@ void QBtSession::configureSession() {
   if (old_listenPort != new_listenPort) {
     qDebug("Session port changes in program preferences: %d -> %d", old_listenPort, new_listenPort);
     setListeningPort(new_listenPort);
-    addConsoleMessage(tr("qMule is bound to port: TCP/%1", "e.g: qBittorrent is bound to port: 6881").arg(QString::number(getListenPort())));
+    addConsoleMessage(tr("qMule is bound to port: TCP/%1", "e.g: qMule is bound to port: 6881").arg(QString::number(getListenPort())));
   }
 
   // Downloads
@@ -2210,7 +2210,7 @@ void QBtSession::readAlerts() {
             } else if (shutdown) {
               confirm_msg = tr("The computer will now be switched off unless you cancel within the next 15 seconds...");
             } else {
-              confirm_msg = tr("qBittorrent will now exit unless you cancel within the next 15 seconds...");
+              confirm_msg = tr("qMule will now exit unless you cancel within the next 15 seconds...");
             }
             if (!ShutdownConfirmDlg::askForConfirmation(confirm_msg))
               return;

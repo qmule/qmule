@@ -137,7 +137,7 @@ protected slots:
   void handleDownloadFromUrlFailure(QString, QString) const;
   void createSystrayDelayed();
   void tab_changed(int);
-  void on_actionLock_qBittorrent_triggered();
+  void on_actionLock_qMule_triggered();
   void defineUILockPassword();
   bool unlockUI();
   void notifyOfUpdate(QString);
@@ -269,7 +269,7 @@ private slots:
     void on_action_Import_Torrent_triggered();
     void on_actionDonate_money_triggered();
     void on_actionExecution_Logs_triggered(bool checked);
-    void on_actionAutoExit_qBittorrent_toggled(bool );
+    void on_actionAutoExit_qMule_toggled(bool );
     void on_actionAutoSuspend_system_toggled(bool );
     void on_actionAutoShutdown_system_toggled(bool );
     // Check for active torrents and set preventing from suspend state
