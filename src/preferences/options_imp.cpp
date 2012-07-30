@@ -151,6 +151,7 @@ options_imp::options_imp(QWidget *parent):
 #ifdef Q_WS_WIN
   connect(checkAssociateTorrents, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAssociateMagnetLinks, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(checkAssociateecolls, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
 #endif
   // Downloads tab
   connect(textSavePath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
@@ -379,6 +380,7 @@ void options_imp::saveOptions() {
   // Windows: file association settings
   Preferences::setTorrentFileAssoc(checkAssociateTorrents->isChecked());
   Preferences::setMagnetLinkAssoc(checkAssociateMagnetLinks->isChecked());
+  Preferences::setEmuleFileAssoc(checkAssociateecolls->isChecked());
 #endif
   // End General preferences
 
@@ -560,6 +562,7 @@ void options_imp::loadOptions() {
   // Windows: file association settings
   checkAssociateTorrents->setChecked(Preferences::isTorrentFileAssocSet());
   checkAssociateMagnetLinks->setChecked(Preferences::isMagnetLinkAssocSet());
+  checkAssociateecolls->setChecked(Preferences::isEmuleFileAssocSet());
 #endif
   // End General preferences
   // Downloads preferences
