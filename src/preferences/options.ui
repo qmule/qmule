@@ -168,7 +168,7 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -381,7 +381,7 @@
                <item>
                 <widget class="QCheckBox" name="checkStartMinimized">
                  <property name="text">
-                  <string>Start qBittorrent minimized</string>
+                  <string>Start qMule minimized</string>
                  </property>
                 </widget>
                </item>
@@ -398,7 +398,7 @@
                <item>
                 <widget class="QGroupBox" name="checkShowSystray">
                  <property name="title">
-                  <string>Show qBittorrent in notification area</string>
+                  <string>Show qMule in notification area</string>
                  </property>
                  <property name="checkable">
                   <bool>true</bool>
@@ -407,7 +407,7 @@
                   <item>
                    <widget class="QCheckBox" name="checkMinimizeToSysTray">
                     <property name="text">
-                     <string>Minimize qBittorrent to notification area</string>
+                     <string>Minimize qMule to notification area</string>
                     </property>
                     <property name="checked">
                      <bool>false</bool>
@@ -417,7 +417,7 @@
                   <item>
                    <widget class="QCheckBox" name="checkCloseToSystray">
                     <property name="text">
-                     <string comment="i.e: The systray tray icon will still be visible when closing the main window.">Close qBittorrent to notification area</string>
+                     <string comment="i.e: The systray tray icon will still be visible when closing the main window.">Close qMule to notification area</string>
                     </property>
                    </widget>
                   </item>
@@ -2027,27 +2027,17 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_15">
-              <item>
-               <widget class="QGroupBox" name="groupBox_10">
-                <property name="title">
-                 <string>Exchange files</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_32">
-                 <item>
-                  <widget class="QLineEdit" name="editExchaneDir"/>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="checkExchange">
-                   <property name="text">
-                    <string>Show own exchange files/directories</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>

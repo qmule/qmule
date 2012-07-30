@@ -245,9 +245,7 @@ options_imp::options_imp(QWidget *parent):
   connect(DNSPasswordTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editLogin, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(editExchaneDir, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(checkExchange, SIGNAL(stateChanged(int)), SLOT(enableApplyButton()));
+  connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));  
 
   //eMule tab
   connect(emuleSpinPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
@@ -525,9 +523,8 @@ void options_imp::saveOptions() {
   int nEmuleSpinPort = emuleSpinPort->value() + nCorrect;
 
   pref.setListenPort(nEmuleSpinPort);
-  pref.setIncomingDirectory(editExchaneDir->text());
-  pref.setShowSharedFiles(checkExchange->isChecked());
-  pref.setShowSharedDirectories(checkExchange->isChecked());
+  //pref.setShowSharedFiles(checkExchange->isChecked());
+  //pref.setShowSharedDirectories(checkExchange->isChecked());
 
   // End Emule
   // End preferences
@@ -794,8 +791,6 @@ void options_imp::loadOptions() {
   editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.nick());
   emuleSpinPort->setValue(pref.listenPort());
-  editExchaneDir->setText(pref.getIncomingDirectory());
-  checkExchange->setChecked(pref.isShowSharedDirectories());
 
   // Random stuff
   srand(time(0));
