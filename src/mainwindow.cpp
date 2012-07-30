@@ -1712,14 +1712,33 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     QString str(strError);
     QString result = strRes;
 
+    // add quotes
     QString sample("Message type=");
     int nPos = result.indexOf(sample);
+
     if (nPos >= 0)
     {
         nPos += sample.length();
         result = result.left(nPos) + "\"" + result.mid(nPos , 1) + "\"" + result.right(result.size() - nPos - 1);
     }
-    //QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");
+
+    // remove all data previous xml header
+    int pos = result.indexOf("<?xml", 0, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(0, pos);
+    }
+
+    // remove all data after xml document end
+    pos = result.lastIndexOf("</DATA>", -1, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(pos + 7, result.length() - pos - 7);
+    }
+
+    //QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");    
     QDomDocument doc;
     QString errorStr;
     int errorLine;
@@ -1727,6 +1746,10 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
 
     if (!doc.setContent(result, true, &errorStr, &errorLine, &errorColumn))
     {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Authentication error, incorrect answer: " ) + result);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
         return;
     }
 
