@@ -78,6 +78,7 @@ private slots:
   void on_browseSaveDirButton_clicked();
   void on_browseTempDirButton_clicked();
   void on_randomButton_clicked();
+  void on_emuleRandomButton_clicked();
   void on_addScanFolderButton_clicked();
   void on_removeScanFolderButton_clicked();
   void on_btnWebUiCrt_clicked();
@@ -112,6 +113,7 @@ private:
   int getActionOnDblClOnTorrentFn() const;
   // Connection options
   int getPort() const;
+  int getEmulePort() const;
   bool isUPnPEnabled() const;
   QPair<int,int> getGlobalBandwidthLimits() const;
   // Bittorrent options

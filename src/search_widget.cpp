@@ -1022,7 +1022,7 @@ void search_widget::download()
         if (bDirs && iter->parent() == treeResult->rootIndex())
             continue;
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-        QString filepath = QDir(Preferences().getIncomingDirectory()).filePath(filename);
+        QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
 
         libed2k::add_transfer_params params;
         params.file_hash = libed2k::md4_hash::fromString(selected_data(treeResult, SWDelegate::SW_ID, *iter).toString().toStdString());

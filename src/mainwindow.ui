@@ -215,12 +215,12 @@
     <string>Search &amp;engine</string>
    </property>
   </action>
-  <action name="actionLock_qBittorrent">
+  <action name="actionLock_qMule">
    <property name="text">
-    <string>Lock qBittorrent</string>
+    <string>Lock qMule</string>
    </property>
    <property name="toolTip">
-    <string>Lock qBittorrent</string>
+    <string>Lock qMule</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
@@ -232,14 +232,6 @@
    </property>
    <property name="toolTip">
     <string>Import torrent...</string>
-   </property>
-  </action>
-  <action name="actionDonate_money">
-   <property name="text">
-    <string>Donate money</string>
-   </property>
-   <property name="toolTip">
-    <string>If you like qBittorrent, please donate!</string>
    </property>
   </action>
   <action name="actionStart_All">
@@ -263,12 +255,15 @@
     <string>Execution Log</string>
    </property>
   </action>
-  <action name="actionAutoExit_qBittorrent">
+  <action name="actionAutoExit_qMule">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Exit qBittorrent</string>
+    <string>Exit qMule</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit qMule</string>
    </property>
   </action>
   <action name="actionAutoSuspend_system">
@@ -414,7 +409,6 @@
   </action>
  </widget>
  <resources>
-  <include location="icons.qrc"/>
   <include location="Icons/emule/emule.qrc"/>
  </resources>
  <connections/>

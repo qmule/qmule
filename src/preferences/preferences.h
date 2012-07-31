@@ -86,7 +86,7 @@ public:
           saveSharedFiles(misc::migrationSharedFiles());
           setListenPort(misc::migrationPort(4662));
           setNick(misc::migrationNick(misc::getUserName()));
-          setIncomingDirectory(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
+          setSavePath(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
           setKnownFile(misc::emuleConfig("known.met"));
           setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
       }
@@ -867,17 +867,6 @@ public:
   {
       setValue(QString::fromUtf8("Preferences/eDonkey/Nick"), nick);
   }
-
-  QString getIncomingDirectory() const
-  {
-      return value(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), misc::QDesktopServicesDownloadLocation()).toString();
-  }
-
-  void setIncomingDirectory(const QString& dir)
-  {
-      setValue(QString::fromUtf8("Preferences/eDonkey/IncomingDir"), dir);
-  }
-
 
   // IP Filter
   bool isFilteringEnabled() const {
