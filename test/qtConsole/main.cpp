@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QFileInfo>
+
 #include <libed2k/is_crypto.hpp>
 #ifdef Q_WS_WIN
 #include <PowrProf.h>
@@ -299,6 +300,22 @@ int main(int argc, char *argv[])
     qDebug() << "CSIDL_LOCAL_APPDATA " << ShellGetFolderPath(CSIDL_LOCAL_APPDATA);
     qDebug() << "CSIDL_APPDATA " << ShellGetFolderPath(CSIDL_APPDATA);
     qDebug() << "CSIDL_PERSONAL " << ShellGetFolderPath(CSIDL_PERSONAL);
+    QString result("FFGHsdAlex<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>< / br>");
+    int pos = result.indexOf("<?xml", 0, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(0, pos);
+    }
+
+    pos = result.lastIndexOf("</DATA>", -1, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(pos + 7, result.length() - pos - 7);
+    }
+
+    qDebug() << result;
 
     QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");
 

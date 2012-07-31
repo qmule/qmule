@@ -155,10 +155,9 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionDecreasePriority->setIcon(IconProvider::instance()->getIcon("go-down"));
   actionDelete->setIcon(IconProvider::instance()->getIcon("list-remove"));
   actionDocumentation->setIcon(IconProvider::instance()->getIcon("help-contents"));
-  actionDonate_money->setIcon(IconProvider::instance()->getIcon("wallet-open"));
   actionExit->setIcon(IconProvider::instance()->getIcon("application-exit"));
   actionIncreasePriority->setIcon(IconProvider::instance()->getIcon("go-up"));
-  actionLock_qBittorrent->setIcon(IconProvider::instance()->getIcon("object-locked"));
+  actionLock_qMule->setIcon(IconProvider::instance()->getIcon("object-locked"));
   actionPause->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
   actionPause_All->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
   actionStart->setIcon(IconProvider::instance()->getIcon("media-playback-start"));
@@ -175,7 +174,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   QMenu *lockMenu = new QMenu(this);
   QAction *defineUiLockPasswdAct = lockMenu->addAction(tr("Set the password..."));
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
-  actionLock_qBittorrent->setMenu(lockMenu);
+  actionLock_qMule->setMenu(lockMenu);
   // Creating Bittorrent session
   connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)),
           this, SLOT(fullDiskError(Transfer, QString)));
@@ -342,7 +341,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   QActionGroup * autoShutdownGroup = new QActionGroup(this);
   autoShutdownGroup->setExclusive(true);
   autoShutdownGroup->addAction(actionAutoShutdown_Disabled);
-  autoShutdownGroup->addAction(actionAutoExit_qBittorrent);
+  autoShutdownGroup->addAction(actionAutoExit_qMule);
   autoShutdownGroup->addAction(actionAutoShutdown_system);
   autoShutdownGroup->addAction(actionAutoSuspend_system);
 #if !defined(Q_WS_X11) || defined(QT_DBUS_LIB)
@@ -352,7 +351,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionAutoShutdown_system->setDisabled(true);
   actionAutoSuspend_system->setDisabled(true);
 #endif
-  actionAutoExit_qBittorrent->setChecked(pref.shutdownqBTWhenDownloadsComplete());
+  actionAutoExit_qMule->setChecked(pref.shutdownqBTWhenDownloadsComplete());
 
   if (!autoShutdownGroup->checkedAction())
     actionAutoShutdown_Disabled->setChecked(true);
@@ -524,7 +523,7 @@ void MainWindow::defineUILockPassword() {
   }
 }
 
-void MainWindow::on_actionLock_qBittorrent_triggered() {
+void MainWindow::on_actionLock_qMule_triggered() {
   Preferences pref;
   // Check if there is a password
   if (pref.getUILockPasswordMD5().isEmpty()) {
@@ -1280,7 +1279,7 @@ void MainWindow::loadPreferences(bool configure_session)
   Session::instance()->addConsoleMessage(tr("Options were saved successfully."));
   const Preferences pref;
   const bool newSystrayIntegration = pref.systrayIntegration();
-  actionLock_qBittorrent->setVisible(newSystrayIntegration);
+  actionLock_qMule->setVisible(newSystrayIntegration);
   if (newSystrayIntegration != (systrayIcon!=0)) {
     if (newSystrayIntegration) {
       // create the trayicon
@@ -1655,7 +1654,7 @@ void MainWindow::on_actionExecution_Logs_triggered(bool checked)
   Preferences().setExecutionLogEnabled(checked);
 }
 
-void MainWindow::on_actionAutoExit_qBittorrent_toggled(bool enabled)
+void MainWindow::on_actionAutoExit_qMule_toggled(bool enabled)
 {
   qDebug() << Q_FUNC_INFO << enabled;
   Preferences().setShutdownqBTWhenDownloadsComplete(enabled);
@@ -1717,14 +1716,33 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     QString str(strError);
     QString result = strRes;
 
+    // add quotes
     QString sample("Message type=");
     int nPos = result.indexOf(sample);
+
     if (nPos >= 0)
     {
         nPos += sample.length();
         result = result.left(nPos) + "\"" + result.mid(nPos , 1) + "\"" + result.right(result.size() - nPos - 1);
     }
-    //QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");
+
+    // remove all data previous xml header
+    int pos = result.indexOf("<?xml", 0, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(0, pos);
+    }
+
+    // remove all data after xml document end
+    pos = result.lastIndexOf("</DATA>", -1, Qt::CaseInsensitive);
+
+    if (pos != -1)
+    {
+        result.remove(pos + 7, result.length() - pos - 7);
+    }
+
+    //QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");    
     QDomDocument doc;
     QString errorStr;
     int errorLine;
@@ -1732,6 +1750,10 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
 
     if (!doc.setContent(result, true, &errorStr, &errorLine, &errorColumn))
     {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Authentication error, incorrect answer: " ) + result);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
         return;
     }
 

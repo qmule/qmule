@@ -310,7 +310,7 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
     if (ece.defined())
     {
         qDebug("Link is correct, add transfer");
-        QString filepath = QDir(Preferences().getIncomingDirectory()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+        QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8();
@@ -329,7 +329,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 
         foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
         {
-            QString filepath = QDir(Preferences().getIncomingDirectory()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+            QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
             qDebug() << "add transfer " << filepath;
             libed2k::add_transfer_params atp;
             atp.file_hash = ece.m_filehash;

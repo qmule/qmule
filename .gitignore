@@ -1,6 +1,5 @@
 src/geoip/GeoIP.dat
-src/qbittorrent
-qbittorrent.pro.user
+src/qmule
 conf.pri
 Makefile
 *.pyc
