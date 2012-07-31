@@ -316,8 +316,5 @@ int main(int argc, char *argv[])
     }
 
     qDebug() << result;
-
-    QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");
-
     return a.exec();
 }
