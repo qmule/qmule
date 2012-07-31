@@ -455,6 +455,11 @@ void QED2KSession::readAlerts()
                     p2->m_np, md4toQString(p2->m_hash),
                     QString::fromUtf8(p2->m_strDirectory.c_str(), p2->m_strDirectory.size()), vRes);
             }
+            else if (libed2k::ismod_shared_directory_files_alert* p2 =
+                     dynamic_cast<libed2k::ismod_shared_directory_files_alert*>(p))
+            {
+                emit peerIsModSharedFiles(p2->m_np, md4toQString(p2->m_hash), md4toQString(p2->m_dir_hash), vRes);
+            }
             else
             {
                 emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);

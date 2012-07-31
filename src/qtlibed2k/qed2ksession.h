@@ -177,6 +177,9 @@ signals:
     void peerSharedFiles(const libed2k::net_identifier& np, const QString& hash,
                          const std::vector<QED2KSearchResultEntry>& vRes);
 
+    void peerIsModSharedFiles(const libed2k::net_identifier& np, const QString& hash, const QString& dir_hash,
+                              const std::vector<QED2KSearchResultEntry>& vRes);
+
     /**
       * requested peers shared directories
      */
