@@ -249,6 +249,8 @@ options_imp::options_imp(QWidget *parent):
 
   //eMule tab
   connect(emuleSpinPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
+  connect(checkEmuleSD, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
+
   // Disable apply Button
   applyButton->setEnabled(false);
   // Tab selection mecanism
@@ -523,8 +525,8 @@ void options_imp::saveOptions() {
   int nEmuleSpinPort = emuleSpinPort->value() + nCorrect;
 
   pref.setListenPort(nEmuleSpinPort);
-  //pref.setShowSharedFiles(checkExchange->isChecked());
-  //pref.setShowSharedDirectories(checkExchange->isChecked());
+  pref.setShowSharedFiles(checkEmuleSD->isChecked());
+  pref.setShowSharedDirectories(checkEmuleSD->isChecked());
 
   // End Emule
   // End preferences
@@ -791,6 +793,7 @@ void options_imp::loadOptions() {
   editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.nick());
   emuleSpinPort->setValue(pref.listenPort());
+  checkEmuleSD->setChecked(pref.isShowSharedDirectories() && pref.isShowSharedFiles());
 
   // Random stuff
   srand(time(0));

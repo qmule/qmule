@@ -25,7 +25,12 @@ void status_widget::addLogMessage(QString log_message)
 {
     QDateTime date_time = QDateTime::currentDateTime();
     QString msg = date_time.toString("dd.MM.yyyy hh:mm:ss") + ": " + log_message;
-    editJournal->appendPlainText(msg);
+    editJournal->appendHtml(msg);
+}
+
+void status_widget::addHtmlLogMessage(const QString& msg)
+{
+    editJournal->appendHtml(msg);
 }
 
 void status_widget::setDisconnectedInfo()

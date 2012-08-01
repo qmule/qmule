@@ -734,7 +734,7 @@ public:
       return (res);
   }
 
-  bool isShowSharedFilesEnabled() const
+  bool isShowSharedFiles() const
   {
       return value(QString::fromUtf8("Preferences/eDonkey/ShowSharedFiles"), true).toBool();
   }

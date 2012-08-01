@@ -210,17 +210,16 @@ void QED2KSession::start()
     Preferences pref;
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
-    m_settings.m_collections_directory = misc::ED2KCollectionLocation().toStdString();
+    m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
     m_settings.m_known_file = pref.knownFile().toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
-    m_settings.m_announce_timeout = 10; // announcing
+    m_settings.m_announce_timeout = 10; // announcing every 10 seconds
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else
     m_settings.server_hostname = "emule.is74.ru";
 #endif
     m_settings.listen_port = pref.listenPort();
-    m_settings.client_name = pref.nick().toStdString();
     m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
     m_session->set_alert_mask(alert::all_categories);
 }
@@ -310,6 +309,13 @@ void QED2KSession::configureSession()
     const unsigned short old_listenPort = m_session->listen_port();
     const unsigned short new_listenPort = pref.listenPort();
 
+    // set common settings before for announce correct nick on server
+    libed2k::session_settings s = m_session->settings();
+    s.client_name = pref.nick().toUtf8().constData();
+    s.m_show_shared_catalogs    = pref.isShowSharedDirectories();
+    s.m_show_shared_files       = pref.isShowSharedFiles();
+    m_session->set_settings(s);
+
     if (new_listenPort != old_listenPort)
     {
         const QString iface_name = pref.getNetworkInterface();
@@ -357,7 +363,7 @@ void QED2KSession::configureSession()
                 }
             }
         }
-    }
+    }    
 }
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}

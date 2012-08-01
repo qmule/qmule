@@ -23,6 +23,8 @@ public:
     void serverInfo(QString strInfo);
     void serverStatus(int nFiles, int nUsers);
     void clientID(unsigned int nClientId);
+public slots:
+    void addHtmlLogMessage(const QString& msg);
 };
 
 #endif // STATUS_WIDGET_H

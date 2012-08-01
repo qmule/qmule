@@ -168,7 +168,7 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -994,7 +994,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>486</width>
+             <width>451</width>
              <height>522</height>
             </rect>
            </property>
@@ -1437,8 +1437,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-13</y>
-             <width>486</width>
+             <y>0</y>
+             <width>398</width>
              <height>456</height>
             </rect>
            </property>
@@ -2021,6 +2021,13 @@
                    </item>
                   </layout>
                  </item>
+                 <item row="4" column="0">
+                  <widget class="QCheckBox" name="checkEmuleSD">
+                   <property name="text">
+                    <string>Other users can see my shared catalogs and files</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -2471,7 +2478,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>486</width>
+             <width>435</width>
              <height>551</height>
             </rect>
            </property>
@@ -2848,8 +2855,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
-             <height>412</height>
+             <width>60</width>
+             <height>18</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>
