@@ -12,7 +12,7 @@
 /**
  * Generic data transfer session
  */
-class Session: public QObject, public SessionBase
+class Session: public SessionBase
 {
     Q_OBJECT
     Q_DISABLE_COPY(Session)
@@ -54,8 +54,6 @@ public:
     void setMaxRatioPerTransfer(const QString& hash, qreal ratio);
     void removeRatioPerTransfer(const QString& hash);
     void useAlternativeSpeedsLimit(bool alternative);
-    void addConsoleMessage(const QString& msg, QColor color=
-                           QApplication::palette().color(QPalette::WindowText));
     void banIP(QString ip);
     QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
     void setDownloadRateLimit(long rate);

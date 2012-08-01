@@ -290,12 +290,12 @@ void QBtSession::configureSession() {
   qDebug("Configuring session");
   const Preferences pref;
   // * Ports binding
-  const unsigned short old_listenPort = getListenPort();
+  const unsigned short old_listenPort = s->listen_port();
   const unsigned short new_listenPort = pref.getSessionPort();
   if (old_listenPort != new_listenPort) {
     qDebug("Session port changes in program preferences: %d -> %d", old_listenPort, new_listenPort);
     setListeningPort(new_listenPort);
-    addConsoleMessage(tr("qMule is bound to port: TCP/%1", "e.g: qMule is bound to port: 6881").arg(QString::number(getListenPort())));
+    addConsoleMessage(tr("qMule is bound to port: TCP/%1", "e.g: qMule is bound to port: 6881").arg(QString::number(s->listen_port())));
   }
 
   // Downloads
@@ -1664,20 +1664,6 @@ void QBtSession::saveFastResumeData() {
   }
 }
 
-#ifdef DISABLE_GUI
-void QBtSession::addConsoleMessage(QString msg, QString) {
-  emit newConsoleMessage(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss") + " - " + msg);
-#else
-void QBtSession::addConsoleMessage(QString msg, QColor color) {
-  if (consoleMessages.size() > MAX_LOG_MESSAGES) {
-    consoleMessages.removeFirst();
-  }
-  msg = "<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>";
-  consoleMessages.append(msg);
-  emit newConsoleMessage(msg);
-#endif
-}
-
 void QBtSession::addPeerBanMessage(QString ip, bool from_ipfilter) {
   if (peerBanMessages.size() > MAX_LOG_MESSAGES) {
     peerBanMessages.removeFirst();
@@ -2545,11 +2531,6 @@ void QBtSession::recheckTransfer(const QString &hash) {
 
 QHash<QString, TrackerInfos> QBtSession::getTrackersInfo(const QString &hash) const {
   return trackersInfos.value(hash, QHash<QString, TrackerInfos>());
-}
-
-int QBtSession::getListenPort() const {
-  qDebug() << Q_FUNC_INFO << s->listen_port();
-  return s->listen_port();
 }
 
 session_status QBtSession::getSessionStatus() const {

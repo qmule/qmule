@@ -63,7 +63,7 @@ struct QED2KPeerOptions
 namespace aux
 {
 
-class QED2KSession: public QObject, public SessionBase
+class QED2KSession: public SessionBase
 {
     Q_OBJECT
     Q_DISABLE_COPY(QED2KSession)

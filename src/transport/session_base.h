@@ -4,6 +4,8 @@
 
 #include <QHash>
 #include <QDebug>
+#include <QPalette>
+#include <QApplication>
 
 #include <vector>
 #include <queue>
@@ -14,8 +16,11 @@
 
 typedef libtorrent::session_status SessionStatus;
 
-class SessionBase
+const int MAX_LOG_MESSAGES = 100;
+
+class SessionBase : public QObject
 {
+    Q_OBJECT
 public:
     static const qreal MAX_RATIO;
 
@@ -56,6 +61,13 @@ public:
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
+    inline virtual QStringList getConsoleMessages() const { return consoleMessages; }
+    virtual void addConsoleMessage(QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
+
+signals:
+    void newConsoleMessage(const QString &msg);
+private:
+    QStringList consoleMessages;
 };
 
 #define DEFER0(call)                                            \

@@ -1,16 +1,20 @@
 #include <fstream>
 #include <iostream>
 #include <libtorrent/bencode.hpp>
+#include "qed2ksession.h"
 #include <libed2k/file.hpp>
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
 #include <libed2k/error_code.hpp>
-#include "qed2ksession.h"
 #include "libed2k/transfer_handle.hpp"
 #include "libed2k/alert_types.hpp"
+
+
+#include <QNetworkInterface>
+#include <QMessageBox>
+
 #include "preferences.h"
 
-#include <QMessageBox>
 
 using namespace libed2k;
 
@@ -298,7 +302,64 @@ void QED2KSession::startUpTransfers()
 {
     loadFastResumeData();
 }
-void QED2KSession::configureSession() {}
+
+void QED2KSession::configureSession()
+{
+    qDebug() << Q_FUNC_INFO;
+    Preferences pref;
+    const unsigned short old_listenPort = m_session->listen_port();
+    const unsigned short new_listenPort = pref.listenPort();
+
+    if (new_listenPort != old_listenPort)
+    {
+        const QString iface_name = pref.getNetworkInterface();
+
+        if (iface_name.isEmpty())
+        {
+            m_session->listen_on(new_listenPort);
+        }
+        else
+        {
+            // Attempt to listen on provided interface
+            const QNetworkInterface network_iface = QNetworkInterface::interfaceFromName(iface_name);
+
+            if (!network_iface.isValid())
+            {
+                qDebug("Invalid network interface: %s", qPrintable(iface_name));
+                addConsoleMessage(tr("The network interface defined is invalid: %1").arg(iface_name), "red");
+                addConsoleMessage(tr("Trying any other network interface available instead."));
+                m_session->listen_on(new_listenPort);
+            }
+            else
+            {
+                QString ip;
+                qDebug("This network interface has %d IP addresses", network_iface.addressEntries().size());
+
+                foreach (const QNetworkAddressEntry &entry, network_iface.addressEntries())
+                {
+                    qDebug("Trying to listen on IP %s (%s)", qPrintable(entry.ip().toString()), qPrintable(iface_name));
+
+                    if (m_session->listen_on(new_listenPort, entry.ip().toString().toAscii().constData()))
+                    {
+                        ip = entry.ip().toString();
+                        break;
+                    }
+                }
+
+                if (m_session->is_listening())
+                {
+                    addConsoleMessage(tr("Listening on IP address %1 on network interface %2...").arg(ip).arg(iface_name));
+                }
+                else
+                {
+                    qDebug("Failed to listen on any of the IP addresses");
+                    addConsoleMessage(tr("Failed to listen on network interface %1").arg(iface_name), "red");
+                }
+            }
+        }
+    }
+}
+
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
 Transfer QED2KSession::addLink(QString strLink, bool resumed)

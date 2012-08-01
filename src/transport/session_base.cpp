@@ -1,9 +1,10 @@
-
+#include <QDateTime>
 #include "session_base.h"
 
 const qreal SessionBase::MAX_RATIO = 9999.;
 
-qreal SessionBase::getRealRatio(const QString &hash) const {
+qreal SessionBase::getRealRatio(const QString &hash) const
+{
     Transfer h = getTransfer(hash);
     if (!h.is_valid()) {
         return 0.;
@@ -27,4 +28,16 @@ qreal SessionBase::getRealRatio(const QString &hash) const {
     if (ratio > MAX_RATIO)
         ratio = MAX_RATIO;
     return ratio;
+}
+
+void SessionBase::addConsoleMessage(QString msg, QColor color/*=QApplication::palette().color(QPalette::WindowText)*/)
+{
+    if (consoleMessages.size() > MAX_LOG_MESSAGES)
+    {
+        consoleMessages.removeFirst();
+    }
+
+    msg = "<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>";
+    consoleMessages.append(msg);
+    emit newConsoleMessage(msg);
 }

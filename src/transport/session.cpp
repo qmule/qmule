@@ -253,9 +253,6 @@ void Session::removeRatioPerTransfer(const QString& hash) {
 void Session::useAlternativeSpeedsLimit(bool alternative) {
     m_btSession.useAlternativeSpeedsLimit(alternative);
 }
-void Session::addConsoleMessage(const QString& msg, QColor color) {
-    m_btSession.addConsoleMessage(msg, color);
-}
 void Session::banIP(QString ip)
 {
     for_each(std::bind2nd(std::mem_fun(&SessionBase::banIP), ip));

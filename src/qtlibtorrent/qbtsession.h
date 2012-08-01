@@ -63,14 +63,13 @@ class BandwidthScheduler;
 class ScanFoldersModel;
 class DNSUpdater;
 
-const int MAX_LOG_MESSAGES = 100;
-
 namespace aux
 {
 
-class QBtSession : public QObject, public SessionBase {
-  Q_OBJECT
-  Q_DISABLE_COPY(QBtSession)
+class QBtSession : public SessionBase
+{
+    Q_OBJECT
+    Q_DISABLE_COPY(QBtSession)
 
 private:
 
@@ -91,13 +90,11 @@ public:
   qreal getPayloadDownloadRate() const;
   qreal getPayloadUploadRate() const;
   libtorrent::session_status getSessionStatus() const;
-  int getListenPort() const;
   QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
   bool hasActiveTransfers() const;
   bool hasDownloadingTorrents() const;
   //int getMaximumActiveDownloads() const;
-  //int getMaximumActiveTorrents() const;
-  inline QStringList getConsoleMessages() const { return consoleMessages; }
+  //int getMaximumActiveTorrents() const;  
   inline QStringList getPeerBanMessages() const { return peerBanMessages; }
   inline libtorrent::session* getSession() const { return s; }
   inline bool useTemporaryFolder() const { return !defaultTempPath.isEmpty(); }
@@ -163,11 +160,6 @@ public slots:
   void enableUPnP(bool b);
   void enableLSD(bool b);
   bool enableDHT(bool b);
-#ifdef DISABLE_GUI
-  void addConsoleMessage(QString msg, QString color=QString::null);
-#else
-  void addConsoleMessage(QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
-#endif
   void addPeerBanMessage(QString msg, bool from_ipfilter);
   void processDownloadedFile(QString, QString);
   void addMagnetSkipAddDlg(QString uri);
@@ -213,8 +205,7 @@ signals:
   void downloadFromUrlFailure(QString url, QString reason);
   void torrentFinishedChecking(const QTorrentHandle& h);
   void metadataReceived(const QTorrentHandle &h);
-  void savePathChanged(const QTorrentHandle &h);
-  void newConsoleMessage(const QString &msg);
+  void savePathChanged(const QTorrentHandle &h);  
   void newBanMessage(const QString &msg);
   void alternativeSpeedsModeChanged(bool alternative);
   void recursiveTorrentDownloadPossible(const QTorrentHandle &h);
@@ -237,7 +228,6 @@ private:
   // File System
   ScanFoldersModel *m_scanFolders;
   // Console / Log
-  QStringList consoleMessages;
   QStringList peerBanMessages;
   // Settings
   bool preAllocateAll;
