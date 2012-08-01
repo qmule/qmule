@@ -204,6 +204,7 @@ search_widget::search_widget(QWidget *parent)
     comboType->addItem(iconFolder, tr("Folder"));
     comboType->addItem(iconUser, tr("User"));
     comboType->setMaxVisibleItems(11);
+    comboName->setMaxCount(50);
 
     tableCond->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableCond->setColumnWidth(0, 200);
@@ -278,6 +279,7 @@ search_widget::search_widget(QWidget *parent)
     		this, SLOT(processSearchResult(const libed2k::net_identifier&, const QString&, const std::vector<QED2KSearchResultEntry>&, bool)));
     connect(tabSearch, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabSearch, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
+    connect(closeAll, SIGNAL(triggered()),  this, SLOT(closeAllTabs()));
     connect(defValue,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defKilos,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defMegas,  SIGNAL(triggered()), this, SLOT(setSizeType()));
@@ -357,14 +359,20 @@ void search_widget::load()
 {
     Preferences pref;
     pref.beginGroup("SearchWidget");
-    nCurTabSearch = pref.value("CurrentTab", 0).toInt();
+
+    if(pref.contains("TreeResultHeader"))
+    {
+        treeResult->header()->restoreState(pref.value("TreeResultHeader").toByteArray());
+    }
+
+    nCurTabSearch = pref.value("CurrentTab", 0).toInt();    
 
     int size = pref.beginReadArray("SearchResults");
 
     for (int i = 0; i < size; ++i)
     {
-        QString title = pref.value("Title", QString()).toString();
         pref.setArrayIndex(i);
+        QString title = pref.value("Title", QString()).toString();        
         searchItems.push_back(SearchResult(pref));
         nCurTabSearch = tabSearch->addTab(iconSerachActive, title);
     }
@@ -377,6 +385,17 @@ void search_widget::load()
     }
 
     pref.endArray();
+
+    // restore comboName
+    size = pref.beginReadArray("ComboNames");
+    for (int i = 0; i < size; ++i)
+    {
+        pref.setArrayIndex(i);
+        comboName->addItem(pref.value("CName", QString()).toString());
+    }
+
+    pref.endArray();
+    comboName->setCurrentIndex(-1);
     pref.endGroup();
 }
 
@@ -385,18 +404,31 @@ void search_widget::save() const
     Preferences pref;
     pref.beginGroup("SearchWidget");
     pref.setValue("CurrentTab", tabSearch->currentIndex());
+    pref.setValue("TreeResultHeader", treeResult->header()->saveState());
     pref.beginWriteArray("SearchResults", searchItems.size());
     int i = 0;
 
     foreach(const SearchResult& sr,  searchItems)
     {
-        pref.setValue("Title", tabSearch->tabText(i));
         pref.setArrayIndex(i);
+        pref.setValue("Title", tabSearch->tabText(i));
         sr.save(pref);
         ++i;
     }
 
     pref.endArray();
+
+    // save comboName
+    pref.beginWriteArray("ComboNames", comboName->count());
+
+    for(int index = 0; index < comboName->count(); ++index)
+    {
+        pref.setArrayIndex(index);
+        pref.setValue("CName", comboName->itemText(index));
+    }
+
+    pref.endArray();
+
     pref.endGroup();
 }
 
@@ -860,6 +892,18 @@ void search_widget::clearSearchTable()
     //tableResult->clear();
     for (int ii = model->rowCount()-1; ii >= 0; --ii)
         model->removeRow(ii);
+}
+
+void search_widget::closeAllTabs()
+{
+    searchItems.clear();
+    clearSearchTable();
+
+    for (int indx = tabSearch->count() - 1; indx != -1; --indx)
+    {
+        qDebug() << "close tab " << indx;
+        tabSearch->removeTab(indx);
+    }
 }
 
 void search_widget::setSizeType()
