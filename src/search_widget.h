@@ -121,6 +121,7 @@ private slots:
     		                 const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
     void closeTab(int index);
     void selectTab(int nTabNum);
+    void closeAllTabs();
     void setSizeType();
     void searchTextChanged(const QString text);
     void applyFilter(QString filter);
