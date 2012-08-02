@@ -13,6 +13,7 @@ public:
     bool    isAllowedSharedFilesView();
     void    requestDirs();
     void    requestFiles(QString dirName);
+    void    requestDirFiles(QString dirHash);
     QString getUserName();
 
     static QED2KPeerHandle getPeerHandle(const libed2k::net_identifier& np);

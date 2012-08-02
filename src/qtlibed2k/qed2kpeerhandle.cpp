@@ -58,6 +58,11 @@ void QED2KPeerHandle::requestFiles(QString dirName)
     PEER_ACTION(get_shared_directory_files, dirName.toUtf8().constData());
 }
 
+void QED2KPeerHandle::requestDirFiles(QString dirHash)
+{
+    PEER_ACTION(get_ismod_directory, libed2k::md4_hash::fromString(dirHash.toStdString()));
+}
+
 QString QED2KPeerHandle::getUserName()
 {
     return QString::fromStdString(m_delegate.get_options().m_strName);
