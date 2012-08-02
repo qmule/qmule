@@ -1874,6 +1874,11 @@ Would you like to update qMule to version %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../preferences/options.ui" line="2027"/>
+        <source>Other users can see my shared catalogs and files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../preferences/options.ui" line="1216"/>
         <source>Host:</source>
         <translation type="unfinished"></translation>

@@ -199,22 +199,6 @@
     <string>Show transfer speed in title bar</string>
    </property>
   </action>
-  <action name="actionRSS_Reader">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;RSS reader</string>
-   </property>
-  </action>
-  <action name="actionSearch_engine">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Search &amp;engine</string>
-   </property>
-  </action>
   <action name="actionLock_qMule">
    <property name="text">
     <string>Lock qMule</string>

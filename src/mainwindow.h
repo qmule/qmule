@@ -44,10 +44,6 @@
 #include "transfer_list.h"
 
 class downloadFromURL;
-//class SearchEngine;
-#ifdef RSS_ENABLE
-class RSSImp;
-#endif
 class options_imp;
 class TransferListWidget;
 class TransferListFiltersWidget;
@@ -115,7 +111,6 @@ public slots:
   void showNotificationBaloon(QString title, QString msg) const;
   void downloadFromURLList(const QStringList& urls);
   void updateAltSpeedsBtn(bool alternative);
-  void updateNbTorrents();
   void deleteBTSession();
   void on_actionOpen_triggered();
   void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
@@ -146,8 +141,6 @@ protected slots:
   // Keyboard shortcuts
   void createKeyboardShortcuts();
   void displayTransferTab() const;
-  void displaySearchTab() const;
-  void displayRSSTab() const;
   // Torrent actions
   void on_actionSet_global_upload_limit_triggered();
   void on_actionSet_global_download_limit_triggered();
@@ -184,9 +177,6 @@ protected:
   void closeEvent(QCloseEvent *);
   void showEvent(QShowEvent *);
   bool event(QEvent * event);
-  void displayRSSTab(bool enable);
-  void displaySearchTab(bool enable);
-
 private:
   QIcon getSystrayIcon() const;
   void selectWidget(Widgets wNum);
@@ -219,28 +209,15 @@ private:
   messages_widget* messages;
   files_widget* files;
 
-  //TransferListFiltersWidget *transferListFilters;
-  //PropertiesWidget *properties;
   bool displaySpeedInTitle;
   bool force_exit;
   bool ui_locked;
   LineEdit *search_filter;
   // Keyboard shortcuts
-  QShortcut *switchSearchShortcut;
-  QShortcut *switchSearchShortcut2;
   QShortcut *switchTransferShortcut;
-  QShortcut *switchRSSShortcut;
   // Widgets
   QAction *prioSeparator;
   QAction *prioSeparatorMenu;
-  //QSplitter *hSplitter;
-  //QSplitter *vSplitter;
-  // Search
-  //QPointer<SearchEngine> searchEngine;
-  // RSS
-#ifdef RSS_ENABLE
-  QPointer<RSSImp> rssWidget;
-#endif
   // Execution Log
   QPointer<ExecutionLog> m_executionLog;
   // Power Management
@@ -262,8 +239,6 @@ private:
   ConeectionState connectioh_state;
 
 private slots:
-    void on_actionSearch_engine_triggered();
-    void on_actionRSS_Reader_triggered();
     void on_actionSpeed_in_title_bar_triggered();
     void on_actionTop_tool_bar_triggered();
     void on_action_Import_Torrent_triggered();

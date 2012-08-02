@@ -54,16 +54,10 @@
 
 #include "transport/session.h"
 #include "mainwindow.h"
-//#include "transferlistwidget.h"
 #include "misc.h"
 #include "torrentcreatordlg.h"
 #include "downloadfromurldlg.h"
 #include "torrentadditiondlg.h"
-//#include "searchengine.h"
-#ifdef RSS_ENABLE
-#include "rss_imp.h"
-#include "rsssettings.h"
-#endif
 #include "trackerlogin.h"
 #include "options_imp.h"
 #include "speedlimitdlg.h"
@@ -208,14 +202,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   if(QToolButton * btn = qobject_cast<QToolButton *>(toolBar->widgetForAction(actionTools)))
     btn->setPopupMode(QToolButton::InstantPopup);
 
-  //tabs = new HidableTabWidget();
-  //connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_changed(int)));
-  //vSplitter = new QSplitter(Qt::Horizontal);
-  //vSplitter->setChildrenCollapsible(false);
-  //hSplitter = new QSplitter(Qt::Vertical);
-  //hSplitter->setChildrenCollapsible(true);
-  //hSplitter->setContentsMargins(0, 4, 0, 0);
-
   // Transfer List tab
   dock = new QDockWidget(this, Qt::Popup);
   QWidget* titleWidget = new QWidget(this);
@@ -267,45 +253,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   menuStatus->setDisabled(true);
 #endif
 
-  //properties = new PropertiesWidget(hSplitter, this, transferList);
-  //transferListFilters = new TransferListFiltersWidget(vSplitter, transferList);
-  //hSplitter->addWidget(switcher1);
-  //hSplitter->addWidget(transfer_List);
-  //hSplitter->addWidget(transferList);
-  //transferList2->hide();
-  //hSplitter->addWidget(properties);
-  //vSplitter->addWidget(transferListFilters);
-  //vSplitter->addWidget(hSplitter);
-  //vSplitter->setCollapsible(0, true);
-  //vSplitter->setCollapsible(1, false);
-  //tabs->addTab(vSplitter, IconProvider::instance()->getIcon("folder-remote"), tr("Transfers"));
-
-
-  // Name filter
-  /*
-  search_filter = new LineEdit();
-//  connect(search_filter, SIGNAL(textChanged(QString)), transferList, SLOT(applyNameFilter(QString)));
-  QAction *searchFilterAct = toolBar->insertWidget(actionLock_qBittorrent, search_filter);
-  search_filter->setFixedWidth(200);
-  QWidget *spacer = new QWidget(this);
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  toolBar->insertWidget(searchFilterAct, spacer);
-*/
-
-//  prioSeparator = toolBar->insertSeparator(actionDecreasePriority);
-//  prioSeparatorMenu = menu_Edit->insertSeparator(actionDecreasePriority);
-
-  // Transfer list slots
-//  connect(actionStart, SIGNAL(triggered()), transferList, SLOT(startSelectedTorrents()));
-//  connect(actionStart_All, SIGNAL(triggered()), QBtSession::instance(), SLOT(resumeAllTorrents()));
-//  connect(actionPause, SIGNAL(triggered()), transferList, SLOT(pauseSelectedTorrents()));
-//  connect(actionPause_All, SIGNAL(triggered()), QBtSession::instance(), SLOT(pauseAllTorrents()));
-//  connect(actionDelete, SIGNAL(triggered()), transferList, SLOT(deleteSelectedTorrents()));
-//  connect(actionIncreasePriority, SIGNAL(triggered()), transferList, SLOT(increasePrioSelectedTorrents()));
-//  connect(actionDecreasePriority, SIGNAL(triggered()), transferList, SLOT(decreasePrioSelectedTorrents()));
-//  connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
-//  connect(actionMinimize, SIGNAL(triggered()), SLOT(minimizeWindow()));
-
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
   connect(preventTimer, SIGNAL(timeout()), SLOT(checkForActiveTorrents()));
@@ -328,13 +275,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   // View settings
   actionTop_tool_bar->setChecked(pref.isToolbarDisplayed());
   actionSpeed_in_title_bar->setChecked(pref.speedInTitleBar());
-#ifdef RSS_ENABLE
-  actionRSS_Reader->setChecked(RssSettings().isRSSEnabled());
-#endif
-  actionSearch_engine->setChecked(pref.isSearchEnabled());
   actionExecution_Logs->setChecked(pref.isExecutionLogEnabled());
-//  displaySearchTab(actionSearch_engine->isChecked());
-//  displayRSSTab(actionRSS_Reader->isChecked());
   on_actionExecution_Logs_triggered(actionExecution_Logs->isChecked());
 
   // Auto shutdown actions
@@ -380,16 +321,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   Session::instance()->startUpTransfers();
   // Add torrent given on command line
   processParams(torrentCmdLine);
-
-  // Populate the transfer list
-//  transferList->getSourceModel()->populate();
-
-  // Update the number of torrents (tab)
-  updateNbTorrents();
-  //connect(transferList->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(updateNbTorrents()));
-  //connect(transferList->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(updateNbTorrents()));
-  //connect(transferList2->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(updateNbTorrents()));
-  //connect(transferList2->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(updateNbTorrents()));
 
   qDebug("GUI Built");
 #ifdef Q_WS_WIN
@@ -471,8 +402,6 @@ MainWindow::~MainWindow() {
   if(executable_watcher)
     delete executable_watcher;
   delete statusBar;
-//  delete search_filter;
-//  delete transferList;
   delete guiUpdater;
   if (createTorrentDlg)
     delete createTorrentDlg;
@@ -494,10 +423,8 @@ MainWindow::~MainWindow() {
   }
 //  delete tabs;
   // Keyboard shortcuts
-  delete switchSearchShortcut;
-  delete switchSearchShortcut2;
   delete switchTransferShortcut;
-  delete switchRSSShortcut;
+
   IconProvider::drop();
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
@@ -539,39 +466,6 @@ void MainWindow::on_actionLock_qMule_triggered() {
   pref.setUILocked(true);
   myTrayIconMenu->setEnabled(false);
   hide();
-}
-
-void MainWindow::displayRSSTab(bool enable) {
-/*  if (enable) {
-    // RSS tab
-    if(!rssWidget) {
-      rssWidget = new RSSImp(tabs);
-      int index_tab = tabs->addTab(rssWidget, tr("RSS"));
-      tabs->setTabIcon(index_tab, IconProvider::instance()->getIcon("application-rss+xml"));
-    }
-  } else {
-    if(rssWidget) {
-      delete rssWidget;
-    }
-  }*/
-}
-
-void MainWindow::displaySearchTab(bool enable) {
-/*  if (enable) {
-    // RSS tab
-    if(!searchEngine) {
-      searchEngine = new SearchEngine(this);
-      tabs->insertTab(1, searchEngine, IconProvider::instance()->getIcon("edit-find"), tr("Search"));
-    }
-  } else {
-    if(searchEngine) {
-      delete searchEngine;
-    }
-  }*/
-}
-
-void MainWindow::updateNbTorrents() {
-//  tabs->setTabText(0, tr("Transfers (%1)").arg(transferList->getSourceModel()->rowCount()));
 }
 
 void MainWindow::on_actionWebsite_triggered() const {
@@ -657,14 +551,8 @@ void MainWindow::createKeyboardShortcuts() {
   actionExit->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Q")));
   switchTransferShortcut = new QShortcut(QKeySequence(tr("Alt+1", "shortcut to switch to first tab")), this);
   connect(switchTransferShortcut, SIGNAL(activated()), this, SLOT(displayTransferTab()));
-  switchSearchShortcut = new QShortcut(QKeySequence(tr("Alt+2", "shortcut to switch to third tab")), this);
-  connect(switchSearchShortcut, SIGNAL(activated()), this, SLOT(displaySearchTab()));
-  switchSearchShortcut2 = new QShortcut(QKeySequence(tr("Ctrl+F", "shortcut to switch to search tab")), this);
-  connect(switchSearchShortcut2, SIGNAL(activated()), this, SLOT(displaySearchTab()));
-  switchRSSShortcut = new QShortcut(QKeySequence(tr("Alt+3", "shortcut to switch to fourth tab")), this);
-  connect(switchRSSShortcut, SIGNAL(activated()), this, SLOT(displayRSSTab()));
   actionDocumentation->setShortcut(QKeySequence("F1"));
-//  actionOptions->setShortcut(QKeySequence(QString::fromUtf8("Alt+O")));
+
 #ifdef Q_WS_MAC
   actionDelete->setShortcut(QKeySequence("Ctrl+Backspace"));
 #else
@@ -685,16 +573,6 @@ void MainWindow::createKeyboardShortcuts() {
 // Keyboard shortcuts slots
 void MainWindow::displayTransferTab() const {
 //  tabs->setCurrentWidget(transferList);
-}
-
-void MainWindow::displaySearchTab() const {
-//  if(searchEngine)
-//    tabs->setCurrentWidget(searchEngine);
-}
-
-void MainWindow::displayRSSTab() const {
-//  if(rssWidget)
-//    tabs->setCurrentWidget(rssWidget);
 }
 
 // End of keyboard shortcuts slots
@@ -774,15 +652,7 @@ void MainWindow::on_actionExit_triggered() {
   close();
 }
 
-/*QWidget* MainWindow::getCurrentTabWidget() const {
-  if(isMinimized() || !isVisible())
-    return 0;
-  if(tabs->currentIndex() == 0)
-    return transferList;
-  return tabs->currentWidget();
-}*/
-
-void MainWindow::setTabText(int index, QString text) const {
+void MainWindow::setTabText(int, QString) const {
 //  tabs->setTabText(index, text);
 }
 
@@ -1564,18 +1434,6 @@ void MainWindow::on_actionSpeed_in_title_bar_triggered() {
     updateGUI();
   else
     setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
-}
-
-void MainWindow::on_actionRSS_Reader_triggered() {
-#ifdef RSS_ENABLE
-  RssSettings().setRSSEnabled(actionRSS_Reader->isChecked());
-  displayRSSTab(actionRSS_Reader->isChecked());
-#endif
-}
-
-void MainWindow::on_actionSearch_engine_triggered() {
-  Preferences().setSearchEnabled(actionSearch_engine->isChecked());
-  displaySearchTab(actionSearch_engine->isChecked());
 }
 
 void MainWindow::on_action_Import_Torrent_triggered()

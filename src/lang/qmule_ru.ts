@@ -2548,6 +2548,10 @@ Would you like to update qMule to version %1?</source>
         <translation>Пароль:</translation>
     </message>
     <message>
+        <source>Other users can see my shared catalogs and files</source>
+        <translation>Другие пользователи могут видеть мои каталоги и файлы обмена</translation>
+    </message>
+    <message>
         <source>SOCKS5</source>
         <translation>Сервер SOCKS5</translation>
     </message>
