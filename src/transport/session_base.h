@@ -63,7 +63,6 @@ public:
     virtual qreal getRealRatio(const QString& hash) const;
     inline virtual QStringList getConsoleMessages() const { return consoleMessages; }
     virtual void addConsoleMessage(QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
-
 signals:
     void newConsoleMessage(const QString &msg);
 private:

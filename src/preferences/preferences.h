@@ -1248,6 +1248,18 @@ public:
     return value(QString::fromUtf8("Preferences/Connection/Interface"), QString()).toString();
   }
 
+  // eMule network interface
+
+  void setNetworkInterfaceMule(const QString& iface)
+  {
+    setValue(QString::fromUtf8("Preferences/Connection/InterfaceMule"), iface);
+  }
+
+  QString getNetworkInterfaceMule() const
+  {
+    return value(QString::fromUtf8("Preferences/Connection/InterfaceMule"), QString()).toString();
+  }
+
   void setNetworkAddress(const QString& addr) {
     setValue(QString::fromUtf8("Preferences/Connection/InetAddress"), addr);
   }

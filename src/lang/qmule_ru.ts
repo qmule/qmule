@@ -176,6 +176,10 @@ p, li { white-space: pre-wrap; }
         <translation>Сетевой интерфейс (Требует перезагрузки)</translation>
     </message>
     <message>
+        <source>Mule Network Interface (requires restart)</source>
+	    <translation>Сетевой интерфейс eDonkey (Требует перезагрузки)</translation>
+	</message>
+    <message>
         <source>Any interface</source>
         <comment>i.e. Any network interface</comment>
         <translation>Любой интерфейс</translation>

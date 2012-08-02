@@ -118,7 +118,7 @@ public slots:
   void updateNbTorrents();
   void deleteBTSession();
   void on_actionOpen_triggered();
-  void addToLog(QString log_message);
+  void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
 
 protected slots:
   // GUI related slots

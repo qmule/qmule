@@ -13,7 +13,7 @@
 #include "preferences.h"
 
 enum AdvSettingsCols {PROPERTY, VALUE};
-enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, RESOLVE_HOSTS, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
+enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, RESOLVE_HOSTS, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, MULE_NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
                     #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
                       UPDATE_CHECK,
                     #endif
@@ -32,7 +32,8 @@ private:
   QCheckBox cb_ignore_limits_lan, cb_recheck_completed, cb_resolve_countries, cb_resolve_hosts,
   cb_super_seeding, cb_program_notifications, cb_tracker_status, cb_confirm_torrent_deletion,
   cb_enable_tracker_ext;
-  QComboBox combo_iface;
+  QComboBox combo_iface;  
+  QComboBox combo_iface_mule;
 #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
   QCheckBox cb_update_check;
 #endif
@@ -87,9 +88,22 @@ public slots:
     if (combo_iface.currentIndex() == 0) {
       // All interfaces (default)
       pref.setNetworkInterface(QString::null);
-    } else {
+    }
+    else
+    {
       pref.setNetworkInterface(combo_iface.currentText());
     }
+
+    if (combo_iface_mule.currentIndex() == 0)
+    {
+        // All interfaces (default)
+        pref.setNetworkInterfaceMule(QString::null);
+    }
+    else
+    {
+        pref.setNetworkInterfaceMule(combo_iface_mule.currentText());
+    }
+
     // Network address
     QHostAddress addr(txt_network_address.text().trimmed());
     if (addr.isNull())
@@ -197,16 +211,34 @@ private slots:
     setRow(SUPER_SEEDING, tr("Strict super seeding"), &cb_super_seeding);
     // Network interface
     combo_iface.addItem(tr("Any interface", "i.e. Any network interface"));
+    combo_iface_mule.addItem(tr("Any interface", "i.e. Any network interface"));
+
     const QString current_iface = pref.getNetworkInterface();
+    const QString current_iface_mule = pref.getNetworkInterfaceMule();
     int i = 1;
-    foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces()) {
-      if (iface.flags() & QNetworkInterface::IsLoopBack) continue;
-      combo_iface.addItem(iface.name());
+    foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces())
+    {
+        if (iface.flags() & QNetworkInterface::IsLoopBack) continue;
+            combo_iface.addItem(iface.name());
+            combo_iface_mule.addItem(iface.name());
+
+      // restore torrent iface
       if (!current_iface.isEmpty() && iface.name() == current_iface)
-        combo_iface.setCurrentIndex(i);
+      {
+          combo_iface.setCurrentIndex(i);
+      }
+
+      // restore mule iface
+      if (!current_iface_mule.isEmpty() && iface.name() == current_iface_mule)
+      {
+          combo_iface_mule.setCurrentIndex(i);
+      }
+
       ++i;
     }
+
     setRow(NETWORK_IFACE, tr("Network Interface (requires restart)"), &combo_iface);
+    setRow(MULE_NETWORK_IFACE, tr("Mule Network Interface (requires restart)"), &combo_iface_mule);
     // Network address
     txt_network_address.setText(pref.getNetworkAddress());
     setRow(NETWORK_ADDRESS, tr("IP Address to report to trackers (requires restart)"), &txt_network_address);

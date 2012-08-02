@@ -1,4 +1,5 @@
 #include <QDateTime>
+#include <QNetworkInterface>
 #include "session_base.h"
 
 const qreal SessionBase::MAX_RATIO = 9999.;
@@ -41,3 +42,4 @@ void SessionBase::addConsoleMessage(QString msg, QColor color/*=QApplication::pa
     consoleMessages.append(msg);
     emit newConsoleMessage(msg);
 }
+

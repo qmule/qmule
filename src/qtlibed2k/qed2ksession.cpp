@@ -207,21 +207,28 @@ QED2KSession::QED2KSession()
 
 void QED2KSession::start()
 {
+    qDebug() <<  Q_FUNC_INFO;
     Preferences pref;
+    // set zero to port for stop automatically listening
+    m_settings.listen_port = 0;
     m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
     m_settings.m_known_file = pref.knownFile().toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
+    const QString iface_name = pref.getNetworkInterfaceMule();
+
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else
     m_settings.server_hostname = "emule.is74.ru";
-#endif
-    m_settings.listen_port = pref.listenPort();
-    m_session.reset(new libed2k::session(m_finger, "0.0.0.0", m_settings));
+#endif    
+    m_session.reset(new libed2k::session(m_finger, NULL, m_settings));
+
     m_session->set_alert_mask(alert::all_categories);
+    // start listening on special interface and port and start server connection
+    configureSession();
 }
 
 void QED2KSession::stop()
@@ -318,7 +325,8 @@ void QED2KSession::configureSession()
 
     if (new_listenPort != old_listenPort)
     {
-        const QString iface_name = pref.getNetworkInterface();
+        qDebug() << "stop listen on " << old_listenPort << " and start on " << new_listenPort;
+        const QString iface_name = pref.getNetworkInterfaceMule();
 
         if (iface_name.isEmpty())
         {
@@ -363,7 +371,12 @@ void QED2KSession::configureSession()
                 }
             }
         }
-    }    
+    }
+    else
+    {
+        qDebug() << "don't execute re-listen";
+    }
+
 }
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}

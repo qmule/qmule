@@ -1706,8 +1706,8 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
     {
         QString msg = tr("Authentication Error: ") + strError;
         QString msg2 = tr("New authentication attempt in 30 seconds.");
-        addToLog(msg);
-        addToLog(msg2);
+        addConsoleMessage(msg);
+        addConsoleMessage(msg2);
         authTimer->start(30000);
 
         statusBar->setStatusMsg(msg + " " + msg2);
@@ -1790,7 +1790,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
 
     if (authMessage.length())
     {
-        addToLog(tr("Message from authentication server: ") + authMessage);
+        addConsoleMessage(tr("Message from authentication server: ") + authMessage);
 
         if (authMessageType)
         {
@@ -1806,7 +1806,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
         case 0:
         {
             QString msg = tr("Authentication comleted");
-            addToLog(msg);
+            addConsoleMessage(msg);
             statusBar->setStatusMsg(msg);
             actionConnect->setIcon(icon_connected);
             connectioh_state = csConnected;
@@ -1862,7 +1862,7 @@ void MainWindow::authRequest()
                 "0.5.6.7",
                 boost::bind(&MainWindow::on_auth_result, this, _1, _2));
 
-        addToLog(msg);
+        addConsoleMessage(msg);
         statusBar->setStatusMsg(msg);
         return;
     }
@@ -1881,7 +1881,7 @@ void MainWindow::authRequest()
                 "0.5.6.7",
                 boost::bind(&MainWindow::on_auth_result, this, _1, _2));
 
-        addToLog(msg);
+        addConsoleMessage(msg);
         statusBar->setStatusMsg(msg);
     }
 #ifdef NOAUTH
@@ -1892,9 +1892,9 @@ void MainWindow::authRequest()
 #endif
 }
 
-void MainWindow::addToLog(QString log_message)
-{
-    status->addLogMessage(log_message);
+void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/)
+{    
+    status->addHtmlLogMessage("<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>");
 }
 
 void MainWindow::startAuthByTimer()

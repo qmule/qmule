@@ -180,6 +180,11 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../preferences/advancedsettings.h" line="209"/>
+        <source>Mule Network Interface (requires restart)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../preferences/advancedsettings.h" line="237"/>
         <source>Exchange trackers with other peers</source>
         <translation type="unfinished"></translation>
