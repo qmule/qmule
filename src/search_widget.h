@@ -137,6 +137,8 @@ private slots:
     void processUserDirs(const libed2k::net_identifier& np, const QString& hash, const QStringList& strList);
     void processUserFiles(const libed2k::net_identifier& np, const QString& hash,
                           const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
+    void processIsModSharedFiles(const libed2k::net_identifier& np, const QString& hash, const QString& dir_hash,
+                                 const std::vector<QED2KSearchResultEntry>& vRes);
     void itemCollapsed(const QModelIndex& index);
     void itemExpanded(const QModelIndex& index);
 
