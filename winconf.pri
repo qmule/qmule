@@ -52,6 +52,7 @@ DEFINES += WITH_SHIPPED_GEOIP_H
 
 CONFIG(debug, debug|release) {
   DEFINES += TORRENT_DEBUG
+  DEFINED += LIBED2K_DEBUG
 } else {
   DEFINES += NDEBUG
 }

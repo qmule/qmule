@@ -86,7 +86,6 @@ usesystemqtsingleapplication {
 }
 
 include(qtlibtorrent/qtlibtorrent.pri)
-#include(webui/webui.pri)
 include(tracker/tracker.pri)
 include (preferences/preferences.pri)
 include(transport/transport.pri)
@@ -175,7 +174,7 @@ nox {
 	         search_widget.cpp \
              login_dlg.cpp \
              search_filter.cpp \
-	     messages_widget.cpp \
+             messages_widget.cpp \
              add_friend.cpp \
              files_widget.cpp \
              status_bar.cpp
@@ -205,7 +204,7 @@ nox {
 	       status_widget.ui \
 	       search_widget.ui \
            login_dlg.ui \
-	   messages_widget.ui \
+           messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
            status_bar.ui

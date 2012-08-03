@@ -12,8 +12,17 @@ CONFIG += link_pkgconfig
 PKGCONFIG += libtorrent-rasterbar
 INCLUDEPATH += $$(LIBED2K_ROOT)/include 
 INCLUDEPATH += $$(BOOST_ROOT)/include
-LIBS += -lssl -lcrypto -L$$(LIBED2K_ROOT)/lib -led2k -lssl -lboost_iostreams -lboost_thread -lpthread -lboost_system -lboost_filesystem -lcrypto++ -lcryptopp
+LIBS += -lssl -lcrypto -L$$(LIBED2K_ROOT)/lib -lssl -lboost_iostreams -lboost_thread -lpthread -lboost_system -lboost_filesystem -lcrypto++ -lcryptopp
 LIBS += -L$$(BOOST_ROOT)/lib
+
+CONFIG(debug, debug|release) {
+  LIBS += -led2kd
+  DEFINES += TORRENT_DEBUG
+  DEFINES += LIBED2K_DEBUG
+} else {
+  LIBS += -led2k
+  DEFINES += NDEBUG
+ }
 
 # Man page
 nox {
