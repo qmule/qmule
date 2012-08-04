@@ -332,10 +332,16 @@ int TorrentModel::torrentRow(const QString &hash) const
 
 void TorrentModel::addTorrent(const Transfer& h)
 {
+  if (h.type() == Transfer::ED2K && h.is_seed()) {
+    // do not show finished ed2k transfers
+    return;
+  }
+
   if (torrentRow(h.hash()) < 0) {
     beginInsertTorrent(m_torrents.size());
     TorrentModelItem *item = new TorrentModelItem(h);
-    connect(item, SIGNAL(labelChanged(QString,QString)), SLOT(handleTorrentLabelChange(QString,QString)));
+    connect(item, SIGNAL(labelChanged(QString,QString)),
+            SLOT(handleTorrentLabelChange(QString,QString)));
     m_torrents << item;
     emit torrentAdded(item);
     endInsertTorrent();

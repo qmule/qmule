@@ -13,6 +13,12 @@
 class Transfer
 {
 public:
+    enum Type {
+        BITTORRENT,
+        ED2K,
+        UNDEFINED
+    };
+
     Transfer();
     Transfer(const QTorrentHandle& h);
     Transfer(const QED2KHandle& h);
@@ -20,6 +26,7 @@ public:
     bool operator<(const Transfer& t) const;
     QTorrentHandle torrentHandle() const;
     QED2KHandle ed2kHandle() const;
+    Type type() const;
 
     QString hash() const;
     QString name() const;

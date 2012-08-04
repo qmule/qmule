@@ -101,9 +101,11 @@ signals:
   void torrentAboutToBeRemoved(TorrentModelItem *torrentItem);
   void torrentChangedLabel(TorrentModelItem *torrentItem, QString previous, QString current);
 
+public slots:
+  void removeTorrent(const QString& hash);
+
 private slots:
   void addTorrent(const Transfer& h);
-  void removeTorrent(const QString &hash);
   void handleTorrentUpdate(const Transfer& h);
   void notifyTorrentChanged(int row);
   void forceModelRefresh();

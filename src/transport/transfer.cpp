@@ -27,6 +27,13 @@ QED2KHandle Transfer::ed2kHandle() const
     return h ? *h : QED2KHandle();
 }
 
+Transfer::Type Transfer::type() const
+{
+    if (dynamic_cast<const QTorrentHandle*>(m_delegate.data())) return BITTORRENT;
+    else if (dynamic_cast<const QED2KHandle*>(m_delegate.data())) return ED2K;
+    return UNDEFINED;
+}
+
 QString Transfer::hash() const { return m_delegate->hash(); }
 
 QString Transfer::name() const { return m_delegate->name(); }
