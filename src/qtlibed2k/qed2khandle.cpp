@@ -98,7 +98,14 @@ TransferBitfield QED2KHandle::pieces() const { return TransferBitfield(); }
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const {}
 TransferSize QED2KHandle::piece_length() const { return 0; }
-bool QED2KHandle::first_last_piece_first() const {return false;}
+bool QED2KHandle::first_last_piece_first() const {
+    const QString ext = misc::file_extension(name());
+
+    if (!misc::isPreviewable(ext)) return false; // No media file
+
+    return m_delegate.piece_priority(0) == 7 &&
+        m_delegate.piece_priority(m_delegate.num_pieces() - 1) == 7;
+}
 void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {}
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
 QString QED2KHandle::filepath_at(unsigned int index) const {
@@ -125,7 +132,12 @@ void QED2KHandle::resume() const { m_delegate.resume(); }
 void QED2KHandle::move_storage(const QString& path) const {}
 void QED2KHandle::rename_file(int index, const QString& new_name) const {}
 void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
-void QED2KHandle::prioritize_first_last_piece(bool p) const {}
+void QED2KHandle::prioritize_first_last_piece(bool p) const
+{
+    int prio = p ? 7 : 3;
+    m_delegate.set_piece_priority(0, prio);
+    m_delegate.set_piece_priority(m_delegate.num_pieces() - 1, prio);
+}
 void QED2KHandle::set_tracker_login(const QString& login, const QString& passwd) const {}
 void QED2KHandle::flush_cache() const {}
 void QED2KHandle::force_recheck() const {}

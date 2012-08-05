@@ -652,10 +652,8 @@ void files_widget::shareDir(QString dirPath, bool bShare)
     for (filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
         files.push_back(filesIter->toStdString());
 
-    if (bShare)
-        Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
-    else
-        Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+    Session::instance()->get_ed2k_session()->delegate()->share_dir(
+        basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files, !bShare);
 }
 
 void files_widget::checkBaseAdd(QString dirPath)
