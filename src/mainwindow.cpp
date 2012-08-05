@@ -79,6 +79,7 @@
 #include "messages_widget.h"
 #include "files_widget.h"
 #include "status_bar.h"
+#include "collection_save_dlg.h"
 
 #include "xcatalog/catalogwidget.h"
 
@@ -1109,8 +1110,8 @@ void MainWindow::processParams(const QStringList& params)
         // for torrent we run dialog when it option activated
         if (useTorrentAdditionDialog && !param.endsWith(".emulecollection"))
         {
-            torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
-            dialog->showLoad(param);
+            collection_save_dlg dialog(this, param);
+            dialog.exec();
         }
         else
         {
