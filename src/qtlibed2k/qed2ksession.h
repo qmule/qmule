@@ -93,7 +93,6 @@ public:
     QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
     void setDownloadRateLimit(long rate);
     void setUploadRateLimit(long rate);
-    bool hasActiveTransfers() const;   
     virtual void saveTempFastResumeData();
     virtual void readAlerts();
     virtual void saveFastResumeData();

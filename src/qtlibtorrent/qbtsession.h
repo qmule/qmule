@@ -91,7 +91,6 @@ public:
   qreal getPayloadUploadRate() const;
   libtorrent::session_status getSessionStatus() const;
   QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
-  bool hasActiveTransfers() const;
   bool hasDownloadingTorrents() const;
   //int getMaximumActiveDownloads() const;
   //int getMaximumActiveTorrents() const;  
@@ -193,7 +192,7 @@ private slots:
 signals:
   void addedTorrent(const QTorrentHandle& h);
   void deletedTorrent(const QString &hash);
-  void torrentAboutToBeRemoved(const QTorrentHandle &h);
+  void torrentAboutToBeRemoved(const QTorrentHandle &h, bool del_files);
   void pausedTorrent(const QTorrentHandle& h);
   void resumedTorrent(const QTorrentHandle& h);
   void finishedTorrent(const QTorrentHandle& h);

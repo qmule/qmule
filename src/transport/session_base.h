@@ -49,7 +49,6 @@ public:
     virtual QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const = 0;
     virtual void setDownloadRateLimit(long rate) = 0;
     virtual void setUploadRateLimit(long rate) = 0;
-    virtual bool hasActiveTransfers() const = 0;
     virtual void startUpTransfers() = 0;
     virtual void configureSession() = 0;
     virtual void enableIPFilter(const QString &filter_path, bool force=false) = 0;
@@ -61,8 +60,10 @@ public:
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
+    virtual bool hasActiveTransfers() const;
     inline virtual QStringList getConsoleMessages() const { return consoleMessages; }
-    virtual void addConsoleMessage(QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
+    virtual void addConsoleMessage(
+        QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
 signals:
     void newConsoleMessage(const QString &msg);
 private:
