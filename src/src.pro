@@ -153,7 +153,8 @@ nox {
               add_friend.h \
               files_widget.h \
               status_bar.h \
-			  clicked_label.h
+              clicked_label.h \
+	      collection_save_dlg.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -177,7 +178,8 @@ nox {
              messages_widget.cpp \
              add_friend.cpp \
              files_widget.cpp \
-             status_bar.cpp
+             status_bar.cpp \
+	     collection_save_dlg.cpp
   win32 {
     HEADERS += programupdater.h
     SOURCES += programupdater.cpp
@@ -207,7 +209,8 @@ nox {
            messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
-           status_bar.ui
+           status_bar.ui \
+	   collection_save_dlg.ui
 }
 
 DESTDIR = .
