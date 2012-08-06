@@ -316,5 +316,25 @@ int main(int argc, char *argv[])
     }
 
     qDebug() << result;
+
+    QString strHTML("<html><body></body></html>");
+    QRegExp re1("<body>[\n\t\s]*</body>", Qt::CaseInsensitive);
+
+    if (strHTML.contains(re1))
+    {
+        qDebug() << "contains ";
+    }
+
+    QString strHTML2("<html><body>XXXdfg</body></html>");
+
+    if (strHTML2.contains(re1))
+    {
+        qDebug() << "contains ";
+    }
+    else
+    {
+        qDebug() << " isn't contain";
+    }
+
     return a.exec();
 }

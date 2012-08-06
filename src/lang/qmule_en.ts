@@ -723,6 +723,19 @@ You should get this information from your Web browser preferences.</source>
     </message>
 </context>
 <context>
+    <name>InformationDialog</name>
+    <message>
+		<location filename="../infodlg.ui" line="17"/>
+		<source>Infodlg</source>
+		<translation type="unfinished"></translation>
+	</message>
+    <message>
+	    <location filename="../infodlg.ui" line="52"/>
+	    <source>Familiar</source>
+	    <translation type="unfinished"></translation>
+	</message>
+</context>
+<context>
     <name>FeedListWidget</name>
     <message>
         <location filename="../rss/feedlistwidget.cpp" line="41"/>

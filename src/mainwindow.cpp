@@ -364,6 +364,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   icon_connected.addFile(QString::fromUtf8(":/emule/ConnectDrop.png"), QSize(), QIcon::Normal, QIcon::Off);
   icon_connecting.addFile(QString::fromUtf8(":/emule/ConnectStop.png"), QSize(), QIcon::Normal, QIcon::Off);
   connectioh_state = csDisconnected;
+  m_info_dlg.reset(new is_info_dlg(this));
   authTimer = new QTimer(this);
   connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
   connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
@@ -1685,6 +1686,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             }
 
             Session::instance()->start();
+            m_info_dlg->start();    // start message watcher
 
             break;
         }

@@ -6948,4 +6948,15 @@ eD2K Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>infodlg</name>
+    <message>
+        <source>Familiar</source>
+        <translation>Ознакомлен</translation>
+    </message>
+    <message>
+        <source>Infodlg</source>
+        <translation>Информация</translation>
+    </message>
+</context>
 </TS>
