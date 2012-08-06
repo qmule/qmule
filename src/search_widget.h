@@ -133,6 +133,7 @@ private slots:
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);
     void download();
+    void preview();
     void requestUserDirs();
     void processUserDirs(const libed2k::net_identifier& np, const QString& hash, const QStringList& strList);
     void processUserFiles(const libed2k::net_identifier& np, const QString& hash,
