@@ -31,6 +31,18 @@ qreal SessionBase::getRealRatio(const QString &hash) const
     return ratio;
 }
 
+bool SessionBase::hasActiveTransfers() const
+{
+    std::vector<Transfer> torrents = getTransfers();
+    std::vector<Transfer>::iterator torrentIT;
+    for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
+        const Transfer h(*torrentIT);
+        if (h.is_valid() && !h.is_paused() && !h.is_queued())
+            return true;
+    }
+    return false;
+}
+
 void SessionBase::addConsoleMessage(QString msg, QColor color/*=QApplication::palette().color(QPalette::WindowText)*/)
 {
     if (consoleMessages.size() > MAX_LOG_MESSAGES)

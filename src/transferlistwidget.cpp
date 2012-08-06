@@ -291,7 +291,14 @@ void TransferListWidget::deleteSelectedTorrents() {
       !DeletionConfirmationDlg::askForDeletionConfirmation(&delete_local_files))
     return;
   foreach (const QString &hash, hashes) {
-    BTSession->deleteTransfer(hash, delete_local_files);
+    Transfer t = BTSession->getTransfer(hash);
+
+    if (t.type() == Transfer::ED2K && t.is_seed() && !delete_local_files) {
+      // delete view only
+      listModel->removeTorrent(hash);
+    }
+    else
+      BTSession->deleteTransfer(hash, delete_local_files);
   }
 }
 

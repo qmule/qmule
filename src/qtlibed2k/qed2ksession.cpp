@@ -303,7 +303,6 @@ QHash<QString, TrackerInfos> QED2KSession::getTrackersInfo(const QString &hash) 
 }
 void QED2KSession::setDownloadRateLimit(long rate) {}
 void QED2KSession::setUploadRateLimit(long rate) {}
-bool QED2KSession::hasActiveTransfers() const { return false; }
 void QED2KSession::startUpTransfers()
 {
     loadFastResumeData();

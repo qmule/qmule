@@ -726,17 +726,6 @@ Transfer QBtSession::getTransfer(const QString& hash) const {
   return Transfer(getTorrentHandle(hash));
 }
 
-bool QBtSession::hasActiveTransfers() const {
-  std::vector<torrent_handle> torrents = s->get_torrents();
-  std::vector<torrent_handle>::iterator torrentIT;
-  for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
-    const QTorrentHandle h(*torrentIT);
-    if (h.is_valid() && !h.is_paused() && !h.is_queued())
-      return true;
-  }
-  return false;
-}
-
 bool QBtSession::hasDownloadingTorrents() const {
   std::vector<torrent_handle> torrents = s->get_torrents();
   std::vector<torrent_handle>::iterator torrentIT;
@@ -766,7 +755,7 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
     qDebug("/!\\ Error: Invalid handle");
     return;
   }
-  emit torrentAboutToBeRemoved(h);
+  emit torrentAboutToBeRemoved(h, delete_local_files);
   qDebug("h is valid, getting name or hash...");
   QString fileName;
   if (h.has_metadata())

@@ -94,8 +94,8 @@ Session::Session()
             this, SLOT(on_metadataReceived(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(fullDiskError(QTorrentHandle, QString)),
             this, SLOT(on_fullDiskError(QTorrentHandle, QString)));
-    connect(&m_btSession, SIGNAL(torrentAboutToBeRemoved(QTorrentHandle)),
-            this, SLOT(on_torrentAboutToBeRemoved(QTorrentHandle)));
+    connect(&m_btSession, SIGNAL(torrentAboutToBeRemoved(QTorrentHandle, bool)),
+            this, SLOT(on_torrentAboutToBeRemoved(QTorrentHandle, bool)));
     connect(&m_btSession, SIGNAL(torrentFinishedChecking(QTorrentHandle)),
             this, SLOT(on_torrentFinishedChecking(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(trackerAuthenticationRequired(QTorrentHandle)),
@@ -322,12 +322,18 @@ void Session::addTransferFromFile(const QString& filename)
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }
 void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Transfer(h)); }
 void Session::on_resumedTorrent(const QTorrentHandle& h) { emit resumedTransfer(Transfer(h)); }
-void Session::on_finishedTorrent(const QTorrentHandle& h) { emit finishedTransfer(Transfer(h)); }
+void Session::on_finishedTorrent(const QTorrentHandle& h)
+{
+    emit finishedTransfer(Transfer(h));
+    shareByED2K(h, false);
+}
 void Session::on_metadataReceived(const QTorrentHandle& h) { emit metadataReceived(Transfer(h)); }
 void Session::on_fullDiskError(const QTorrentHandle& h, QString msg) {
     emit fullDiskError(Transfer(h), msg);
 }
-void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h) {
+void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files)
+{
+    if (del_files) shareByED2K(h, true);
     emit transferAboutToBeRemoved(Transfer(h));
 }
 void Session::on_torrentFinishedChecking(const QTorrentHandle& h) {
@@ -354,4 +360,26 @@ void Session::saveFastResumeData()
     m_alerts_reading->stop();
     m_btSession.saveFastResumeData();
     m_edSession.saveFastResumeData();
+}
+
+void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
+{
+    QString save_path = h.save_path();
+    int num_files = h.num_files();
+    std::set<QString> roots;
+    std::deque<std::string> excludes;
+
+    for (int i = 0; i < num_files; ++i)
+        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+
+    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
+    {
+        QString path = save_path + *i;
+        QFileInfo info(path);
+        if (info.isFile())
+            m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
+        else if (info.isDir())
+            m_edSession.delegate()->share_dir(
+                save_path.toUtf8().constData(), path.toUtf8().constData(), excludes, unshare);
+    }
 }
