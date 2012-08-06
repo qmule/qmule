@@ -290,6 +290,7 @@ search_widget::search_widget(QWidget *parent)
     connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
     connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));
     connect(btnDownload, SIGNAL(clicked()), this, SLOT(download()));
+    connect(btnPreview, SIGNAL(clicked()), this, SLOT(preview()));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerSharedDirectories(const libed2k::net_identifier&, const QString&, const QStringList&)),
             this, SLOT(processUserDirs(const libed2k::net_identifier&, const QString&, const QStringList&)));
     connect(Session::instance()->get_ed2k_session(),
@@ -1181,6 +1182,10 @@ void search_widget::download()
         params.seed_mode = false;
         Session::instance()->addTransfer(params);
     }
+}
+
+void search_widget::preview()
+{
 }
 
 void search_widget::setUserPicture(const libed2k::net_identifier& np, QIcon& icon)
