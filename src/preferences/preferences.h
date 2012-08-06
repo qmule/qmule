@@ -1368,7 +1368,7 @@ public:
 
   static bool isFileAssocSet(const QString& file)
   {
-      QSettings settings("HKEY_CLASSES_ROOT", QIniSettings::NativeFormat);
+      QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
       if (settings.value(file + QString("/Default")).toString() != "qMule") {
         qDebug(".torrent != qMule");
         return false;
@@ -1393,7 +1393,7 @@ public:
 
   static void setFileAssoc(const QString& file, bool set)
   {
-    QSettings settings("HKEY_CLASSES_ROOT", QSettings::NativeFormat);
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // .file association
     if (set) {
@@ -1439,7 +1439,7 @@ public:
   }
 
   static bool isMagnetLinkAssocSet() {
-    QSettings settings("HKEY_CLASSES_ROOT", QIniSettings::NativeFormat);
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // Check magnet link assoc
     QRegExp exe_reg("\"([^\"]+)\".*");
@@ -1454,7 +1454,7 @@ public:
   }
 
   static void setMagnetLinkAssoc(bool set) {
-    QSettings settings("HKEY_CLASSES_ROOT", QSettings::NativeFormat);
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // Magnet association
     if (set) {
