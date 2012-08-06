@@ -1,3 +1,5 @@
+#include <libed2k/constants.hpp>
+
 #include "qed2khandle.h"
 #include "misc.h"
 
@@ -93,13 +95,13 @@ bool QED2KHandle::is_checking() const {return false;}
 bool QED2KHandle::has_metadata() const { return true; }
 bool QED2KHandle::priv() const {return false;}
 bool QED2KHandle::super_seeding() const {return false;}
-bool QED2KHandle::is_sequential_download() const {return false;}
-TransferBitfield QED2KHandle::pieces() const { return TransferBitfield(); }
+bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequential_download(); }
+TransferBitfield QED2KHandle::pieces() const { return m_delegate.status().pieces; }
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
-void QED2KHandle::piece_availability(std::vector<int>& avail) const {}
-TransferSize QED2KHandle::piece_length() const { return 0; }
+void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
+TransferSize QED2KHandle::piece_length() const { return libed2k::PIECE_SIZE; }
 bool QED2KHandle::first_last_piece_first() const {
-    const QString ext = misc::file_extension(name());
+    const QString ext = misc::file_extension(filename_at(0));
 
     if (!misc::isPreviewable(ext)) return false; // No media file
 
@@ -154,5 +156,5 @@ void QED2KHandle::queue_position_down() const {}
 void QED2KHandle::queue_position_top() const {}
 void QED2KHandle::queue_position_bottom() const {}
 void QED2KHandle::super_seeding(bool ss) const {}
-void QED2KHandle::set_sequential_download(bool sd) const {}
+void QED2KHandle::set_sequential_download(bool sd) const { m_delegate.set_sequential_download(sd); }
 void QED2KHandle::save_resume_data() const { m_delegate.save_resume_data(); }

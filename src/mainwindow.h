@@ -177,9 +177,12 @@ protected:
   void closeEvent(QCloseEvent *);
   void showEvent(QShowEvent *);
   bool event(QEvent * event);
+
 private:
   QIcon getSystrayIcon() const;
   void selectWidget(Widgets wNum);
+  void playPendingMedia();
+  bool playMedia(const QString& hash);
 
 private:
   QFileSystemWatcher *executable_watcher;
@@ -237,6 +240,8 @@ private:
   QIcon icon_CurTray;
 
   ConeectionState connectioh_state;
+
+  std::vector<QString> pending_medias;
 
 private slots:
     void on_actionSpeed_in_title_bar_triggered();
