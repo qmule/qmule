@@ -5,55 +5,55 @@
     <name>AboutDlg</name>
     <message>
         <source>About qMule</source>
-        <translation>О qMule</translation>
+        <translation type="obsolete">О qMule</translation>
     </message>
     <message>
         <source>About</source>
-        <translation>О программе</translation>
+        <translation type="obsolete">О программе</translation>
     </message>
     <message>
         <source>Author</source>
-        <translation>Автор</translation>
+        <translation type="obsolete">Автор</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Имя:</translation>
+        <translation type="obsolete">Имя:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation>Страна:</translation>
+        <translation type="obsolete">Страна:</translation>
     </message>
     <message>
         <source>E-mail:</source>
-        <translation>Электронная почта:</translation>
+        <translation type="obsolete">Электронная почта:</translation>
     </message>
     <message>
         <source>Christophe Dumez</source>
-        <translation>Кристоф Дюме (Christophe Dumez)</translation>
+        <translation type="obsolete">Кристоф Дюме (Christophe Dumez)</translation>
     </message>
     <message>
         <source>France</source>
-        <translation>Франция</translation>
+        <translation type="obsolete">Франция</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation>Перевод</translation>
+        <translation type="obsolete">Перевод</translation>
     </message>
     <message>
         <source>License</source>
-        <translation>Лицензия</translation>
+        <translation type="obsolete">Лицензия</translation>
     </message>
     <message>
         <source>&lt;h3&gt;&lt;b&gt;qMule&lt;/b&gt;&lt;/h3&gt;</source>
-        <translation>&lt;h3&gt;&lt;b&gt;qMule&lt;/b&gt;&lt;/h3&gt;</translation>
+        <translation type="obsolete">&lt;h3&gt;&lt;b&gt;qMule&lt;/b&gt;&lt;/h3&gt;</translation>
     </message>
     <message>
         <source>chris@qbittorrent.org</source>
-        <translation>chris@qbittorrent.org</translation>
+        <translation type="obsolete">chris@qbittorrent.org</translation>
     </message>
     <message>
         <source>Thanks to</source>
-        <translation>Благодарности</translation>
+        <translation type="obsolete">Благодарности</translation>
     </message>
     <message utf8="true">
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -79,7 +79,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt;An advanced BitTorrent client programmed in C++, based on Qt4 toolkit and libtorrent-rasterbar. &lt;br /&gt;&lt;br /&gt;Copyright ©2006-2011 Christophe Dumez&lt;br /&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;; text-decoration: underline;&quot;&gt;Home Page:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt; &lt;/span&gt;&lt;a href=&quot;http://www.qbittorrent.org&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; text-decoration: underline; color:#0057ae;&quot;&gt;http://www.qbittorrent.org&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;; text-decoration: underline;&quot;&gt;Bug Tracker:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt; &lt;/span&gt;&lt;a href=&quot;http://bugs.qbittorrent.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;http://bugs.qbittorrent.org&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;; text-decoration: underline;&quot;&gt;Forum:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt; &lt;/span&gt;&lt;a href=&quot;http://forum.qbittorrent.org&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; text-decoration: underline; color:#0057ae;&quot;&gt;http://forum.qbittorrent.org&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;; text-decoration: underline;&quot;&gt;IRC:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;DejaVu Sans&apos;;&quot;&gt; #qbittorrent on Freenode&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -89,23 +89,23 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Libraries</source>
-        <translation>Библиотеки</translation>
+        <translation type="obsolete">Библиотеки</translation>
     </message>
     <message>
         <source>This version of qMule was built against the following libraries:</source>
-        <translation>Эта версия qMule была создана с использованием следующих библиотек:</translation>
+        <translation type="obsolete">Эта версия qMule была создана с использованием следующих библиотек:</translation>
     </message>
     <message>
         <source>Qt:</source>
-        <translation>Qt:</translation>
+        <translation type="obsolete">Qt:</translation>
     </message>
     <message>
         <source>Boost:</source>
-        <translation>Boost:</translation>
+        <translation type="obsolete">Boost:</translation>
     </message>
     <message>
         <source>Libtorrent:</source>
-        <translation>Libtorrent:</translation>
+        <translation type="obsolete">Libtorrent:</translation>
     </message>
 </context>
 <context>
@@ -177,8 +177,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Mule Network Interface (requires restart)</source>
-	    <translation>Сетевой интерфейс eDonkey (Требует перезагрузки)</translation>
-	</message>
+        <translation>Сетевой интерфейс eDonkey (Требует перезагрузки)</translation>
+    </message>
     <message>
         <source>Any interface</source>
         <comment>i.e. Any network interface</comment>
@@ -646,23 +646,23 @@ p, li { white-space: pre-wrap; }
     <name>CookiesDlg</name>
     <message>
         <source>Cookies management</source>
-        <translation>Управление Cookies</translation>
+        <translation type="obsolete">Управление Cookies</translation>
     </message>
     <message>
         <source>Key</source>
         <extracomment>As in Key/Value pair</extracomment>
-        <translation>Ключ</translation>
+        <translation type="obsolete">Ключ</translation>
     </message>
     <message>
         <source>Value</source>
         <extracomment>As in Key/Value pair</extracomment>
-        <translation>Значение</translation>
+        <translation type="obsolete">Значение</translation>
     </message>
     <message>
         <source>Common keys for cookies are : &apos;%1&apos;, &apos;%2&apos;.
 You should get this information from your Web browser preferences.</source>
         <translatorcomment>&apos;из настроек&apos; - в firefox 3.6.4</translatorcomment>
-        <translation>Частые ключи для cookies это : &apos;%1&apos;, &apos;%2&apos;.
+        <translation type="obsolete">Частые ключи для cookies это : &apos;%1&apos;, &apos;%2&apos;.
 Вам следует взять эту информацию из настроек вашего веб-браузера.</translation>
     </message>
 </context>
@@ -686,7 +686,7 @@ You should get this information from your Web browser preferences.</source>
     </message>
     <message>
         <source>Dynamic DNS error: qMule was blacklisted by the service, please report a bug at http://bugs.qbittorrent.org.</source>
-        <translation>Ошибка Dynamic DNS: qMule внесён службой в чёрный список. Пожалуйста, сообщите об ошибке на  http://bugs.qbittorrent.org.</translation>
+        <translation type="obsolete">Ошибка Dynamic DNS: qMule внесён службой в чёрный список. Пожалуйста, сообщите об ошибке на  http://bugs.qbittorrent.org.</translation>
     </message>
     <message>
         <source>Dynamic DNS error: %1 was returned by the service, please report a bug at http://bugs.qbittorrent.org.</source>
@@ -710,6 +710,10 @@ You should get this information from your Web browser preferences.</source>
     </message>
     <message>
         <source>Your dynamic DNS was successfully updated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dynamic DNS error: qBittorrent was blacklisted by the service, please report a bug at http://bugs.qbittorrent.org.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1057,6 +1061,28 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>Unread</source>
         <translation type="obsolete">Не прочитано</translation>
+    </message>
+</context>
+<context>
+    <name>FileItemDelegate</name>
+    <message>
+        <source>Ð¡ÐµÐ³Ð¾Ð´Ð½Ñ Ð² %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÑÐµÑÐ° Ð² %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FilterLineEdit</name>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1680,31 +1706,31 @@ Would you like to update qMule to version %1?</source>
     <name>LegalNotice</name>
     <message>
         <source>Legal Notice</source>
-        <translation>Официальное уведомление</translation>
+        <translation type="obsolete">Официальное уведомление</translation>
     </message>
     <message>
         <source>Legal notice</source>
-        <translation>Официальное уведомление</translation>
+        <translation type="obsolete">Официальное уведомление</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
     <message>
         <source>I Agree</source>
-        <translation>Я согласен</translation>
+        <translation type="obsolete">Я согласен</translation>
     </message>
     <message>
         <source>qMule is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.
 
 No further notices will be issued.</source>
-        <translation>qMule - программа для обмена файлами. Когда вы запускаете торрент, данные становятся доступными другим участникам обмена для отдачи. Конечно, любые данные которые вы отдаете на обмен только ваша ответственность.
+        <translation type="obsolete">qMule - программа для обмена файлами. Когда вы запускаете торрент, данные становятся доступными другим участникам обмена для отдачи. Конечно, любые данные которые вы отдаете на обмен только ваша ответственность.
 
 Больше это уведомление не будет показано.</translation>
     </message>
     <message>
         <source>Press %1 key to accept and continue...</source>
-        <translation>Нажмите %1 чтобы принять и продолжить...</translation>
+        <translation type="obsolete">Нажмите %1 чтобы принять и продолжить...</translation>
     </message>
 </context>
 <context>
@@ -1856,12 +1882,12 @@ No further notices will be issued.</source>
     <message>
         <source>&amp;RSS reader</source>
         <translatorcomment>Корявенько... Но имхо &apos;просмотрщик&apos; - это viewer // читалка как-то криво тоже. но лучше не придумал пока</translatorcomment>
-        <translation>&amp;RSS читалка</translation>
+        <translation type="obsolete">&amp;RSS читалка</translation>
     </message>
     <message>
         <source>Search &amp;engine</source>
         <translatorcomment>Исходя из следущего (хотя я лично целиком и полностью за &apos;Поисковый движок&apos;)</translatorcomment>
-        <translation>По&amp;исковик</translation>
+        <translation type="obsolete">По&amp;исковик</translation>
     </message>
     <message>
         <source>Log viewer</source>
@@ -1902,11 +1928,11 @@ No further notices will be issued.</source>
     <message>
         <source>Donate money</source>
         <translatorcomment>so silly</translatorcomment>
-        <translation>Пожертвовать деньги</translation>
+        <translation type="obsolete">Пожертвовать деньги</translation>
     </message>
     <message>
         <source>If you like qMule, please donate!</source>
-        <translation>Если вам нравится qMule, пожалуйста - пожертвуйте!</translation>
+        <translation type="obsolete">Если вам нравится qMule, пожалуйста - пожертвуйте!</translation>
     </message>
     <message>
         <source>qMule %1</source>
@@ -1928,7 +1954,7 @@ No further notices will be issued.</source>
     <message>
         <source>qMule is not the default application to open torrent files or Magnet links.
 Do you want to associate qMule to torrent files and Magnet links?</source>
-        <translation>qMule сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
+        <translation type="obsolete">qMule сейчас не является приложением по умолчанию для открытия торрент-файлов или Magnet-ссылок.
 Хотите ли вы открывать торрент-файлы и Magnet-ссылки с помощью qMule?</translation>
     </message>
     <message>
@@ -1989,17 +2015,17 @@ Do you want to associate qMule to torrent files and Magnet links?</source>
     <message>
         <source>Alt+2</source>
         <comment>shortcut to switch to third tab</comment>
-        <translation>Alt+2</translation>
+        <translation type="obsolete">Alt+2</translation>
     </message>
     <message>
         <source>Ctrl+F</source>
         <comment>shortcut to switch to search tab</comment>
-        <translation>Ctrl+F</translation>
+        <translation type="obsolete">Ctrl+F</translation>
     </message>
     <message>
         <source>Alt+3</source>
         <comment>shortcut to switch to fourth tab</comment>
-        <translation>Alt+3</translation>
+        <translation type="obsolete">Alt+3</translation>
     </message>
     <message>
         <source>Recursive download confirmation</source>
@@ -2166,11 +2192,11 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished">Импорт</translation>
+        <translation>Импорт</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Tools</source>
@@ -2178,7 +2204,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished">Соединение</translation>
+        <translation type="obsolete">Соединение</translation>
     </message>
     <message>
         <source>Catalog</source>
@@ -2190,7 +2216,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Connecting</source>
-        <translation type="obsolete">Соединение</translation>
+        <translation>Соединение</translation>
     </message>
     <message>
         <source>Do you want to break network connection?</source>
@@ -2223,6 +2249,20 @@ Would you like to update qMule to version %1?</source>
     <message>
         <source>Sending authentication request.</source>
         <translation>Запрос авторизации.</translation>
+    </message>
+    <message>
+        <source>qMule is not the default application to open torrent files, Magnet links or eMule collections.
+Do you want to associate qMule to torrent files, Magnet links and eMule collections?</source>
+        <translation>qMule сейчас не является приложением по умолчанию для открытия торрент-файлов, Magnet-ссылок или eMule коллекций.
+Хотите ли вы открывать торрент-файлы, Magnet-ссылки и eMule коллекции с помощью qMule?</translation>
+    </message>
+    <message>
+        <source>Disconnecting</source>
+        <translation>Отключение</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отменить</translation>
     </message>
 </context>
 <context>
@@ -3087,14 +3127,10 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation type="obsolete">Порт</translation>
     </message>
     <message>
-        <source>Exchange files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show own exchange files/directories</source>
+        <source>Use qMule for cmule collections</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3699,19 +3735,19 @@ Would you like to update qMule to version %1?</source>
     <name>RSS</name>
     <message>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation type="obsolete">Поиск</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation type="obsolete">Переименовать</translation>
     </message>
     <message>
         <source>Refresh RSS streams</source>
-        <translation>Обновить RSS потоки</translation>
+        <translation type="obsolete">Обновить RSS потоки</translation>
     </message>
     <message>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -3719,7 +3755,7 @@ Would you like to update qMule to version %1?</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Torrents:&lt;/span&gt; &lt;span style=&quot; font-style:italic;&quot;&gt;(double-click to download)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -3727,31 +3763,31 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Download torrent</source>
-        <translation>Скачать торрент</translation>
+        <translation type="obsolete">Скачать торрент</translation>
     </message>
     <message>
         <source>Open news URL</source>
-        <translation>Открыть новый URL</translation>
+        <translation type="obsolete">Открыть новый URL</translation>
     </message>
     <message>
         <source>Copy feed URL</source>
-        <translation>Скопировать URL канала</translation>
+        <translation type="obsolete">Скопировать URL канала</translation>
     </message>
     <message>
         <source>New subscription</source>
-        <translation>Новая подписка</translation>
+        <translation type="obsolete">Новая подписка</translation>
     </message>
     <message>
         <source>Mark items read</source>
-        <translation>Отметить элементы как прочитанные</translation>
+        <translation type="obsolete">Отметить элементы как прочитанные</translation>
     </message>
     <message>
         <source>Update all</source>
-        <translation>Обновить все</translation>
+        <translation type="obsolete">Обновить все</translation>
     </message>
     <message>
         <source>Update all feeds</source>
-        <translation>Обновить все каналы</translation>
+        <translation type="obsolete">Обновить все каналы</translation>
     </message>
     <message>
         <source>RSS feeds</source>
@@ -3759,7 +3795,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation type="obsolete">Обновить</translation>
     </message>
     <message>
         <source>Feed URL</source>
@@ -3771,11 +3807,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Rename...</source>
-        <translation>Переименовать...</translation>
+        <translation type="obsolete">Переименовать...</translation>
     </message>
     <message>
         <source>New subscription...</source>
-        <translation>Новая подписка...</translation>
+        <translation type="obsolete">Новая подписка...</translation>
     </message>
     <message>
         <source>RSS feed downloader...</source>
@@ -3783,20 +3819,20 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>New folder...</source>
-        <translation>Новая папка...</translation>
+        <translation type="obsolete">Новая папка...</translation>
     </message>
     <message>
         <source>Manage cookies...</source>
         <translatorcomment>Или &apos;Управлять&apos;?</translatorcomment>
-        <translation>Управление cookies...</translation>
+        <translation type="obsolete">Управление cookies...</translation>
     </message>
     <message>
         <source>Settings...</source>
-        <translation>Настройки...</translation>
+        <translation type="obsolete">Настройки...</translation>
     </message>
     <message>
         <source>RSS Downloader...</source>
-        <translation>Загрузчик RSS...</translation>
+        <translation type="obsolete">Загрузчик RSS...</translation>
     </message>
 </context>
 <context>
@@ -3888,6 +3924,37 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ReportDialog</name>
+    <message utf8="true">
+        <source>Пожаловаться на файл</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Причина</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Пожалуйста выберите причину</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Отмена</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº Ð¾ÑÑÑÑÑÑÐ²ÑÐµÑ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ð¡Ð¾Ð´ÐµÑÐ¶Ð¸Ð¼Ð¾Ðµ Ð½Ðµ ÑÐ¾Ð¾ÑÐ²ÐµÑÑÑÐ²ÑÐµÑ Ð·Ð°ÑÐ²Ð»ÐµÐ½Ð½Ð¾Ð¼Ñ</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RssArticle</name>
     <message>
         <source>No description available</source>
@@ -3932,19 +3999,19 @@ p, li { white-space: pre-wrap; }
     <name>RssSettingsDlg</name>
     <message>
         <source>RSS Reader Settings</source>
-        <translation>Настройки читалки RSS</translation>
+        <translation type="obsolete">Настройки читалки RSS</translation>
     </message>
     <message>
         <source>RSS feeds refresh interval:</source>
-        <translation>Интервал обновления RSS каналов:</translation>
+        <translation type="obsolete">Интервал обновления RSS каналов:</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>минут</translation>
+        <translation type="obsolete">минут</translation>
     </message>
     <message>
         <source>Maximum number of articles per feed:</source>
-        <translation>Максимальное число статей на канал:</translation>
+        <translation type="obsolete">Максимальное число статей на канал:</translation>
     </message>
 </context>
 <context>
@@ -4012,78 +4079,78 @@ p, li { white-space: pre-wrap; }
     <name>SearchCategories</name>
     <message>
         <source>All categories</source>
-        <translation>Все категории</translation>
+        <translation type="obsolete">Все категории</translation>
     </message>
     <message>
         <source>Movies</source>
-        <translation>Фильмы</translation>
+        <translation type="obsolete">Фильмы</translation>
     </message>
     <message>
         <source>TV shows</source>
-        <translation>ТВ-шоу</translation>
+        <translation type="obsolete">ТВ-шоу</translation>
     </message>
     <message>
         <source>Music</source>
-        <translation>Музыка</translation>
+        <translation type="obsolete">Музыка</translation>
     </message>
     <message>
         <source>Games</source>
-        <translation>Игры</translation>
+        <translation type="obsolete">Игры</translation>
     </message>
     <message>
         <source>Anime</source>
-        <translation>Аниме</translation>
+        <translation type="obsolete">Аниме</translation>
     </message>
     <message>
         <source>Software</source>
-        <translation>Программы</translation>
+        <translation type="obsolete">Программы</translation>
     </message>
     <message>
         <source>Pictures</source>
-        <translation>Изображения</translation>
+        <translation type="obsolete">Изображения</translation>
     </message>
     <message>
         <source>Books</source>
-        <translation>Книги</translation>
+        <translation type="obsolete">Книги</translation>
     </message>
 </context>
 <context>
     <name>SearchEngine</name>
     <message>
         <source>Empty search pattern</source>
-        <translation>Очистить шаблон поиска</translation>
+        <translation type="obsolete">Очистить шаблон поиска</translation>
     </message>
     <message>
         <source>Please type a search pattern first</source>
-        <translation>Пожалуйста, наберите сначала шаблон поиска</translation>
+        <translation type="obsolete">Пожалуйста, наберите сначала шаблон поиска</translation>
     </message>
     <message>
         <source>Results</source>
-        <translation>Результаты</translation>
+        <translation type="obsolete">Результаты</translation>
     </message>
     <message>
         <source>Searching...</source>
-        <translation>Поиск...</translation>
+        <translation type="obsolete">Поиск...</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation>Вырезать</translation>
+        <translation type="obsolete">Вырезать</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation>Копировать</translation>
+        <translation type="obsolete">Копировать</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation>Вставить</translation>
+        <translation type="obsolete">Вставить</translation>
     </message>
     <message>
         <source>Clear field</source>
-        <translation>Очистить поле</translation>
+        <translation type="obsolete">Очистить поле</translation>
     </message>
     <message>
         <source>Clear completion history</source>
-        <translation>Очистить историю</translation>
+        <translation type="obsolete">Очистить историю</translation>
     </message>
     <message>
         <source>Search Engine</source>
@@ -4112,41 +4179,41 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Unknown</source>
-        <translation>Неизвестно</translation>
+        <translation type="obsolete">Неизвестно</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation type="obsolete">Поиск</translation>
     </message>
     <message>
         <source>Download error</source>
-        <translation>Ошибка при скачивании</translation>
+        <translation type="obsolete">Ошибка при скачивании</translation>
     </message>
     <message>
         <source>Python setup could not be downloaded, reason: %1.
 Please install it manually.</source>
         <translatorcomment>А вот нефиг ставить вручную! Ставить надо из репозитория. Думаю тут лучше будет &apos;самостоятельно&apos;...</translatorcomment>
-        <translation>Установщик Python не может быть загружен по причине: %1.
+        <translation type="obsolete">Установщик Python не может быть загружен по причине: %1.
 Пожалуйста, установите его вручную.</translation>
     </message>
     <message>
         <source>Missing Python Interpreter</source>
-        <translation>Отсутствует интерпретатор Python</translation>
+        <translation type="obsolete">Отсутствует интерпретатор Python</translation>
     </message>
     <message>
         <source>Python 2.x is required to use the search engine but it does not seem to be installed.
 Do you want to install it now?</source>
-        <translation>Python 2.x требуется для использования поисковиков, но не похоже что он установлен.
+        <translation type="obsolete">Python 2.x требуется для использования поисковиков, но не похоже что он установлен.
 Хотите ли Вы установить его сечас?</translation>
     </message>
     <message>
         <source>Confirmation</source>
-        <translation>Подтверждение</translation>
+        <translation type="obsolete">Подтверждение</translation>
     </message>
     <message>
         <source>Are you sure you want to clear the history?</source>
         <translatorcomment>Или &apos;журнал&apos;?</translatorcomment>
-        <translation>Вы уверены, что хотите очистить историю?</translation>
+        <translation type="obsolete">Вы уверены, что хотите очистить историю?</translation>
     </message>
 </context>
 <context>
@@ -4154,26 +4221,26 @@ Do you want to install it now?</source>
     <message>
         <source>Name</source>
         <comment>i.e: file name</comment>
-        <translation>Имя</translation>
+        <translation type="obsolete">Имя</translation>
     </message>
     <message>
         <source>Size</source>
         <comment>i.e: file size</comment>
-        <translation>Размер</translation>
+        <translation type="obsolete">Размер</translation>
     </message>
     <message>
         <source>Seeders</source>
         <comment>i.e: Number of full sources</comment>
-        <translation>Раздающие</translation>
+        <translation type="obsolete">Раздающие</translation>
     </message>
     <message>
         <source>Leechers</source>
         <comment>i.e: Number of partial sources</comment>
-        <translation>Скачивающие</translation>
+        <translation type="obsolete">Скачивающие</translation>
     </message>
     <message>
         <source>Search engine</source>
-        <translation>Поисковый движок</translation>
+        <translation type="obsolete">Поисковый движок</translation>
     </message>
 </context>
 <context>
@@ -4194,31 +4261,31 @@ Do you want to install it now?</source>
     <name>StatusBar</name>
     <message>
         <source>Connection status:</source>
-        <translation>Состояние связи:</translation>
+        <translation type="obsolete">Состояние связи:</translation>
     </message>
     <message>
         <source>No direct connections. This may indicate network configuration problems.</source>
-        <translation>Нет прямых соединений. Причиной этого могут быть проблемы в настройке сети.</translation>
+        <translation type="obsolete">Нет прямых соединений. Причиной этого могут быть проблемы в настройке сети.</translation>
     </message>
     <message>
         <source>DHT: %1 nodes</source>
-        <translation>DHT: %1 узлов</translation>
+        <translation type="obsolete">DHT: %1 узлов</translation>
     </message>
     <message>
         <source>Connection Status:</source>
-        <translation>Состояние связи:</translation>
+        <translation type="obsolete">Состояние связи:</translation>
     </message>
     <message>
         <source>Online</source>
-        <translation>В сети</translation>
+        <translation type="obsolete">В сети</translation>
     </message>
     <message>
         <source>Global Download Speed Limit</source>
-        <translation>Глобальное ограничение скорости закачки</translation>
+        <translation type="obsolete">Глобальное ограничение скорости закачки</translation>
     </message>
     <message>
         <source>Global Upload Speed Limit</source>
-        <translation>Глобальное ограничение скорости раздачи</translation>
+        <translation type="obsolete">Глобальное ограничение скорости раздачи</translation>
     </message>
     <message>
         <source>D: %1/s - T: %2</source>
@@ -4242,7 +4309,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Offline. This usually means that qMule failed to listen on the selected port for incoming connections.</source>
-        <translation>Отключен. Обычно это означает, что qMule не может прослушивать выбранный порт для входящих соединений.</translation>
+        <translation type="obsolete">Отключен. Обычно это означает, что qMule не может прослушивать выбранный порт для входящих соединений.</translation>
     </message>
     <message>
         <source>Click to disable alternative speed limits</source>
@@ -4254,24 +4321,24 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>qMule needs to be restarted</source>
-        <translation>qMule надо перезапустить</translation>
+        <translation type="obsolete">qMule надо перезапустить</translation>
     </message>
     <message>
         <source>qMule was just updated and needs to be restarted for the changes to be effective.</source>
-        <translation>qMule был обновлен и нуждается в перезапуске, чтобы изменение вступили в силу.</translation>
+        <translation type="obsolete">qMule был обновлен и нуждается в перезапуске, чтобы изменение вступили в силу.</translation>
     </message>
     <message>
         <source>Click to switch to alternative speed limits</source>
-        <translation>Нажмите для переключения к альтернативным лимитам скорости</translation>
+        <translation type="obsolete">Нажмите для переключения к альтернативным лимитам скорости</translation>
     </message>
     <message>
         <source>Click to switch to regular speed limits</source>
-        <translation>Нажмите для переключения к обычным лимитам скорости</translation>
+        <translation type="obsolete">Нажмите для переключения к обычным лимитам скорости</translation>
     </message>
     <message>
         <source>%1/s</source>
         <comment>Per second</comment>
-        <translation>%1/с</translation>
+        <translation type="obsolete">%1/с</translation>
     </message>
 </context>
 <context>
@@ -4381,7 +4448,7 @@ Do you want to install it now?</source>
     <message>
         <source>This assistant will help you share with qMule a torrent that you have already downloaded.</source>
         <translatorcomment>dont understand phrase</translatorcomment>
-        <translation>Помошник поможет вам настроить раздачу торрента, который вы уже скачали.</translation>
+        <translation type="obsolete">Помошник поможет вам настроить раздачу торрента, который вы уже скачали.</translation>
     </message>
     <message>
         <source>Torrent file to import:</source>
@@ -4432,6 +4499,10 @@ Do you want to install it now?</source>
     <message>
         <source>This is not a valid torrent file.</source>
         <translation>Это не правильный торрент файл.</translation>
+    </message>
+    <message>
+        <source>This assistant will help you share with qBittorrent a torrent that you have already downloaded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4985,24 +5056,24 @@ Do you want to install it now?</source>
     <name>UpDownRatioDlg</name>
     <message>
         <source>Torrent Upload/Download Ratio Limiting</source>
-        <translation type="obsolete">Ограничение коэффициента скачивания/раздачи торрента</translation>
+        <translation type="unfinished">Ограничение коэффициента скачивания/раздачи торрента</translation>
     </message>
     <message>
         <source>Use global ratio limit</source>
-        <translation type="obsolete">Использовать глобальное ограничение коэффициента</translation>
+        <translation type="unfinished">Использовать глобальное ограничение коэффициента</translation>
     </message>
     <message>
         <source>buttonGroup</source>
         <translatorcomment>Do you really need to translate it?</translatorcomment>
-        <translation type="obsolete">buttonGroup</translation>
+        <translation type="unfinished">buttonGroup</translation>
     </message>
     <message>
         <source>Set no ratio limit</source>
-        <translation type="obsolete">Убрать ограничение коэффициента</translation>
+        <translation type="unfinished">Убрать ограничение коэффициента</translation>
     </message>
     <message>
         <source>Set ratio limit to</source>
-        <translation type="obsolete">Установить ограничение коэффициента</translation>
+        <translation type="unfinished">Установить ограничение коэффициента</translation>
     </message>
 </context>
 <context>
@@ -5025,7 +5096,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>changes the webui port (current: %1)</source>
-        <translation>Изменить порт Web интерфейса (сейчас: %1)</translation>
+        <translation type="obsolete">Изменить порт Web интерфейса (сейчас: %1)</translation>
     </message>
     <message>
         <source>[files or urls]: downloads the torrents passed by the user (optional)</source>
@@ -5033,18 +5104,85 @@ Do you want to install it now?</source>
     </message>
 </context>
 <context>
+    <name>XCatalogWidget</name>
+    <message>
+        <source>xCatalog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Каталог</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Поиск по всему каталогу</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Фильтр</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>about:blank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>xCatalog v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ±Ð½Ð¾Ð²Ð¸ÑÑ ÑÐ¿Ð¸ÑÐ¾Ðº ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¹</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ±Ð½Ð¾Ð²Ð¸ÑÑ ÑÐ¿Ð¸ÑÐ¾Ðº ÑÐ°Ð¹Ð»Ð¾Ð²</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ð¡Ð¾ÑÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð¿Ð¾ Ð¸Ð¼ÐµÐ½Ð¸</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ð¡Ð¾ÑÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð¿Ð¾ Ð´Ð°ÑÐµ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;a href=&quot;%ED2KLINK%&quot; class=&quot;img-link&quot; title=&quot;ÐÑÐ¾ÑÐ¼Ð¾ÑÑ&quot;&gt;&lt;img src=&quot;qrc:/images/preview16.png&quot; alt=&quot;ÐÑÐ¾ÑÐ¼Ð¾ÑÑ&quot;&gt;&lt;/a&gt;&amp;nbsp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;a href=&quot;%ED2KLINK%&quot; class=&quot;cool-button play-button&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td width=&quot;5&quot;&gt;&lt;img src=&quot;qrc:/images/preview32.png&quot; alt=&quot;ÐÑÐ¾ÑÐ¼Ð¾ÑÑ&quot;&gt;&lt;/td&gt;&lt;td&gt;ÐÑÐ¾ÑÐ¼Ð¾ÑÑ&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ¾Ð¸ÑÐº Ð¿Ð¾ Ð²ÑÐµÐ¼Ñ ÐºÐ°ÑÐ°Ð»Ð¾Ð³Ñ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ¾Ð¸ÑÐº Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸ &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ÐÐ¾Ð¸ÑÐº Ð¿Ð¾ Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¼ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ð ÐµÐ·ÑÐ»ÑÑÐ°ÑÑ Ð¿Ð¾Ð¸ÑÐºÐ°</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>about</name>
     <message>
         <source>qMule</source>
-        <translation>qMule</translation>
+        <translation type="obsolete">qMule</translation>
     </message>
     <message>
         <source>I would like to thank the following people who volunteered to translate qMule:</source>
-        <translation>Я хочу поблагодарить следующих людей, кто вызвался перевести qMule:</translation>
+        <translation type="obsolete">Я хочу поблагодарить следующих людей, кто вызвался перевести qMule:</translation>
     </message>
     <message>
         <source>Please contact me if you would like to translate qMule into your own language.</source>
-        <translation>Пожалуйста, свяжитесь со мной, если хотите перевести qMule на свой язык.</translation>
+        <translation type="obsolete">Пожалуйста, свяжитесь со мной, если хотите перевести qMule на свой язык.</translation>
     </message>
 </context>
 <context>
@@ -5232,7 +5370,7 @@ Do you want to install it now?</source>
     <message>
         <source>qBittorrent is bound to port: TCP/%1</source>
         <comment>e.g: qBittorrent is bound to port: 6881</comment>
-        <translation type="unfinished">qBittorrent привязан к порту: TCP/%1</translation>
+        <translation type="obsolete">qBittorrent привязан к порту: TCP/%1</translation>
     </message>
     <message>
         <source>UPnP / NAT-PMP support [ON]</source>
@@ -5397,28 +5535,28 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Torrent name: %1</source>
-        <translation type="unfinished">Имя торрента: %1</translation>
+        <translation type="obsolete">Имя торрента: %1</translation>
     </message>
     <message>
         <source>Torrent size: %1</source>
-        <translation type="unfinished">Размер торрента: %1</translation>
+        <translation type="obsolete">Размер торрента: %1</translation>
     </message>
     <message>
         <source>Save path: %1</source>
-        <translation type="unfinished">Путь для сохранения: %1</translation>
+        <translation type="obsolete">Путь для сохранения: %1</translation>
     </message>
     <message>
         <source>The torrent was downloaded in %1.</source>
         <comment>The torrent was downloaded in 1 hour and 20 seconds</comment>
-        <translation type="unfinished">Торрент был скачен за %1.</translation>
+        <translation type="obsolete">Торрент был скачен за %1.</translation>
     </message>
     <message>
         <source>Thank you for using qBittorrent.</source>
-        <translation type="unfinished">Спасибо за использование qBittorrent.</translation>
+        <translation type="obsolete">Спасибо за использование qBittorrent.</translation>
     </message>
     <message>
         <source>[qBittorrent] %1 has finished downloading</source>
-        <translation type="unfinished">[qBittorrent] скачивание %1 завершено</translation>
+        <translation type="obsolete">[qBittorrent] скачивание %1 завершено</translation>
     </message>
     <message>
         <source>Unable to decode %1 torrent file.</source>
@@ -5434,7 +5572,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>qBittorrent will now exit unless you cancel within the next 15 seconds...</source>
-        <translation type="unfinished">Сейчас qBittorrent будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
+        <translation type="obsolete">Сейчас qBittorrent будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
     </message>
     <message>
         <source>An I/O error occured, &apos;%1&apos; paused.</source>
@@ -5478,50 +5616,102 @@ Do you want to install it now?</source>
         <source>Error: Failed to parse the provided IP filter.</source>
         <translation type="unfinished">Ошибка: Не возможно разобрать фильтр IP.</translation>
     </message>
-</context>
-<context>
-    <name>captcha</name>
     <message>
-        <source>Type symbols on the picture</source>
-        <translation type="unfinished"></translation>
+        <source>qMule is bound to port: TCP/%1</source>
+        <comment>e.g: qMule is bound to port: 6881</comment>
+        <translation type="unfinished">qMule привязан к порту: TCP/%1</translation>
     </message>
     <message>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <source>qMule will now exit unless you cancel within the next 15 seconds...</source>
+        <translation type="unfinished">Сейчас qMule будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
+    </message>
+</context>
+<context>
+    <name>aux::QED2KSession</name>
+    <message>
+        <source>The network interface defined is invalid: %1</source>
+        <translation type="unfinished">Указанный сетевой интерфейс ошибочен: %1</translation>
+    </message>
+    <message>
+        <source>Trying any other network interface available instead.</source>
+        <translation type="unfinished">Пробуем другой достпуный сетевой интерфейс.</translation>
+    </message>
+    <message>
+        <source>Listening on IP address %1 on network interface %2...</source>
+        <translation type="unfinished">Слушаем на IP адресе %1 на сетевом интерфейсе %2...</translation>
+    </message>
+    <message>
+        <source>Failed to listen on network interface %1</source>
+        <translation type="unfinished">Не возможно слушать сетевой интерфейс %1</translation>
+    </message>
+</context>
+<context>
+    <name>collection_save_dlg</name>
+    <message>
+        <source>collection_save_dlg</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Collection list</source>
+        <translation>Сптсок коллекции</translation>
+    </message>
+    <message>
+        <source>Directory name</source>
+        <translation>Имя каталога</translation>
+    </message>
+    <message>
+        <source>Directory path</source>
+        <translation>Место сохранения каталога</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>Приём</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <source>File name</source>
+        <translation>Имя файла</translation>
+    </message>
+    <message>
+        <source>File size</source>
+        <translation>Размер файла</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>Хэш файла</translation>
+    </message>
+    <message>
+        <source>Open Directory</source>
+        <translation>Выбор директории</translation>
     </message>
 </context>
 <context>
     <name>commona_data</name>
     <message>
-        <source>Clients</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Details...</source>
-        <translation type="unfinished">Детали...</translation>
-    </message>
-    <message>
-        <source>Add to friends</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Детали...</translation>
     </message>
     <message>
         <source>Send message</source>
-        <translation type="unfinished">Послать сообщение</translation>
+        <translation type="obsolete">Послать сообщение</translation>
     </message>
     <message>
         <source>Browse files</source>
-        <translation type="unfinished">Просмотреть файлы</translation>
+        <translation type="obsolete">Просмотреть файлы</translation>
     </message>
 </context>
 <context>
     <name>confirmDeletionDlg</name>
     <message>
         <source>Deletion confirmation - qMule</source>
-        <translation>Подтверждение удаления - qMule</translation>
+        <translation type="obsolete">Подтверждение удаления - qMule</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the selected torrents from the transfer list?</source>
@@ -5534,6 +5724,10 @@ Do you want to install it now?</source>
     <message>
         <source>Also delete the files on the hard disk</source>
         <translation>Также удалить файлы и с жесткого диска</translation>
+    </message>
+    <message>
+        <source>Deletion confirmation - qBittorrent</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5841,35 +6035,35 @@ Do you want to install it now?</source>
     <name>engineSelect</name>
     <message>
         <source>Search plugins</source>
-        <translation>Плагины поиска</translation>
+        <translation type="obsolete">Плагины поиска</translation>
     </message>
     <message>
         <source>Installed search engines:</source>
-        <translation>Установленные плагины поиска:</translation>
+        <translation type="obsolete">Установленные плагины поиска:</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>Имя</translation>
+        <translation type="obsolete">Имя</translation>
     </message>
     <message>
         <source>Url</source>
-        <translation>Ссылка</translation>
+        <translation type="obsolete">Ссылка</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>Включено</translation>
+        <translation type="obsolete">Включено</translation>
     </message>
     <message>
         <source>Install a new one</source>
-        <translation>Установить новый</translation>
+        <translation type="obsolete">Установить новый</translation>
     </message>
     <message>
         <source>Check for updates</source>
-        <translation>Проверить обновления</translation>
+        <translation type="obsolete">Проверить обновления</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="obsolete">Закрыть</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -5881,108 +6075,108 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Uninstall</source>
-        <translation>Удалить</translation>
+        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>You can get new search engine plugins here: &lt;a href=&quot;http://plugins.qbittorrent.org&quot;&gt;http://plugins.qbittorrent.org&lt;/a&gt;</source>
-        <translation>Вы можете получить новые плагины поиска здесь: &lt;a href=&quot;http://plugins.qbittorrent.org&quot;&gt;http://plugins.qbittorrent.org&lt;/a&gt;</translation>
+        <translation type="obsolete">Вы можете получить новые плагины поиска здесь: &lt;a href=&quot;http://plugins.qbittorrent.org&quot;&gt;http://plugins.qbittorrent.org&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
     <name>engineSelectDlg</name>
     <message>
         <source>Uninstall warning</source>
-        <translation>Предупреждение об удалении</translation>
+        <translation type="obsolete">Предупреждение об удалении</translation>
     </message>
     <message>
         <source>Some plugins could not be uninstalled because they are included in qMule.
  Only the ones you added yourself can be uninstalled.
 However, those plugins were disabled.</source>
-        <translation>Некоторые плагины не могут быть удалены, так как включены в qMule.
+        <translation type="obsolete">Некоторые плагины не могут быть удалены, так как включены в qMule.
 Удалены могут быть лишь те, что вы установили сами.
 Но все равно, эти плагины будут отключены.</translation>
     </message>
     <message>
         <source>Uninstall success</source>
-        <translation>Удаление произведено</translation>
+        <translation type="obsolete">Удаление произведено</translation>
     </message>
     <message>
         <source>Select search plugins</source>
-        <translation>Выбрать поисковые движки</translation>
+        <translation type="obsolete">Выбрать поисковые движки</translation>
     </message>
     <message>
         <source>qMule search plugins</source>
-        <translation>Плагин поиска qMule</translation>
+        <translation type="obsolete">Плагин поиска qMule</translation>
     </message>
     <message>
         <source>Search plugin install</source>
-        <translation>Установка поискового плагина</translation>
+        <translation type="obsolete">Установка поискового плагина</translation>
     </message>
     <message>
         <source>qMule</source>
-        <translation>qMule</translation>
+        <translation type="obsolete">qMule</translation>
     </message>
     <message>
         <source>A more recent version of %1 search engine plugin is already installed.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Самая последняя версия поискового движка %1 уже установлена.</translation>
+        <translation type="obsolete">Самая последняя версия поискового движка %1 уже установлена.</translation>
     </message>
     <message>
         <source>Search plugin update</source>
-        <translation>Обновление поисковых плагинов</translation>
+        <translation type="obsolete">Обновление поисковых плагинов</translation>
     </message>
     <message>
         <source>Sorry, update server is temporarily unavailable.</source>
-        <translation>Извините, сервер обновлений временно недоступен.</translation>
+        <translation type="obsolete">Извините, сервер обновлений временно недоступен.</translation>
     </message>
     <message>
         <source>All your plugins are already up to date.</source>
-        <translation>Все ваши плагины имеют последние версии.</translation>
+        <translation type="obsolete">Все ваши плагины имеют последние версии.</translation>
     </message>
     <message>
         <source>%1 search engine plugin could not be updated, keeping old version.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Плагин поискового движка %1 не может быть обновлен, осталась старая версия.</translation>
+        <translation type="obsolete">Плагин поискового движка %1 не может быть обновлен, осталась старая версия.</translation>
     </message>
     <message>
         <source>%1 search engine plugin could not be installed.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Плагин поискового движка %1 не может быть установлен.</translation>
+        <translation type="obsolete">Плагин поискового движка %1 не может быть установлен.</translation>
     </message>
     <message>
         <source>All selected plugins were uninstalled successfully</source>
-        <translation>Все выбранные плагины были успешно удалены</translation>
+        <translation type="obsolete">Все выбранные плагины были успешно удалены</translation>
     </message>
     <message>
         <source>%1 search engine plugin was successfully updated.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Плагин поискового движка %1 был успешно обновлен.</translation>
+        <translation type="obsolete">Плагин поискового движка %1 был успешно обновлен.</translation>
     </message>
     <message>
         <source>%1 search engine plugin was successfully installed.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Плагин поискового движка %1 был успешно установлен.</translation>
+        <translation type="obsolete">Плагин поискового движка %1 был успешно установлен.</translation>
     </message>
     <message>
         <source>Sorry, %1 search plugin install failed.</source>
         <comment>%1 is the name of the search engine</comment>
-        <translation>Извините, установка поискового плагина %1 не удалась.</translation>
+        <translation type="obsolete">Извините, установка поискового плагина %1 не удалась.</translation>
     </message>
     <message>
         <source>New search engine plugin URL</source>
-        <translation>URL нового плагина поискового движка</translation>
+        <translation type="obsolete">URL нового плагина поискового движка</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation> URL:</translation>
+        <translation type="obsolete"> URL:</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation type="obsolete">Да</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Нет</translation>
+        <translation type="obsolete">Нет</translation>
     </message>
 </context>
 <context>
@@ -6050,6 +6244,28 @@ However, those plugins were disabled.</source>
     <message>
         <source>Don&apos;t exchange with subdirs</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>info_dlg</name>
+    <message>
+        <source>Infodlg</source>
+        <translation type="unfinished">Информация</translation>
+    </message>
+    <message>
+        <source>Familiar</source>
+        <translation type="unfinished">Ознакомлен</translation>
+    </message>
+</context>
+<context>
+    <name>infodlg</name>
+    <message>
+        <source>Familiar</source>
+        <translation type="obsolete">Ознакомлен</translation>
+    </message>
+    <message>
+        <source>Infodlg</source>
+        <translation type="obsolete">Информация</translation>
     </message>
 </context>
 <context>
@@ -6323,19 +6539,19 @@ However, those plugins were disabled.</source>
     <name>pluginSourceDlg</name>
     <message>
         <source>Plugin source</source>
-        <translation>Код плагина</translation>
+        <translation type="obsolete">Код плагина</translation>
     </message>
     <message>
         <source>Search plugin source:</source>
-        <translation>Код поискового плагина:</translation>
+        <translation type="obsolete">Код поискового плагина:</translation>
     </message>
     <message>
         <source>Local file</source>
-        <translation>Локальный файл</translation>
+        <translation type="obsolete">Локальный файл</translation>
     </message>
     <message>
         <source>Web link</source>
-        <translation>Веб ссылка</translation>
+        <translation type="obsolete">Веб ссылка</translation>
     </message>
 </context>
 <context>
@@ -6388,27 +6604,27 @@ However, those plugins were disabled.</source>
     <name>search_engine</name>
     <message>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation type="obsolete">Поиск</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation>Состояние:</translation>
+        <translation type="obsolete">Состояние:</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>Остановлено</translation>
+        <translation type="obsolete">Остановлено</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation>Скачать</translation>
+        <translation type="obsolete">Скачать</translation>
     </message>
     <message>
         <source>Search engines...</source>
-        <translation>Поисковые движки...</translation>
+        <translation type="obsolete">Поисковые движки...</translation>
     </message>
     <message>
         <source>Go to description page</source>
-        <translation>Перейти на страницу описания</translation>
+        <translation type="obsolete">Перейти на страницу описания</translation>
     </message>
 </context>
 <context>
@@ -6670,7 +6886,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Clients: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Клиенты: </translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Предпросмотр</translation>
     </message>
 </context>
 <context>

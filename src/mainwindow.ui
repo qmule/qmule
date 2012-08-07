@@ -337,10 +337,10 @@
      <normaloff>:/emule/ConnectDoBig.png</normaloff>:/emule/ConnectDoBig.png</iconset>
    </property>
    <property name="text">
-    <string>Connect</string>
+    <string>Connecting</string>
    </property>
    <property name="toolTip">
-    <string>Connect</string>
+    <string>Connecting</string>
    </property>
   </action>
   <action name="actionCatalog">

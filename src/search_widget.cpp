@@ -1073,27 +1073,30 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
         btnDownload->setEnabled(false);
     else
     {
-        QModelIndexList selected = treeResult->selectionModel()->selectedIndexes();
+        QModelIndexList selected = treeResult->selectionModel()->selectedRows();
         btnDownload->setEnabled(selected.size());
 
         if (selected.size() && tabSearch->currentIndex() >= 0 && searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS)
         {
-            QString hash = model->data(model->index(selected.first().row(), SWDelegate::SW_ID)).toString();
-
-            std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
-            std::vector<QED2KSearchResultEntry>::const_iterator it;
-            std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
-            std::vector<UserDir>::iterator dir_iter = userDirs.begin();
-            for (it = vRes.begin(); it != vRes.end(); ++it, ++dir_iter)
+            if (selected.first().parent() == treeResult->rootIndex())
             {
-                if (it->m_hFile == hash)        
-                    break;
-            }
+                QString hash = model->data(model->index(selected.first().row(), SWDelegate::SW_ID)).toString();
 
-            if (dir_iter != userDirs.end())
-            {
-                if (!dir_iter->vecFiles.size())
-                    btnDownload->setEnabled(false);
+                std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
+                std::vector<QED2KSearchResultEntry>::const_iterator it;
+                std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
+                std::vector<UserDir>::iterator dir_iter = userDirs.begin();
+                for (it = vRes.begin(); it != vRes.end(); ++it, ++dir_iter)
+                {
+                    if (it->m_hFile == hash)        
+                        break;
+                }
+
+                if (dir_iter != userDirs.end())
+                {
+                    if (!dir_iter->vecFiles.size())
+                        btnDownload->setEnabled(false);
+                }
             }
         }
     }
