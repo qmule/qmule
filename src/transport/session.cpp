@@ -298,10 +298,12 @@ bool Session::playMedia(Transfer t)
         (t.first_last_piece_first() || t.is_seed()))
     {
         TransferBitfield pieces = t.pieces();
-        if (pieces[0] && pieces[pieces.size() - 1])
+        int last_piece = pieces.size() - 1;
+        int penult_piece = std::max(last_piece - 1, 0);
+        if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
         {
             t.set_sequential_download(true);
-            return (t.progress() >= 0.1 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
+            return (t.progress() >= 0.05 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
         }
     }
 

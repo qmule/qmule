@@ -105,8 +105,11 @@ bool QED2KHandle::first_last_piece_first() const {
 
     if (!misc::isPreviewable(ext)) return false; // No media file
 
+    int last_piece = m_delegate.num_pieces() - 1;
+    int penult_piece = std::max(last_piece - 1, 0);
     return m_delegate.piece_priority(0) == 7 &&
-        m_delegate.piece_priority(m_delegate.num_pieces() - 1) == 7;
+        m_delegate.piece_priority(last_piece) == 7 &&
+        m_delegate.piece_priority(penult_piece) == 7;
 }
 void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {}
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
@@ -137,8 +140,12 @@ void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
 void QED2KHandle::prioritize_first_last_piece(bool p) const
 {
     int prio = p ? 7 : 1;
+
+    int last_piece = m_delegate.num_pieces() - 1;
+    int penult_piece = std::max(last_piece - 1, 0);
     m_delegate.set_piece_priority(0, prio);
-    m_delegate.set_piece_priority(m_delegate.num_pieces() - 1, prio);
+    m_delegate.set_piece_priority(last_piece, prio);
+    m_delegate.set_piece_priority(penult_piece, prio);
 }
 void QED2KHandle::set_tracker_login(const QString& login, const QString& passwd) const {}
 void QED2KHandle::flush_cache() const {}
