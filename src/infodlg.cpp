@@ -2,7 +2,7 @@
 #include <QDebug>
 
 is_info_dlg::is_info_dlg(QWidget *parent) : QDialog(parent, Qt::CustomizeWindowHint |
-                                                    Qt::WindowTitleHint), m_first_call(false)
+                                                    Qt::WindowTitleHint), m_first_call(true)
 {
     setupUi(this);
     m_alert.reset(new QTimer);
