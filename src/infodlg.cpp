@@ -51,7 +51,7 @@ void is_info_dlg::replyFinished(QNetworkReply* pReply)
         qDebug() << "reply correct";
         m_first_call = false;
         QByteArray data = pReply->readAll();
-        QString strAnswer = QString::fromUtf16((const ushort*)(data.constData()), data.length());
+        QString strAnswer = QString::fromUtf16((const ushort*)(data.constData()), data.length()/2);
         QRegExp re1("<body>[\n\t\s\r]*</body>", Qt::CaseInsensitive);
 
         // answer is not empty and html body is not empty
