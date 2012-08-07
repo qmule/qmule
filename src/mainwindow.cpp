@@ -1045,6 +1045,7 @@ void MainWindow::on_actionConnect_triggered()
             if (msgBox.exec() == QMessageBox::Ok)
             {
                 actionConnect->setIcon(icon_disconnected);
+                actionConnect->setText(tr("Connecting"));
                 connectioh_state = csDisconnected;
                 ar.stop();
             }
@@ -1669,6 +1670,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             addConsoleMessage(msg);
             statusBar->setStatusMsg(msg);
             actionConnect->setIcon(icon_connected);
+            actionConnect->setText(tr("Disconnecting"));
             connectioh_state = csConnected;
 
             actionStatus->setEnabled(true);
@@ -1693,6 +1695,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
         case 1:
         {
             actionConnect->setIcon(icon_disconnected);
+            actionConnect->setText(tr("Connecting"));
             connectioh_state = csDisconnected;
             authTimer->start(1000);
             Preferences pref;
@@ -1735,6 +1738,7 @@ void MainWindow::authRequest()
         pref.setISLogin(dlg.getLogin());
         pref.setISPassword(dlg.getPasswd());
         actionConnect->setIcon(icon_connecting);
+        actionConnect->setText(tr("Cancel"));
         connectioh_state = csConnecting;
         ar.start("el.is74.ru", "auth.php",
                 pref.getISLogin().toUtf8().constData(),
@@ -1868,6 +1872,7 @@ void MainWindow::stopMessageFlickering()
 void MainWindow::setDisconnectedStatus()
 {
     actionConnect->setIcon(icon_disconnected);
+    actionConnect->setText(tr("Connecting"));
     connectioh_state = csDisconnected;
     status->setDisconnectedInfo();
     statusBar->reset();

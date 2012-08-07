@@ -81,7 +81,9 @@ void collection_save_dlg::init()
     tableFiles->selectAll();
 
     btnDowload->setDisabled(true);
-    dirPath = "/";
+    Preferences pref;
+    dirPath = pref.getSavePath();
+    separator = '/';
 }
 
 collection_save_dlg::~collection_save_dlg()
@@ -111,8 +113,21 @@ void collection_save_dlg::selectDirectory()
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), dirPath, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir.size())
     {
+        if (dir.indexOf("/") > 0)
+        {
+            if (dir.lastIndexOf("/") == (dir.length() - 1) )
+                dir = dir.left(dir.length() - 1);
+            separator = '/';
+        }
+        if (dir.indexOf("\\") > 0)
+        {
+            if (dir.lastIndexOf("\\") == (dir.length() - 1) )
+                dir = dir.left(dir.length() - 1);
+            separator = '\\';
+        }
+        
         dirPath = dir;
-        labelPath->setText(dirPath + "/" + lineDirName->text());
+        labelPath->setText(dirPath + separator + lineDirName->text());
         if (lineDirName->text().length())
             btnDowload->setEnabled(true);
         else
@@ -161,7 +176,7 @@ void collection_save_dlg::checkDir(const QString& dir_name)
     if (dirName != dir_name)
         lineDirName->setText(dirName);
 
-    labelPath->setText(dirPath + "/" + lineDirName->text());
+    labelPath->setText(dirPath + separator + lineDirName->text());
     if (dirName.length())
         if (tableFiles->selectedItems().size())
         {

@@ -19,6 +19,7 @@ class collection_save_dlg : public QDialog, public Ui::collection_save_dlg
 private:
     std::vector<FileData> file_data;
     QString dirPath;
+    QChar separator;
 
 public:
     collection_save_dlg(QWidget *parent, QString path);
