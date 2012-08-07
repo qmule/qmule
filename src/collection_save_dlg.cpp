@@ -9,7 +9,10 @@ collection_save_dlg::collection_save_dlg(QWidget *parent, QString path)
 {
     setupUi(this);
 
-    QString collectionName;
+    Preferences pref;
+    QDir incoming(pref.getSavePath());
+
+    QString collectionName;    
     if (path.lastIndexOf("/") >=0 )
         collectionName = path.right(path.size() - path.lastIndexOf("/") - 1);
     else if (path.lastIndexOf("\\") >=0 )
@@ -20,6 +23,7 @@ collection_save_dlg::collection_save_dlg(QWidget *parent, QString path)
     this->setWindowTitle(collectionName);
     collectionName.replace(".emulecollection","");
     lineDirName->setText(collectionName);
+    labelPath->setText(incoming.filePath(collectionName));
 
     if (QFile::exists(path))
     {
