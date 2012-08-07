@@ -356,6 +356,7 @@ search_widget::search_widget(QWidget *parent)
     connect(treeResult, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(download()));
     
     btnDownload->setEnabled(false);
+    btnPreview->setEnabled(false);
     // sort by name ascending
     treeResult->header()->setSortIndicator(SWDelegate::SW_NAME, Qt::AscendingOrder);
     load();
@@ -1096,6 +1097,8 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
             }
         }
     }
+
+    btnPreview->setEnabled(hasSelectedMedia());
 }
 
 void search_widget::download()
@@ -1187,6 +1190,50 @@ void search_widget::download()
 
 void search_widget::preview()
 {
+    if (selected_row(treeResult) < 0)
+    {
+        ERR("preview button should be disabled when result isn't selected");
+        return;
+    }
+
+    QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+    QModelIndexList::const_iterator iter;
+
+    for (iter = selected.begin(); iter != selected.end(); ++iter)
+    {
+        QString hash = selected_data(treeResult, SWDelegate::SW_ID, *iter).toString();
+        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
+        QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
+
+        if (misc::isPreviewable(misc::file_extension(filename)))
+        {
+            libed2k::add_transfer_params params;
+            params.file_hash = libed2k::md4_hash::fromString(hash.toStdString());
+            params.file_path = filepath.toUtf8().constData();
+            params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE, *iter).toULongLong();
+            params.seed_mode = false;
+            Transfer t = Session::instance()->addTransfer(params);
+            Session::instance()->deferPlayMedia(t);
+        }
+    }
+}
+
+bool search_widget::hasSelectedMedia()
+{
+    QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+    QModelIndexList::const_iterator iter;
+
+    for (iter = selected.begin(); iter != selected.end(); ++iter)
+    {
+        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
+
+        if (misc::isPreviewable(misc::file_extension(filename)))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void search_widget::setUserPicture(const libed2k::net_identifier& np, QIcon& icon)

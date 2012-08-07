@@ -1025,36 +1025,6 @@ void MainWindow::selectWidget(Widgets wNum)
     }
 }
 
-void MainWindow::playPendingMedia()
-{
-    for (std::vector<QString>::iterator i = pending_medias.begin(); i != pending_medias.end();)
-    {
-        if (playMedia(*i))
-            i = pending_medias.erase(i);
-        else
-            ++i;
-    }
-}
-
-bool MainWindow::playMedia(const QString& hash)
-{
-    Transfer t = Session::instance()->getTransfer(hash);
-
-    if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))) &&
-        t.first_last_piece_first() && t.is_sequential_download())
-    {
-        TransferBitfield pieces = t.pieces();
-        if (pieces[0] && pieces[pieces.size() - 1] && t.progress() >= 0.1 &&
-            QDesktopServices::openUrl(QUrl(t.filepath_at(0))))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void MainWindow::on_actionConnect_triggered()
 {
     QMessageBox msgBox;
@@ -1321,7 +1291,7 @@ void MainWindow::updateGUI() {
   }
 
   statusBar->setUpDown(status.payload_upload_rate, status.payload_download_rate);
-  playPendingMedia();
+  Session::instance()->playPendingMedia();
 }
 
 void MainWindow::showNotificationBaloon(QString title, QString msg) const {

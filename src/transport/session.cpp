@@ -1,5 +1,7 @@
 #include <boost/bind.hpp>
 #include <libtorrent/torrent_handle.hpp>
+#include <QDesktopServices>
+
 #include "transport/session.h"
 
 using namespace libtorrent;
@@ -282,6 +284,42 @@ bool Session::isPexEnabled() const { return m_btSession.isPexEnabled(); }
 bool Session::isLSDEnabled() const { return m_btSession.isLSDEnabled(); }
 bool Session::isQueueingEnabled() const { return m_btSession.isQueueingEnabled(); }
 bool Session::isListening() const { return m_btSession.getSession()->is_listening(); }
+
+void Session::deferPlayMedia(Transfer t)
+{
+    t.prioritize_first_last_piece(true);
+    m_pending_medias.push_back(t.hash());
+}
+
+bool Session::playMedia(Transfer t)
+{
+    if (t.is_valid() && t.has_metadata() &&
+        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))) &&
+        (t.first_last_piece_first() || t.is_seed()))
+    {
+        TransferBitfield pieces = t.pieces();
+        if (pieces[0] && pieces[pieces.size() - 1])
+        {
+            t.set_sequential_download(true);
+            return (t.progress() >= 0.1 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
+        }
+    }
+
+    return false;
+}
+
+void Session::playPendingMedia()
+{
+    for (std::vector<QString>::iterator i = m_pending_medias.begin(); i != m_pending_medias.end();)
+    {
+        Transfer t = getTransfer(*i);
+        if (!t.is_valid() || playMedia(t))
+            i = m_pending_medias.erase(i);
+        else
+            ++i;
+    }
+}
+
 void Session::startUpTransfers()
 {
     for_each(std::mem_fun(&SessionBase::startUpTransfers));

@@ -136,7 +136,7 @@ bool Transfer::super_seeding() const { return m_delegate->super_seeding(); }
 bool Transfer::is_sequential_download() const {
     return m_delegate->is_sequential_download(); }
 
-TransferBitfield Transfer::pieces() const { return m_delegate-> pieces(); }
+TransferBitfield Transfer::pieces() const { return m_delegate->pieces(); }
 
 void Transfer::downloading_pieces(TransferBitfield& bf) const {
     m_delegate->downloading_pieces(bf); }

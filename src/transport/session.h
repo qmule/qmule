@@ -66,7 +66,11 @@ public:
     bool isQueueingEnabled() const;
     bool isListening() const;
 
+    void deferPlayMedia(Transfer t);
+    bool playMedia(Transfer t);
+
 public slots:
+    void playPendingMedia();
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);
@@ -133,6 +137,8 @@ private:
     QScopedPointer<TorrentSpeedMonitor> m_speedMonitor;
     QScopedPointer<QTimer>  m_periodic_resume;
     QScopedPointer<QTimer>  m_alerts_reading;
+
+    std::vector<QString> m_pending_medias;
 };
 
 #endif

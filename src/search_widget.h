@@ -110,6 +110,7 @@ private:
     void setUserPicture(const libed2k::net_identifier& np, QIcon& icon);
     bool findSelectedUser(QED2KSearchResultEntry& entry);
     void fillFileValues(int row, const QED2KSearchResultEntry& fileEntry, const QModelIndex& parent = QModelIndex());
+    bool hasSelectedMedia();
 
 private slots:
     void itemCondClicked(QTableWidgetItem* item);

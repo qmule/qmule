@@ -136,7 +136,7 @@ void QED2KHandle::rename_file(int index, const QString& new_name) const {}
 void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
 void QED2KHandle::prioritize_first_last_piece(bool p) const
 {
-    int prio = p ? 7 : 3;
+    int prio = p ? 7 : 1;
     m_delegate.set_piece_priority(0, prio);
     m_delegate.set_piece_priority(m_delegate.num_pieces() - 1, prio);
 }
