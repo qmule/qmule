@@ -4,6 +4,8 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QMessageBox>
+#include <QWebFrame>
+#include <QWebElementCollection>
 
 #include "collection_save_dlg.h"
 #include "search_widget.h"
@@ -357,6 +359,11 @@ search_widget::search_widget(QWidget *parent)
     
     btnDownload->setEnabled(false);
     btnPreview->setEnabled(false);
+
+    torrentSearchView = new QWebView();
+    connect(torrentSearchView, SIGNAL(loadFinished(bool)),
+            this, SLOT(torrentSearchFinished(bool)));
+
     // sort by name ascending
     treeResult->header()->setSortIndicator(SWDelegate::SW_NAME, Qt::AscendingOrder);
     load();
@@ -592,7 +599,11 @@ void search_widget::startSearch()
     if (checkPlus->checkState() == Qt::Checked)
         searchRequest += " NOT +++";
 
-    Session::instance()->get_ed2k_session()->searchFiles(searchRequest, nMinSize, nMaxSize, nAvail, nSources, fileType, fileExt, mediaCodec, nBitRate, 0);
+    Session::instance()->get_ed2k_session()->searchFiles(
+        searchRequest, nMinSize, nMaxSize, nAvail, nSources,
+        fileType, fileExt, mediaCodec, nBitRate, 0);
+
+    torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/") + searchRequest));
 }
 
 void search_widget::continueSearch()
@@ -1526,5 +1537,25 @@ void search_widget::processIsModSharedFiles(const libed2k::net_identifier& np, c
                 }
             }
         }
+    }
+}
+
+void search_widget::torrentSearchFinished(bool ok)
+{
+    if (!ok) return;
+
+    QWebElementCollection res_rows =
+        torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
+
+    foreach (QWebElement res, res_rows) {
+        QWebElement eText = res.findFirst("div[class=\"text\"] a");
+        QString name = eText.toPlainText();
+        QString href = eText.attribute("href");
+        QString magnet = res.findFirst("div[class=\"magnet\"] a").attribute("href");
+        QString type = res.findFirst("div[class=\"date\"]").toPlainText();
+        QString size = res.findFirst("div[class=\" col-3\"]").toPlainText();
+        QString seeders = res.findFirst("div[class=\" col-4\"]").toPlainText();
+        QString leechers = res.findFirst("div[class=\" col-5\"]").toPlainText();
+        QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
     }
 }

@@ -2,6 +2,8 @@
 #define SEARCH_WIDGET_H
 
 #include <QWidget>
+#include <QWebView>
+
 #include "ui_search_widget.h"
 #include "search_widget_delegate.h"
 #include "qtlibed2k/qed2ksession.h"
@@ -97,6 +99,8 @@ private:
     QIcon iconFolder;
     QIcon iconUser;
 
+    QWebView* torrentSearchView;
+
 public:
     search_widget(QWidget *parent = 0);
     void load();
@@ -143,6 +147,8 @@ private slots:
                                  const std::vector<QED2KSearchResultEntry>& vRes);
     void itemCollapsed(const QModelIndex& index);
     void itemExpanded(const QModelIndex& index);
+
+    void torrentSearchFinished(bool ok);
 
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
