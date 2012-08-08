@@ -1560,14 +1560,22 @@ void search_widget::processIsModSharedFiles(const libed2k::net_identifier& np, c
 }
 
 // parse strings like: '500 MB', '1.6 GB'
+// return 0 on fail
 qlonglong parseSize(const QString& strSize)
 {
     QStringList lst = strSize.split(" ", QString::SkipEmptyParts);
-    float base = lst[0].toFloat();
+    float base = 0;
     qlonglong mes = 1;
-    if (lst[1] == "KB") mes = 1024;
-    else if (lst[1] == "MB") mes = 1024 * 1024;
-    else if (lst[1] == "GB") mes = 1024 * 1024 * 1024;
+
+    if (lst.size() == 2)
+    {
+        base = lst[0].toFloat();
+
+        if (lst[1] == "KB") mes = 1024;
+        else if (lst[1] == "MB") mes = 1024 * 1024;
+        else if (lst[1] == "GB") mes = 1024 * 1024 * 1024;
+        else mes = 0;
+    }
 
     return base * mes;
 }
@@ -1579,7 +1587,6 @@ void search_widget::torrentSearchFinished(bool ok)
     QWebElementCollection res_rows =
         torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
     std::vector<QED2KSearchResultEntry> entries;
-    int row = 0;
 
     foreach (QWebElement res, res_rows) {
         QWebElement eText = res.findFirst("div[class=\"text\"] a");
@@ -1592,14 +1599,16 @@ void search_widget::torrentSearchFinished(bool ok)
         int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
         QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
 
-        QED2KSearchResultEntry entry;
-        entry.m_strFilename = eText.toOuterXml();
-        entry.m_nFilesize = size;
-        entry.m_nCompleteSources = seeders;
-        entry.m_strMediaCodec = type;
-        entry.m_hFile = site;
-        entries.push_back(entry);
-        row++;
+        if (!eText.isNull() && size)
+        {
+            QED2KSearchResultEntry entry;
+            entry.m_strFilename = eText.toOuterXml();
+            entry.m_nFilesize = size;
+            entry.m_nCompleteSources = seeders;
+            entry.m_strMediaCodec = type;
+            entry.m_hFile = site;
+            entries.push_back(entry);
+        }
     }
 
     processSearchResult(libed2k::net_identifier(), QString(), entries, false);
