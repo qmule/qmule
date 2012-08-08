@@ -157,7 +157,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   actionStart->setIcon(IconProvider::instance()->getIcon("media-playback-start"));
   actionStart_All->setIcon(IconProvider::instance()->getIcon("media-playback-start"));
   action_Import_Torrent->setIcon(IconProvider::instance()->getIcon("document-import"));
-//  menuAuto_Shutdown_on_downloads_completion->setIcon(IconProvider::instance()->getIcon("application-exit"));
 
   QMenu *startAllMenu = new QMenu(this);
   startAllMenu->addAction(actionStart_All);
@@ -310,8 +309,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
     }
   }
 
-//  properties->readSettings();
-
   // Start watching the executable for updates
   executable_watcher = new QFileSystemWatcher();
   connect(executable_watcher, SIGNAL(fileChanged(QString)), this, SLOT(notifyOfUpdate(QString)));
@@ -342,14 +339,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 #endif
 #ifdef Q_WS_MAC
   qt_mac_set_dock_menu(getTrayIconMenu());
-#endif
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-  // Check for update
-/*  if (pref.isUpdateCheckEnabled()) {
-    ProgramUpdater *updater = new ProgramUpdater(this);
-    connect(updater, SIGNAL(updateCheckFinished(bool, QString)), SLOT(handleUpdateCheckFinished(bool, QString)));
-    updater->checkForUpdates();
-  }*/
 #endif
 
   // Make sure the Window is visible if we don't have a tray icon
@@ -398,7 +387,6 @@ MainWindow::~MainWindow() {
   // Workaround to avoid bug http://bugreports.qt.nokia.com/browse/QTBUG-7305
   setUnifiedTitleAndToolBarOnMac(false);
 #endif
-//  disconnect(tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_changed(int)));
   // Delete other GUI objects
   if(executable_watcher)
     delete executable_watcher;
@@ -419,7 +407,7 @@ MainWindow::~MainWindow() {
   if (myTrayIconMenu) {
     delete myTrayIconMenu;
   }
-//  delete tabs;
+
   // Keyboard shortcuts
   delete switchTransferShortcut;
 
@@ -478,29 +466,16 @@ void MainWindow::on_actionBugReport_triggered() const {
   QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://is74.ru")));
 }
 
-void MainWindow::tab_changed(int new_tab) {
+void MainWindow::tab_changed(int new_tab)
+{
   Q_UNUSED(new_tab);
-  // We cannot rely on the index new_tab
-  // because the tab order is undetermined now
-/*  if(tabs->currentWidget() == vSplitter) {
-    qDebug("Changed tab to transfer list, refreshing the list");
-    properties->loadDynamicData();
-    return;
-  }
-  if(tabs->currentWidget() == searchEngine) {
-    qDebug("Changed tab to search engine, giving focus to search input");
-    searchEngine->giveFocusToSearchInput();
-  }*/
 }
 
 void MainWindow::writeSettings() {
   Preferences settings;
   settings.beginGroup(QString::fromUtf8("MainWindow"));
   settings.setValue("geometry", saveGeometry());
-  // Splitter size
-//  settings.setValue(QString::fromUtf8("vsplitterState"), vSplitter->saveState());
   settings.endGroup();
-//  properties->saveSettings();
 }
 
 void MainWindow::readSettings() {
@@ -511,12 +486,6 @@ void MainWindow::readSettings() {
       m_posInitialized = true;
   }
   const QByteArray splitterState = settings.value("vsplitterState").toByteArray();
-/*  if(splitterState.isEmpty()) {
-    // Default sizes
-    vSplitter->setSizes(QList<int>() << 120 << vSplitter->width()-120);
-  } else {
-    vSplitter->restoreState(splitterState);
-  }*/
   settings.endGroup();
 }
 
@@ -1199,9 +1168,6 @@ void MainWindow::loadPreferences(bool configure_session)
   getTransferList()->setRefreshInterval(new_refreshInterval);
   getTransferList()->setAlternatingRowColors(pref.useAlternatingRowColors());
 
-//  properties->getFilesList()->setAlternatingRowColors(pref.useAlternatingRowColors());
-//  properties->getTrackerList()->setAlternatingRowColors(pref.useAlternatingRowColors());
-//  properties->getPeerList()->setAlternatingRowColors(pref.useAlternatingRowColors());
   // Queueing System
   if (pref.isQueueingSystemEnabled()) {
     if (!actionDecreasePriority->isVisible()) {
@@ -1216,14 +1182,10 @@ void MainWindow::loadPreferences(bool configure_session)
       getTransferList()->hidePriorityColumn(true);
       actionDecreasePriority->setVisible(false);
       actionIncreasePriority->setVisible(false);
-      //prioSeparator->setVisible(false);
-      //prioSeparatorMenu->setVisible(false);
     }
   }
 
   // Torrent properties
-  //properties->reloadPreferences();
-
   // Icon provider
 #if defined(Q_WS_X11)
   IconProvider::instance()->useSystemIconTheme(pref.useSystemIconTheme());
