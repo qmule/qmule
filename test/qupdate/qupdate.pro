@@ -12,9 +12,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    silent_updater.cpp
+        ../../src/silent_updater.cpp
 
 HEADERS  += mainwindow.h \
-    silent_updater.h
+    ../../src/silent_updater.h
 
 FORMS    += mainwindow.ui

@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#ifdef Q_WS_WIN
 #include <windows.h>
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,6 +32,7 @@ void MainWindow::on_btn_clicked()
 {
     m_upd->start();
     return;
+#ifdef Q_WS_WIN
     qDebug() << "btn clicked";
     qDebug() << "move" << QApplication::applicationFilePath();
     QString new_path = QApplication::applicationFilePath() + QString(".old");
@@ -47,4 +50,5 @@ void MainWindow::on_btn_clicked()
             qDebug() << "new program succesfully copied";
         }
     }
+#endif
 }

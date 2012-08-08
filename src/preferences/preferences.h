@@ -1494,15 +1494,6 @@ public:
     setValue(QString::fromUtf8("Preferences/Advanced/trackerPort"), port);
   }
 
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-  bool isUpdateCheckEnabled() const {
-    return value(QString::fromUtf8("Preferences/Advanced/updateCheck"), true).toBool();
-  }
-
-  void setUpdateCheckEnabled(bool enabled) {
-    setValue(QString::fromUtf8("Preferences/Advanced/updateCheck"), enabled);
-  }
-#endif
   bool confirmTorrentDeletion() const {
     return value(QString::fromUtf8("Preferences/Advanced/confirmTorrentDeletion"), true).toBool();
   }

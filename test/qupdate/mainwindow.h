@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "silent_updater.h"
+#include "../../src/silent_updater.h"
 
 namespace Ui {
 class MainWindow;

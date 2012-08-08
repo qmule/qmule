@@ -99,7 +99,7 @@ void sigsegvHandler(int) {
   signal(SIGABRT, 0);
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
-  std::cerr << "Catching SIGSEGV, please report a bug at http://www.is74.ru provide the following backtrace:\n";
+  std::cerr << "Catching SIGSEGV, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
   std::cerr << "qMule version: " << VERSION << std::endl;
   print_stacktrace();
   raise(SIGSEGV);
@@ -109,7 +109,7 @@ void sigabrtHandler(int) {
   signal(SIGABRT, 0);
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
-  std::cerr << "Catching SIGABRT, please report a bug at http://www.is74.ru provide the following backtrace:\n";
+  std::cerr << "Catching SIGABRT, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
   std::cerr << "qMule version: " << VERSION << std::endl;
   print_stacktrace();
   raise(SIGABRT);
@@ -168,8 +168,6 @@ int main(int argc, char *argv[]) {
 
   qDebug("Program locale: %s", qPrintable(locale));
   setlocale(LC_CTYPE, ""); // TODO - need attention
-
-  //locale = "ru.ts";
 
   if (qtTranslator.load(
           QString::fromUtf8("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath)
