@@ -1578,6 +1578,7 @@ void search_widget::torrentSearchFinished(bool ok)
 
     QWebElementCollection res_rows =
         torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
+    std::vector<QED2KSearchResultEntry> entries;
     int row = 0;
 
     foreach (QWebElement res, res_rows) {
@@ -1591,12 +1592,15 @@ void search_widget::torrentSearchFinished(bool ok)
         int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
         QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
 
-        model->insertRow(row);
-        model->setData(model->index(row, SWDelegate::SW_NAME), eText.toOuterXml());
-        model->setData(model->index(row, SWDelegate::SW_SIZE), size);
-        model->setData(model->index(row, SWDelegate::SW_AVAILABILITY), seeders);
-        model->setData(model->index(row, SWDelegate::SW_SOURCES), site);
-        model->setData(model->index(row, SWDelegate::SW_TYPE), type);
+        QED2KSearchResultEntry entry;
+        entry.m_strFilename = eText.toOuterXml();
+        entry.m_nFilesize = size;
+        entry.m_nCompleteSources = seeders;
+        entry.m_strMediaCodec = type;
+        entry.m_hFile = site;
+        entries.push_back(entry);
         row++;
     }
+
+    processSearchResult(libed2k::net_identifier(), QString(), entries, false);
 }
