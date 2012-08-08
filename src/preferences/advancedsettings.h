@@ -34,9 +34,6 @@ private:
   cb_enable_tracker_ext;
   QComboBox combo_iface;  
   QComboBox combo_iface_mule;
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-  QCheckBox cb_update_check;
-#endif
 #if defined(Q_WS_X11)
   QCheckBox cb_use_icon_theme;
 #endif
@@ -115,9 +112,6 @@ public slots:
     // Tracker
     pref.setTrackerEnabled(cb_tracker_status.isChecked());
     pref.setTrackerPort(spin_tracker_port.value());
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-    pref.setUpdateCheckEnabled(cb_update_check.isChecked());
-#endif
     // Icon theme
 #if defined(Q_WS_X11)
     pref.useSystemIconTheme(cb_use_icon_theme.isChecked());
@@ -253,10 +247,6 @@ private slots:
     spin_tracker_port.setMaximum(65535);
     spin_tracker_port.setValue(pref.getTrackerPort());
     setRow(TRACKER_PORT, tr("Embedded tracker port"), &spin_tracker_port);
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-    cb_update_check.setChecked(pref.isUpdateCheckEnabled());
-    setRow(UPDATE_CHECK, tr("Check for software updates"), &cb_update_check);
-#endif
 #if defined(Q_WS_X11)
     cb_use_icon_theme.setChecked(pref.useSystemIconTheme());
     setRow(USE_ICON_THEME, tr("Use system icon theme"), &cb_use_icon_theme);
