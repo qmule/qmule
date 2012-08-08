@@ -47,6 +47,11 @@
 #include <QIcon>
 #endif
 
+const int version_major = 0;
+const int version_minor = 1;
+const int version_update = 0;
+const int version_build  = 0;
+
 const qlonglong MAX_ETA = 8640000;
 
 typedef QMap<QString, QList<QString> > shared_map;
