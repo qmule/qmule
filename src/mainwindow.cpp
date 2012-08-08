@@ -70,7 +70,6 @@
 #include "hidabletabwidget.h"
 #include "qinisettings.h"
 #include "torrentimportdlg.h"
-//#include "torrentmodel.h"
 #include "executionlog.h"
 #include "iconprovider.h"
 #include "status_widget.h"
@@ -89,9 +88,6 @@ void qt_mac_set_dock_menu(QMenu *menu);
 #endif
 #include "lineedit.h"
 #include "sessionapplication.h"
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-#include "programupdater.h"
-#endif
 #include "powermanagement.h"
 
 using namespace libtorrent;
