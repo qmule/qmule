@@ -2,6 +2,9 @@
 #define SEARCHWIDGETDELEGATE_H
 
 #include <QItemDelegate>
+#include <QAbstractItemView>
+#include <QLabel>
+
 #include "misc.h"
 
 class SWDelegate: public QItemDelegate {
@@ -35,6 +38,28 @@ public:
     {
         switch (index.column())
         {
+            case SW_NAME:
+            {
+                QAbstractItemView* view = dynamic_cast<QAbstractItemView*>(parent());
+                QString name = index.data().toString();
+                if (name.startsWith("<a"))
+                {
+                    // this is a link to torrent tracker
+                    if (!view->indexWidget(index))
+                    {
+                        QLabel* label = new QLabel(name, view);
+                        label->setOpenExternalLinks(true);
+                        label->setToolTip(label->text());
+                        view->setIndexWidget(index, label);
+                    }
+                    drawDisplay(painter, option, option.rect, "");
+                }
+                else
+                {
+                    drawDisplay(painter, option, option.rect, name);
+                }
+                break;
+            }
             case SW_SIZE:
             {
                 drawDisplay(painter, option, option.rect, misc::friendlyUnit(index.data().toLongLong(), sizeType));

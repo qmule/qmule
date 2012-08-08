@@ -1112,6 +1112,7 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
         }
     }
 
+    btnDownload->setEnabled(hasSelectedFiles());
     btnPreview->setEnabled(hasSelectedMedia());
 }
 
@@ -1242,6 +1243,24 @@ bool search_widget::hasSelectedMedia()
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
 
         if (misc::isPreviewable(misc::file_extension(filename)))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool search_widget::hasSelectedFiles()
+{
+    QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+    QModelIndexList::const_iterator iter;
+
+    for (iter = selected.begin(); iter != selected.end(); ++iter)
+    {
+        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
+
+        if (!filename.startsWith("<a"))
         {
             return true;
         }
@@ -1540,12 +1559,26 @@ void search_widget::processIsModSharedFiles(const libed2k::net_identifier& np, c
     }
 }
 
+// parse strings like: '500 MB', '1.6 GB'
+qlonglong parseSize(const QString& strSize)
+{
+    QStringList lst = strSize.split(" ", QString::SkipEmptyParts);
+    float base = lst[0].toFloat();
+    qlonglong mes = 1;
+    if (lst[1] == "KB") mes = 1024;
+    else if (lst[1] == "MB") mes = 1024 * 1024;
+    else if (lst[1] == "GB") mes = 1024 * 1024 * 1024;
+
+    return base * mes;
+}
+
 void search_widget::torrentSearchFinished(bool ok)
 {
     if (!ok) return;
 
     QWebElementCollection res_rows =
         torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
+    int row = 0;
 
     foreach (QWebElement res, res_rows) {
         QWebElement eText = res.findFirst("div[class=\"text\"] a");
@@ -1553,9 +1586,17 @@ void search_widget::torrentSearchFinished(bool ok)
         QString href = eText.attribute("href");
         QString magnet = res.findFirst("div[class=\"magnet\"] a").attribute("href");
         QString type = res.findFirst("div[class=\"date\"]").toPlainText();
-        QString size = res.findFirst("div[class=\" col-3\"]").toPlainText();
-        QString seeders = res.findFirst("div[class=\" col-4\"]").toPlainText();
-        QString leechers = res.findFirst("div[class=\" col-5\"]").toPlainText();
+        qlonglong size = parseSize(res.findFirst("div[class=\" col-3\"]").toPlainText());
+        int seeders = res.findFirst("div[class=\" col-4\"]").toPlainText().toInt();
+        int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
         QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
+
+        model->insertRow(row);
+        model->setData(model->index(row, SWDelegate::SW_NAME), eText.toOuterXml());
+        model->setData(model->index(row, SWDelegate::SW_SIZE), size);
+        model->setData(model->index(row, SWDelegate::SW_AVAILABILITY), seeders);
+        model->setData(model->index(row, SWDelegate::SW_SOURCES), site);
+        model->setData(model->index(row, SWDelegate::SW_TYPE), type);
+        row++;
     }
 }

@@ -115,6 +115,7 @@ private:
     bool findSelectedUser(QED2KSearchResultEntry& entry);
     void fillFileValues(int row, const QED2KSearchResultEntry& fileEntry, const QModelIndex& parent = QModelIndex());
     bool hasSelectedMedia();
+    bool hasSelectedFiles();
 
 private slots:
     void itemCondClicked(QTableWidgetItem* item);
