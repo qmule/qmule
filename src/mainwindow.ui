@@ -110,11 +110,6 @@
     <string>Visit &amp;Website</string>
    </property>
   </action>
-  <action name="actionDownload_from_URL">
-   <property name="text">
-    <string>Add &amp;link to torrent...</string>
-   </property>
-  </action>
   <action name="actionCreate_torrent">
    <property name="text">
     <string>Torrent &amp;creator</string>

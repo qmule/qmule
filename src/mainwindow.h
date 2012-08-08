@@ -158,12 +158,7 @@ protected slots:
   // Options slots
   void on_actionOptions_triggered();
   void optionsSaved();
-  // HTTP slots
-  void on_actionDownload_from_URL_triggered();
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-  void handleUpdateCheckFinished(bool update_available, QString new_version);
-  void handleUpdateInstalled(QString error_msg);
-#endif
+
 
   void on_actionStatus_triggerd();
   void on_actionTransfer_triggerd();
@@ -195,7 +190,6 @@ private:
   QPointer<options_imp> options;
   QPointer<consoleDlg> console;
   QPointer<TorrentCreatorDlg> createTorrentDlg;
-  QPointer<downloadFromURL> downloadFromURLDialog;
   QPointer<QSystemTrayIcon> systrayIcon;
   QPointer<QTimer> systrayCreator;
   QPointer<QMenu> myTrayIconMenu;
@@ -245,7 +239,6 @@ private slots:
     void on_actionSpeed_in_title_bar_triggered();
     void on_actionTop_tool_bar_triggered();
     void on_action_Import_Torrent_triggered();
-    void on_actionDonate_money_triggered();
     void on_actionExecution_Logs_triggered(bool checked);
     void on_actionAutoExit_qMule_toggled(bool );
     void on_actionAutoSuspend_system_toggled(bool );

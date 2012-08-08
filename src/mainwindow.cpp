@@ -140,7 +140,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   this->setWindowIcon(mainWndIcon);
 
   actionOpen->setIcon(IconProvider::instance()->getIcon("list-add"));
-  actionDownload_from_URL->setIcon(IconProvider::instance()->getIcon("insert-link"));
   actionSet_upload_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/seeding.png")));
   actionSet_download_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/download.png")));
   actionSet_global_upload_limit->setIcon(QIcon(QString::fromUtf8(":/Icons/skin/seeding.png")));
@@ -411,9 +410,6 @@ MainWindow::~MainWindow() {
     delete m_executionLog;
   if (options)
     delete options;
-  if (downloadFromURLDialog)
-    delete downloadFromURLDialog;
-
   if(systrayCreator) {
     delete systrayCreator;
   }
@@ -1385,7 +1381,6 @@ QMenu* MainWindow::getTrayIconMenu() {
   myTrayIconMenu->addAction(actionToggleVisibility);
   myTrayIconMenu->addSeparator();
   myTrayIconMenu->addAction(actionOpen);
-  //myTrayIconMenu->addAction(actionDownload_from_URL);
   myTrayIconMenu->addSeparator();
   const bool isAltBWEnabled = Preferences().isAltBandwidthEnabled();
   updateAltSpeedsBtn(isAltBWEnabled);
@@ -1443,53 +1438,6 @@ void MainWindow::on_actionSpeed_in_title_bar_triggered() {
 void MainWindow::on_action_Import_Torrent_triggered()
 {
   TorrentImportDlg::importTorrent();
-}
-
-/*****************************************************
- *                                                   *
- *                 HTTP Downloader                   *
- *                                                   *
- *****************************************************/
-
-// Display an input dialog to prompt user for
-// an url
-void MainWindow::on_actionDownload_from_URL_triggered() {
-  if (!downloadFromURLDialog) {
-    downloadFromURLDialog = new downloadFromURL(this);
-    connect(downloadFromURLDialog, SIGNAL(urlsReadyToBeDownloaded(QStringList)), this, SLOT(downloadFromURLList(QStringList)));
-  }
-}
-
-#if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-
-void MainWindow::handleUpdateCheckFinished(bool update_available, QString new_version)
-{
-  if (update_available) {
-    if (QMessageBox::question(this, tr("A newer version is available"),
-                             tr("A newer version of qMule is available on Sourceforge.\nWould you like to update qMule to version %1?").arg(new_version),
-                             QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
-      // The user want to update, let's download the update
-      ProgramUpdater* updater = dynamic_cast<ProgramUpdater*>(sender());
-      connect(updater, SIGNAL(updateInstallFinished(QString)), SLOT(handleUpdateInstalled(QString)));
-      updater->updateProgram();
-      return;
-    }
-  }
-  sender()->deleteLater();
-}
-
-void MainWindow::handleUpdateInstalled(QString error_msg)
-{
-  if (!error_msg.isEmpty()) {
-    QMessageBox::critical(this, tr("Impossible to update qMule"), tr("qMule failed to update, reason: %1").arg(error_msg));
-  }
-}
-
-#endif
-
-void MainWindow::on_actionDonate_money_triggered()
-{
-  QDesktopServices::openUrl(QUrl("http://sourceforge.net/donate/index.php?group_id=163414"));
 }
 
 void MainWindow::showConnectionSettings()

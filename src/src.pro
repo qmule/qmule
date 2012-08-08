@@ -155,7 +155,8 @@ nox {
               status_bar.h \
               clicked_label.h \
               collection_save_dlg.h \ 
-			  infodlg.h
+			  infodlg.h \
+              silent_updater.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -181,18 +182,12 @@ nox {
              files_widget.cpp \
              status_bar.cpp \
              collection_save_dlg.cpp \ 
-			 infodlg.cpp
-  win32 {
-    HEADERS += programupdater.h
-    SOURCES += programupdater.cpp
-  }
+			 infodlg.cpp \
+             silent_updater.cpp
 
   macx {
-    HEADERS += qmacapplication.h \
-               programupdater.h
-
-    SOURCES += qmacapplication.cpp \
-               programupdater.cpp
+    HEADERS += qmacapplication.h 
+    SOURCES += qmacapplication.cpp 
   }
 
   FORMS += mainwindow.ui \
