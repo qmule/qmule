@@ -29,17 +29,17 @@ private:
     int                     m_minor;
     int                     m_update;
     int                     m_build;
+    QNetworkReply*          m_reply;        //!< download reply
+    QNetworkReply*          m_update_reply; //!< update reply
     QScopedPointer<QTimer>  m_check_tm;
-    QScopedPointer<QNetworkAccessManager> m_version_nc;
-    QScopedPointer<QNetworkAccessManager> m_downloader;
+    QScopedPointer<QNetworkAccessManager> m_nm;
     QScopedPointer<QFile>                 m_file;
-    QNetworkReply*                        m_reply;
     
 signals:
     
 private slots:
     void on_check_updates();
-    void on_network_check_completed(QNetworkReply* pReply);
+    void on_update_check_finished();
     void on_data_finished();
     void on_data_ready();
 
