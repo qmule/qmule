@@ -47,6 +47,9 @@
 #include <QIcon>
 #endif
 
+#define PRODUCT_NAME "qMule"
+#define COMPANY_NAME "intersvyaz"
+
 const qlonglong MAX_ETA = 8640000;
 
 typedef QMap<QString, QList<QString> > shared_map;
