@@ -2,7 +2,6 @@
 #include <QAction>
 #include <QPushButton>
 #include <QStandardItemModel>
-#include <QSortFilterProxyModel>
 #include <QMessageBox>
 #include <QWebFrame>
 #include <QWebElementCollection>
@@ -252,7 +251,7 @@ search_widget::search_widget(QWidget *parent)
     model.data()->setHeaderData(SWDelegate::SW_BITRATE, Qt::Horizontal,        tr("Bitrate"));
     model.data()->setHeaderData(SWDelegate::SW_CODEC, Qt::Horizontal,          tr("Codec"));
 
-    filterModel.reset(new QSortFilterProxyModel());
+    filterModel.reset(new SWSortFilterProxyModel());
     filterModel.data()->setDynamicSortFilter(true);
     filterModel.data()->setSourceModel(model.data());
     filterModel.data()->setFilterKeyColumn(SWDelegate::SW_NAME);
@@ -1612,4 +1611,17 @@ void search_widget::torrentSearchFinished(bool ok)
     }
 
     processSearchResult(libed2k::net_identifier(), QString(), entries, false);
+}
+
+bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    QString name1 = sourceModel()->data(sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
+    QString name2 = sourceModel()->data(sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
+    bool torr1 = name1.startsWith("<a");
+    bool torr2 = name2.startsWith("<a");
+
+    if (torr1 && !torr2) return sortOrder() == Qt::DescendingOrder;
+    else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
+
+    return QSortFilterProxyModel::lessThan(left, right);
 }

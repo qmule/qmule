@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QWebView>
+#include <QSortFilterProxyModel>
 
 #include "ui_search_widget.h"
 #include "search_widget_delegate.h"
@@ -153,6 +154,13 @@ private slots:
 
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
+};
+
+class SWSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    SWSortFilterProxyModel(QObject* parent = 0): QSortFilterProxyModel(parent){}
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 };
 
 #endif // SEARCH_WIDGET_H
