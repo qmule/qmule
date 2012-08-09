@@ -873,12 +873,12 @@ void search_widget::fillFileValues(int row, const QED2KSearchResultEntry& fileEn
 {
     model->setData(model->index(row, SWDelegate::SW_NAME, parent), fileEntry.m_strFilename);
     model->setData(model->index(row, SWDelegate::SW_SIZE, parent), fileEntry.m_nFilesize);
-    model->setData(model->index(row, SWDelegate::SW_AVAILABILITY, parent), fileEntry.m_nCompleteSources);
     QString sources = (fileEntry.m_nSources > 0) ? (QString::number(100 * fileEntry.m_nCompleteSources / fileEntry.m_nSources)) : "0";
     sources += "%(";
-    sources += QString::number(fileEntry.m_nSources);
+    sources += QString::number(fileEntry.m_nCompleteSources);
     sources += ")";
     model->setData(model->index(row, SWDelegate::SW_SOURCES, parent), sources);
+    model->setData(model->index(row, SWDelegate::SW_AVAILABILITY, parent), fileEntry.m_nSources);
 
     EED2KFileType fileType = GetED2KFileTypeID(fileEntry.m_strFilename.toStdString());
     switch (fileType)
