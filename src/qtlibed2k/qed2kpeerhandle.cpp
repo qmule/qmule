@@ -65,5 +65,5 @@ void QED2KPeerHandle::requestDirFiles(QString dirHash)
 
 QString QED2KPeerHandle::getUserName()
 {
-    return QString::fromStdString(m_delegate.get_options().m_strName);
+    return QString::fromUtf8(m_delegate.get_options().m_strName.c_str());
 }
