@@ -25,7 +25,6 @@ QString current_filename()
     return QApplication::applicationFilePath();
 }
 
-
 silent_updater::silent_updater(int major, int minor, int update, int build, QObject *parent) :
     QObject(parent),
     m_download_aborted(false),
@@ -64,7 +63,7 @@ void silent_updater::start()
 {
     if (m_started) return;
     m_started = true;
-    m_check_tm->start(1000);
+    m_check_tm->start(10000);   // start first check after 10 seconds from program was started
 }
 
 void silent_updater::on_check_updates()
@@ -169,7 +168,7 @@ void silent_updater::on_update_check_finished()
     m_update_reply->deleteLater();
     m_update_reply = NULL;
     // start new cycle - possible we got temporary fail
-    m_check_tm->start(10000);
+    m_check_tm->start(update_timeout);
 }
 
 void silent_updater::on_data_ready()
@@ -239,7 +238,7 @@ void silent_updater::on_data_finished()
     else
     {
         // start new upgrade iteration when changes weren't made
-        m_check_tm->start(10000);
+        m_check_tm->start(update_timeout);
     }
 }
 

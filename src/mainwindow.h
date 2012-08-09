@@ -43,6 +43,7 @@
 #include "qtorrenthandle.h"
 #include "transfer_list.h"
 #include "infodlg.h"
+#include "silent_updater.h"
 
 class downloadFromURL;
 class options_imp;
@@ -222,6 +223,7 @@ private:
   QTimer *authTimer;
   QTimer *flickerTimer;
   QScopedPointer<is_info_dlg> m_info_dlg;
+  QScopedPointer<silent_updater> m_updater;
   libed2k::auth_runner ar;
 
   QIcon icon_disconnected;

@@ -19,6 +19,7 @@ class silent_updater : public QObject
 {
     Q_OBJECT
 public:
+    enum { update_timeout = 3600000 };
     explicit silent_updater(int major, int minor, int update, int build, QObject *parent = 0);
     ~silent_updater();
     void start();

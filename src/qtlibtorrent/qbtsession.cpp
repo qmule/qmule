@@ -62,7 +62,6 @@
 #include <libtorrent/extensions/lt_trackers.hpp>
 #include <libtorrent/extensions/ut_pex.hpp>
 #include <libtorrent/extensions/smart_ban.hpp>
-//#include <libtorrent/extensions/metadata_transfer.hpp>
 #include <libtorrent/entry.hpp>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/error_code.hpp>
@@ -127,8 +126,9 @@ void QBtSession::start()
   QList<int> version;
   version << VERSION_MAJOR;
   version << VERSION_MINOR;
-  version << VERSION_BUGFIX;
-  version << 0;
+  version << VERSION_UPDATE;
+  version << VERSION_BUILD;
+
   const QString peer_id = "qB";
   // Construct session
   s = new session(fingerprint(peer_id.toLocal8Bit().constData(), version.at(0), version.at(1), version.at(2), version.at(3)), 0);
@@ -139,8 +139,8 @@ void QBtSession::start()
   s->set_alert_mask(alert::error_notification | alert::peer_notification | alert::port_mapping_notification | alert::storage_notification | alert::tracker_notification | alert::status_notification | alert::ip_block_notification | alert::progress_notification);
   // Load previous state
   loadSessionState();
+
   // Enabling plugins
-  //s->add_extension(&create_metadata_plugin);
   s->add_extension(&create_ut_metadata_plugin);
   if (pref.trackerExchangeEnabled())
     s->add_extension(&create_lt_trackers_plugin);
