@@ -9,9 +9,6 @@ collection_save_dlg::collection_save_dlg(QWidget *parent, QString path)
 {
     setupUi(this);
 
-    Preferences pref;
-    QDir incoming(pref.getSavePath());
-
     QString collectionName;    
     if (path.lastIndexOf("/") >=0 )
         collectionName = path.right(path.size() - path.lastIndexOf("/") - 1);
@@ -87,7 +84,7 @@ void collection_save_dlg::init()
     Preferences pref;
     dirPath = pref.getSavePath();
     separator = '/';
-    QDir incoming(pref.getSavePath());
+    QDir incoming(dirPath);
     labelPath->setText(incoming.filePath(lineDirName->text()));
 }
 
