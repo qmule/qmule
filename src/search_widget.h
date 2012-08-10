@@ -71,8 +71,8 @@ private:
 
     int nCurTabSearch;
     int nSortedColumn;
+    int nSearchesInProgress;
 
-    bool moreSearch;
     QIcon iconSerachActive;
     QIcon iconSearchResult;
     QIcon iconUserFiles;
@@ -118,14 +118,13 @@ private:
     bool hasSelectedMedia();
     bool hasSelectedFiles();
 
+    void processSearchResult(const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult);
+
 private slots:
     void itemCondClicked(QTableWidgetItem* item);
     void sortChanged(int logicalIndex, Qt::SortOrder order);
     void startSearch();
     void continueSearch();
-    void processSearchResult(const libed2k::net_identifier& np,
-    		                 const QString& hash,
-    		                 const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
     void closeTab(int index);
     void selectTab(int nTabNum);
     void closeAllTabs();
@@ -150,6 +149,8 @@ private slots:
     void itemCollapsed(const QModelIndex& index);
     void itemExpanded(const QModelIndex& index);
 
+    void ed2kSearchFinished(const libed2k::net_identifier& np,const QString& hash,
+                            const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
     void torrentSearchFinished(bool ok);
 
 signals:

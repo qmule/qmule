@@ -130,7 +130,7 @@ QVariant selected_data(QAbstractItemView* view, int column, const QModelIndex& i
 }
 
 search_widget::search_widget(QWidget *parent)
-    : QWidget(parent) , nCurTabSearch(-1), nSortedColumn(-1)
+    : QWidget(parent) , nCurTabSearch(-1), nSortedColumn(-1), nSearchesInProgress(0)
 {
     setupUi(this);
 
@@ -278,8 +278,11 @@ search_widget::search_widget(QWidget *parent)
     connect(tableCond, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(itemCondClicked(QTableWidgetItem*)));
     connect(btnStart, SIGNAL(clicked()), this, SLOT(startSearch()));
     connect(btnMore, SIGNAL(clicked()), this, SLOT(continueSearch()));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(searchResult(const libed2k::net_identifier&, const QString&, const std::vector<QED2KSearchResultEntry>&, bool)),
-    		this, SLOT(processSearchResult(const libed2k::net_identifier&, const QString&, const std::vector<QED2KSearchResultEntry>&, bool)));
+    connect(Session::instance()->get_ed2k_session(),
+            SIGNAL(searchResult(const libed2k::net_identifier&, const QString&,
+                                const std::vector<QED2KSearchResultEntry>&, bool)),
+    		this, SLOT(ed2kSearchFinished(const libed2k::net_identifier&, const QString&,
+                                          const std::vector<QED2KSearchResultEntry>&, bool)));
     connect(tabSearch, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabSearch, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(closeAll, SIGNAL(triggered()),  this, SLOT(closeAllTabs()));
@@ -593,8 +596,6 @@ void search_widget::startSearch()
     btnCancel->setEnabled(false);
     btnMore->setEnabled(false);
 
-    moreSearch = false;
-
     if (checkPlus->checkState() == Qt::Checked)
         searchRequest += " NOT +++";
 
@@ -603,6 +604,8 @@ void search_widget::startSearch()
         fileType, fileExt, mediaCodec, nBitRate, 0);
 
     torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/") + searchRequest));
+
+    nSearchesInProgress = 2;
 }
 
 void search_widget::continueSearch()
@@ -613,21 +616,25 @@ void search_widget::continueSearch()
 
     tabSearch->setTabIcon(nCurTabSearch, iconSerachActive);
 
-    moreSearch = true;
     Session::instance()->get_ed2k_session()->searchMoreResults();
+
+    nSearchesInProgress += 1;
 }
 
-void search_widget::processSearchResult(const libed2k::net_identifier& np,
-		const QString& hash,
-		const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult)
+void search_widget::processSearchResult(
+    const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult)
 {
+    nSearchesInProgress -= 1;
+
     if (nCurTabSearch < 0)
         return;
 
     tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
-    btnStart->setEnabled(true);      
+    btnStart->setEnabled(nSearchesInProgress == 0);
 
-    btnMore->setEnabled(bMoreResult);
+    if (obMoreResult)
+        btnMore->setEnabled(obMoreResult);
+
     searchItems[nCurTabSearch].vecResults.insert(searchItems[nCurTabSearch].vecResults.end(), vRes.begin(), vRes.end());
 
     quint64 overallSize = 0;
@@ -1579,6 +1586,13 @@ qlonglong parseSize(const QString& strSize)
     return base * mes;
 }
 
+void search_widget::ed2kSearchFinished(
+    const libed2k::net_identifier& np,const QString& hash,
+    const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult)
+{
+    processSearchResult(vRes, bMoreResult);
+}
+
 void search_widget::torrentSearchFinished(bool ok)
 {
     if (!ok) return;
@@ -1603,14 +1617,14 @@ void search_widget::torrentSearchFinished(bool ok)
             QED2KSearchResultEntry entry;
             entry.m_strFilename = eText.toOuterXml();
             entry.m_nFilesize = size;
-            entry.m_nCompleteSources = seeders;
+            entry.m_nSources = seeders;
             entry.m_strMediaCodec = type;
             entry.m_hFile = site;
             entries.push_back(entry);
         }
     }
 
-    processSearchResult(libed2k::net_identifier(), QString(), entries, false);
+    processSearchResult(entries, boost::optional<bool>());
 }
 
 bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
