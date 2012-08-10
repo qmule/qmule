@@ -1169,7 +1169,7 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>Some files are currently transferring.
 Are you sure you want to quit qMule?</source>
-        <translation type="obsolete">Есть активные торренты. Вы уверены что хотите выйти из qMule?</translation>
+        <translation type="obsolete">Некоторые файлы передаются в данный момент. Вы уверены что хотите выйти из qMule?</translation>
     </message>
     <message>
         <source>Alt+2</source>
