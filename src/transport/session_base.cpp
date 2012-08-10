@@ -37,7 +37,7 @@ bool SessionBase::hasActiveTransfers() const
     std::vector<Transfer>::iterator torrentIT;
     for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
         const Transfer h(*torrentIT);
-        if (h.is_valid() && !h.is_paused() && !h.is_queued())
+        if (h.is_valid() && !h.is_seed() && !h.is_paused() && !h.is_queued() )
             return true;
     }
     return false;
