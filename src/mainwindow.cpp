@@ -698,7 +698,10 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     return;
   }
 
-  if (pref.confirmOnExit() && Session::instance()->hasActiveTransfers())
+  SessionStatus status = Session::instance()->getSessionStatus();
+
+  // has active transfers or sessions speed > 0 (we have incoming peers)
+  if (pref.confirmOnExit() && (Session::instance()->hasActiveTransfers() || (status.payload_download_rate > 0) || (status.payload_upload_rate > 0)))
   {
     if (e->spontaneous() || force_exit) {
       if (!isVisible())
