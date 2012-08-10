@@ -17,6 +17,20 @@
 
 using namespace libed2k;
 
+boost::optional<int> toInt(const QString& str)
+{
+    bool bOk = false;
+    int res = str.toInt(&bOk);
+    return bOk ? boost::optional<int>(res) : boost::optional<int>();
+}
+
+boost::optional<qulonglong> toULongLong(const QString& str)
+{
+    bool bOk = false;
+    qulonglong res = str.toULongLong(&bOk);
+    return bOk ? boost::optional<qulonglong>(res) : boost::optional<qulonglong>();
+}
+
 UserDir::UserDir(Preferences& pref)
 {
     bExpanded = pref.value("Expanded", false).toBool();
@@ -603,9 +617,15 @@ void search_widget::startSearch()
         searchRequest, nMinSize, nMaxSize, nAvail, nSources,
         fileType, fileExt, mediaCodec, nBitRate, 0);
 
-    torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/") + searchRequest));
+    nSearchesInProgress = 1;
 
-    nSearchesInProgress = 2;
+    if (fileType != ED2KFTSTR_EMULECOLLECTION.c_str() &&
+        fileType != ED2KFTSTR_FOLDER.c_str() &&
+        fileType != ED2KFTSTR_USER.c_str())
+    {
+        torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/0/") + searchRequest));
+        nSearchesInProgress++;
+    }
 }
 
 void search_widget::continueSearch()
@@ -1567,11 +1587,11 @@ void search_widget::processIsModSharedFiles(const libed2k::net_identifier& np, c
 
 // parse strings like: '500 MB', '1.6 GB'
 // return 0 on fail
-qlonglong parseSize(const QString& strSize)
+qulonglong parseSize(const QString& strSize)
 {
     QStringList lst = strSize.split(" ", QString::SkipEmptyParts);
     float base = 0;
-    qlonglong mes = 1;
+    qulonglong mes = 1;
 
     if (lst.size() == 2)
     {
@@ -1597,6 +1617,13 @@ void search_widget::torrentSearchFinished(bool ok)
 {
     if (!ok) return;
 
+    boost::optional<qulonglong> oMinSize = toULongLong(tableCond->item(0, 1)->text());
+    if (oMinSize) oMinSize = oMinSize.get() * 1024 * 1024;
+    boost::optional<qulonglong> oMaxSize = toULongLong(tableCond->item(1, 1)->text());
+    if (oMaxSize) oMaxSize = oMaxSize.get() * 1024 * 1024;
+    boost::optional<int> oAvail = toInt(tableCond->item(2, 1)->text());
+    boost::optional<int> oSources = toInt(tableCond->item(3, 1)->text());
+
     QWebElementCollection res_rows =
         torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
     std::vector<QED2KSearchResultEntry> entries;
@@ -1607,17 +1634,21 @@ void search_widget::torrentSearchFinished(bool ok)
         QString href = eText.attribute("href");
         QString magnet = res.findFirst("div[class=\"magnet\"] a").attribute("href");
         QString type = res.findFirst("div[class=\"date\"]").toPlainText();
-        qlonglong size = parseSize(res.findFirst("div[class=\" col-3\"]").toPlainText());
+        qulonglong size = parseSize(res.findFirst("div[class=\" col-3\"]").toPlainText());
         int seeders = res.findFirst("div[class=\" col-4\"]").toPlainText().toInt();
         int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
         QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
 
-        if (!eText.isNull() && size)
+        if (!eText.isNull() && size &&
+            size >= oMinSize.get_value_or(0) &&
+            size <= oMaxSize.get_value_or(std::numeric_limits<qulonglong>::max()) &&
+            seeders >= oAvail.get_value_or(0) && seeders >= oSources.get_value_or(0))
         {
             QED2KSearchResultEntry entry;
             entry.m_strFilename = eText.toOuterXml();
             entry.m_nFilesize = size;
             entry.m_nSources = seeders;
+            entry.m_nCompleteSources = seeders;
             entry.m_strMediaCodec = type;
             entry.m_hFile = site;
             entries.push_back(entry);
@@ -1629,8 +1660,10 @@ void search_widget::torrentSearchFinished(bool ok)
 
 bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    QString name1 = sourceModel()->data(sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
-    QString name2 = sourceModel()->data(sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
+    QString name1 = sourceModel()->data(
+        sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
+    QString name2 = sourceModel()->data(
+        sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
     bool torr1 = name1.startsWith("<a");
     bool torr2 = name2.startsWith("<a");
 
