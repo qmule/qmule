@@ -617,7 +617,8 @@ void TransferListWidget::renameSelectedTorrent() {
   bool ok;
   const QString name = QInputDialog::getText(this, tr("Rename"), tr("New name:"), QLineEdit::Normal, h.name(), &ok);
   if (ok && !name.isEmpty()) {
-    // Rename the torrent
+    if (h.type() == Transfer::ED2K) h.rename_file(0, name);
+    // Rename the transfer
     nameFilterModel->setData(selectedIndexes.first(), name, Qt::DisplayRole);
   }
 }

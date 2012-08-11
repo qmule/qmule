@@ -1,6 +1,7 @@
 #include <libed2k/constants.hpp>
 
 #include "qed2khandle.h"
+#include "torrentpersistentdata.h"
 #include "misc.h"
 
 QED2KHandle::QED2KHandle()
@@ -138,8 +139,20 @@ void QED2KHandle::get_peer_info(std::vector<PeerInfo>& infos) const {
 std::vector<AnnounceEntry> QED2KHandle::trackers() const { return std::vector<AnnounceEntry>(); }
 void QED2KHandle::pause() const { m_delegate.pause(); }
 void QED2KHandle::resume() const { m_delegate.resume(); }
-void QED2KHandle::move_storage(const QString& path) const {}
-void QED2KHandle::rename_file(int index, const QString& new_name) const {}
+void QED2KHandle::move_storage(const QString& new_path) const {
+    if (QDir(save_path()) == QDir(new_path))
+        return;
+
+    TorrentPersistentData::setPreviousSavePath(hash(), save_path());
+    // Create destination directory if necessary
+    // or move_storage() will fail...
+    QDir().mkpath(new_path);
+    // Actually move the storage
+    m_delegate.move_storage(new_path.toUtf8().constData());
+}
+void QED2KHandle::rename_file(int index, const QString& new_name) const {
+    m_delegate.rename_file(new_name.toUtf8().constData());
+}
 void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
 void QED2KHandle::prioritize_first_last_piece(bool p) const
 {
