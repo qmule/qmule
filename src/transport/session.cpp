@@ -203,9 +203,6 @@ qreal Session::getGlobalMaxRatio() const { return m_btSession.getGlobalMaxRatio(
 qreal Session::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const {
     return delegate(hash)->getMaxRatioPerTransfer(hash, use_global);
 }
-bool Session::isFilePreviewPossible(const QString& hash) const {
-    return delegate(hash)->isFilePreviewPossible(hash);
-}
 void Session::changeLabelInSavePath(
     const Transfer& t, const QString& old_label, const QString& new_label) {
     return delegate(t)->changeLabelInSavePath(t, old_label, new_label);

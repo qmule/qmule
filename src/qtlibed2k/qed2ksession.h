@@ -78,7 +78,6 @@ public:
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
-    bool isFilePreviewPossible(const QString& hash) const;
     SessionStatus getSessionStatus() const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);
     void pauseTransfer(const QString& hash);

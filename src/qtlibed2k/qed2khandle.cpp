@@ -111,7 +111,11 @@ bool QED2KHandle::first_last_piece_first() const {
         m_delegate.piece_priority(last_piece) == 7 &&
         m_delegate.piece_priority(penult_piece) == 7;
 }
-void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {}
+void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {
+    fp.clear();
+    // using piece progress granularity
+    fp.push_back(pieces().count() * libed2k::PIECE_SIZE);
+}
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
 QString QED2KHandle::filepath_at(unsigned int index) const {
     return misc::toQStringU(m_delegate.filepath().string());

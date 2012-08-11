@@ -34,7 +34,6 @@ public:
     qlonglong getETA(const QString& hash) const;
     qreal getGlobalMaxRatio() const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
-    bool isFilePreviewPossible(const QString& hash) const;
     QStringList getConsoleMessages() const;
     QStringList getPeerBanMessages() const;
     SessionStatus getSessionStatus() const;

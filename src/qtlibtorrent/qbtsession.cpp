@@ -1666,21 +1666,6 @@ void QBtSession::addPeerBanMessage(QString ip, bool from_ipfilter) {
   emit newBanMessage(msg);
 }
 
-bool QBtSession::isFilePreviewPossible(const QString &hash) const {
-  // See if there are supported files in the torrent
-  const QTorrentHandle h = getTorrentHandle(hash);
-  if (!h.is_valid() || !h.has_metadata()) {
-    return false;
-  }
-  const unsigned int nbFiles = h.num_files();
-  for (unsigned int i=0; i<nbFiles; ++i) {
-    const QString extension = misc::file_extension(h.filename_at(i));
-    if (misc::isPreviewable(extension))
-      return true;
-  }
-  return false;
-}
-
 void QBtSession::addTorrentsFromScanFolder(QStringList &pathList) {
   foreach (const QString &file, pathList) {
     qDebug("File %s added", qPrintable(file));
