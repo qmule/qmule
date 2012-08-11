@@ -700,7 +700,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   bool super_seeding_mode = false;
   bool all_same_sequential_download_mode = true, all_same_prio_firstlast = true;
   bool sequential_download_mode = false, prioritize_first_last = false;
-  bool one_has_metadata = false, one_not_seed = false;
+  bool one_has_metadata = false, one_not_seed = false, one_is_bittorrent = false;
   bool first = true;
   Transfer h;
   qDebug("Displaying menu");
@@ -712,6 +712,8 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     if (!h.is_valid()) continue;
     if (h.has_metadata())
       one_has_metadata = true;
+    if (h.type() == Transfer::BITTORRENT)
+      one_is_bittorrent = true;
     if (!h.is_seed()) {
       one_not_seed = true;
       if (h.has_metadata()) {
@@ -816,7 +818,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     prioMenu->addAction(&actionBottomPriority);
   }
   listMenu.addSeparator();
-  if (one_has_metadata)
+  if (one_has_metadata && one_is_bittorrent)
     listMenu.addAction(&actionCopy_magnet_link);
   // Call menu
   QAction *act = 0;
