@@ -292,6 +292,8 @@ search_widget::search_widget(QWidget *parent)
     connect(tableCond, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(itemCondClicked(QTableWidgetItem*)));
     connect(btnStart, SIGNAL(clicked()), this, SLOT(startSearch()));
     connect(btnMore, SIGNAL(clicked()), this, SLOT(continueSearch()));
+    connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSearch()));
+    connect(btnClear, SIGNAL(clicked()), this, SLOT(clearSearch()));
     connect(Session::instance()->get_ed2k_session(),
             SIGNAL(searchResult(const libed2k::net_identifier&, const QString&,
                                 const std::vector<QED2KSearchResultEntry>&, bool)),
@@ -607,7 +609,7 @@ void search_widget::startSearch()
     
     clearSearchTable();
     btnStart->setEnabled(false);
-    btnCancel->setEnabled(false);
+    btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
 
     if (checkPlus->checkState() == Qt::Checked)
@@ -619,7 +621,8 @@ void search_widget::startSearch()
 
     nSearchesInProgress = 1;
 
-    if (fileType != ED2KFTSTR_EMULECOLLECTION.c_str() &&
+    if (checkTorrents->checkState() == Qt::Checked &&
+        fileType != ED2KFTSTR_EMULECOLLECTION.c_str() &&
         fileType != ED2KFTSTR_FOLDER.c_str() &&
         fileType != ED2KFTSTR_USER.c_str())
     {
@@ -631,7 +634,7 @@ void search_widget::startSearch()
 void search_widget::continueSearch()
 {
     btnStart->setEnabled(false);
-    btnCancel->setEnabled(false);
+    btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
 
     tabSearch->setTabIcon(nCurTabSearch, iconSerachActive);
@@ -639,6 +642,34 @@ void search_widget::continueSearch()
     Session::instance()->get_ed2k_session()->searchMoreResults();
 
     nSearchesInProgress += 1;
+}
+
+void search_widget::cancelSearch()
+{
+    Session::instance()->get_ed2k_session()->cancelSearch();
+
+    btnStart->setEnabled(true);
+    btnCancel->setEnabled(false);
+    btnMore->setEnabled(false);
+
+    tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
+
+    nSearchesInProgress = 0;
+
+    nCurTabSearch = -1;
+}
+
+void search_widget::clearSearch()
+{
+    comboName->setEditText("");
+    comboType->setCurrentIndex(0);
+
+    checkOwn->setChecked(Qt::Unchecked);
+    checkPlus->setChecked(Qt::Unchecked);
+    checkTorrents->setChecked(Qt::Unchecked);
+
+    for (int ii = 0; ii < 11; ii ++)
+        tableCond->item(ii, 1)->setText("");
 }
 
 void search_widget::processSearchResult(
@@ -651,6 +682,7 @@ void search_widget::processSearchResult(
 
     tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
     btnStart->setEnabled(nSearchesInProgress == 0);
+    btnCancel->setEnabled(nSearchesInProgress != 0);
 
     if (obMoreResult)
         btnMore->setEnabled(obMoreResult);
@@ -740,7 +772,12 @@ void search_widget::closeTab(int index)
     if (tabSearch->currentIndex() == nCurTabSearch)
     {
         nCurTabSearch = -1;
+
+        btnStart->setEnabled(true);
+        btnCancel->setEnabled(false);
         btnMore->setEnabled(false);
+
+        nSearchesInProgress = 0;
     }
     tabSearch->removeTab(index);
     
@@ -1023,7 +1060,8 @@ void search_widget::showErrorParamMsg(int numParam)
 
 void search_widget::searchTextChanged(const QString text)
 {
-    btnStart->setEnabled(text.length() > 0);
+    if (!nSearchesInProgress)
+        btnStart->setEnabled(text.length() > 0);
 }
 
 void search_widget::applyFilter(QString filter)

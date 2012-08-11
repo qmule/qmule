@@ -125,6 +125,8 @@ private slots:
     void sortChanged(int logicalIndex, Qt::SortOrder order);
     void startSearch();
     void continueSearch();
+    void cancelSearch();
+    void clearSearch();
     void closeTab(int index);
     void selectTab(int nTabNum);
     void closeAllTabs();

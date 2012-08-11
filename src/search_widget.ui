@@ -123,6 +123,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="checkTorrents">
+           <property name="text">
+            <string>Use torrent search</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

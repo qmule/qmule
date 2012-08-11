@@ -3,6 +3,8 @@
 
 #include <QItemDelegate>
 #include <QAbstractItemView>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 #include <QLabel>
 
 #include "misc.h"
@@ -56,7 +58,27 @@ public:
                 }
                 else
                 {
-                    drawDisplay(painter, option, option.rect, name);
+                    QRect textRect = option.rect;
+                    const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+                    if (filterModel)
+                    {
+                        const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(filterModel->sourceModel());
+                        if (model)
+                        {
+                            QStandardItem* item = model->itemFromIndex(filterModel->mapToSource(index));
+                            if (item)
+                            {
+                                QIcon icon = item->icon();
+                                QRect imgRect = option.rect;
+                                imgRect.setHeight(16);
+                                imgRect.setWidth(16);
+                                drawDecoration(painter, option, imgRect, icon.pixmap(16, 16));
+
+                                textRect.setLeft(textRect.left() + 16);
+                            }
+                        }
+                    }
+                    drawDisplay(painter, option, textRect, name);
                 }
                 break;
             }
