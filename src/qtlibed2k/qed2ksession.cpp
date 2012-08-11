@@ -464,6 +464,11 @@ void QED2KSession::searchMoreResults()
     m_session->post_search_more_result_request();
 }
 
+void QED2KSession::cancelSearch()
+{
+    m_session->post_cancel_search();
+}
+
 libed2k::peer_connection_handle QED2KSession::getPeer(const libed2k::net_identifier& np)
 {
     libed2k::peer_connection_handle pch = m_session->find_peer_connection(np);

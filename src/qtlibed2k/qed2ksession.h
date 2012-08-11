@@ -138,6 +138,10 @@ public slots:
 	  * you can search more results only when previous call return succuss
 	 */
 	void searchMoreResults();
+	/**
+	  * stops current search
+	 */
+    void cancelSearch();
 
     libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
 

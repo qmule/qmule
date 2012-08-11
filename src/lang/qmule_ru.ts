@@ -202,7 +202,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Check for software updates</source>
-        <translation>Проверить обновления</translation>
+        <translation type="obsolete">Проверить обновления</translation>
     </message>
     <message>
         <source>Use system icon theme</source>
@@ -5321,6 +5321,10 @@ Do you want to install it now?</source>
         <source>Add...</source>
         <translation>Добавить...</translation>
     </message>
+    <message>
+        <source>4662</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>authentication</name>
@@ -6678,7 +6682,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Display own files</source>
-        <translation>Показывать собственный файлы</translation>
+        <translation>Показывать свои файлы</translation>
     </message>
     <message>
         <source>Filter &apos;+++&apos;</source>
@@ -6854,43 +6858,47 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Clients</source>
-        <translation type="unfinished"></translation>
+        <translation>Клиенты</translation>
     </message>
     <message>
         <source>Update client</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновить клиента</translation>
     </message>
     <message>
         <source>Details...</source>
-        <translation type="unfinished">Детали...</translation>
+        <translation>Детали...</translation>
     </message>
     <message>
         <source>Add to friends</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в друзья</translation>
     </message>
     <message>
         <source>Send message</source>
-        <translation type="unfinished">Послать сообщение</translation>
+        <translation>Послать сообщение</translation>
     </message>
     <message>
         <source>Browse files</source>
-        <translation type="unfinished">Просмотреть файлы</translation>
+        <translation>Просмотреть файлы</translation>
     </message>
     <message>
         <source>Files: </source>
-        <translation type="unfinished"></translation>
+        <translation>Файлы: </translation>
     </message>
     <message>
         <source>Folders: </source>
-        <translation type="unfinished"></translation>
+        <translation>Каталоги: </translation>
     </message>
     <message>
         <source>Clients: </source>
-        <translation type="unfinished">Клиенты: </translation>
+        <translation>Клиенты: </translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation type="unfinished">Предпросмотр</translation>
+        <translation>Предпросмотр</translation>
+    </message>
+    <message>
+        <source>Use torrent search</source>
+        <translation>Поиск по торрентам</translation>
     </message>
 </context>
 <context>
