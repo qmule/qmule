@@ -767,6 +767,24 @@ void search_widget::processSearchResult(
         selectTab(nCurTabSearch);
 }
 
+Transfer search_widget::addTransfer(const QModelIndex& index)
+{
+    QString hash = selected_data(treeResult, SWDelegate::SW_ID, index).toString();
+    QString filename = selected_data(treeResult, SWDelegate::SW_NAME, index).toString();
+    QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
+
+    libed2k::add_transfer_params params;
+    params.file_hash = libed2k::md4_hash::fromString(hash.toStdString());
+    params.file_path = filepath.toUtf8().constData();
+    params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE, index).toULongLong();
+    params.seed_mode = false;
+    params.num_complete_sources = selected_data(treeResult, SWDelegate::SW_SOURCES, index).toInt();
+    params.num_incomplete_sources =
+        selected_data(treeResult, SWDelegate::SW_AVAILABILITY, index).toInt() -
+        params.num_complete_sources;
+    return Session::instance()->addTransfer(params);
+}
+
 void search_widget::closeTab(int index)
 {
     if (tabSearch->currentIndex() == nCurTabSearch)
@@ -936,11 +954,7 @@ void search_widget::fillFileValues(int row, const QED2KSearchResultEntry& fileEn
 {
     model->setData(model->index(row, SWDelegate::SW_NAME, parent), fileEntry.m_strFilename);
     model->setData(model->index(row, SWDelegate::SW_SIZE, parent), fileEntry.m_nFilesize);
-    QString sources = (fileEntry.m_nSources > 0) ? (QString::number(100 * fileEntry.m_nCompleteSources / fileEntry.m_nSources)) : "0";
-    sources += "%(";
-    sources += QString::number(fileEntry.m_nCompleteSources);
-    sources += ")";
-    model->setData(model->index(row, SWDelegate::SW_SOURCES, parent), sources);
+    model->setData(model->index(row, SWDelegate::SW_SOURCES, parent), fileEntry.m_nCompleteSources);
     model->setData(model->index(row, SWDelegate::SW_AVAILABILITY, parent), fileEntry.m_nSources);
 
     EED2KFileType fileType = GetED2KFileTypeID(fileEntry.m_strFilename.toStdString());
@@ -1254,16 +1268,8 @@ void search_widget::download()
 
             continue;
         }
-        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-        QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
 
-        libed2k::add_transfer_params params;
-        params.file_hash = libed2k::md4_hash::fromString(
-            selected_data(treeResult, SWDelegate::SW_ID, *iter).toString().toStdString());
-        params.file_path = filepath.toUtf8().constData();
-        params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE, *iter).toULongLong();
-        params.seed_mode = false;
-        Session::instance()->addTransfer(params);
+        addTransfer(*iter);
     }
 }
 
@@ -1280,18 +1286,9 @@ void search_widget::preview()
 
     for (iter = selected.begin(); iter != selected.end(); ++iter)
     {
-        QString hash = selected_data(treeResult, SWDelegate::SW_ID, *iter).toString();
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-        QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
-
-        if (misc::isPreviewable(misc::file_extension(filename)))
-        {
-            libed2k::add_transfer_params params;
-            params.file_hash = libed2k::md4_hash::fromString(hash.toStdString());
-            params.file_path = filepath.toUtf8().constData();
-            params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE, *iter).toULongLong();
-            params.seed_mode = false;
-            Transfer t = Session::instance()->addTransfer(params);
+        if (misc::isPreviewable(misc::file_extension(filename))) {
+            Transfer t = addTransfer(*iter);
             Session::instance()->deferPlayMedia(t);
         }
     }
