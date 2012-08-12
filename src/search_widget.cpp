@@ -513,6 +513,13 @@ void search_widget::sortChanged(int logicalIndex, Qt::SortOrder order)
 
 void search_widget::startSearch()
 {
+    // search in ed2k when server connection isn't online
+    if (!Session::instance()->get_ed2k_session()->isServerConnected() && !checkTorrents->isChecked())
+    {
+        QMessageBox::warning(this, tr("Server connection closed"), tr("You can't search in ED2K network on closed server connection, set connection or check torrent combobox"));
+        return;
+    }
+
     QString searchRequest = comboName->currentText();
     if (!searchRequest.length())
         return;
@@ -615,11 +622,13 @@ void search_widget::startSearch()
     if (checkPlus->checkState() == Qt::Checked)
         searchRequest += " NOT +++";
 
-    Session::instance()->get_ed2k_session()->searchFiles(
-        searchRequest, nMinSize, nMaxSize, nAvail, nSources,
-        fileType, fileExt, mediaCodec, nBitRate, 0);
-
-    nSearchesInProgress = 1;
+    if (Session::instance()->get_ed2k_session()->isServerConnected())
+    {
+        Session::instance()->get_ed2k_session()->searchFiles(
+            searchRequest, nMinSize, nMaxSize, nAvail, nSources,
+            fileType, fileExt, mediaCodec, nBitRate, 0);
+        nSearchesInProgress = 1;
+    }
 
     if (checkTorrents->checkState() == Qt::Checked &&
         fileType != ED2KFTSTR_EMULECOLLECTION.c_str() &&

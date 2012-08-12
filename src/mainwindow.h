@@ -101,11 +101,8 @@ public:
   // Construct / Destruct
   MainWindow(QWidget *parent=0, QStringList torrentCmdLine=QStringList());
   ~MainWindow();
-  // Methods
-  //QWidget* getCurrentTabWidget() const;
   TransferListWidget* getTransferList() const { return transfer_List->getTransferList(); }
   QMenu* getTrayIconMenu();
-//  PropertiesWidget *getProperties() const { return properties; }
 
 public slots:
   void trackerAuthenticationRequired(const Transfer& h);
@@ -113,7 +110,7 @@ public slots:
   void showNotificationBaloon(QString title, QString msg) const;
   void downloadFromURLList(const QStringList& urls);
   void updateAltSpeedsBtn(bool alternative);
-  void deleteBTSession();
+  void deleteSession();
   void on_actionOpen_triggered();
   void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
 
@@ -180,6 +177,7 @@ private:
   void selectWidget(Widgets wNum);
 
 private:
+  void activateControls(bool status);
   QFileSystemWatcher *executable_watcher;
   // Bittorrent
   QList<QPair<Transfer,QString> > unauthenticated_trackers; // Still needed?
@@ -257,11 +255,11 @@ private slots:
     void setDisconnectedStatus();
 
     void ed2kServerNameResolved(QString strServer);
-    void ed2kConnectionInitialized(unsigned int nClientId);
+    void ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
     void ed2kServerStatus(int nFiles, int nUsers);
     void ed2kServerMessage(QString strMessage);
     void ed2kIdentity(QString strName, QString strDescription);
-    void ed2kConnectionFailed(QString strError);
+    void ed2kConnectionClosed(QString strError);
 
 signals:
     void signalAuth(const QString& strRes, const QString& strError);

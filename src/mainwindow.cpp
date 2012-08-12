@@ -111,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
   displaySpeedInTitle = pref.speedInTitleBar();
   // Clean exit on log out
-  connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteBTSession()));
+  connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteSession()));
   // Setting icons
 
   icon_TrayConn.addFile(":/emule/TrayConnected.ico", QSize(22, 22));
@@ -241,18 +241,14 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   on_actionCatalog_triggerd();
 #ifndef NOAUTH
-  actionStatus->setDisabled(true);
-  actionTransfer->setDisabled(true);
-  actionSearch->setDisabled(true);
-  actionCatalog->setDisabled(true);
-  menuStatus->setDisabled(true);
+    activateControls(false);
 #endif
 
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
   connect(preventTimer, SIGNAL(timeout()), SLOT(checkForActiveTorrents()));
 
-  // Configure BT session according to options
+  // Configure session according to options
   loadPreferences(false);
 
   // Start connection checking timer
@@ -355,17 +351,17 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
 
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(unsigned int)), this, SLOT(ed2kConnectionInitialized(unsigned int)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(quint32, quint32, quint32)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(int, int)), this, SLOT(ed2kServerStatus(int, int)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverMessage(QString)), this, SLOT(ed2kServerMessage(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(QString, QString)), this, SLOT(ed2kIdentity(QString, QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionFailed(QString)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
   authRequest();
 }
 
-void MainWindow::deleteBTSession()
+void MainWindow::deleteSession()
 {
   guiUpdater->stop();
   Session::drop();
@@ -991,13 +987,17 @@ void MainWindow::selectWidget(Widgets wNum)
     }
 }
 
+void MainWindow::activateControls(bool status)
+{
+    actionStatus->setDisabled(!status);
+    actionTransfer->setDisabled(!status);
+    actionSearch->setDisabled(!status);
+    actionCatalog->setDisabled(!status);
+    menuStatus->setDisabled(!status);
+}
+
 void MainWindow::on_actionConnect_triggered()
 {
-    QMessageBox msgBox;
-    msgBox.setText(tr("Do you want to break network connection?"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-
     switch (connectioh_state)
     {
         case csDisconnected:
@@ -1006,24 +1006,17 @@ void MainWindow::on_actionConnect_triggered()
             break;
         }
         case csConnecting:
-        {
-            if (msgBox.exec() == QMessageBox::Ok)
-            {
-                actionConnect->setIcon(icon_disconnected);
-                actionConnect->setText(tr("Connecting"));
-                connectioh_state = csDisconnected;
-                ar.stop();
-            }
-            break;
-        }
         case csConnected:
         {
-            if (msgBox.exec() == QMessageBox::Ok)
+            if (QMessageBox::question(this, tr("Server connection"), tr("Do you want to break network connection?")), QMessageBox::Ok | QMessageBox::Cancel)
             {
-                setDisconnectedStatus();
+                Session::instance()->get_ed2k_session()->stopServerConnection();
             }
+
             break;
         }
+        default:
+            break;
     }
 }
 
@@ -1579,30 +1572,19 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
         {
             QString msg = tr("Authentication comleted");
             addConsoleMessage(msg);
-            statusBar->setStatusMsg(msg);
-            actionConnect->setIcon(icon_connected);
-            actionConnect->setText(tr("Disconnecting"));
-            connectioh_state = csConnected;
+            statusBar->setStatusMsg(msg);      
 
-            actionStatus->setEnabled(true);
-            actionTransfer->setEnabled(true);
-            actionSearch->setEnabled(true);
-            actionCatalog->setEnabled(true);
-            menuStatus->setEnabled(true);
-
-            status->updateConnectedInfo();
-            statusBar->setConnected(true);
-
-            icon_CurTray = icon_TrayConn;
-            if (systrayIcon) {
-                systrayIcon->setIcon(getSystrayIcon());
+            if (Session::instance()->started())
+            {
+                // when session started - we have to run only server connection
+                Session::instance()->get_ed2k_session()->startServerConnection();
+            }
+            else
+            {
+                Session::instance()->start();
             }
 
-            Session::instance()->start();
-            m_info_dlg->start();    // start message watcher
-            //temporary commented
-            //m_updater->start();
-
+            activateControls(true);
             break;
         }
         case 1:
@@ -1686,14 +1668,30 @@ void MainWindow::ed2kServerNameResolved(QString strServer)
     status->serverAddress(strServer);
 }
 
-void MainWindow::ed2kConnectionInitialized(unsigned int nClientId)
+void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port)
 {
+    qDebug() << Q_FUNC_INFO;
+    status->updateConnectedInfo();
+    statusBar->setConnected(true);
+    actionConnect->setIcon(icon_connected);
+    actionConnect->setText(tr("Disconnecting"));
+    connectioh_state = csConnected;
+
+    icon_CurTray = icon_TrayConn;
+    if (systrayIcon) {
+        systrayIcon->setIcon(getSystrayIcon());
+    }
+
+    m_info_dlg->start();    // start message watcher
+    //temporary commented
+    //m_updater->start();
+
     QString log_msg("Client ID: ");
     QString id;
-    id.setNum(nClientId);
+    id.setNum(client_id);
     log_msg += id;
     status->addLogMessage(log_msg);
-    status->clientID(nClientId);
+    status->clientID(client_id);
 }
 
 void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
@@ -1725,7 +1723,7 @@ void MainWindow::ed2kIdentity(QString strName, QString strDescription)
     status->addLogMessage(strDescription);
 }
 
-void MainWindow::ed2kConnectionFailed(QString strError)
+void MainWindow::ed2kConnectionClosed(QString strError)
 {
     status->addLogMessage(strError);
 

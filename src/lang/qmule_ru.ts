@@ -2264,6 +2264,10 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <source>Cancel</source>
         <translation>Отменить</translation>
     </message>
+    <message>
+        <source>Server connection</source>
+        <translation>Соединение с сервером</translation>
+    </message>
 </context>
 <context>
     <name>PeerAdditionDlg</name>
@@ -6899,6 +6903,14 @@ However, those plugins were disabled.</source>
     <message>
         <source>Use torrent search</source>
         <translation>Поиск по торрентам</translation>
+    </message>
+    <message>
+        <source>Server connection closed</source>
+        <translation>Соединение с сервером отсутствует</translation>
+    </message>
+    <message>
+        <source>You can't search in ED2K network on closed server connection, set connection or check torrent combobox</source>
+        <translation>Вы не можете производить поиск по eDonkey без соединения с сервером, установите соединение или используйте галку поиск по торрентам</translation>
     </message>
 </context>
 <context>

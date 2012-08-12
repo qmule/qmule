@@ -95,6 +95,9 @@ public:
     virtual void saveTempFastResumeData();
     virtual void readAlerts();
     virtual void saveFastResumeData();
+    void startServerConnection();
+    void stopServerConnection();
+    bool isServerConnected() const;
 
     /**
       * scan ed2k backup directory and load all files were matched name filter
@@ -146,7 +149,7 @@ public slots:
 
 signals:
     void serverNameResolved(QString strName);
-    void serverConnectionInitialized(unsigned int nClientId);
+    void serverConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
     void serverConnectionClosed(QString strError);
     void serverStatus(int nFiles, int nUsers);
     void serverMessage(QString strMessage);
