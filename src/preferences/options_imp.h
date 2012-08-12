@@ -46,7 +46,7 @@ QT_END_NAMESPACE
 class options_imp : public QDialog, private Ui_Preferences {
   Q_OBJECT
 private:
-  enum Tabs {TAB_UI, TAB_DOWNLOADS, TAB_CONNECTION, TAB_SPEED, TAB_EMULE, TAB_BITTORRENT, TAB_WEBUI, TAB_ADVANCED};
+  enum Tabs {TAB_UI, TAB_DOWNLOADS, TAB_CONNECTION, TAB_SPEED, TAB_EMULE, TAB_BITTORRENT, TAB_ADVANCED};
 
 public:
   // Contructor / Destructor
@@ -81,9 +81,6 @@ private slots:
   void on_emuleRandomButton_clicked();
   void on_addScanFolderButton_clicked();
   void on_removeScanFolderButton_clicked();
-  void on_btnWebUiCrt_clicked();
-  void on_btnWebUiKey_clicked();
-  void on_registerDNSBtn_clicked();
   void setLocale(const QString &locale);
   void toggleAnonymousMode(bool enabled);
 
@@ -143,15 +140,8 @@ private:
   int getMaxActiveDownloads() const;
   int getMaxActiveUploads() const;
   int getMaxActiveTorrents() const;
-  bool isWebUiEnabled() const;
-  quint16 webUiPort() const;
-  QString webUiUsername() const;
-  QString webUiPassword() const;
-  QSize sizeFittingScreen() const;
 
-private:
-  void setSslKey(const QByteArray &key, bool interactive = true);
-  void setSslCertificate(const QByteArray &cert, bool interactive = true);
+  QSize sizeFittingScreen() const;
 
 private:
   QButtonGroup choiceLanguage;

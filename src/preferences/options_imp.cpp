@@ -72,8 +72,7 @@ options_imp::options_imp(QWidget *parent):
   tabSelection->item(TAB_BITTORRENT)->setIcon(IconProvider::instance()->getIcon("preferences-system-network"));
   tabSelection->item(TAB_CONNECTION)->setIcon(IconProvider::instance()->getIcon("network-wired"));
   tabSelection->item(TAB_DOWNLOADS)->setIcon(IconProvider::instance()->getIcon("download"));
-  tabSelection->item(TAB_SPEED)->setIcon(IconProvider::instance()->getIcon("chronometer"));
-  tabSelection->item(TAB_WEBUI)->setIcon(IconProvider::instance()->getIcon("network-server"));
+  tabSelection->item(TAB_SPEED)->setIcon(IconProvider::instance()->getIcon("chronometer"));  
   tabSelection->item(TAB_ADVANCED)->setIcon(IconProvider::instance()->getIcon("preferences-other"));
   IpFilterRefreshBtn->setIcon(IconProvider::instance()->getIcon("view-refresh"));
 
@@ -116,9 +115,6 @@ options_imp::options_imp(QWidget *parent):
 #if !defined(Q_WS_X11)
   label_trayIconStyle->setVisible(false);
   comboTrayIcon->setVisible(false);
-#endif
-#if defined(QT_NO_OPENSSL)
-  checkWebUiHttps->setVisible(false);
 #endif
 
 #ifndef Q_WS_WIN
@@ -228,21 +224,7 @@ options_imp::options_imp(QWidget *parent):
   connect(spinMaxActiveUploads, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(spinMaxActiveTorrents, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(checkIgnoreSlowTorrentsForQueueing, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  // Web UI tab
-  connect(checkWebUi, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(spinWebUiPort, SIGNAL(valueChanged(int)), this, SLOT(enableApplyButton()));
-  connect(checkWebUIUPnP, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
-  connect(checkWebUiHttps, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
-  connect(btnWebUiKey, SIGNAL(clicked()), SLOT(enableApplyButton()));
-  connect(btnWebUiCrt, SIGNAL(clicked()), SLOT(enableApplyButton()));
-  connect(textWebUiUsername, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(textWebUiPassword, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(checkBypassLocalAuth, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(checkDynDNS, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
-  connect(comboDNSService, SIGNAL(currentIndexChanged(int)), SLOT(enableApplyButton()));
-  connect(domainNameTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(DNSUsernameTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(DNSPasswordTxt, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
+
   connect(editLogin, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));  
@@ -479,30 +461,7 @@ void options_imp::saveOptions() {
   pref.setMaxActiveTorrents(spinMaxActiveTorrents->value());
   pref.setIgnoreSlowTorrentsForQueueing(checkIgnoreSlowTorrentsForQueueing->isChecked());
   // End Queueing system preferences
-  // Web UI
-  pref.setWebUiEnabled(isWebUiEnabled());
-  if (isWebUiEnabled())
-  {
-    pref.setWebUiPort(webUiPort());
-    pref.setUPnPForWebUIPort(checkWebUIUPnP->isChecked());
-    pref.setWebUiHttpsEnabled(checkWebUiHttps->isChecked());
-    if (checkWebUiHttps->isChecked())
-    {
-      pref.setWebUiHttpsCertificate(m_sslCert);
-      pref.setWebUiHttpsKey(m_sslKey);
-    }
-    pref.setWebUiUsername(webUiUsername());
-    // FIXME: Check that the password is valid (not empty at least)
-    pref.setWebUiPassword(webUiPassword());
-    pref.setWebUiLocalAuthEnabled(!checkBypassLocalAuth->isChecked());
-    // DynDNS
-    pref.setDynDNSEnabled(checkDynDNS->isChecked());
-    pref.setDynDNSService(comboDNSService->currentIndex());
-    pref.setDynDomainName(domainNameTxt->text());
-    pref.setDynDNSUsername(DNSUsernameTxt->text());
-    pref.setDynDNSPassword(DNSPasswordTxt->text());
-  }
-  // End Web UI
+
   // Emule
   pref.setISLogin(editLogin->text());
   pref.setISPassword(editPassword->text());
@@ -771,23 +730,7 @@ void options_imp::loadOptions() {
   spinMaxActiveTorrents->setValue(pref.getMaxActiveTorrents());
   checkIgnoreSlowTorrentsForQueueing->setChecked(pref.ignoreSlowTorrentsForQueueing());
   // End Queueing system preferences
-  // Web UI
-  checkWebUi->setChecked(pref.isWebUiEnabled());
-  spinWebUiPort->setValue(pref.getWebUiPort());
-  checkWebUIUPnP->setChecked(pref.useUPnPForWebUIPort());
-  checkWebUiHttps->setChecked(pref.isWebUiHttpsEnabled());
-  setSslCertificate(pref.getWebUiHttpsCertificate(), false);
-  setSslKey(pref.getWebUiHttpsKey(), false);
-  textWebUiUsername->setText(pref.getWebUiUsername());
-  textWebUiPassword->setText(pref.getWebUiPassword());
-  checkBypassLocalAuth->setChecked(!pref.isWebUiLocalAuthEnabled());
-  // Dynamic DNS
-  checkDynDNS->setChecked(pref.isDynDNSEnabled());
-  comboDNSService->setCurrentIndex((int)pref.getDynDNSService());
-  domainNameTxt->setText(pref.getDynDomainName());
-  DNSUsernameTxt->setText(pref.getDynDNSUsername());
-  DNSPasswordTxt->setText(pref.getDynDNSPassword());
-  // End Web UI
+
   //Emule
   editLogin->setText(pref.getISLogin());
   editPassword->setText(pref.getISPassword());
@@ -1217,57 +1160,9 @@ QString options_imp::getFilter() const {
   return textFilterPath->text();
 }
 
-// Web UI
-
-bool options_imp::isWebUiEnabled() const
-{
-  return checkWebUi->isChecked();
-}
-
-quint16 options_imp::webUiPort() const
-{
-  return spinWebUiPort->value();
-}
-
-QString options_imp::webUiUsername() const
-{
-  return textWebUiUsername->text();
-}
-
-QString options_imp::webUiPassword() const
-{
-  return textWebUiPassword->text();
-}
-
 void options_imp::showConnectionTab()
 {
   tabSelection->setCurrentRow(2);
-}
-
-void options_imp::on_btnWebUiCrt_clicked() {
-  QString filename = QFileDialog::getOpenFileName(this, QString(), QString(), tr("SSL Certificate (*.crt *.pem)"));
-  if (filename.isNull())
-    return;
-  QFile file(filename);
-  if (file.open(QIODevice::ReadOnly)) {
-    setSslCertificate(file.readAll());
-    file.close();
-  }
-}
-
-void options_imp::on_btnWebUiKey_clicked() {
-  QString filename = QFileDialog::getOpenFileName(this, QString(), QString(), tr("SSL Key (*.key *.pem)"));
-  if (filename.isNull())
-    return;
-  QFile file(filename);
-  if (file.open(QIODevice::ReadOnly)) {
-    setSslKey(file.readAll());
-    file.close();
-  }
-}
-
-void options_imp::on_registerDNSBtn_clicked() {
-  QDesktopServices::openUrl(DNSUpdater::getRegistrationUrl(comboDNSService->currentIndex()));
 }
 
 void options_imp::on_IpFilterRefreshBtn_clicked() {
@@ -1347,36 +1242,6 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
     return eng_lang;
   }
   }
-}
-
-void options_imp::setSslKey(const QByteArray &key, bool interactive)
-{
-#ifndef QT_NO_OPENSSL
-  if (!key.isEmpty() && !QSslKey(key, QSsl::Rsa).isNull()) {
-    lblSslKeyStatus->setPixmap(QPixmap(":/Icons/oxygen/security-high.png").scaledToHeight(20, Qt::SmoothTransformation));
-    m_sslKey = key;
-  } else {
-    lblSslKeyStatus->setPixmap(QPixmap(":/Icons/oxygen/security-low.png").scaledToHeight(20, Qt::SmoothTransformation));
-    m_sslKey.clear();
-    if (interactive)
-      QMessageBox::warning(this, tr("Invalid key"), tr("This is not a valid SSL key."));
-  }
-#endif
-}
-
-void options_imp::setSslCertificate(const QByteArray &cert, bool interactive)
-{
-#ifndef QT_NO_OPENSSL
-  if (!cert.isEmpty() && !QSslCertificate(cert).isNull()) {
-    lblSslCertStatus->setPixmap(QPixmap(":/Icons/oxygen/security-high.png").scaledToHeight(20, Qt::SmoothTransformation));
-    m_sslCert = cert;
-  } else {
-    lblSslCertStatus->setPixmap(QPixmap(":/Icons/oxygen/security-low.png").scaledToHeight(20, Qt::SmoothTransformation));
-    m_sslCert.clear();
-    if (interactive)
-      QMessageBox::warning(this, tr("Invalid certificate"), tr("This is not a valid SSL certificate."));
-  }
-#endif
 }
 
 void options_imp::toggleAnonymousMode(bool enabled)
