@@ -118,7 +118,9 @@ private:
     bool hasSelectedMedia();
     bool hasSelectedFiles();
 
-    void processSearchResult(const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult);
+    void processSearchResult(
+        const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult);
+    Transfer addTransfer(const QModelIndex& index);
 
 private slots:
     void itemCondClicked(QTableWidgetItem* item);

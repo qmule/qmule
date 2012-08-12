@@ -84,7 +84,23 @@ public:
             }
             case SW_SIZE:
             {
-                drawDisplay(painter, option, option.rect, misc::friendlyUnit(index.data().toLongLong(), sizeType));
+                drawDisplay(painter, option, option.rect,
+                            misc::friendlyUnit(index.data().toLongLong(), sizeType));
+                break;
+            }
+            case SW_SOURCES:
+            {
+                const QAbstractItemModel* model = index.model();
+                int sources = model->data(
+                    model->index(index.row(), SWDelegate::SW_AVAILABILITY)).toInt();
+                int completeSources = index.data().toInt();
+
+                QString strSrc = (sources > 0) ?
+                    (QString::number(100 * completeSources / sources)) : "0";
+                strSrc += "%(";
+                strSrc += QString::number(completeSources);
+                strSrc += ")";
+                drawDisplay(painter, option, option.rect, strSrc);
                 break;
             }
             case SW_DURATION:
