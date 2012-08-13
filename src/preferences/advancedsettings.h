@@ -14,9 +14,6 @@
 
 enum AdvSettingsCols {PROPERTY, VALUE};
 enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, RESOLVE_HOSTS, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, MULE_NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
-                    #if defined(Q_WS_WIN) || defined(Q_WS_MAC)
-                      UPDATE_CHECK,
-                    #endif
                     #if defined(Q_WS_X11)
                       USE_ICON_THEME,
                     #endif
