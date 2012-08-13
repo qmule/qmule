@@ -355,11 +355,24 @@ search_widget::search_widget(QWidget *parent)
     userMenu->addAction(userSendMessage);
     userMenu->addAction(userBrowseFiles);
 
+    fileMenu = new QMenu(this);
+    fileMenu->setObjectName(QString::fromUtf8("fileMenu"));
+    fileMenu->setTitle(tr("Files"));
+
+    fileSearchRelated = new QAction(this);
+    fileSearchRelated->setObjectName(QString::fromUtf8("fileSearchRelated"));
+    fileSearchRelated->setText(tr("Search related files"));
+    fileSearchRelated->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+
+    fileMenu->addAction(fileSearchRelated);
+
     treeResult->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(treeResult, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
     connect(userUpdate,  SIGNAL(triggered()), this, SLOT(initPeer()));    
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
+
+    connect(fileSearchRelated,  SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
 
     connect(Session::instance()->get_ed2k_session(),
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
@@ -679,6 +692,40 @@ void search_widget::clearSearch()
 
     for (int ii = 0; ii < 11; ii ++)
         tableCond->item(ii, 1)->setText("");
+}
+
+void search_widget::searchRelatedFiles()
+{
+    // search in ed2k when server connection isn't online
+    if (!Session::instance()->get_ed2k_session()->isServerConnected() && !checkTorrents->isChecked())
+    {
+        QMessageBox::warning(
+            this, tr("Server connection closed"),
+            tr("You can't search in ED2K network on closed server connection, "
+               "set connection or check torrent combobox"));
+        return;
+    }
+
+    QString reqType = tr("Files: ");
+    RESULT_TYPE resultType = RT_FILES;
+    QString hash = selected_data(treeResult, SWDelegate::SW_ID).toString();
+    nCurTabSearch = tabSearch->addTab(iconSerachActive, reqType + hash);
+    tabSearch->setCurrentIndex(nCurTabSearch);
+
+    std::vector<QED2KSearchResultEntry> vec;
+    SearchResult result(hash, resultType, vec);
+    searchItems.push_back(result);
+
+    clearSearchTable();
+    btnStart->setEnabled(false);
+    btnCancel->setEnabled(true);
+    btnMore->setEnabled(false);
+
+    if (Session::instance()->get_ed2k_session()->isServerConnected())
+    {
+        Session::instance()->get_ed2k_session()->searchRelatedFiles(hash);
+        nSearchesInProgress = 1;
+    }
 }
 
 void search_widget::processSearchResult(
@@ -1130,6 +1177,14 @@ void search_widget::displayListMenu(const QPoint&)
         }
 
         userMenu->exec(QCursor::pos());
+    }
+    else if (searchItems[tabSearch->currentIndex()].resultType == RT_FILES)
+    {
+        QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+        fileSearchRelated->setEnabled(
+            selected.size() == 1 &&
+            !selected_data(treeResult, SWDelegate::SW_NAME).toString().startsWith("<a"));
+        fileMenu->exec(QCursor::pos());
     }
 }
 

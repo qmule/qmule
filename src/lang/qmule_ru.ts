@@ -6885,6 +6885,10 @@ However, those plugins were disabled.</source>
         <translation>Просмотреть файлы</translation>
     </message>
     <message>
+        <source>Search related files</source>
+        <translation>Искать связанные файлы</translation>
+    </message>
+    <message>
         <source>Files: </source>
         <translation>Файлы: </translation>
     </message>
