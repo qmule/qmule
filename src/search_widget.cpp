@@ -529,7 +529,7 @@ void search_widget::startSearch()
     // search in ed2k when server connection isn't online
     if (!Session::instance()->get_ed2k_session()->isServerConnected() && !checkTorrents->isChecked())
     {
-        QMessageBox::warning(this, tr("Server connection closed"), tr("You can't search in ED2K network on closed server connection, set connection or check torrent combobox"));
+        warnDisconnected();
         return;
     }
 
@@ -613,24 +613,7 @@ void search_widget::startSearch()
             break;
     }
 
-    if (!tabSearch->count())
-    {
-        tabSearch->show();
-        searchFilter->show();
-        closeAll->setEnabled(true);
-    }
-
-    nCurTabSearch = tabSearch->addTab(iconSerachActive, reqType + comboName->currentText());
-    tabSearch->setCurrentIndex(nCurTabSearch);
-    
-    std::vector<QED2KSearchResultEntry> vec;
-    SearchResult result(comboName->currentText(), resultType, vec);
-    searchItems.push_back(result);
-    
-    clearSearchTable();
-    btnStart->setEnabled(false);
-    btnCancel->setEnabled(true);
-    btnMore->setEnabled(false);
+    prepareNewSearch(reqType, comboName->currentText(), resultType, iconSerachActive);
 
     if (checkPlus->checkState() == Qt::Checked)
         searchRequest += " NOT +++";
@@ -699,27 +682,14 @@ void search_widget::searchRelatedFiles()
     // search in ed2k when server connection isn't online
     if (!Session::instance()->get_ed2k_session()->isServerConnected() && !checkTorrents->isChecked())
     {
-        QMessageBox::warning(
-            this, tr("Server connection closed"),
-            tr("You can't search in ED2K network on closed server connection, "
-               "set connection or check torrent combobox"));
+        warnDisconnected();
         return;
     }
 
     QString reqType = tr("Files: ");
-    RESULT_TYPE resultType = RT_FILES;
     QString hash = selected_data(treeResult, SWDelegate::SW_ID).toString();
-    nCurTabSearch = tabSearch->addTab(iconSerachActive, reqType + hash);
-    tabSearch->setCurrentIndex(nCurTabSearch);
 
-    std::vector<QED2KSearchResultEntry> vec;
-    SearchResult result(hash, resultType, vec);
-    searchItems.push_back(result);
-
-    clearSearchTable();
-    btnStart->setEnabled(false);
-    btnCancel->setEnabled(true);
-    btnMore->setEnabled(false);
+    prepareNewSearch(reqType, hash, RT_FILES, iconSerachActive);
 
     if (Session::instance()->get_ed2k_session()->isServerConnected())
     {
@@ -839,6 +809,37 @@ Transfer search_widget::addTransfer(const QModelIndex& index)
         selected_data(treeResult, SWDelegate::SW_AVAILABILITY, index).toInt() -
         params.num_complete_sources;
     return Session::instance()->addTransfer(params);
+}
+
+void search_widget::warnDisconnected()
+{
+    QMessageBox::warning(
+        this, tr("Server connection closed"),
+        tr("You can't search in ED2K network on closed server connection, "
+           "set connection or check torrent combobox"));
+}
+
+void search_widget::prepareNewSearch(
+    const QString& reqType, const QString& reqText, RESULT_TYPE resultType, const QIcon& icon)
+{
+    if (!tabSearch->count())
+    {
+        tabSearch->show();
+        searchFilter->show();
+        closeAll->setEnabled(true);
+    }
+
+    nCurTabSearch = tabSearch->addTab(icon, reqType + reqText);
+    tabSearch->setCurrentIndex(nCurTabSearch);
+
+    std::vector<QED2KSearchResultEntry> vec;
+    SearchResult result(reqText, resultType, vec);
+    searchItems.push_back(result);
+
+    clearSearchTable();
+    btnStart->setEnabled(false);
+    btnCancel->setEnabled(true);
+    btnMore->setEnabled(false);
 }
 
 void search_widget::closeTab(int index)

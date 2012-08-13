@@ -125,6 +125,10 @@ private:
         const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult);
     Transfer addTransfer(const QModelIndex& index);
 
+    void warnDisconnected();
+    void prepareNewSearch(
+        const QString& reqType, const QString& reqText, RESULT_TYPE resultType, const QIcon& icon);
+
 private slots:
     void itemCondClicked(QTableWidgetItem* item);
     void sortChanged(int logicalIndex, Qt::SortOrder order);
