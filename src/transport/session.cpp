@@ -1,6 +1,7 @@
 #include <boost/bind.hpp>
 #include <libtorrent/torrent_handle.hpp>
 #include <QDesktopServices>
+#include <QDirIterator>
 
 #include "transport/session.h"
 
@@ -401,7 +402,7 @@ void Session::saveFastResumeData()
 
 void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 {
-    QString save_path = h.save_path();
+    QDir save_path(h.save_path());
     int num_files = h.num_files();
     std::set<QString> roots;
     std::deque<std::string> excludes;
@@ -411,12 +412,32 @@ void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 
     for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
     {
-        QString path = save_path + *i;
+        QString path = save_path.filePath(*i);  // never contains last separator
         QFileInfo info(path);
+
         if (info.isFile())
+        {
             m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
+        }
         else if (info.isDir())
-            m_edSession.delegate()->share_dir(
-                save_path.toUtf8().constData(), path.toUtf8().constData(), excludes, unshare);
+        {
+            QStringList dlist;
+            dlist << path;
+            QDirIterator it(path, QDirIterator::Subdirectories);
+
+            while(it.hasNext())
+            {
+                QDir d = QFileInfo(it.next()).dir();
+                dlist << d.path();
+            }
+
+            dlist.removeDuplicates();
+
+            foreach(const QString& str, dlist)
+            {
+                m_edSession.delegate()->share_dir(
+                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
+            }
+        }
     }
 }
