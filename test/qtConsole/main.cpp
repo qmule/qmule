@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QFileInfo>
+#include <QDirIterator>
 
 #include <libed2k/is_crypto.hpp>
 #ifdef Q_WS_WIN
@@ -261,6 +262,25 @@ QString emuleAuthPassword()
     return qs.value("AuthPassword", QString("")).toString();
 }
 
+QStringList getSubDirs(const QString& strBase)
+{
+    QDir d(strBase);
+    QStringList dlist;
+    dlist << d.path();
+
+    QDirIterator it(strBase, QDirIterator::Subdirectories);
+
+    while(it.hasNext())
+    {
+        QDir d = QFileInfo(it.next()).dir();
+        dlist << d.path();
+    }
+
+    dlist.removeDuplicates();
+
+    return dlist;
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -336,5 +356,6 @@ int main(int argc, char *argv[])
         qDebug() << " isn't contain";
     }
 
+    qDebug() << getSubDirs("/home/apavlov/work/newmule");
     return a.exec();
 }
