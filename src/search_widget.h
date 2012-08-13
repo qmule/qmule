@@ -88,6 +88,9 @@ private:
     QAction* userSendMessage;
     QAction* userBrowseFiles;
 
+    QMenu* fileMenu;
+    QAction* fileSearchRelated;
+
     QIcon iconAny;
     QIcon iconArchive;
     QIcon iconAudio;
@@ -129,6 +132,7 @@ private slots:
     void continueSearch();
     void cancelSearch();
     void clearSearch();
+    void searchRelatedFiles();
     void closeTab(int index);
     void selectTab(int nTabNum);
     void closeAllTabs();
