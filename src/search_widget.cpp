@@ -359,11 +359,24 @@ search_widget::search_widget(QWidget *parent)
     fileMenu->setObjectName(QString::fromUtf8("fileMenu"));
     fileMenu->setTitle(tr("Files"));
 
+    fileDownload = new QAction(this);
+    fileDownload->setObjectName(QString::fromUtf8("fileDownload"));
+    fileDownload->setText(tr("Download"));
+    fileDownload->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+
+    filePreview = new QAction(this);
+    filePreview->setObjectName(QString::fromUtf8("filePreview"));
+    filePreview->setText(tr("Preview"));
+    filePreview->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+
     fileSearchRelated = new QAction(this);
     fileSearchRelated->setObjectName(QString::fromUtf8("fileSearchRelated"));
     fileSearchRelated->setText(tr("Search related files"));
     fileSearchRelated->setIcon(QIcon(":/emule/users/UserFiles.ico"));
 
+    fileMenu->addAction(fileDownload);
+    fileMenu->addAction(filePreview);
+    fileMenu->addSeparator();
     fileMenu->addAction(fileSearchRelated);
 
     treeResult->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -372,6 +385,8 @@ search_widget::search_widget(QWidget *parent)
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
 
+    connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
+    connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
     connect(fileSearchRelated,  SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
 
     connect(Session::instance()->get_ed2k_session(),
@@ -1255,8 +1270,12 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
         }
     }
 
-    btnDownload->setEnabled(hasSelectedFiles());
-    btnPreview->setEnabled(hasSelectedMedia());
+    bool hasSelFiles = hasSelectedFiles();
+    bool hasSelMedia = hasSelectedMedia();
+    btnDownload->setEnabled(hasSelFiles);
+    btnPreview->setEnabled(hasSelMedia);
+    fileDownload->setEnabled(hasSelFiles);
+    filePreview->setEnabled(hasSelMedia);
 }
 
 void search_widget::download()

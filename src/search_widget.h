@@ -89,6 +89,8 @@ private:
     QAction* userBrowseFiles;
 
     QMenu* fileMenu;
+    QAction* fileDownload;
+    QAction* filePreview;
     QAction* fileSearchRelated;
 
     QIcon iconAny;
