@@ -755,7 +755,16 @@ void QED2KSession::loadFastResumeData()
                             params.resume_data = const_cast<std::vector<char>* >(&trd.m_fast_resume_data.getTagByNameId(libed2k::FT_FAST_RESUME_DATA)->asBlob());
                         }
 
-                        delegate()->add_transfer(params);
+                        QFileInfo qfi(QString::fromUtf8(trd.m_filepath.m_collection.c_str()));
+                        // add transfer only when file still exists
+                        if (qfi.exists() && qfi.isFile())
+                        {
+                            delegate()->add_transfer(params);
+                        }
+                        else
+                        {
+                            qDebug() << "file not exists: " << qfi.fileName();
+                        }
                     }
                 }
             }
