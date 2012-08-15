@@ -73,6 +73,9 @@ const int UNLEN = 256;
 #endif
 
 #include <libed2k/is_crypto.hpp>
+#include "libtorrent/bencode.hpp"
+#include "transport/session.h"
+#include "torrentpersistentdata.h"
 
 #ifndef DISABLE_GUI
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
@@ -1146,6 +1149,106 @@ shared_map misc::migrationShareds()
 QStringList misc::migrationSharedFiles()
 {
     return emuleSharedFiles().filter(QRegExp("^[^-]"));
+}
+
+bool misc::migrationTorrents()
+{
+    QString appdataPath(getenv("APPDATA"));
+    if (!appdataPath.length())
+        return false;
+
+    Session::instance()->get_torrent_session()->start();
+    Session::instance()->get_ed2k_session()->start();
+
+    QString resumeFile = appdataPath + "\\uTorrent\\";
+    QFileInfo u_file(resumeFile);
+    if (u_file.exists())
+        return misc::processTorrentFile(resumeFile, false);
+
+    resumeFile = appdataPath + "\\BitTorrent\\";
+    QFileInfo bt_file(resumeFile);
+    if (bt_file.exists())
+        return misc::processTorrentFile(resumeFile, true);
+
+    return true;
+}
+
+bool misc::processTorrentFile(QString filePath, bool BTorrent)
+{
+    QString resumeFile = filePath + "resume.dat";
+    std::vector<char> buf;
+	error_code ec;
+    int ret = load_file(resumeFile.toUtf8().constData(), buf, ec);
+    if (ret < 0)
+        return false;
+
+    lazy_entry e;
+	if (buf.size() == 0 || lazy_bdecode(&buf[0], &buf[0] + buf.size(), e) != 0)
+		return false;
+
+    if (e.type() != lazy_entry::dict_t)
+		return false;
+
+    for (int ii = 0; ii < e.dict_size(); ii++)
+    {
+        std::pair<std::string, lazy_entry const*> dic_elem = e.dict_at(ii);
+        if (dic_elem.second->type() != lazy_entry::dict_t)
+            continue;
+        lazy_entry const* dict = dic_elem.second;
+
+        QString torrentSavePath(dict->dict_find_string_value("path").c_str());
+        QString torrentFilePath(dic_elem.first.c_str());
+
+        if (BTorrent)
+            torrentFilePath = filePath + torrentFilePath;
+
+
+        int completed = dict->dict_find_int_value("completed_on");
+
+        boost::intrusive_ptr<torrent_info> torrentInfo;
+        try 
+        {
+            torrentInfo = new torrent_info(torrentFilePath.toStdString().c_str());
+            if (!torrentInfo->is_valid())
+                throw std::exception();
+        } 
+        catch(std::exception& e) 
+        {
+            continue;
+        }
+
+        const QString hash = misc::toQString(torrentInfo->info_hash());
+        TorrentTempData::deleteTempData(hash);
+        if (torrentInfo->num_files() == 1)
+        {
+            QStringList path_list;
+            path_list << torrentSavePath;
+
+            TorrentTempData::setFilesPath(hash,path_list);
+            QFileInfo file(torrentSavePath);
+            if (file.exists())
+                torrentSavePath = file.absolutePath();
+        }
+
+        TorrentTempData::setSavePath(hash, torrentSavePath);
+        TorrentTempData::setSeedingMode(hash, completed > 0);
+
+        std::string prio = dict->dict_find_string_value("prio");
+        std::vector<char> priorities(prio.begin(), prio.end());
+        std::vector<int> file_priorities;
+        for (std::vector<char>::const_iterator iter = priorities.begin(); iter != priorities.end(); ++iter)
+        {
+            if (*iter == 128)
+                file_priorities.push_back(0);
+            else
+                file_priorities.push_back(1);
+        }
+
+        TorrentTempData::setFilesPriority(hash, file_priorities);
+
+        qDebug("Adding the torrent to the session...");
+        Session::instance()->addTorrent(torrentFilePath);
+    }
 }
 
 #else

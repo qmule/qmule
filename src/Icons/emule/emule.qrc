@@ -65,5 +65,9 @@
         <file>newmule.png</file>
         <file>Preferences.png</file>
         <file>files/SharedFolderOvl.png</file>
+        <file>search/Download.png</file>
+        <file>search/preview32.png</file>
+        <file>search/closeall.png</file>
+        <file>search/SearchRelated.png</file>
     </qresource>
 </RCC>
