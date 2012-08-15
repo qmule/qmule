@@ -12,9 +12,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        ../../src/silent_updater.cpp
+        ../../src/silent_updater.cpp \
+    ../../src/taskbar_iface.cpp
 
 HEADERS  += mainwindow.h \
-    ../../src/silent_updater.h
+    ../../src/silent_updater.h \
+    ../../src/taskbar_iface.h
+
+LIBS += ole32.lib user32.lib
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    icons.qrc

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="icon_1">clock.png</file>
+        <file alias="icon_2">comment.png</file>
+        <file alias="icon_3">warning.png</file>
+    </qresource>
+</RCC>
