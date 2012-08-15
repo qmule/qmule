@@ -308,9 +308,7 @@ search_widget::search_widget(QWidget *parent)
     connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));
     connect(comboName->lineEdit(), SIGNAL(returnPressed()), this, SLOT(startSearch()));
     connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
-    connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));
-    connect(btnDownload, SIGNAL(clicked()), this, SLOT(download()));
-    connect(btnPreview, SIGNAL(clicked()), this, SLOT(preview()));
+    connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));   
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerSharedDirectories(const libed2k::net_identifier&, const QString&, const QStringList&)),
             this, SLOT(processUserDirs(const libed2k::net_identifier&, const QString&, const QStringList&)));
     connect(Session::instance()->get_ed2k_session(),
@@ -362,17 +360,25 @@ search_widget::search_widget(QWidget *parent)
     fileDownload = new QAction(this);
     fileDownload->setObjectName(QString::fromUtf8("fileDownload"));
     fileDownload->setText(tr("Download"));
-    fileDownload->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+    fileDownload->setIcon(QIcon(":/emule/search/Download.png"));
+    fileDownload->setEnabled(false);
 
     filePreview = new QAction(this);
     filePreview->setObjectName(QString::fromUtf8("filePreview"));
     filePreview->setText(tr("Preview"));
-    filePreview->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+    filePreview->setIcon(QIcon(":/emule/search/preview32.png"));
+    filePreview->setEnabled(false);
 
     fileSearchRelated = new QAction(this);
     fileSearchRelated->setObjectName(QString::fromUtf8("fileSearchRelated"));
     fileSearchRelated->setText(tr("Search related files"));
-    fileSearchRelated->setIcon(QIcon(":/emule/users/UserFiles.ico"));
+    fileSearchRelated->setIcon(QIcon(":/emule/search/SearchRelated.png"));
+
+    btnDownload->setDefaultAction(fileDownload);
+    btnPreview->setDefaultAction(filePreview);
+
+    btnDownload->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnPreview->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     fileMenu->addAction(fileDownload);
     fileMenu->addAction(filePreview);
@@ -402,9 +408,6 @@ search_widget::search_widget(QWidget *parent)
     connect(treeResult, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(itemCollapsed(const QModelIndex&)));
     connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(sortChanged(int, Qt::SortOrder)));
     connect(treeResult, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(download()));
-    
-    btnDownload->setEnabled(false);
-    btnPreview->setEnabled(false);
 
     torrentSearchView = new QWebView();
     connect(torrentSearchView, SIGNAL(loadFinished(bool)),
@@ -1272,8 +1275,6 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
 
     bool hasSelFiles = hasSelectedFiles();
     bool hasSelMedia = hasSelectedMedia();
-    btnDownload->setEnabled(hasSelFiles);
-    btnPreview->setEnabled(hasSelMedia);
     fileDownload->setEnabled(hasSelFiles);
     filePreview->setEnabled(hasSelMedia);
 }

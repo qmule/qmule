@@ -998,6 +998,14 @@ void MainWindow::activateControls(bool status)
 
 void MainWindow::on_actionConnect_triggered()
 {
+    QMessageBox confirmBox(QMessageBox::Question, tr("Server connection"),
+                           tr("Do you want to break network connection?"),
+                           QMessageBox::NoButton, this);
+
+    confirmBox.addButton(tr("No"), QMessageBox::NoRole);
+    QPushButton *yesBtn = confirmBox.addButton(tr("Yes"), QMessageBox::YesRole);
+    confirmBox.setDefaultButton(yesBtn);
+
     switch (connectioh_state)
     {
         case csDisconnected:
@@ -1008,7 +1016,8 @@ void MainWindow::on_actionConnect_triggered()
         case csConnecting:
         case csConnected:
         {
-            if (QMessageBox::question(this, tr("Server connection"), tr("Do you want to break network connection?")), QMessageBox::Ok | QMessageBox::Cancel)
+            confirmBox.exec();
+            if (confirmBox.clickedButton() && confirmBox.clickedButton() == yesBtn)
             {
                 Session::instance()->get_ed2k_session()->stopServerConnection();
             }
