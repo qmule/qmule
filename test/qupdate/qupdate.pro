@@ -23,5 +23,9 @@ LIBS += ole32.lib user32.lib
 
 FORMS    += mainwindow.ui
 
+CONFIG(win7) {
+    DEFINES += WIN7_SDK
+}
+
 RESOURCES += \
     icons.qrc

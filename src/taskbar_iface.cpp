@@ -1,6 +1,6 @@
 #include "taskbar_iface.h"
 
-#ifdef Q_WS_WIN
+#if (defined Q_WS_WIN) && (defined WIN7_SDK)
 #include <WinSDKVer.h>
 
 #if _WIN32_MAXVER >= 0x0601
