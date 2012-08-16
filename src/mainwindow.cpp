@@ -809,8 +809,8 @@ bool MainWindow::winEvent(MSG * message, long * result)
     if (message->message == m_nTaskbarButtonCreated)
     {
 
-        m_iface->initialize();
-        m_iface->setState(winId(), taskbar_iface::S_NOPROGRESS);
+        m_tbar->initialize();
+        m_tbar->setState(winId(), taskbar_iface::S_NOPROGRESS);
     }
 
     return false;
