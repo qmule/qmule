@@ -64,6 +64,7 @@ public:
     virtual void addConsoleMessage(
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
+    virtual float progress() const;
 
 signals:
     void newConsoleMessage(const QString &msg);

@@ -156,7 +156,8 @@ nox {
               clicked_label.h \
               collection_save_dlg.h \ 
 			  infodlg.h \
-              silent_updater.h
+              silent_updater.h\
+              taskbar_iface.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -183,7 +184,8 @@ nox {
              status_bar.cpp \
              collection_save_dlg.cpp \ 
 			 infodlg.cpp \
-             silent_updater.cpp
+             silent_updater.cpp\
+             taskbar_iface.cpp
 
   macx {
     HEADERS += qmacapplication.h 

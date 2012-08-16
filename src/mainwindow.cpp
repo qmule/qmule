@@ -346,6 +346,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connectioh_state = csDisconnected;
   m_info_dlg.reset(new is_info_dlg(this));
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
+  m_tbar.reset(new taskbar_iface(this, 99));
   authTimer = new QTimer(this);
   connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
   connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
@@ -358,6 +359,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
+#ifdef Q_WS_WIN
+  m_nTaskbarButtonCreated = RegisterWindowMessage(L"TaskbarButtonCreated");
+#else
+  m_nTaskbarButtonCreated = 0;
+#endif
   authRequest();
 }
 
@@ -796,6 +802,20 @@ bool MainWindow::event(QEvent * e) {
     }
     return QMainWindow::event(e);
 }
+
+#ifdef Q_WS_WIN
+bool MainWindow::winEvent(MSG * message, long * result)
+{
+    if (message->message == m_nTaskbarButtonCreated)
+    {
+
+        m_iface->initialize();
+        m_iface->setState(winId(), taskbar_iface::S_NOPROGRESS);
+    }
+
+    return false;
+}
+#endif
 
 // Action executed when a file is dropped
 void MainWindow::dropEvent(QDropEvent *event) {
@@ -1254,6 +1274,8 @@ void MainWindow::updateGUI() {
 
   statusBar->setUpDown(status.payload_upload_rate, status.payload_download_rate);
   Session::instance()->playPendingMedia();
+  m_tbar->setProgress(winId(), Session::instance()->progress()*100);
+  m_tbar->setState(winId(), Session::instance()->hasActiveTransfers()?taskbar_iface::S_NORM:taskbar_iface::S_PAUSED);
 }
 
 void MainWindow::showNotificationBaloon(QString title, QString msg) const {

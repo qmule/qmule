@@ -84,7 +84,7 @@ public:
 };
 
 #else
-// linux
+
 class taskbar_iface::TaskBarIface
 {
 public:
@@ -98,7 +98,7 @@ public:
 
 
 taskbar_iface::taskbar_iface(QObject *parent, quint64 total) :
-    QObject(parent), m_total(total)
+    QObject(parent), m_total(total), m_pdelegate(NULL)
 {
 }
 

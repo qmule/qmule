@@ -44,6 +44,7 @@
 #include "transfer_list.h"
 #include "infodlg.h"
 #include "silent_updater.h"
+#include "taskbar_iface.h"
 
 class downloadFromURL;
 class options_imp;
@@ -172,6 +173,10 @@ protected:
   void showEvent(QShowEvent *);
   bool event(QEvent * event);
 
+#ifdef Q_WS_WIN
+  bool winEvent(MSG * message, long * result);
+#endif
+
 private:
   QIcon getSystrayIcon() const;
   void selectWidget(Widgets wNum);
@@ -222,6 +227,8 @@ private:
   QTimer *flickerTimer;
   QScopedPointer<is_info_dlg> m_info_dlg;
   QScopedPointer<silent_updater> m_updater;
+  QScopedPointer<taskbar_iface>  m_tbar;
+  unsigned int m_nTaskbarButtonCreated;
   libed2k::auth_runner ar;
 
   QIcon icon_disconnected;
