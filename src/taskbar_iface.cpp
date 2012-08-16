@@ -3,7 +3,9 @@
 #if (defined Q_WS_WIN) && (defined WIN7_SDK)
 #include <WinSDKVer.h>
 
-#if _WIN32_MAXVER >= 0x0601
+#if _WIN32_MAXVER < 0x0601
+#error SDK version is not 7.0 for WIN7
+#endif
 
 #include <shlobj.h>
 
@@ -80,20 +82,6 @@ public:
         }
     }
 };
-
-#else
-
-// old windows
-class taskbar_iface::TaskBarIface
-{
-public:
-    TaskBarIface(){}
-    void setState(WId w, TBSTATE tb_state){}
-    void setProgress(WId w, quint64 completed, quint64 total) {}
-    void setOverlayIcon(WId w, const QIcon& icon, const QString& description){}
-};
-
-#endif
 
 #else
 // linux
