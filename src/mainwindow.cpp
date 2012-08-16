@@ -250,6 +250,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   // Configure session according to options
   loadPreferences(false);
+  m_tbar.reset(new taskbar_iface(this, 99));
 
   // Start connection checking timer
   guiUpdater = new QTimer(this);
@@ -346,7 +347,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connectioh_state = csDisconnected;
   m_info_dlg.reset(new is_info_dlg(this));
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
-  m_tbar.reset(new taskbar_iface(this, 99));
   authTimer = new QTimer(this);
   connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
   connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
