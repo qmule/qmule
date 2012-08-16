@@ -22,5 +22,9 @@ CONFIG(debug, debug|release) {
 		  ssleay32MD.lib
 }
 
-LIBS += advapi32.lib shell32.lib cryptlib.lib
+CONFIG(win7){
+  LIBS += ole32.lib
+}
+
+LIBS += advapi32.lib shell32.lib cryptlib.lib user32.lib
 LIBS += PowrProf.lib
