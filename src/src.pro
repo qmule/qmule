@@ -157,7 +157,8 @@ nox {
               collection_save_dlg.h \ 
 			  infodlg.h \
               silent_updater.h\
-              taskbar_iface.h
+              taskbar_iface.h \
+	      user_properties.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -185,7 +186,8 @@ nox {
              collection_save_dlg.cpp \ 
 			 infodlg.cpp \
              silent_updater.cpp\
-             taskbar_iface.cpp
+             taskbar_iface.cpp \
+	     user_properties.cpp
 
   macx {
     HEADERS += qmacapplication.h 
@@ -210,7 +212,8 @@ nox {
            files_widget.ui \
            status_bar.ui \
 	       collection_save_dlg.ui \
-		   infodlg.ui
+		   infodlg.ui \
+	   user_properties.ui
 }
 
 DESTDIR = .

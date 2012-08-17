@@ -85,7 +85,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>GroupBox</string>
+          <string>Information</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -97,6 +97,19 @@
           <property name="margin">
            <number>3</number>
           </property>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Upload:</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="QLabel" name="label_hash">
             <property name="text">
@@ -150,32 +163,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Identification:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Upload:</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="QLabel" name="label_programm">
             <property name="text">
@@ -184,27 +171,20 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="label_ident">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
            <widget class="QLabel" name="label_upload">
             <property name="text">
              <string>TextLabel</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Download:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="4" column="1">
            <widget class="QLabel" name="label_download">
             <property name="text">
              <string>TextLabel</string>
@@ -256,6 +236,9 @@
        </item>
        <item>
         <widget class="MyTabWidget" name="tabWidget">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
          <property name="tabsClosable">
           <bool>true</bool>
          </property>
@@ -295,6 +278,11 @@
              <width>16777215</width>
              <height>80</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
           </widget>
          </item>

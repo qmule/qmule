@@ -1,5 +1,6 @@
 #include <QDateTime>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QStandardItemModel>
 
@@ -9,15 +10,16 @@
 #include "qed2kpeerhandle.h"
 
 #include "add_friend.h"
+#include "user_properties.h"
 #include "messages_widget.h"
 
 using namespace libed2k;
 
-USER::USER()
+USER::USER() : strName(), netPoint(), connected(-1), edit(NULL), nTabNum(-1), post_msg()
 {
 }
 
-USER::USER(const Preferences& pref)
+USER::USER(const Preferences& pref) : connected(-1), edit(NULL), nTabNum(-1), post_msg()
 {
     strName = pref.value("Username", QString()).toString();
     netPoint.m_nIP = pref.value("IP", 0).toUInt();
@@ -44,7 +46,6 @@ messages_widget::messages_widget(QWidget *parent)
     label_name->setText("-");
     label_hash->setText("-");
     label_programm->setText("-");
-    label_ident->setText("-");
     label_upload->setText("-");
     label_download->setText("-");
 
@@ -89,16 +90,61 @@ messages_widget::messages_widget(QWidget *parent)
     userMenu->addAction(userAdd);
     userMenu->addAction(userBrowseFiles);
     userMenu->addAction(userDelete);
+        
+    userAddTab = new QAction(this);
+    userAddTab->setObjectName(QString::fromUtf8("userAddTab"));
+    userAddTab->setText(tr("Add to the friend list"));
+    userAddTab->setIcon(QIcon(":/emule/users/UserAdd.ico"));
+      
+    userDetailsTab = new QAction(this);
+    userDetailsTab->setObjectName(QString::fromUtf8("userDetailsTab"));
+    userDetailsTab->setText(tr("Details..."));
+    userDetailsTab->setIcon(QIcon(":/emule/users/UserDetails.ico"));
+
+    userDeleteTab = new QAction(this);
+    userDeleteTab->setObjectName(QString::fromUtf8("userDeleteTab"));
+    userDeleteTab->setText(tr("Delete"));
+    userDeleteTab->setIcon(QIcon(":/emule/users/UserDelete.ico"));
+
+    closeCurTab = new QAction(userAdd);
+    closeCurTab = new QAction(this);
+    closeCurTab->setObjectName(QString::fromUtf8("closeCurTab"));
+    closeCurTab->setText(tr("Close"));
+
+    tabMenu = new QMenu(tabWidget);
+    tabMenu->setObjectName(QString::fromUtf8("tabMenu"));
+    tabMenu->addAction(userDetailsTab);
+    tabMenu->addAction(userAddTab);
+    tabMenu->addAction(closeCurTab);
+        
+    tabMenuFriend = new QMenu(tabWidget);
+    tabMenuFriend->setObjectName(QString::fromUtf8("tabMenuFriend"));
+    tabMenuFriend->addAction(userDetailsTab);
+    tabMenuFriend->addAction(userDeleteTab);
+    tabMenuFriend->addAction(closeCurTab);
 
     model = new QStandardItemModel(0, 1);
     listFriends->setModel(model);
     listFriends->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    greenColor = QColor::fromRgb(0, 200, 0);
+    blueColor = QColor::fromRgb(0, 175, 255);
+    systemColor = QColor(Qt::darkGreen);
+
     connect(listFriends, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
+    connect(tabWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayTabMenu(const QPoint&)));
+    
     connect(userAdd, SIGNAL(triggered()), this, SLOT(addFriend()));
     connect(userSendMessage, SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userDelete, SIGNAL(triggered()), this, SLOT(deleteFriend()));    
     connect(userBrowseFiles, SIGNAL(triggered()), this, SLOT(requestUserDirs()));
+    connect(userDetails, SIGNAL(triggered()), this, SLOT(friendDetails()));
+
+    connect(userAddTab, SIGNAL(triggered()), this, SLOT(addTabFriend()));
+    connect(userDeleteTab, SIGNAL(triggered()), this, SLOT(deleteTabFriend()));
+    connect(closeCurTab, SIGNAL(triggered()), this, SLOT(closeTab()));
+    connect(userDetailsTab, SIGNAL(triggered()), this, SLOT(userTabDetails()));
+
     connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabWidget, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(btnSend, SIGNAL(clicked()), this, SLOT(pushMessage()));
@@ -125,6 +171,8 @@ messages_widget::messages_widget(QWidget *parent)
 
     textMsg->installEventFilter(this);
 
+    enableButtons(false);
+
     setFocusPolicy(Qt::StrongFocus);
     load();
 }
@@ -150,34 +198,65 @@ void messages_widget::closeTab(int index)
     QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(index));
     tabWidget->removeTab(index);
     delete edit;
+
+    if (!tabWidget->count())
+        enableButtons(false);
 }
 
 void messages_widget::startChat(const QString& user_name, const libed2k::net_identifier& np)
 {
     QTextEdit* edit = new QTextEdit(this);
-    edit->setReadOnly(true);int new_tab = tabWidget->addTab(edit, QIcon(":/emule/users/Chat.ico"), user_name);    
+    edit->setReadOnly(true);
+    edit->setFontPointSize(10);
+    int new_tab = tabWidget->addTab(edit, QIcon(":/emule/users/Chat.ico"), user_name);    
     tabWidget->setCurrentIndex(new_tab);
 
     USER user;
     user.strName = user_name;
     user.netPoint = np;
+    user.edit = edit;
+    user.nTabNum = new_tab;
+    if (connectedPeers.contains(np))
+        user.connected = true;
     users.push_back(user);
+
+    edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+    edit->setTextColor(systemColor);
+    edit->insertPlainText(tr("*** Begin chat: ") + user_name);
+    edit->setTextColor(Qt::black);
+
+    enableButtons();
+    textMsg->setFocus();
 }
 
 void messages_widget::pushMessage()
 {
     QString msg = textMsg->toPlainText();
-    textMsg->clear();
     if (tabWidget->currentIndex() < 0 || !msg.length())
         return;
-    USER user = users[tabWidget->currentIndex()];
+
+    USER& user = users[tabWidget->currentIndex()];
+    if (user.post_msg.length())
+        return;
+    
+    textMsg->clear();
 
     QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(tabWidget->currentIndex()));
 
-    QDateTime date_time = QDateTime::currentDateTime();
-    QString newMsg = "[" + date_time.toString("hh:mm") + "] " + "me: " + msg;
-
-    edit->append(newMsg);
+    if (user.connected > 0)
+    {
+        Preferences pref;
+        addMessage(edit, pref.nick(), msg, greenColor);
+    }
+    else
+    {
+        user.post_msg = msg;
+        user.connected = -1;
+        edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+        edit->setTextColor(systemColor);
+        edit->insertPlainText(tr("*** Connecting... "));
+        edit->setTextColor(Qt::black);
+    }
 
     QED2KPeerHandle::getPeerHandle(user.netPoint).sendMessageToPeer(msg);
     textMsg->setFocus();
@@ -185,25 +264,16 @@ void messages_widget::pushMessage()
 
 void messages_widget::newMessage(const libed2k::net_identifier& np, const QString& hash, const QString& strMessage)
 {
-    std::vector<USER>::const_iterator it;
-    int nTab = 0;
-    for (it = users.begin(); it != users.end(); ++it, ++nTab)
+    std::vector<USER>::iterator it = findUser(np);
+    if ( it != users.end())
     {
-        if (it->netPoint == np)
-            break;
-    }
-    if (it != users.end())
-    {
-        QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
-        QDateTime date_time = QDateTime::currentDateTime();
-        QString msg = "[" + date_time.toString("hh:mm") + "] " + it->strName + ": " + strMessage;
-        edit->append(msg);
+        addMessage(it->edit, it->strName, strMessage, blueColor);
 
-        lastMessageTab = nTab;
+        lastMessageTab = it->nTabNum;
 
-        if (!this->isActiveWindow() || !this->isVisible() || nTab != tabWidget->currentIndex())
+        if (!this->isActiveWindow() || !this->isVisible() || it->nTabNum != tabWidget->currentIndex())
         {
-            tabWidget->setTabFontColor(nTab, QColor(Qt::darkRed));
+            tabWidget->setTabFontColor(it->nTabNum, QColor(Qt::darkRed));
             emit newMessage();
         }
     }
@@ -212,11 +282,10 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
         QString name = QED2KPeerHandle::getPeerHandle(np).getUserName();
         startChat(name, np);
 
-        nTab = tabWidget->currentIndex();
+        int nTab = tabWidget->currentIndex();
         QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
-        QDateTime date_time = QDateTime::currentDateTime();
-        QString msg = "[" + date_time.toString("hh:mm") + "] " + name + ": " + strMessage;
-        edit->append(msg);
+
+        addMessage(edit, name, strMessage, blueColor);
 
         lastMessageTab = nTab;
         if (!this->isActiveWindow() || !this->isVisible())
@@ -229,49 +298,38 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
 
 void messages_widget::peerCaptchaRequest(const libed2k::net_identifier& np, const QString& hash, const QPixmap& pm)
 {
-    std::vector<USER>::const_iterator it;
-    int nTab = 0;
-    for (it = users.begin(); it != users.end(); ++it, ++nTab)
+    std::vector<USER>::iterator it = findUser(np);
+    if ( it != users.end())
     {
-        if (it->netPoint == np)
-            break;
-    }
-    if (it != users.end())
-    {
-        QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
-        QTextCursor cursor = edit->textCursor();
+        it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+        it->edit->setTextColor(systemColor);
+        it->edit->insertPlainText(tr("*** To avoid spam user is asking for captcha authentification. Please enter symbols on the picture below:\n"));
+        it->edit->setTextColor(Qt::black);
 
-        QDateTime date_time = QDateTime::currentDateTime();
-        QString msg = "\n[" + date_time.toString("hh:mm") + "] *** ";
-        cursor.insertText(msg + tr("To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below:\n"));
+        QTextCursor cursor = it->edit->textCursor();
+        QTextCharFormat format = it->edit->currentCharFormat();
         cursor.insertImage(pm.toImage());
+        it->edit->setCurrentCharFormat(format);
     }
 }
 
 void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult)
 {
-    std::vector<USER>::const_iterator it;
-    int nTab = 0;
-    for (it = users.begin(); it != users.end(); ++it, ++nTab)
+    std::vector<USER>::iterator it = findUser(np);
+    if ( it != users.end())
     {
-        if (it->netPoint == np)
-            break;
-    }
-    if (it != users.end())
-    {
-        QTextEdit* edit = qobject_cast<QTextEdit*>(tabWidget->widget(nTab));
-        QTextCursor cursor = edit->textCursor();
+        it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+        it->edit->setTextColor(systemColor);
 
-        QDateTime date_time = QDateTime::currentDateTime();
-        QString msg = "\n[" + date_time.toString("hh:mm") + "] *** ";
         if (nResult)
         {            
-            cursor.insertText(msg + tr("Your answer is incorrect and message is ignored. You may request captcha again by sending new message.\n"));
+            it->edit->insertPlainText(tr("*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message.\n"));
         }
         else
         {
-            cursor.insertText(msg + tr("Your answer is correct. User has recived your message.\n"));
+            it->edit->insertPlainText(tr("*** Your answer is correct. User has recived your message.\n"));
         }
+        it->edit->setTextColor(Qt::black);
     }
 }
 
@@ -297,6 +355,24 @@ void messages_widget::displayListMenu(const QPoint& pos)
     userMenu->exec(QCursor::pos());
 }
 
+void messages_widget::displayTabMenu(const QPoint& pos) 
+{
+    tabMenuNum = tabWidget->getTabNum(pos);
+    if (tabMenuNum < 0)
+        return;
+
+    USER user = users[tabMenuNum];
+    std::vector<USER>::iterator it;
+    for (it = friends.begin(); it != friends.end(); ++it)
+        if (it->netPoint == user.netPoint)
+            break;
+
+    if (it != friends.end())
+        tabMenuFriend->exec(QCursor::pos());
+    else
+        tabMenu->exec(QCursor::pos());
+}
+
 void messages_widget::addFriend()
 {
     add_friend dlg(this);
@@ -312,7 +388,11 @@ void messages_widget::addFriend()
         int row = model->rowCount();
         model->insertRow(row);
         model->setData(model->index(row, 0), new_friend.strName);
-        model->item(row)->setIcon(QIcon(":/emule/users/Friends1.ico"));
+
+        if (connectedPeers.contains(new_friend.netPoint))
+            model->item(row)->setIcon(QIcon(":/emule/users/Friends3.ico"));
+        else
+            model->item(row)->setIcon(QIcon(":/emule/users/Friends1.ico"));
 
         friends.push_back(new_friend);
     }
@@ -320,6 +400,9 @@ void messages_widget::addFriend()
 
 void messages_widget::deleteFriend()
 {
+    if (QMessageBox::question(0, "qMule", tr("Do you realy want to delete a friend?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::No) 
+        return;
+
     QModelIndex index = listFriends->currentIndex();
 
     if (!index.isValid())
@@ -357,6 +440,65 @@ void messages_widget::sendMessage()
     {
         startChat(friends[num].strName, friends[num].netPoint);
     }
+}
+
+void messages_widget::friendDetails()
+{
+    QModelIndex index = listFriends->currentIndex();
+
+    if (!index.isValid())
+        return;
+
+    int num = index.row();
+
+    user_properties dlg(this, friends[num].strName, friends[num].netPoint);
+    dlg.exec();
+}
+
+void messages_widget::addTabFriend()
+{
+    USER user = users[tabMenuNum];
+
+    int row = model->rowCount();
+    model->insertRow(row);
+    model->setData(model->index(row, 0), user.strName);
+
+    if (connectedPeers.contains(user.netPoint))
+        model->item(row)->setIcon(QIcon(":/emule/users/Friends3.ico"));
+    else
+        model->item(row)->setIcon(QIcon(":/emule/users/Friends1.ico"));
+
+    friends.push_back(user);
+}
+
+void messages_widget::deleteTabFriend()
+{
+    if (QMessageBox::question(0, "qMule", tr("Do you realy want to delete a friend?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::No) 
+        return;
+
+    USER user = users[tabMenuNum];
+    std::vector<USER>::iterator it;
+    int num = 0;
+    for (it = friends.begin(); it != friends.end(); ++it, ++num)
+        if (it->netPoint == user.netPoint)
+            break;
+
+    if (it != friends.end())
+    {
+        model->removeRow(num);
+        friends.erase(it);    
+    }
+}
+
+void messages_widget::closeTab()
+{
+    closeTab(tabMenuNum);
+}
+
+void messages_widget::userTabDetails()
+{
+    user_properties dlg(this, users[tabMenuNum].strName, users[tabMenuNum].netPoint);
+    dlg.exec();
 }
 
 void messages_widget::selectTab(int nTabNum)
@@ -476,12 +618,68 @@ bool messages_widget::eventFilter(QObject *obj, QEvent *e)
 
 void messages_widget::peerConnected(const libed2k::net_identifier& np, const QString& hash, bool bActive)
 {
-    connectedPeers.push_back(np);
+    std::vector<USER>::iterator it = findUser(np);
+    if ( it != users.end())
+    {
+
+        if (it->connected >= 0)
+        {
+            it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+            it->edit->setTextColor(systemColor);
+            it->edit->insertPlainText(tr("*** Connected"));
+        }
+        else
+        {
+            it->edit->setTextColor(systemColor);
+            it->edit->insertPlainText(tr("OK"));
+        }
+
+        if (it->post_msg.length())
+        {
+            Preferences pref;
+            addMessage(it->edit, pref.nick(), it->post_msg, greenColor);
+            it->post_msg = "";
+        }
+        
+        it->connected = 1;
+        it->edit->setTextColor(Qt::black);
+    }
+    else
+    {
+        if (!connectedPeers.contains(np))
+            connectedPeers.append(np);
+    }
+    setFriendIcon(np, true);
 }
 
 void messages_widget::peerDisconnected(const libed2k::net_identifier& np, const QString& hash, const libed2k::error_code ec)
 {
-	connectedPeers.erase(std::remove(connectedPeers.begin(), connectedPeers.end(), np), connectedPeers.end());
+    std::vector<USER>::iterator it = findUser(np);
+    if ( it != users.end())
+    {
+        if (it->connected > 0)
+        {
+            it->connected = 0;
+            it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+            it->edit->setTextColor(systemColor);
+            it->edit->insertPlainText(tr("*** Disconnected"));
+        }
+        else
+        {
+            it->edit->setTextColor(systemColor);
+            it->edit->insertPlainText(tr("refused"));
+            it->post_msg = "";
+        }
+
+        it->edit->setTextColor(Qt::black);
+    }
+    else
+    {
+        if (connectedPeers.contains(np))
+            connectedPeers.removeOne(np);
+    }
+
+    setFriendIcon(np, false);
 }
 
 void messages_widget::requestUserDirs()
@@ -493,4 +691,54 @@ void messages_widget::requestUserDirs()
 
     int num = index.row();
     QED2KPeerHandle::getPeerHandle(friends[num].netPoint).requestDirs();
+}
+
+void messages_widget::enableButtons(bool enable)
+{
+    btnSend->setEnabled(enable);
+    btnClose->setEnabled(enable);
+}
+
+void messages_widget::addMessage(QTextEdit* edit, QString name, QString msg, QColor& color)
+{
+    edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
+    edit->setTextColor(color);
+    edit->insertPlainText(name + ": ");
+    edit->setTextColor(Qt::black);
+    edit->insertPlainText(msg);
+}
+
+std::vector<USER>::iterator messages_widget::findUser(const libed2k::net_identifier& np)
+{
+    std::vector<USER>::iterator it;
+    for (it = users.begin(); it != users.end(); ++it)
+        if (it->netPoint == np)
+            break;
+
+    return it;
+}
+
+void messages_widget::setFriendIcon(const libed2k::net_identifier& np, bool connected)
+{
+    std::vector<USER>::iterator it;
+    int num = 0;
+    for (it = friends.begin(); it != friends.end(); ++it, ++num)
+        if (it->netPoint == np)
+            break;
+
+    if (it != friends.end())
+    {
+        if (connected)
+        {
+            it->connected = 1;
+            model->item(num)->setIcon(QIcon(":/emule/users/Friends3.ico"));
+        }
+        else
+        {
+            if (it->connected < 0)
+                model->item(num)->setIcon(QIcon(":/emule/users/Friends1.ico"));
+            else
+                model->item(num)->setIcon(QIcon(":/emule/users/Friends2.ico"));
+        }
+    }
 }

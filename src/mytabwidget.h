@@ -13,6 +13,11 @@ public:
     {
         tabBar()->setTabTextColor(nTab, color);
     }
+
+    int getTabNum(const QPoint& point)
+    {
+        return tabBar()->tabAt(point);
+    }
 };
 
 #endif

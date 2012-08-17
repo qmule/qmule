@@ -67,3 +67,8 @@ QString QED2KPeerHandle::getUserName()
 {
     return QString::fromUtf8(m_delegate.get_options().m_strName.c_str());
 }
+
+libed2k::md4_hash QED2KPeerHandle::getHash()
+{
+    return m_delegate.get_hash();
+}

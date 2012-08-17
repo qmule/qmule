@@ -6306,10 +6306,6 @@ However, those plugins were disabled.</source>
         <translation>Друзья</translation>
     </message>
     <message>
-        <source>GroupBox</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>TextLabel</source>
         <translation></translation>
     </message>
@@ -6372,17 +6368,73 @@ However, those plugins were disabled.</source>
     <message>
         <source>To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below:
 </source>
-        <translation>Чтобы избежать спама, пользователь запросил captcha аутентификацию для отсылки ему сообщения. Пожалуйста, введите символы, которые Вы видите на этом изображении:</translation>
+        <translation type="obsolete">Чтобы избежать спама, пользователь запросил captcha аутентификацию для отсылки ему сообщения. Пожалуйста, введите символы, которые Вы видите на этом изображении:</translation>
     </message>
     <message>
         <source>Your answer is incorrect and message is ignored. You may request captcha again by sending new message.
 </source>
-        <translation>Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
+        <translation type="obsolete">Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
     </message>
     <message>
         <source>Your answer is correct. User has recived your message.
 </source>
-        <translation>Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
+        <translation type="obsolete">Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Информация</translation>
+    </message>
+    <message>
+        <source>*** To avoid spam user is asking for captcha autentification. Please enter symbols on the picture below:
+</source>
+        <translation type="obsolete">*** Чтобы избежать спама, пользователь запросил captcha аутентификацию для отсылки ему сообщения. Пожалуйста, введите символы, которые Вы видите на этом изображении:</translation>
+    </message>
+    <message>
+        <source>*** To avoid spam user is asking for captcha authentification. Please enter symbols on the picture below:
+</source>
+        <translation>*** Чтобы избежать спама, пользователь запросил captcha аутентификацию для отсылки ему сообщения. Пожалуйста, введите символы, которые Вы видите на этом изображении:</translation>
+    </message>
+    <message>
+        <source>*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message.
+</source>
+        <translation>*** Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
+    </message>
+    <message>
+        <source>*** Your answer is correct. User has recived your message.
+</source>
+        <translation>*** Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
+    </message>
+    <message>
+        <source>Add to the friend list</source>
+        <translation>Добавить в список друзей</translation>
+    </message>
+    <message>
+        <source>*** Begin chat: </source>
+        <translation>*** Начало сессии чата:</translation>
+    </message>
+    <message>
+        <source>*** Connecting... </source>
+        <translation>*** Соединение... </translation>
+    </message>
+    <message>
+        <source>Do you realy want to delete a friend?</source>
+        <translation>Вы действительно хотите удалтить друга?</translation>
+    </message>
+    <message>
+        <source>*** Connected</source>
+        <translation>*** Соединён</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>ОК</translation>
+    </message>
+    <message>
+        <source>*** Disconnected</source>
+        <translation>*** Отсоединён</translation>
+    </message>
+    <message>
+        <source>refused</source>
+        <translation>не удалось</translation>
     </message>
 </context>
 <context>
@@ -6915,6 +6967,10 @@ However, those plugins were disabled.</source>
     <message>
         <source>You can't search in ED2K network on closed server connection, set connection or check torrent combobox</source>
         <translation>Вы не можете производить поиск по eDonkey без соединения с сервером, установите соединение или используйте галку поиск по торрентам</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation type="unfinished">Файлы</translation>
     </message>
 </context>
 <context>
