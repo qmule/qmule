@@ -116,6 +116,34 @@ void sigabrtHandler(int) {
 }
 #endif
 
+#ifdef Q_WS_WIN
+
+void customMessageHandler(QtMsgType type, const char *msg)
+{
+    QString txt;
+    switch (type) {
+    case QtDebugMsg:
+        txt = QString("Debug: %1").arg(msg);
+        break;
+
+    case QtWarningMsg:
+        txt = QString("Warning: %1").arg(msg);
+    break;
+    case QtCriticalMsg:
+        txt = QString("Critical: %1").arg(msg);
+    break;
+    case QtFatalMsg:
+        txt = QString("Fatal: %1").arg(msg);
+        abort();
+    }
+
+    QFile outFile("debuglog.txt");
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream ts(&outFile);
+    ts << txt << endl;
+}
+
+#endif
 // Main
 int main(int argc, char *argv[]) {
   // Create Application
@@ -124,6 +152,10 @@ int main(int argc, char *argv[]) {
   QtSingleCoreApplication app("qMule-"+uid, argc, argv);
 #else
   SessionApplication app("qMule-"+uid, argc, argv);
+#endif
+
+#ifdef Q_WS_WIN
+    qInstallMsgHandler(customMessageHandler);
 #endif
 
   QStringList al = app.arguments();

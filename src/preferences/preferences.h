@@ -89,9 +89,7 @@ public:
           setSavePath(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
           setKnownFile(misc::emuleConfig("known.met"));
           setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
-#ifdef Q_WS_WIN32
-          misc::migrationTorrents();
-#endif
+          misc::migrateTorrents();
       }
   }
 

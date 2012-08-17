@@ -192,8 +192,6 @@ public:
   static QStringList emuleSharedFiles();
   static QStringList emuleSharedDirs();
   static QString emuleKeyFile();
-  static bool migrationTorrents();
-  static bool processTorrentFile(QString filePath, bool BTorrent);
 #endif
 
   static QString migrationIncomingDir(const QString& dir);
@@ -203,6 +201,7 @@ public:
   static QString migrationAuthPassword();
   static shared_map migrationShareds();
   static QStringList migrationSharedFiles();
+  static void migrateTorrents();
 
 };
 

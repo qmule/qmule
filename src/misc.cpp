@@ -1151,103 +1151,83 @@ QStringList misc::migrationSharedFiles()
     return emuleSharedFiles().filter(QRegExp("^[^-]"));
 }
 
-bool misc::migrationTorrents()
+void misc::migrateTorrents()
 {
-    QString appdataPath(getenv("APPDATA"));
-    if (!appdataPath.length())
-        return false;
+    qDebug() << Q_FUNC_INFO;
 
-    Session::instance()->get_torrent_session()->start();
-    Session::instance()->get_ed2k_session()->start();
+    // generate locations list
+    QString res;
+    QList<QFileInfo> dl;
+    dl << QFileInfo(QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("uTorrent\\resume.dat"))
+    << QFileInfo(QDir(ShellGetFolderPath(CSIDL_APPDATA)).filePath("uTorrent\\resume.dat"))
+    << QFileInfo(QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("BitTorrent\\resume.dat"))
+    << QFileInfo(QDir(ShellGetFolderPath(CSIDL_APPDATA)).filePath("BitTorrent\\resume.dat"));
 
-    QString resumeFile = appdataPath + "\\uTorrent\\";
-    QFileInfo u_file(resumeFile);
-    if (u_file.exists())
-        return misc::processTorrentFile(resumeFile, false);
+    dl.erase(std::remove_if(dl.begin(), dl.end(),
+        std::not1(std::mem_fun_ref(static_cast<bool (QFileInfo::*)() const>(&QFileInfo::exists)))), dl.end());
 
-    resumeFile = appdataPath + "\\BitTorrent\\";
-    QFileInfo bt_file(resumeFile);
-    if (bt_file.exists())
-        return misc::processTorrentFile(resumeFile, true);
-
-    return true;
-}
-
-bool misc::processTorrentFile(QString filePath, bool BTorrent)
-{
-    QString resumeFile = filePath + "resume.dat";
-    std::vector<char> buf;
-	error_code ec;
-    int ret = load_file(resumeFile.toUtf8().constData(), buf, ec);
-    if (ret < 0)
-        return false;
-
-    lazy_entry e;
-	if (buf.size() == 0 || lazy_bdecode(&buf[0], &buf[0] + buf.size(), e) != 0)
-		return false;
-
-    if (e.type() != lazy_entry::dict_t)
-		return false;
-
-    for (int ii = 0; ii < e.dict_size(); ii++)
+    foreach(QFileInfo fi, dl)
     {
-        std::pair<std::string, lazy_entry const*> dic_elem = e.dict_at(ii);
-        if (dic_elem.second->type() != lazy_entry::dict_t)
-            continue;
-        lazy_entry const* dict = dic_elem.second;
+        qDebug() << "process " << fi.filePath();
+        std::vector<char> buf;
+        error_code ec;
+        int ret = load_file(fi.filePath().toUtf8().constData(), buf, ec);
 
-        QString torrentSavePath(dict->dict_find_string_value("path").c_str());
-        QString torrentFilePath(dic_elem.first.c_str());
-
-        if (BTorrent)
-            torrentFilePath = filePath + torrentFilePath;
-
-
-        int completed = dict->dict_find_int_value("completed_on");
-
-        boost::intrusive_ptr<torrent_info> torrentInfo;
-        try 
+        if (ret != 0)
         {
-            torrentInfo = new torrent_info(torrentFilePath.toStdString().c_str());
-            if (!torrentInfo->is_valid())
-                throw std::exception();
-        } 
-        catch(std::exception& e) 
-        {
+            qDebug() << "error on load_file";
             continue;
         }
 
-        const QString hash = misc::toQString(torrentInfo->info_hash());
-        TorrentTempData::deleteTempData(hash);
-        if (torrentInfo->num_files() == 1)
-        {
-            QStringList path_list;
-            path_list << torrentSavePath;
+        lazy_entry e;
 
-            TorrentTempData::setFilesPath(hash,path_list);
-            QFileInfo file(torrentSavePath);
-            if (file.exists())
-                torrentSavePath = file.absolutePath();
+        if (buf.size() == 0 || lazy_bdecode(&buf[0], &buf[0] + buf.size(), e) != 0)
+        {
+            qDebug() << "error on decode";
+            continue;
         }
 
-        TorrentTempData::setSavePath(hash, torrentSavePath);
-        TorrentTempData::setSeedingMode(hash, completed > 0);
-
-        std::string prio = dict->dict_find_string_value("prio");
-        std::vector<char> priorities(prio.begin(), prio.end());
-        std::vector<int> file_priorities;
-        for (std::vector<char>::const_iterator iter = priorities.begin(); iter != priorities.end(); ++iter)
+        if (e.type() != lazy_entry::dict_t)
         {
-            if (*iter == 128)
-                file_priorities.push_back(0);
-            else
-                file_priorities.push_back(1);
+            qDebug() << "type error";
+            continue;
         }
 
-        TorrentTempData::setFilesPriority(hash, file_priorities);
+        for (int n = 0; n < e.dict_size(); ++n)
+        {
+            std::pair<std::string, lazy_entry const*> dic_elem = e.dict_at(n);
 
-        qDebug("Adding the torrent to the session...");
-        Session::instance()->addTorrent(torrentFilePath);
+            if (dic_elem.second->type() != lazy_entry::dict_t)
+            {
+                qDebug() << "type error on dict";
+                continue;
+            }
+
+            lazy_entry const* dict = dic_elem.second;
+
+            QString torrentSavePath(dict->dict_find_string_value("path").c_str());
+            QString torrentFilePath(dic_elem.first.c_str());
+            qDebug() << "Torrent save path " << torrentSavePath << " file path " << torrentFilePath;
+
+            if (!QFileInfo(torrentFilePath).exists())
+            {
+                torrentFilePath = fi.dir().filePath(torrentFilePath);
+
+                if (!QFileInfo(torrentFilePath).exists())
+                {
+                    torrentFilePath.clear();
+                }
+            }
+
+            if (torrentFilePath.isEmpty())
+            {
+                qDebug() << "torrent file path is empty";
+                continue;
+            }
+
+            qDebug() << "add torrent to session " <<  torrentFilePath;
+            Session::instance()->addTransferFromFile(torrentFilePath);
+        }
     }
 }
 
@@ -1281,6 +1261,11 @@ shared_map misc::migrationShareds()
  QStringList misc::migrationSharedFiles()
  {
      return QStringList();
+ }
+
+ void misc::migrateTorrents()
+ {
+
  }
 
 #endif
