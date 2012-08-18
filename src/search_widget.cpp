@@ -1069,7 +1069,7 @@ void search_widget::fillFileValues(int row, const QED2KSearchResultEntry& fileEn
             break;
         default:
             // don't set icon for torrent links
-            if (!fileEntry.m_strFilename.startsWith("<a"))
+            if (!misc::isTorrentLink(fileEntry.m_strFilename))
                 model->itemFromIndex(model->index(row, 0, parent))->setIcon(iconAny);
 
     }
@@ -1204,7 +1204,7 @@ void search_widget::displayListMenu(const QPoint&)
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
         fileSearchRelated->setEnabled(
             selected.size() == 1 &&
-            !selected_data(treeResult, SWDelegate::SW_NAME).toString().startsWith("<a"));
+            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
         fileMenu->exec(QCursor::pos());
     }
 }
@@ -1248,8 +1248,6 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
     else
     {
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
-        btnDownload->setEnabled(selected.size());
-
         if (selected.size() && tabSearch->currentIndex() >= 0 && searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS)
         {
             if (selected.first().parent() == treeResult->rootIndex())
@@ -1408,7 +1406,7 @@ bool search_widget::hasSelectedFiles()
     {
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
 
-        if (!filename.startsWith("<a"))
+        if (!misc::isTorrentLink(filename))
         {
             return true;
         }
@@ -1786,8 +1784,8 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
         sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
     QString name2 = sourceModel()->data(
         sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
-    bool torr1 = name1.startsWith("<a");
-    bool torr2 = name2.startsWith("<a");
+    bool torr1 = misc::isTorrentLink(name1);
+    bool torr2 = misc::isTorrentLink(name2);
 
     if (torr1 && !torr2) return sortOrder() == Qt::DescendingOrder;
     else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
