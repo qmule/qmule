@@ -1068,7 +1068,9 @@ void search_widget::fillFileValues(int row, const QED2KSearchResultEntry& fileEn
             model->itemFromIndex(model->index(row, 0, parent))->setIcon(iconCollection);
             break;
         default:
-            model->itemFromIndex(model->index(row, 0, parent))->setIcon(iconAny);
+            // don't set icon for torrent links
+            if (!fileEntry.m_strFilename.startsWith("<a"))
+                model->itemFromIndex(model->index(row, 0, parent))->setIcon(iconAny);
 
     }
     model->setData(model->index(row, SWDelegate::SW_ID, parent), fileEntry.m_hFile);
