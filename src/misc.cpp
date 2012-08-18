@@ -1204,29 +1204,61 @@ void misc::migrateTorrents()
             }
 
             lazy_entry const* dict = dic_elem.second;
+            int completed = dict->dict_find_int_value("completed_on");
 
-            QString torrentSavePath(dict->dict_find_string_value("path").c_str());
-            QString torrentFilePath(dic_elem.first.c_str());
-            qDebug() << "Torrent save path " << torrentSavePath << " file path " << torrentFilePath;
+            /**
+              * torrentSavePath = save path for torrent when torrent contains more than one file
+              * torrentSavePath = file name for torrent when torrent contains only one file
+             */
+            QString torrentSavePath = QString::fromUtf8(dict->dict_find_string_value("path").c_str());
+            QString torrentFileName = QString::fromUtf8(dic_elem.first.c_str());
+            qDebug() << "Torrent save path " << torrentSavePath
+                     << " file path " << torrentFileName;
 
-            if (!QFileInfo(torrentFilePath).exists())
+            // generate torrent file name
+            if (!QFileInfo(torrentFileName).exists())
             {
-                torrentFilePath = fi.dir().filePath(torrentFilePath);
+                torrentFileName = fi.dir().filePath(torrentFileName);
 
-                if (!QFileInfo(torrentFilePath).exists())
+                if (!QFileInfo(torrentFileName).exists())
                 {
-                    torrentFilePath.clear();
+                    torrentFileName.clear();
                 }
             }
 
-            if (torrentFilePath.isEmpty())
+            if (torrentFileName.isEmpty())
             {
-                qDebug() << "torrent file path is empty";
+                qDebug() << "torrent file name is empty";
                 continue;
             }
 
-            qDebug() << "add torrent to session " <<  torrentFilePath;
-            Session::instance()->addTransferFromFile(torrentFilePath);
+            // load torrent file
+            QFile ti_file(torrentFileName);
+            if (!ti_file.open(QIODevice::ReadOnly)) continue;
+            const QByteArray content = ti_file.readAll();
+            ti_file.close();
+            error_code ec;
+            torrent_info ti(content.constData(), content.size(), ec);
+
+            if (ec || !ti.is_valid())
+            {
+                qDebug() << "error on load temp torrent file";
+                continue;
+            }
+
+            // store save path to migration map
+            QString hash = misc::toQString(ti.info_hash());
+            // for one file extract directory because it is filename
+            if (ti.num_files() == 1)
+            {
+                torrentSavePath = QFileInfo(torrentSavePath).dir().path();
+            }
+
+            qDebug() << "save path is : " << torrentSavePath;
+            TorrentTempData::setSavePath(hash, torrentSavePath);
+            TorrentTempData::setSeedingMode(hash, completed > 0);
+            qDebug() << "add torrent to session " <<  torrentFileName;
+            Session::instance()->addTransferFromFile(torrentFileName);
         }
     }
 }

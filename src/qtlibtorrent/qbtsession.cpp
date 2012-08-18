@@ -1100,13 +1100,15 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
 #endif
 
   QString savePath;
-  if (!from_url.isEmpty() && savepathLabel_fromurl.contains(QUrl::fromEncoded(from_url.toUtf8()))) {
-    // Enforcing the save path defined before URL download (from RSS for example)
-    QPair<QString, QString> savePath_label = savepathLabel_fromurl.take(QUrl::fromEncoded(from_url.toUtf8()));
+  if (!from_url.isEmpty() && savepathLabel_fromurl.contains(QUrl::fromEncoded(from_url.toUtf8())))
+  {
+      // Enforcing the save path defined before URL download (from RSS for example) - but it doesn't work on migration
+      QPair<QString, QString> savePath_label = savepathLabel_fromurl.take(QUrl::fromEncoded(from_url.toUtf8()));
     if (savePath_label.first.isEmpty())
       savePath = getSavePath(hash, fromScanDir, path, root_folder);
     else
       savePath = savePath_label.first;
+
     // Remember label
     TorrentTempData::setLabel(hash, savePath_label.second);
   } else {
@@ -2513,6 +2515,7 @@ session_status QBtSession::getSessionStatus() const {
 
 QString QBtSession::getSavePath(const QString &hash, bool fromScanDir, QString filePath, QString root_folder) {
   QString savePath;
+
   if (TorrentTempData::hasTempData(hash)) {
     savePath = TorrentTempData::getSavePath(hash);
     if (savePath.isEmpty()) {
@@ -2553,6 +2556,7 @@ QString QBtSession::getSavePath(const QString &hash, bool fromScanDir, QString f
     }
     qDebug("getSavePath, got save_path from persistent data: %s", qPrintable(savePath));
   }
+
   // Clean path
   savePath.replace("\\", "/");
   savePath = misc::expandPath(savePath);
