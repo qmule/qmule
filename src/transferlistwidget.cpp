@@ -117,6 +117,7 @@ TransferListWidget::TransferListWidget(QWidget *parent, MainWindow *main_window,
     setColumnHidden(TorrentModelItem::TR_AMOUNT_DOWNLOADED, true);
     setColumnHidden(TorrentModelItem::TR_AMOUNT_LEFT, true);
     setColumnHidden(TorrentModelItem::TR_TIME_ELAPSED, true);
+    setColumnHidden(TorrentModelItem::TR_LABEL, true);
   }
 
   setContextMenuPolicy(Qt::CustomContextMenu);
@@ -775,6 +776,11 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   foreach (const QString &label, customLabels) {
     labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("inode-directory"), label);
   }
+
+  // temporary disable label actions
+  foreach (QAction* a, labelActions)
+    a->setEnabled(false);
+
   listMenu.addSeparator();
   if (one_not_seed)
     listMenu.addAction(&actionSet_download_limit);
