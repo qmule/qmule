@@ -365,6 +365,7 @@ void options_imp::saveOptions() {
   Preferences::setTorrentFileAssoc(checkAssociateTorrents->isChecked());
   Preferences::setMagnetLinkAssoc(checkAssociateMagnetLinks->isChecked());
   Preferences::setEmuleFileAssoc(checkAssociateecolls->isChecked());
+  Preferences::setCommonAssocSection(checkAssociateTorrents->isChecked() || checkAssociateecolls->isChecked());
 #endif
   // End General preferences
 

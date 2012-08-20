@@ -328,6 +328,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
       Preferences::setTorrentFileAssoc(true);
       Preferences::setMagnetLinkAssoc(true);
       Preferences::setEmuleFileAssoc(true);
+      Preferences::setCommonAssocSection(true); // enable common section
     }
     else
     {
