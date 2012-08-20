@@ -679,16 +679,20 @@ void messages_widget::enableButtons(bool enable)
 
 void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color)
 {
-    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + color + "' size=4>" +
-                       name + ": </font><font color='000000' size=4>" + msg + "</font><br>";
+    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + color + "'>" +
+                       name + ": </font><font color='000000'>" + msg + "</font><br>";
+    edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
+    edit->moveCursor(QTextCursor::End);
 }
 
 void messages_widget::addSystemMessage(QTextEdit* edit, const QString& msg)
 {
-    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + systemColor + "' size=4>" +
+    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + systemColor + "'>" +
                        msg + "</font><br>";
+    edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
+    edit->moveCursor(QTextCursor::End);
 }
 
 std::vector<USER>::iterator messages_widget::findUser(const libed2k::net_identifier& np)
