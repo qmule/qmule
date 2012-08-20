@@ -950,6 +950,9 @@ void MainWindow::on_auth_result(const std::string& strRes, const boost::system::
     qDebug("MainWindow::on_auth_result: %s", strRes.c_str());
     QString strError;
 
+    // do not emit signal on aborted operation
+    if (ec == boost::asio::error::operation_aborted) return;
+
     if (ec)
     {
         strError = QString::fromLocal8Bit(ec.message().c_str());
