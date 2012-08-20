@@ -590,6 +590,39 @@ void search_widget::startSearch()
         return;
     }
 
+    QString duration = tableCond->item(7, 1)->text();
+    bOk = true;
+    int nDuration = 0;
+    if (duration.length())
+    {
+        int nPos, nNum, coef = 1;
+        QString num;
+        do
+        {
+            nPos = duration.lastIndexOf(':');
+            if (nPos >= 0)
+            {
+                num = duration.right(duration.length() - nPos - 1);
+                duration = duration.left(nPos);
+            }
+            else
+            {
+                num = duration;
+                duration = "";
+            }
+
+            nNum = num.toInt(&bOk);
+            nDuration += nNum * coef;
+            coef *= 60;
+        }
+        while (bOk && duration.length());
+    }
+    if (!bOk)
+    {
+        showErrorParamMsg(7);
+        return;
+    }
+
     QString fileType = "";
     QString reqType = tr("Files: ");
     RESULT_TYPE resultType = RT_FILES;
@@ -640,7 +673,7 @@ void search_widget::startSearch()
     {
         Session::instance()->get_ed2k_session()->searchFiles(
             searchRequest, nMinSize, nMaxSize, nAvail, nSources,
-            fileType, fileExt, mediaCodec, nBitRate, 0);
+            fileType, fileExt, mediaCodec, nBitRate, nDuration);
         nSearchesInProgress = 1;
     }
 
@@ -1069,7 +1102,7 @@ void search_widget::fillFileValues(int row, const QED2KSearchResultEntry& fileEn
             break;
         default:
             // don't set icon for torrent links
-            if (!fileEntry.m_strFilename.startsWith("<a"))
+            if (!misc::isTorrentLink(fileEntry.m_strFilename))
                 model->itemFromIndex(model->index(row, 0, parent))->setIcon(iconAny);
 
     }
@@ -1204,7 +1237,7 @@ void search_widget::displayListMenu(const QPoint&)
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
         fileSearchRelated->setEnabled(
             selected.size() == 1 &&
-            !selected_data(treeResult, SWDelegate::SW_NAME).toString().startsWith("<a"));
+            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
         fileMenu->exec(QCursor::pos());
     }
 }
@@ -1243,42 +1276,8 @@ void search_widget::peerDisconnected(const libed2k::net_identifier& np, const QS
 
 void search_widget::resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel)
 {
-    if (tabSearch->currentIndex() >= 0 && searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
-        btnDownload->setEnabled(false);
-    else
-    {
-        QModelIndexList selected = treeResult->selectionModel()->selectedRows();
-        btnDownload->setEnabled(selected.size());
-
-        if (selected.size() && tabSearch->currentIndex() >= 0 && searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS)
-        {
-            if (selected.first().parent() == treeResult->rootIndex())
-            {
-                QString hash = model->data(model->index(selected.first().row(), SWDelegate::SW_ID)).toString();
-
-                std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
-                std::vector<QED2KSearchResultEntry>::const_iterator it;
-                std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
-                std::vector<UserDir>::iterator dir_iter = userDirs.begin();
-                for (it = vRes.begin(); it != vRes.end(); ++it, ++dir_iter)
-                {
-                    if (it->m_hFile == hash)        
-                        break;
-                }
-
-                if (dir_iter != userDirs.end())
-                {
-                    if (!dir_iter->vecFiles.size())
-                        btnDownload->setEnabled(false);
-                }
-            }
-        }
-    }
-
-    bool hasSelFiles = hasSelectedFiles();
-    bool hasSelMedia = hasSelectedMedia();
-    fileDownload->setEnabled(hasSelFiles);
-    filePreview->setEnabled(hasSelMedia);
+    fileDownload->setEnabled(hasSelectedFiles());
+    filePreview->setEnabled(hasSelectedMedia());
 }
 
 void search_widget::download()
@@ -1383,13 +1382,15 @@ void search_widget::preview()
 
 bool search_widget::hasSelectedMedia()
 {
+    if (tabSearch->currentIndex() < 0 ||
+        searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+        return false;
+
     QModelIndexList selected = treeResult->selectionModel()->selectedRows();
     QModelIndexList::const_iterator iter;
-
     for (iter = selected.begin(); iter != selected.end(); ++iter)
     {
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-
         if (misc::isPreviewable(misc::file_extension(filename)))
         {
             return true;
@@ -1401,17 +1402,41 @@ bool search_widget::hasSelectedMedia()
 
 bool search_widget::hasSelectedFiles()
 {
+    if (tabSearch->currentIndex() < 0 ||
+        searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+        return false;
+
     QModelIndexList selected = treeResult->selectionModel()->selectedRows();
-    QModelIndexList::const_iterator iter;
-
-    for (iter = selected.begin(); iter != selected.end(); ++iter)
+    if (selected.size() && searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS)
     {
-        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-
-        if (!filename.startsWith("<a"))
+        if (selected.first().parent() == treeResult->rootIndex())
         {
-            return true;
+            QString hash = model->data(
+                model->index(selected.first().row(), SWDelegate::SW_ID)).toString();
+
+            std::vector<QED2KSearchResultEntry> const& vRes =
+                searchItems[tabSearch->currentIndex()].vecResults;
+            std::vector<QED2KSearchResultEntry>::const_iterator it;
+            std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
+            std::vector<UserDir>::iterator dir_iter = userDirs.begin();
+            for (it = vRes.begin(); it != vRes.end(); ++it, ++dir_iter)
+            {
+                if (it->m_hFile == hash)
+                    break;
+            }
+
+            if (dir_iter != userDirs.end())
+            {
+                if (!dir_iter->vecFiles.size())
+                    return false;
+            }
         }
+    }
+    foreach (const QModelIndex& index, selected)
+    {
+        QString filename = selected_data(treeResult, SWDelegate::SW_NAME, index).toString();
+        if (!misc::isTorrentLink(filename))
+            return true;
     }
 
     return false;
@@ -1786,8 +1811,8 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
         sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
     QString name2 = sourceModel()->data(
         sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
-    bool torr1 = name1.startsWith("<a");
-    bool torr2 = name2.startsWith("<a");
+    bool torr1 = misc::isTorrentLink(name1);
+    bool torr2 = misc::isTorrentLink(name2);
 
     if (torr1 && !torr2) return sortOrder() == Qt::DescendingOrder;
     else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;

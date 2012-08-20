@@ -54,9 +54,9 @@ private:
 
     int lastMessageTab;
 
-    QColor greenColor;
-    QColor blueColor;
-    QColor systemColor;
+    QString greenColor;
+    QString blueColor;
+    QString systemColor;
 
     QIcon imgMsg1;
     QIcon imgMsg2;
@@ -76,7 +76,8 @@ protected:
 
 private:
     void enableButtons(bool enable = true);
-    void addMessage(QTextEdit* edit, QString name, QString msg, QColor& color);
+    void addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color);
+    void addSystemMessage(QTextEdit* edit, const QString& msg);
     std::vector<USER>::iterator findUser(const libed2k::net_identifier& np);
     void setFriendIcon(const libed2k::net_identifier& np, bool connected);
 
@@ -104,6 +105,7 @@ private slots:
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void requestUserDirs();
+    void friendSelected(const QModelIndex& index, const QModelIndex& prev);
 
 signals:
     void newMessage();

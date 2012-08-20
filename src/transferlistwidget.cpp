@@ -781,15 +781,20 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   foreach (QAction* a, labelActions)
     a->setEnabled(false);
 
-  listMenu.addSeparator();
-  if (one_not_seed)
-    listMenu.addAction(&actionSet_download_limit);
-  listMenu.addAction(&actionSet_max_ratio);
-  listMenu.addAction(&actionSet_upload_limit);
-  if (!one_not_seed && all_same_super_seeding && one_has_metadata) {
-    actionSuper_seeding_mode.setChecked(super_seeding_mode);
-    listMenu.addAction(&actionSuper_seeding_mode);
+  if (one_is_bittorrent)
+  {
+    // use limits only for bittorrent transfers
+    listMenu.addSeparator();
+    if (one_not_seed)
+      listMenu.addAction(&actionSet_download_limit);
+    listMenu.addAction(&actionSet_max_ratio);
+    listMenu.addAction(&actionSet_upload_limit);
+    if (!one_not_seed && all_same_super_seeding && one_has_metadata) {
+      actionSuper_seeding_mode.setChecked(super_seeding_mode);
+      listMenu.addAction(&actionSuper_seeding_mode);
+    }
   }
+
   listMenu.addSeparator();
   bool added_preview_action = false;
   if (has_preview) {
@@ -810,7 +815,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   }
   if (added_preview_action)
     listMenu.addSeparator();
-  if (one_has_metadata) {
+  if (one_has_metadata && one_is_bittorrent) {
     listMenu.addAction(&actionForce_recheck);
     listMenu.addSeparator();
   }

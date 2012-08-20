@@ -106,6 +106,11 @@ public:
       return (s.length() == 40);
   }
 
+  static inline bool isTorrentLink(const QString& s)
+  {
+      return s.startsWith("<a");
+  }
+
   static inline QString file_extension(const QString &filename) {
     QString extension;
     int point_index = filename.lastIndexOf(".");

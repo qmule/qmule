@@ -43,16 +43,17 @@ public:
             case SW_NAME:
             {
                 QString name = index.data().toString();
-                if (name.startsWith("<a"))
+                if (misc::isTorrentLink(name))
                 {
                     // this is a link to torrent tracker
                     QAbstractItemView* view = dynamic_cast<QAbstractItemView*>(parent());
                     if (!view->indexWidget(index))
                     {
                         // link isn't set yet
-                        QLabel* label = new QLabel(name, view);
+                        QString iconLink = "<img src=\":/emule/common/hyperlink.ico\">";
+                        QLabel* label = new QLabel(iconLink + "&nbsp;" + name, view);
                         label->setOpenExternalLinks(true);
-                        label->setToolTip(label->text());
+                        label->setToolTip(name);
                         view->setIndexWidget(index, label);
                     }
                     drawDisplay(painter, option, option.rect, "");

@@ -11,6 +11,7 @@
         <file>common/FileTypeProgram.ico</file>
         <file>common/FileTypeVideo.ico</file>
         <file>common/FolderOpen.ico</file>
+        <file>common/hyperlink.ico</file>
         <file>search/SearchResults.ico</file>
         <file>status/ServerInfo.ico</file>
         <file>status/Log.ico</file>

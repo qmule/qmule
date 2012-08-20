@@ -1,7 +1,8 @@
 #include <QDateTime>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QKeyEvent>
 #include <QStandardItemModel>
 
 #include "libed2k/util.hpp"
@@ -46,8 +47,8 @@ messages_widget::messages_widget(QWidget *parent)
     label_name->setText("-");
     label_hash->setText("-");
     label_programm->setText("-");
-    label_upload->setText("-");
-    label_download->setText("-");
+    label_IP->setText("-");
+    label_port->setText("-");
 
     QList<int> sizes;
     sizes.append(300);
@@ -127,9 +128,9 @@ messages_widget::messages_widget(QWidget *parent)
     listFriends->setModel(model);
     listFriends->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    greenColor = QColor::fromRgb(0, 200, 0);
-    blueColor = QColor::fromRgb(0, 175, 255);
-    systemColor = QColor(Qt::darkGreen);
+    greenColor = "#00C800";
+    blueColor = "#00AFFF";
+    systemColor = "#008000";
 
     connect(listFriends, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
     connect(tabWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayTabMenu(const QPoint&)));
@@ -165,6 +166,8 @@ messages_widget::messages_widget(QWidget *parent)
     connect(Session::instance()->get_ed2k_session(),
             SIGNAL(peerDisconnected(const libed2k::net_identifier&, const QString&, const libed2k::error_code)),
             this, SLOT(peerDisconnected(const libed2k::net_identifier&, const QString&, const libed2k::error_code)));
+
+    connect(listFriends->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(friendSelected(const QModelIndex&, const QModelIndex&)));
 
     imgMsg1.addFile(QString::fromUtf8(":/emule/statusbar/Message.ico"), QSize(), QIcon::Normal, QIcon::Off);
     imgMsg2.addFile(QString::fromUtf8(":/emule/statusbar/MessagePending.ico"), QSize(), QIcon::Normal, QIcon::Off);
@@ -207,7 +210,6 @@ void messages_widget::startChat(const QString& user_name, const libed2k::net_ide
 {
     QTextEdit* edit = new QTextEdit(this);
     edit->setReadOnly(true);
-    edit->setFontPointSize(10);
     int new_tab = tabWidget->addTab(edit, QIcon(":/emule/users/Chat.ico"), user_name);    
     tabWidget->setCurrentIndex(new_tab);
 
@@ -220,10 +222,7 @@ void messages_widget::startChat(const QString& user_name, const libed2k::net_ide
         user.connected = true;
     users.push_back(user);
 
-    edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-    edit->setTextColor(systemColor);
-    edit->insertPlainText(tr("*** Begin chat: ") + user_name);
-    edit->setTextColor(Qt::black);
+    addSystemMessage(edit, tr("*** Begin chat: ") + user_name);
 
     enableButtons();
     textMsg->setFocus();
@@ -252,10 +251,8 @@ void messages_widget::pushMessage()
     {
         user.post_msg = msg;
         user.connected = -1;
-        edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-        edit->setTextColor(systemColor);
-        edit->insertPlainText(tr("*** Connecting... "));
-        edit->setTextColor(Qt::black);
+
+        addSystemMessage(edit, tr("*** Connecting... "));
     }
 
     QED2KPeerHandle::getPeerHandle(user.netPoint).sendMessageToPeer(msg);
@@ -301,15 +298,11 @@ void messages_widget::peerCaptchaRequest(const libed2k::net_identifier& np, cons
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
-        it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-        it->edit->setTextColor(systemColor);
-        it->edit->insertPlainText(tr("*** To avoid spam user is asking for captcha authentification. Please enter symbols on the picture below:\n"));
-        it->edit->setTextColor(Qt::black);
-
+        addSystemMessage(it->edit, tr("*** To avoid spam user is asking for captcha authentification. Please enter symbols on the picture below:\n"));
+        
         QTextCursor cursor = it->edit->textCursor();
-        QTextCharFormat format = it->edit->currentCharFormat();
         cursor.insertImage(pm.toImage());
-        it->edit->setCurrentCharFormat(format);
+        it->edit->append("\n");
     }
 }
 
@@ -318,18 +311,14 @@ void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
-        it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-        it->edit->setTextColor(systemColor);
-
         if (nResult)
-        {            
-            it->edit->insertPlainText(tr("*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message.\n"));
+        {
+            addSystemMessage(it->edit, tr("*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message."));
         }
         else
         {
-            it->edit->insertPlainText(tr("*** Your answer is correct. User has recived your message.\n"));
+            addSystemMessage(it->edit, tr("*** Your answer is correct. User has recived your message."));
         }
-        it->edit->setTextColor(Qt::black);
     }
 }
 
@@ -621,17 +610,13 @@ void messages_widget::peerConnected(const libed2k::net_identifier& np, const QSt
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
-
         if (it->connected >= 0)
         {
-            it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-            it->edit->setTextColor(systemColor);
-            it->edit->insertPlainText(tr("*** Connected"));
+            addSystemMessage(it->edit, tr("*** Connected"));
         }
         else
         {
-            it->edit->setTextColor(systemColor);
-            it->edit->insertPlainText(tr("OK"));
+            addSystemMessage(it->edit, tr("*** Connection established"));
         }
 
         if (it->post_msg.length())
@@ -642,13 +627,11 @@ void messages_widget::peerConnected(const libed2k::net_identifier& np, const QSt
         }
         
         it->connected = 1;
-        it->edit->setTextColor(Qt::black);
     }
-    else
-    {
-        if (!connectedPeers.contains(np))
-            connectedPeers.append(np);
-    }
+
+    if (!connectedPeers.contains(np))
+        connectedPeers.append(np);
+
     setFriendIcon(np, true);
 }
 
@@ -660,18 +643,13 @@ void messages_widget::peerDisconnected(const libed2k::net_identifier& np, const 
         if (it->connected > 0)
         {
             it->connected = 0;
-            it->edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-            it->edit->setTextColor(systemColor);
-            it->edit->insertPlainText(tr("*** Disconnected"));
+            addSystemMessage(it->edit, tr("*** Disconnected"));
         }
         else
         {
-            it->edit->setTextColor(systemColor);
-            it->edit->insertPlainText(tr("refused"));
-            it->post_msg = "";
+            addSystemMessage(it->edit, tr("*** Connection refused"));
         }
-
-        it->edit->setTextColor(Qt::black);
+        it->post_msg = "";
     }
     else
     {
@@ -699,13 +677,18 @@ void messages_widget::enableButtons(bool enable)
     btnClose->setEnabled(enable);
 }
 
-void messages_widget::addMessage(QTextEdit* edit, QString name, QString msg, QColor& color)
+void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color)
 {
-    edit->append("[" + QDateTime::currentDateTime().toString("hh:mm") + "] ");
-    edit->setTextColor(color);
-    edit->insertPlainText(name + ": ");
-    edit->setTextColor(Qt::black);
-    edit->insertPlainText(msg);
+    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + color + "' size=4>" +
+                       name + ": </font><font color='000000' size=4>" + msg + "</font><br>";
+    edit->insertHtml(htmlText);
+}
+
+void messages_widget::addSystemMessage(QTextEdit* edit, const QString& msg)
+{
+    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + systemColor + "' size=4>" +
+                       msg + "</font><br>";
+    edit->insertHtml(htmlText);
 }
 
 std::vector<USER>::iterator messages_widget::findUser(const libed2k::net_identifier& np)
@@ -741,4 +724,27 @@ void messages_widget::setFriendIcon(const libed2k::net_identifier& np, bool conn
                 model->item(num)->setIcon(QIcon(":/emule/users/Friends2.ico"));
         }
     }
+}
+
+void messages_widget::friendSelected(const QModelIndex& index, const QModelIndex& prev)
+{
+    int num = index.row();
+    QED2KPeerHandle peer = QED2KPeerHandle::findPeerHandle(friends[num].netPoint);
+
+    label_name->setText(friends[num].strName);
+    label_IP->setText(QString::fromStdString(libed2k::int2ipstr(friends[num].netPoint.m_nIP)));
+    label_port->setText(QString::number(friends[num].netPoint.m_nPort));
+
+    libed2k::peer_connection_options options = peer.getConnectionOptions();
+    if (options.m_strModVersion.length())
+        label_programm->setText(QString::fromStdString(options.m_strModVersion));
+    else
+        label_programm->setText("-");
+
+    libed2k::md4_hash hash = peer.getHash();
+    libed2k::md4_hash empty_hash;
+    if (hash != empty_hash)
+        label_hash->setText(QString::fromStdString(hash.toString()));
+    else
+        label_hash->setText("-");
 }

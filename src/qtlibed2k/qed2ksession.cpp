@@ -480,6 +480,13 @@ libed2k::peer_connection_handle QED2KSession::getPeer(const libed2k::net_identif
     return pch;
 }
 
+libed2k::peer_connection_handle QED2KSession::findPeer(const libed2k::net_identifier& np)
+{
+    libed2k::peer_connection_handle pch = m_session->find_peer_connection(np);
+
+    return pch;
+}
+
 void QED2KSession::readAlerts()
 {
     std::auto_ptr<libed2k::alert> a = m_session->pop_alert();

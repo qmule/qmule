@@ -80,6 +80,9 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
         </widget>
        </item>
        <item>
@@ -98,7 +101,7 @@
            <number>3</number>
           </property>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_8">
+           <widget class="QLabel" name="labelIP">
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -106,7 +109,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Upload:</string>
+             <string>IP:</string>
             </property>
            </widget>
           </item>
@@ -118,7 +121,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="labelName">
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -138,7 +141,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_5">
+           <widget class="QLabel" name="labelHash">
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -151,7 +154,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_6">
+           <widget class="QLabel" name="labelProgram">
             <property name="maximumSize">
              <size>
               <width>100</width>
@@ -171,21 +174,21 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="label_upload">
+           <widget class="QLabel" name="label_IP">
             <property name="text">
              <string>TextLabel</string>
             </property>
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="labelPort">
             <property name="text">
-             <string>Download:</string>
+             <string>Port:</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLabel" name="label_download">
+           <widget class="QLabel" name="label_port">
             <property name="text">
              <string>TextLabel</string>
             </property>

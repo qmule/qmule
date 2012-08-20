@@ -15,9 +15,13 @@ public:
     void    requestFiles(QString dirName);
     void    requestDirFiles(QString dirHash);
     QString getUserName();
+
     libed2k::md4_hash getHash();
 
+    libed2k::peer_connection_options getConnectionOptions();
+
     static QED2KPeerHandle getPeerHandle(const libed2k::net_identifier& np);
+    static QED2KPeerHandle findPeerHandle(const libed2k::net_identifier& np);
 
 private:
     libed2k::peer_connection_handle m_delegate;
