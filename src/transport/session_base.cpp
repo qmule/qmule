@@ -76,15 +76,14 @@ bool SessionBase::isFilePreviewPossible(const QString& hash) const
 float SessionBase::progress() const
 {
     std::vector<Transfer> v = getTransfers();
-    v.erase(std::remove_if(v.begin(), v.end(), std::not1(std::mem_fun_ref(&Transfer::is_valid))), v.end());
-    v.erase(std::remove_if(v.begin(), v.end(), std::mem_fun_ref(&Transfer::is_seed)), v.end());
+    v.erase(std::remove_if(v.begin(), v.end(), std::not1(std::mem_fun_ref(&Transfer::is_valid))), v.end());    
 
-    float total_progress = 0;
+    float min_progress = v.empty()?0:1;
 
     for(std::vector<Transfer>::const_iterator itr = v.begin(); itr != v.end(); ++itr)
     {
-        total_progress += itr->progress();
+        min_progress = std::min(min_progress, itr->progress());
     }
 
-    return (total_progress/v.size());
+    return (min_progress);
 }

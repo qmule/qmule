@@ -105,6 +105,12 @@ using namespace libtorrent;
 MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
   setupUi(this);
 
+  m_tbar.reset(new taskbar_iface(this, 99));
+#ifdef Q_WS_WIN
+  m_nTaskbarButtonCreated = RegisterWindowMessage(L"TaskbarButtonCreated");
+#else
+  m_nTaskbarButtonCreated = 0;
+#endif
   Preferences pref;
   pref.migrate();
   ui_locked = pref.isUILocked();
@@ -250,7 +256,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   // Configure session according to options
   loadPreferences(false);
-  m_tbar.reset(new taskbar_iface(this, 99));
 
   // Start connection checking timer
   guiUpdater = new QTimer(this);
@@ -359,11 +364,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
-#ifdef Q_WS_WIN
-  m_nTaskbarButtonCreated = RegisterWindowMessage(L"TaskbarButtonCreated");
-#else
-  m_nTaskbarButtonCreated = 0;
-#endif
   authRequest();
 }
 
@@ -808,9 +808,10 @@ bool MainWindow::winEvent(MSG * message, long * result)
 {
     if (message->message == m_nTaskbarButtonCreated)
     {
-
+        qDebug() << "initialize task bar";
         m_tbar->initialize();
         m_tbar->setState(winId(), taskbar_iface::S_NOPROGRESS);
+        return true;
     }
 
     return false;
