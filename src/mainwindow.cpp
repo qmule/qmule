@@ -381,6 +381,7 @@ void MainWindow::deleteSession()
 // Destructor
 MainWindow::~MainWindow() {
   qDebug("GUI destruction");
+  ar.stop();
   hide();
 #ifdef Q_WS_MAC
   // Workaround to avoid bug http://bugreports.qt.nokia.com/browse/QTBUG-7305
