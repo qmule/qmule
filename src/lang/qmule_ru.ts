@@ -2117,21 +2117,21 @@ Are you sure you want to quit qMule?</source>
     </message>
     <message>
         <source>A newer version is available</source>
-        <translation>Доступна новая версия</translation>
+        <translation type="obsolete">Доступна новая версия</translation>
     </message>
     <message>
         <source>A newer version of qMule is available on Sourceforge.
 Would you like to update qMule to version %1?</source>
-        <translation>Новая версия qMule доступна на Sourceforge.
+        <translation type="obsolete">Новая версия qMule доступна на Sourceforge.
 Хотите обновить qMule до версии %1?</translation>
     </message>
     <message>
         <source>Impossible to update qMule</source>
-        <translation>Невозможно обновить qMule</translation>
+        <translation type="obsolete">Невозможно обновить qMule</translation>
     </message>
     <message>
         <source>qMule failed to update, reason: %1</source>
-        <translation>qMule не может быть обновлен. Причина: %1</translation>
+        <translation type="obsolete">qMule не может быть обновлен. Причина: %1</translation>
     </message>
     <message>
         <source>&amp;Add torrent file...</source>
@@ -2139,7 +2139,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Add &amp;link to torrent...</source>
-        <translation>Добавит &amp;ссылку к торренту...</translation>
+        <translation type="obsolete">Добавит &amp;ссылку к торренту...</translation>
     </message>
     <message>
         <source>Import existing torrent...</source>
@@ -2428,7 +2428,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Web UI</source>
-        <translation>Web интерфейс</translation>
+        <translation type="obsolete">Web интерфейс</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -2793,7 +2793,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Enable Web User Interface (Remote control)</source>
-        <translation>Включить Web интерфейс (Удалённое управление)</translation>
+        <translation type="obsolete">Включить Web интерфейс (Удалённое управление)</translation>
     </message>
     <message>
         <source>Share ratio limiting</source>
@@ -2923,7 +2923,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Bypass authentication for localhost</source>
-        <translation>Пропускать аутентификацию для localhost</translation>
+        <translation type="obsolete">Пропускать аутентификацию для localhost</translation>
     </message>
     <message>
         <source>Ask for program exit confirmation</source>
@@ -3011,23 +3011,23 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use UPnP / NAT-PMP to forward the port from my router</source>
-        <translation>Использовать UPnP / NAT-PMP для перенаправления порта через мой маршрутизатор</translation>
+        <translation type="obsolete">Использовать UPnP / NAT-PMP для перенаправления порта через мой маршрутизатор</translation>
     </message>
     <message>
         <source>Update my dynamic domain name</source>
-        <translation>Обновлять моё динамическое доменное имя</translation>
+        <translation type="obsolete">Обновлять моё динамическое доменное имя</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation>Служба:</translation>
+        <translation type="obsolete">Служба:</translation>
     </message>
     <message>
         <source>Register</source>
-        <translation>Регистрация</translation>
+        <translation type="obsolete">Регистрация</translation>
     </message>
     <message>
         <source>Domain name:</source>
-        <translation>Доменное имя:</translation>
+        <translation type="obsolete">Доменное имя:</translation>
     </message>
     <message>
         <source>Global Rate Limits</source>
@@ -3067,27 +3067,27 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use HTTPS instead of HTTP</source>
-        <translation>Использовать HTTPS вместо HTTP</translation>
+        <translation type="obsolete">Использовать HTTPS вместо HTTP</translation>
     </message>
     <message>
         <source>Import SSL Certificate</source>
-        <translation>Импортировать сертификат SSL</translation>
+        <translation type="obsolete">Импортировать сертификат SSL</translation>
     </message>
     <message>
         <source>Import SSL Key</source>
-        <translation>Импортировать ключ SSL</translation>
+        <translation type="obsolete">Импортировать ключ SSL</translation>
     </message>
     <message>
         <source>Certificate:</source>
-        <translation>Сертификат:</translation>
+        <translation type="obsolete">Сертификат:</translation>
     </message>
     <message>
         <source>Key:</source>
-        <translation>Ключ:</translation>
+        <translation type="obsolete">Ключ:</translation>
     </message>
     <message>
         <source>&lt;a href=http://httpd.apache.org/docs/2.1/ssl/ssl_faq.html#aboutcerts&gt;Information about certificates&lt;/a&gt;</source>
-        <translation>&lt;a href=http://httpd.apache.org/docs/2.1/ssl/ssl_faq.html#aboutcerts&gt;Информация о сертификатах&lt;/a&gt;</translation>
+        <translation type="obsolete">&lt;a href=http://httpd.apache.org/docs/2.1/ssl/ssl_faq.html#aboutcerts&gt;Информация о сертификатах&lt;/a&gt;</translation>
     </message>
     <message>
         <source>File association</source>
@@ -3943,7 +3943,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ОК</translation>
     </message>
     <message utf8="true">
         <source>Отмена</source>
@@ -6323,15 +6323,15 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Identification:</source>
-        <translation>Идентификация:</translation>
+        <translation type="obsolete">Идентификация:</translation>
     </message>
     <message>
         <source>Upload:</source>
-        <translation>Отдал:</translation>
+        <translation type="obsolete">Отдал:</translation>
     </message>
     <message>
         <source>Download:</source>
-        <translation>Принял:</translation>
+        <translation type="obsolete">Принял:</translation>
     </message>
     <message>
         <source>Messages</source>
@@ -6397,12 +6397,12 @@ However, those plugins were disabled.</source>
     <message>
         <source>*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message.
 </source>
-        <translation>*** Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
+        <translation type="obsolete">*** Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
     </message>
     <message>
         <source>*** Your answer is correct. User has recived your message.
 </source>
-        <translation>*** Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
+        <translation type="obsolete">*** Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
     </message>
     <message>
         <source>Add to the friend list</source>
@@ -6410,7 +6410,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>*** Begin chat: </source>
-        <translation>*** Начало сессии чата:</translation>
+        <translation>*** Начало сессии чата: </translation>
     </message>
     <message>
         <source>*** Connecting... </source>
@@ -6426,7 +6426,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="obsolete">ОК</translation>
     </message>
     <message>
         <source>*** Disconnected</source>
@@ -6434,7 +6434,31 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>refused</source>
-        <translation>не удалось</translation>
+        <translation type="obsolete">не удалось</translation>
+    </message>
+    <message>
+        <source>IP:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation>Порт:</translation>
+    </message>
+    <message>
+        <source>*** Your answer is incorrect and message is ignored. You may request captcha again by sending new message.</source>
+        <translation>*** Ваш ответ неправильный и сообщение проигнорировано. Вы можете запросить captcha заново, послав новое сообщение.</translation>
+    </message>
+    <message>
+        <source>*** Your answer is correct. User has recived your message.</source>
+        <translation>*** Вы прошли проверку. Пользователь получил Ваше сообщение.</translation>
+    </message>
+    <message>
+        <source>*** Connection established</source>
+        <translation>*** Соединение установлено</translation>
+    </message>
+    <message>
+        <source>*** Connection refused</source>
+        <translation>*** Соединение не удалось</translation>
     </message>
 </context>
 <context>
@@ -6567,27 +6591,27 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>SSL Certificate (*.crt *.pem)</source>
-        <translation>SSL сертификат (*.crt *.pem)</translation>
+        <translation type="obsolete">SSL сертификат (*.crt *.pem)</translation>
     </message>
     <message>
         <source>SSL Key (*.key *.pem)</source>
-        <translation>SSL ключ (*.key *.pem)</translation>
+        <translation type="obsolete">SSL ключ (*.key *.pem)</translation>
     </message>
     <message>
         <source>Invalid key</source>
-        <translation>Недействительный ключ</translation>
+        <translation type="obsolete">Недействительный ключ</translation>
     </message>
     <message>
         <source>This is not a valid SSL key.</source>
-        <translation>Это не действительный SSL ключ.</translation>
+        <translation type="obsolete">Это не действительный SSL ключ.</translation>
     </message>
     <message>
         <source>Invalid certificate</source>
-        <translation>Недействительный сертификат</translation>
+        <translation type="obsolete">Недействительный сертификат</translation>
     </message>
     <message>
         <source>This is not a valid SSL certificate.</source>
-        <translation>Это не действительный SSL сертификат.</translation>
+        <translation type="obsolete">Это не действительный SSL сертификат.</translation>
     </message>
     <message>
         <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
@@ -6965,7 +6989,7 @@ However, those plugins were disabled.</source>
         <translation>Соединение с сервером отсутствует</translation>
     </message>
     <message>
-        <source>You can't search in ED2K network on closed server connection, set connection or check torrent combobox</source>
+        <source>You can&apos;t search in ED2K network on closed server connection, set connection or check torrent combobox</source>
         <translation>Вы не можете производить поиск по eDonkey без соединения с сервером, установите соединение или используйте галку поиск по торрентам</translation>
     </message>
     <message>
@@ -7246,6 +7270,45 @@ eD2K Server</source>
     <message>
         <source>Split window</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>user_properties</name>
+    <message>
+        <source>Client details</source>
+        <translation>Детали клиента</translation>
+    </message>
+    <message>
+        <source>Main details</source>
+        <translation>Основные детали</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Имя:</translation>
+    </message>
+    <message>
+        <source>Hash:</source>
+        <translation>Хэш:</translation>
+    </message>
+    <message>
+        <source>Program:</source>
+        <translation>Программа:</translation>
+    </message>
+    <message>
+        <source>IP:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation>Порт:</translation>
+    </message>
+    <message>
+        <source>-</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
     </message>
 </context>
 </TS>

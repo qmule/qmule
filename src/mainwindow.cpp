@@ -365,6 +365,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
+
+  //Tray actions.
+  connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
+  connect(actionStart_All, SIGNAL(triggered()), Session::instance()->get_torrent_session(), SLOT(resumeAllTorrents()));
+  connect(actionPause_All, SIGNAL(triggered()), Session::instance()->get_torrent_session, SLOT(pauseAllTorrents()));
   authRequest();
 }
 
