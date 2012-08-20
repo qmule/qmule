@@ -146,6 +146,7 @@ public slots:
     void cancelSearch();
 
     libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
+    libed2k::peer_connection_handle findPeer(const libed2k::net_identifier& np);
 
 signals:
     void serverNameResolved(QString strName);

@@ -590,6 +590,39 @@ void search_widget::startSearch()
         return;
     }
 
+    QString duration = tableCond->item(7, 1)->text();
+    bOk = true;
+    int nDuration = 0;
+    if (duration.length())
+    {
+        int nPos, nNum, coef = 1;
+        QString num;
+        do
+        {
+            nPos = duration.lastIndexOf(':');
+            if (nPos >= 0)
+            {
+                num = duration.right(duration.length() - nPos - 1);
+                duration = duration.left(nPos);
+            }
+            else
+            {
+                num = duration;
+                duration = "";
+            }
+
+            nNum = num.toInt(&bOk);
+            nDuration += nNum * coef;
+            coef *= 60;
+        }
+        while (bOk && duration.length());
+    }
+    if (!bOk)
+    {
+        showErrorParamMsg(7);
+        return;
+    }
+
     QString fileType = "";
     QString reqType = tr("Files: ");
     RESULT_TYPE resultType = RT_FILES;
@@ -640,7 +673,7 @@ void search_widget::startSearch()
     {
         Session::instance()->get_ed2k_session()->searchFiles(
             searchRequest, nMinSize, nMaxSize, nAvail, nSources,
-            fileType, fileExt, mediaCodec, nBitRate, 0);
+            fileType, fileExt, mediaCodec, nBitRate, nDuration);
         nSearchesInProgress = 1;
     }
 

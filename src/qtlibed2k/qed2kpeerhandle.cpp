@@ -38,6 +38,11 @@ QED2KPeerHandle QED2KPeerHandle::getPeerHandle(const libed2k::net_identifier& np
     return Session::instance()->get_ed2k_session()->getPeer(np);
 }
 
+QED2KPeerHandle QED2KPeerHandle::findPeerHandle(const libed2k::net_identifier& np)
+{
+    return Session::instance()->get_ed2k_session()->findPeer(np);
+}
+
 void QED2KPeerHandle::sendMessageToPeer(const QString& strMessage)
 {
     PEER_ACTION(send_message, strMessage.toUtf8().constData())
@@ -70,5 +75,26 @@ QString QED2KPeerHandle::getUserName()
 
 libed2k::md4_hash QED2KPeerHandle::getHash()
 {
-    return m_delegate.get_hash();
+    libed2k::md4_hash hash;
+    try
+    {
+        hash = m_delegate.get_hash();
+    }
+    catch(libed2k::libed2k_exception& e) 
+    {
+    }
+    return hash;
+}
+
+libed2k::peer_connection_options QED2KPeerHandle::getConnectionOptions()
+{
+    libed2k::peer_connection_options options;
+    try
+    {
+        options = m_delegate.get_options();
+    }
+    catch(libed2k::libed2k_exception& e) 
+    {
+    }
+    return options;
 }
