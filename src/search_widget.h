@@ -149,6 +149,7 @@ private slots:
     void displayListMenu(const QPoint&);
     void initPeer();
     void sendMessage();
+    void addToFriends();
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);
@@ -169,6 +170,7 @@ private slots:
 
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
+    void addFriend(const QString& user_name, const libed2k::net_identifier& np);
 };
 
 class SWSortFilterProxyModel : public QSortFilterProxyModel

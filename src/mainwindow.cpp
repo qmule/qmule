@@ -236,6 +236,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
+  connect(search, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
+
   // load from catalog link, temporary without deferred proxy
   connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
 
@@ -369,7 +371,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   //Tray actions.
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
   connect(actionStart_All, SIGNAL(triggered()), Session::instance()->get_torrent_session(), SLOT(resumeAllTorrents()));
-  connect(actionPause_All, SIGNAL(triggered()), Session::instance()->get_torrent_session, SLOT(pauseAllTorrents()));
+  connect(actionPause_All, SIGNAL(triggered()), Session::instance()->get_torrent_session(), SLOT(pauseAllTorrents()));
   authRequest();
 }
 
@@ -1779,6 +1781,12 @@ void MainWindow::startChat(const QString& user_name, const libed2k::net_identifi
 {
     on_actionMessages_triggerd();
     messages->startChat(user_name, np);
+}
+
+void MainWindow::addFriend(const QString& user_name, const libed2k::net_identifier& np)
+{
+    on_actionMessages_triggerd();
+    messages->addFriend(user_name, np);
 }
 
 void MainWindow::startMessageFlickering()
