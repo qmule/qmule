@@ -36,8 +36,6 @@ public:
     virtual SessionStatus getSessionStatus() const = 0;
     virtual void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) = 0;
-    virtual void pauseTransfer(const QString& hash) = 0;
-    virtual void resumeTransfer(const QString& hash) = 0;
     virtual void deleteTransfer(const QString& hash, bool delete_files) = 0;
     virtual void recheckTransfer(const QString& hash) = 0;
     virtual void setDownloadLimit(const QString& hash, long limit) = 0;
@@ -65,13 +63,25 @@ public:
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
 
+public slots:
+    virtual void pauseTransfer(const QString& hash);
+    virtual void resumeTransfer(const QString& hash);
+    virtual void pauseAllTransfers();
+    virtual void resumeAllTransfers();
+
     /**
       * return minimum progress in transfers
      */
     virtual float progress() const;
 
 signals:
+    void addedTransfer(Transfer t);
+    void pausedTransfer(Transfer t);
+    void resumedTransfer(Transfer t);
+    void deletedTransfer(QString hash);
+    void transferAboutToBeRemoved(Transfer t);
     void newConsoleMessage(const QString &msg);
+
 private:
     QStringList consoleMessages;
 };
@@ -128,8 +138,6 @@ public:
     void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) {
         DEFER3(changeLabelInSavePath, t, old_label, new_label); }
-    void pauseTransfer(const QString& hash) { DEFER1(pauseTransfer, hash); }
-    void resumeTransfer(const QString& hash) { DEFER1(resumeTransfer, hash); }
     void deleteTransfer(const QString& hash, bool delete_files) {
         DEFER2(deleteTransfer, hash, delete_files); }
     void recheckTransfer(const QString& hash) { DEFER1(recheckTransfer, hash); }

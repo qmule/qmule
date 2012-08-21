@@ -804,20 +804,6 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
   qDebug("Deleted signal emitted.");
 }
 
-void QBtSession::pauseAllTorrents() {
-  std::vector<torrent_handle> torrents = s->get_torrents();
-  std::vector<torrent_handle>::iterator torrentIT;
-  for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
-    try {
-      QTorrentHandle h = QTorrentHandle(*torrentIT);
-      if (!h.is_paused()) {
-        h.pause();
-        emit pausedTorrent(h);
-      }
-    } catch(invalid_handle&) {}
-  }
-}
-
 std::vector<torrent_handle> QBtSession::getTorrents() const {
   return s->get_torrents();
 }
@@ -831,36 +817,6 @@ std::vector<Transfer> QBtSession::getTransfers() const {
       transfers.push_back(QTorrentHandle(*i));
 
   return transfers;
-}
-
-void QBtSession::resumeAllTorrents() {
-  std::vector<torrent_handle> torrents = s->get_torrents();
-  std::vector<torrent_handle>::iterator torrentIT;
-  for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
-    try {
-      QTorrentHandle h = QTorrentHandle(*torrentIT);
-      if (h.is_paused()) {
-        h.resume();
-        emit resumedTorrent(h);
-      }
-    } catch(invalid_handle&) {}
-  }
-}
-
-void QBtSession::pauseTransfer(const QString &hash) {
-  QTorrentHandle h = getTorrentHandle(hash);
-  if (!h.is_paused()) {
-    h.pause();
-    emit pausedTorrent(h);
-  }
-}
-
-void QBtSession::resumeTransfer(const QString &hash) {
-  QTorrentHandle h = getTorrentHandle(hash);
-  if (h.is_paused()) {
-    h.resume();
-    emit resumedTorrent(h);
-  }
 }
 
 bool QBtSession::loadFastResumeData(const QString &hash, std::vector<char> &buf) {

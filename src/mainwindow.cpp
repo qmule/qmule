@@ -370,8 +370,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   //Tray actions.
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
-  connect(actionStart_All, SIGNAL(triggered()), Session::instance()->get_torrent_session(), SLOT(resumeAllTorrents()));
-  connect(actionPause_All, SIGNAL(triggered()), Session::instance()->get_torrent_session(), SLOT(pauseAllTorrents()));
+  connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
+  connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
   authRequest();
 }
 

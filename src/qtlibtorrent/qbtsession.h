@@ -117,14 +117,8 @@ public slots:
   void startUpTransfers();
   void recheckTransfer(const QString& hash);
   void useAlternativeSpeedsLimit(bool alternative);
-  /* Needed by Web UI */
-  void pauseAllTorrents();
-  void pauseTransfer(const QString& hash);
-  void resumeTransfer(const QString& hash);
-  void resumeAllTorrents();
-  /* End Web UI */
   void preAllocateAllFiles(bool b);
-  virtual void saveFastResumeData();
+  void saveFastResumeData();
   void enableIPFilter(const QString &filter_path, bool force=false);
   void disableIPFilter();
   void setQueueingEnabled(bool enable);
@@ -193,7 +187,6 @@ signals:
   void deletedTorrent(const QString &hash);
   void torrentAboutToBeRemoved(const QTorrentHandle &h, bool del_files);
   void pausedTorrent(const QTorrentHandle& h);
-  void resumedTorrent(const QTorrentHandle& h);
   void finishedTorrent(const QTorrentHandle& h);
   void fullDiskError(const QTorrentHandle& h, QString msg);
   void trackerError(const QString &hash, QString time, QString msg);
