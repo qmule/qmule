@@ -210,7 +210,7 @@ void QED2KSession::start()
     qDebug() <<  Q_FUNC_INFO;
     Preferences pref;
     // set zero to port for stop automatically listening
-    m_settings.listen_port = 0;
+    m_settings.listen_port = pref.listenPort();
     m_settings.server_reconnect_timeout = -1;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
@@ -306,7 +306,7 @@ void QED2KSession::configureSession()
 {
     qDebug() << Q_FUNC_INFO;
     Preferences pref;
-    const unsigned short old_listenPort = m_session->listen_port();
+    const unsigned short old_listenPort = m_session->settings().listen_port;
     const unsigned short new_listenPort = pref.listenPort();
 
     // set common settings before for announce correct nick on server
