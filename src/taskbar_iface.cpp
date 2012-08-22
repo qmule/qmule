@@ -1,12 +1,8 @@
 #include "taskbar_iface.h"
 
-#if (defined Q_WS_WIN) && (defined WIN7_SDK)
+#if (defined Q_WS_WIN) && (_WIN32_WINNT >= 0x0601)
+
 #include <WinSDKVer.h>
-
-#if _WIN32_MAXVER < 0x0601
-#error SDK version is not 7.0 for WIN7
-#endif
-
 #include <shlobj.h>
 
 class taskbar_iface::TaskBarIface
