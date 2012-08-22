@@ -6,6 +6,44 @@
 
 const qreal SessionBase::MAX_RATIO = 9999.;
 
+void SessionBase::pauseTransfer(const QString& hash)
+{
+    Transfer h = getTransfer(hash);
+    if (h.is_valid() && !h.is_paused()) {
+        h.pause();
+    }
+}
+
+void SessionBase::resumeTransfer(const QString &hash)
+{
+    Transfer h = getTransfer(hash);
+    if (h.is_valid() && h.is_paused()) {
+        h.resume();
+    }
+}
+
+void SessionBase::pauseAllTransfers()
+{
+    std::vector<Transfer> torrents = getTransfers();
+    std::vector<Transfer>::iterator torrentIT;
+    for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
+        if (torrentIT->is_valid() && !torrentIT->is_paused()) {
+            torrentIT->pause();
+        }
+    }
+}
+
+void SessionBase::resumeAllTransfers()
+{
+    std::vector<Transfer> torrents = getTransfers();
+    std::vector<Transfer>::iterator torrentIT;
+    for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
+        if (torrentIT->is_valid() && torrentIT->is_paused()) {
+            torrentIT->resume();
+        }
+    }
+}
+
 qreal SessionBase::getRealRatio(const QString &hash) const
 {
     Transfer h = getTransfer(hash);

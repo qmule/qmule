@@ -362,29 +362,37 @@ void messages_widget::displayTabMenu(const QPoint& pos)
         tabMenu->exec(QCursor::pos());
 }
 
-void messages_widget::addFriend()
+void messages_widget::addFriendDlg()
 {
     add_friend dlg(this);
     if (dlg.exec() == QDialog::Accepted)
     {
-        USER new_friend;
-        new_friend.strName = dlg.getName();
-        if (!new_friend.strName.length())
-            new_friend.strName = dlg.getIP();
-        new_friend.netPoint.m_nIP = address2int(ip::address::from_string(dlg.getIP().toUtf8().constData()));
-        new_friend.netPoint.m_nPort = dlg.getPort().toInt();
-
-        int row = model->rowCount();
-        model->insertRow(row);
-        model->setData(model->index(row, 0), new_friend.strName);
-
-        if (connectedPeers.contains(new_friend.netPoint))
-            model->item(row)->setIcon(QIcon(":/emule/users/Friends3.ico"));
-        else
-            model->item(row)->setIcon(QIcon(":/emule/users/Friends1.ico"));
-
-        friends.push_back(new_friend);
+        QString user_name = dlg.getName();
+        libed2k::net_identifier netPoint;
+        netPoint.m_nIP = address2int(ip::address::from_string(dlg.getIP().toUtf8().constData()));
+        netPoint.m_nPort = dlg.getPort().toInt();
+        addFriend(user_name, netPoint);
     }
+}
+
+void messages_widget::addFriend(const QString& user_name, const libed2k::net_identifier& np)
+{
+    USER new_friend;
+    new_friend.strName = user_name;
+    if (!new_friend.strName.length())
+        new_friend.strName = np.m_nIP;
+    new_friend.netPoint = np;
+
+    int row = model->rowCount();
+    model->insertRow(row);
+    model->setData(model->index(row, 0), new_friend.strName);
+
+    if (connectedPeers.contains(new_friend.netPoint))
+        model->item(row)->setIcon(QIcon(":/emule/users/Friends3.ico"));
+    else
+        model->item(row)->setIcon(QIcon(":/emule/users/Friends1.ico"));
+
+    friends.push_back(new_friend);
 }
 
 void messages_widget::deleteFriend()
@@ -679,16 +687,20 @@ void messages_widget::enableButtons(bool enable)
 
 void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color)
 {
-    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + color + "' size=4>" +
-                       name + ": </font><font color='000000' size=4>" + msg + "</font><br>";
+    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + color + "'>" +
+                       name + ": </font><font color='000000'>" + msg + "</font><br>";
+    edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
+    edit->moveCursor(QTextCursor::End);
 }
 
 void messages_widget::addSystemMessage(QTextEdit* edit, const QString& msg)
 {
-    QString htmlText = "<font size=4>[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "</font><font color='" + systemColor + "' size=4>" +
+    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + systemColor + "'>" +
                        msg + "</font><br>";
+    edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
+    edit->moveCursor(QTextCursor::End);
 }
 
 std::vector<USER>::iterator messages_widget::findUser(const libed2k::net_identifier& np)

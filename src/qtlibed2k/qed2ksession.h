@@ -80,8 +80,6 @@ public:
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     SessionStatus getSessionStatus() const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);
-    void pauseTransfer(const QString& hash);
-    void resumeTransfer(const QString& hash);
     void deleteTransfer(const QString& hash, bool delete_files);
     void recheckTransfer(const QString& hash);
     void setDownloadLimit(const QString& hash, long limit);
@@ -196,12 +194,6 @@ signals:
      */
     void peerSharedDirectoryFiles(const libed2k::net_identifier& np, const QString& hash,
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
-
-    void addedTransfer(Transfer t);
-    void pausedTransfer(Transfer t);
-    void resumedTransfer(Transfer t);
-    void deletedTransfer(QString hash);
-    void transferAboutToBeRemoved(Transfer t);
 };
 
 }

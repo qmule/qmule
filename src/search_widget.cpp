@@ -390,6 +390,7 @@ search_widget::search_widget(QWidget *parent)
     connect(userUpdate,  SIGNAL(triggered()), this, SLOT(initPeer()));    
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
+    connect(userAddToFriends,  SIGNAL(triggered()), this, SLOT(addToFriends()));
 
     connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
     connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
@@ -437,10 +438,10 @@ void search_widget::load()
         pref.setArrayIndex(i);
         QString title = pref.value("Title", QString()).toString();        
         searchItems.push_back(SearchResult(pref));
-        if (searchItems[searchItems.size() - 1].resultType == RT_CLIENTS)
-            nCurTabSearch = tabSearch->addTab(iconSearchResult, title);
-        else
+        if (searchItems[searchItems.size() - 1].resultType == RT_USER_DIRS)
             nCurTabSearch = tabSearch->addTab(iconUserFiles, title);
+        else
+            nCurTabSearch = tabSearch->addTab(iconSearchResult, title);
     }
 
     if (size > 0)
@@ -1257,6 +1258,15 @@ void search_widget::sendMessage()
     if (findSelectedUser(entry))
     {
         emit sendMessage(entry.m_strFilename.replace("+++USERNICK+++", "").trimmed(), entry.m_network_point);
+    }
+}
+
+void search_widget::addToFriends()
+{
+    QED2KSearchResultEntry entry;
+    if (findSelectedUser(entry))
+    {
+        emit addFriend(entry.m_strFilename.replace("+++USERNICK+++", "").trimmed(), entry.m_network_point);
     }
 }
 

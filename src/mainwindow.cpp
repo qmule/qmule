@@ -236,6 +236,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
+  connect(search, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
+
   // load from catalog link, temporary without deferred proxy
   connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
 
@@ -328,6 +330,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
       Preferences::setTorrentFileAssoc(true);
       Preferences::setMagnetLinkAssoc(true);
       Preferences::setEmuleFileAssoc(true);
+      Preferences::setCommonAssocSection(true); // enable common section
     }
     else
     {
@@ -364,6 +367,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
+
+  //Tray actions.
+  connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
+  connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
+  connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
   authRequest();
 }
 
@@ -1773,6 +1781,12 @@ void MainWindow::startChat(const QString& user_name, const libed2k::net_identifi
 {
     on_actionMessages_triggerd();
     messages->startChat(user_name, np);
+}
+
+void MainWindow::addFriend(const QString& user_name, const libed2k::net_identifier& np)
+{
+    on_actionMessages_triggerd();
+    messages->addFriend(user_name, np);
 }
 
 void MainWindow::startMessageFlickering()

@@ -67,6 +67,7 @@ public:
     void setNewMessageImg(int state);
     void save() const;
     void load();
+    void addFriend(const QString& user_name, const libed2k::net_identifier& np);
 
 protected:
     //virtual void showEvent(QShowEvent* e);
@@ -93,7 +94,7 @@ private slots:
     void peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult);
     void displayListMenu(const QPoint& pos);
     void displayTabMenu(const QPoint& pos);
-    void addFriend();
+    void addFriendDlg();
     void deleteFriend();
     void sendMessage();
     void friendDetails();

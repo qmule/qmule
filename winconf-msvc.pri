@@ -11,7 +11,7 @@ CONFIG(debug, debug|release) {
           libboost_thread-vc90-mt-gd-1_49.lib \
           libed2kd.lib \
           libeay32MD.lib\
-          ssleay3MD2.lib
+          ssleay32MD.lib
 } else {
   LIBS += libtorrent.lib \
           libboost_system-vc90-mt-1_49.lib \

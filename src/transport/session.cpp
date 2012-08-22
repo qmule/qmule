@@ -89,8 +89,6 @@ Session::Session()
             this, SIGNAL(deletedTransfer(QString)));
     connect(&m_btSession, SIGNAL(pausedTorrent(QTorrentHandle)),
             this, SLOT(on_pausedTorrent(QTorrentHandle)));
-    connect(&m_btSession, SIGNAL(resumedTorrent(QTorrentHandle)),
-            this, SLOT(on_resumedTorrent(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(finishedTorrent(QTorrentHandle)),
             this, SLOT(on_finishedTorrent(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(metadataReceived(QTorrentHandle)),
@@ -226,12 +224,6 @@ void Session::downloadFromUrl(const QString& url) {
 void Session::processDownloadedFile(const QString& url, const QString& path) {
     m_btSession.processDownloadedFile(url, path);
 }
-void Session::pauseTransfer(const QString& hash) {
-    delegate(hash)->pauseTransfer(hash);
-}
-void Session::resumeTransfer(const QString& hash) {
-    delegate(hash)->resumeTransfer(hash);
-}
 void Session::deleteTransfer(const QString& hash, bool delete_files) {
     delegate(hash)->deleteTransfer(hash, delete_files);
 }
@@ -359,7 +351,6 @@ void Session::addTransferFromFile(const QString& filename)
 
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }
 void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Transfer(h)); }
-void Session::on_resumedTorrent(const QTorrentHandle& h) { emit resumedTransfer(Transfer(h)); }
 void Session::on_finishedTorrent(const QTorrentHandle& h)
 {
     emit finishedTransfer(Transfer(h));

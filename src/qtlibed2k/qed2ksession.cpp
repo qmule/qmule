@@ -269,16 +269,10 @@ qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global
 SessionStatus QED2KSession::getSessionStatus() const { return m_session->status(); }
 void QED2KSession::changeLabelInSavePath(
     const Transfer& t, const QString& old_label,const QString& new_label) {}
-void QED2KSession::pauseTransfer(const QString& hash) { getTransfer(hash).pause(); }
-void QED2KSession::resumeTransfer(const QString& hash) { getTransfer(hash).resume(); }
-void QED2KSession::deleteTransfer(const QString& hash, bool delete_files) {
+void QED2KSession::deleteTransfer(const QString& hash, bool delete_files)
+{
     const Transfer t = getTransfer(hash);
-
-    if (!t.is_valid())
-    {
-        return;
-    }
-
+    if (!t.is_valid()) return;
     emit transferAboutToBeRemoved(t);
 
     m_session->remove_transfer(

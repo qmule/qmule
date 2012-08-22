@@ -256,6 +256,7 @@ private slots:
     void authRequest();
     void startAuthByTimer();
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
+    void addFriend(const QString& user_name, const libed2k::net_identifier& np);
     void startMessageFlickering();
     void stopMessageFlickering();
     void on_flickerTimer();

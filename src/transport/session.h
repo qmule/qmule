@@ -43,8 +43,6 @@ public:
     QED2KHandle addTransfer(const libed2k::add_transfer_params& params);
     void downloadFromUrl(const QString& url);
     void processDownloadedFile(const QString& url, const QString& path);
-    void pauseTransfer(const QString& hash);
-    void resumeTransfer(const QString& hash);
     void deleteTransfer(const QString& hash, bool delete_files);
     void recheckTransfer(const QString& hash);
     void setDownloadLimit(const QString& hash, long limit);
@@ -81,14 +79,9 @@ public slots:
     virtual void addTransferFromFile(const QString& filename);
 
 signals:
-    void addedTransfer(Transfer t);
-    void deletedTransfer(QString hash);
-    void pausedTransfer(Transfer t);
-    void resumedTransfer(Transfer t);
     void finishedTransfer(Transfer t);
     void metadataReceived(Transfer t);
     void fullDiskError(Transfer t, QString msg);
-    void transferAboutToBeRemoved(Transfer t);
     void transferFinishedChecking(Transfer t);
     void trackerAuthenticationRequired(Transfer t);
     void newDownloadedTransfer(QString path, QString url);
@@ -96,13 +89,11 @@ signals:
     void alternativeSpeedsModeChanged(bool alternative);
     void recursiveDownloadPossible(QTorrentHandle t);
     void savePathChanged(Transfer t);
-    void newConsoleMessage(QString msg);
     void newBanMessage(QString msg);
 
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
     void on_pausedTorrent(const QTorrentHandle& h);
-    void on_resumedTorrent(const QTorrentHandle& h);
     void on_finishedTorrent(const QTorrentHandle& h);
     void on_metadataReceived(const QTorrentHandle& h);
     void on_fullDiskError(const QTorrentHandle& h, QString msg);
@@ -112,7 +103,7 @@ private slots:
     void on_savePathChanged(const QTorrentHandle& h);
     void saveTempFastResumeData();
     void readAlerts();
-    virtual void saveFastResumeData();
+    void saveFastResumeData();
 
 private:
     Session();

@@ -1385,7 +1385,7 @@ public:
       if (assoc_exe.compare(qApp->applicationFilePath().replace("/", "\\"), Qt::CaseInsensitive) != 0)
         return false;
       // Icon
-      const QString icon_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\",1";
+      const QString icon_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\",0";
       if (settings.value("qMule/DefaultIcon/Default", icon_str).toString().compare(icon_str, Qt::CaseInsensitive) != 0)
         return false;
 
@@ -1397,26 +1397,42 @@ public:
     QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // .file association
-    if (set) {
-      const QString command_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\" \"%1\"";
-      const QString icon_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\",1";
-
+    if (set)
+    {
       settings.setValue(file + QString("/Default"), "qMule");
       settings.setValue(file + QString("/Content Type"), "application/x-bittorrent");
-      settings.setValue("qMule/shell/Default", "open");
-      settings.setValue("qMule/shell/open/command/Default", command_str);
-      settings.setValue("qMule/Content Type/Default", "application/x-bittorrent");
-      settings.setValue("qMule/DefaultIcon/Default", icon_str);
+      settings.setValue(file + QString("/OpenWithProgids/qMule"), "");
     }
     else
     {
       settings.remove(file + QString("/Default"));
       settings.remove(file + QString("/Content Type"));
-      settings.remove("qMule/shell/Default");
-      settings.remove("qMule/shell/open/command/Default");
-      settings.remove("qMule/Content Type/Default");
-      settings.remove("qMule/DefaultIcon/Default");
+      settings.remove(file + QString("/OpenWithProgids"));
     }
+  }
+
+  // set common section of qMule
+  static void setCommonAssocSection(bool set)
+  {
+      QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
+
+
+      if (set)
+      {
+          const QString command_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\" \"%1\"";
+          const QString icon_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\",0";
+          settings.setValue("qMule/shell/Default", "open");
+          settings.setValue("qMule/shell/open/command/Default", command_str);
+          settings.setValue("qMule/Content Type/Default", "application/x-bittorrent");
+          settings.setValue("qMule/DefaultIcon/Default", icon_str);
+      }
+      else
+      {
+          settings.remove("qMule/shell/Default");
+          settings.remove("qMule/shell/open/command/Default");
+          settings.remove("qMule/Content Type/Default");
+          settings.remove("qMule/DefaultIcon/Default");
+      }
   }
 
   static bool isTorrentFileAssocSet()
