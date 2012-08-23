@@ -61,6 +61,8 @@ files_widget::files_widget(QWidget *parent)
     Preferences pref;
     dirRules = pref.loadSharedDirs();
     fileRules = pref.loadSharedFiles();
+    saveDirPath = pref.getSavePath();
+    addLastSlash(saveDirPath);
     generateSharedTree();
 
     QFileInfoList drivesList = QDir::drives();
@@ -118,27 +120,27 @@ files_widget::files_widget(QWidget *parent)
     filesExchSubdir->setObjectName(QString::fromUtf8("filesExchSubdir"));
     filesExchSubdir->setText(tr("Exchange with subdirs"));
 
-    filesNotExchDir = new QAction(this);
-    filesNotExchDir->setObjectName(QString::fromUtf8("filesNotExchDir"));
-    filesNotExchDir->setText(tr("Don't exchange dir"));
+    filesUnexchDir = new QAction(this);
+    filesUnexchDir->setObjectName(QString::fromUtf8("filesUnexchDir"));
+    filesUnexchDir->setText(tr("Don't exchange dir"));
 
-    filesNotExchSubdir = new QAction(this);
-    filesNotExchSubdir->setObjectName(QString::fromUtf8("filesNotExchSubdir"));
-    filesNotExchSubdir->setText(tr("Don't exchange with subdirs"));
+    filesUnexchSubdir = new QAction(this);
+    filesUnexchSubdir->setObjectName(QString::fromUtf8("filesUnexchSubdir"));
+    filesUnexchSubdir->setText(tr("Don't exchange with subdirs"));
 
     filesMenu->addAction(filesExchDir);
     filesMenu->addAction(filesExchSubdir);
     filesMenu->addSeparator();
-    filesMenu->addAction(filesNotExchDir);
-    filesMenu->addAction(filesNotExchSubdir);
+    filesMenu->addAction(filesUnexchDir);
+    filesMenu->addAction(filesUnexchSubdir);
 
     connect(filesExchDir,  SIGNAL(triggered()), this, SLOT(exchangeDir()));
     connect(filesExchSubdir,  SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
-    connect(filesNotExchDir,  SIGNAL(triggered()), this, SLOT(notExchangeDir()));
-    connect(filesNotExchSubdir,  SIGNAL(triggered()), this, SLOT(notExchangeSubdir()));
+    connect(filesUnexchDir,  SIGNAL(triggered()), this, SLOT(unexchangeDir()));
+    connect(filesUnexchSubdir,  SIGNAL(triggered()), this, SLOT(unxchangeSubdir()));
 
-    connect(Session::instance(), SIGNAL(addedTransfer(Transfer)), this, SLOT(addedTransfer(Transfer)));
-    connect(Session::instance(), SIGNAL(deletedTransfer(QString)), this, SLOT(deletedTransfer(QString)));
+    connect(Session::instance()->get_ed2k_session(), SIGNAL(addedTransfer(Transfer)), this, SLOT(addedTransfer(Transfer)));
+    connect(Session::instance()->get_ed2k_session(), SIGNAL(deletedTransfer(QString)), this, SLOT(deletedTransfer(QString)));
 
     tabWidget->hide();
 }
@@ -177,6 +179,9 @@ void files_widget::itemExpanded(QTreeWidgetItem* item)
                     if (partOfSharedPath(strPath))
                         newItem->setFont(0, boldFont); 
             }
+
+            if (strPath == saveDirPath)
+                setExchangeStatus(newItem, true);
 
             QDir dirInfo(iter->absoluteFilePath());
             QFileInfoList dirList = dirInfo.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -244,8 +249,15 @@ void files_widget::currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* ol
         model->setData(model->index(row, FW_SIZE), misc::friendlyUnit(iter->size()));
         QStandardItem* listItem = model->item(row, FW_NAME);
         listItem->setIcon(provider.icon(*iter));
-        listItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
+        if (dirPath == saveDirPath)
+        {
+            listItem->setCheckState(Qt::PartiallyChecked);
+            listItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+            continue;
+        }
+
+        listItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         if (isDir && !dirRules.contains(dirPath))
         {
             if (fileRules.contains(dirPath + iter->fileName()))
@@ -296,7 +308,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             if (!fileRules.contains(filePath))
             {
                 fileRules.push_back(filePath);
-                Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toStdString());
+                Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toUtf8().constData());
                 curItem->setFont(0, boldFont);
                 while (curItem->parent() != allDirs)
                 {
@@ -304,14 +316,13 @@ void files_widget::tableItemChanged(QStandardItem* item)
                     curItem->setFont(0, boldFont);
                 }
             }
-
         }
         else
         {
             if (fileRules.contains(filePath))
             {
                 fileRules.removeOne(filePath);
-                Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toStdString());
+                Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toUtf8().constData());
                 checkExchangeParentStatus(curItem);
             }
         }
@@ -349,18 +360,18 @@ void files_widget::displayTreeMenu(const QPoint&)
 
     if (isDirTreeItem(curItem))
     {
-        filesExchDir->setEnabled(true);
+        filesExchDir->setEnabled(!isExchangeDir(curItem));
         filesExchSubdir->setEnabled(true);
-        filesNotExchDir->setEnabled(true);
-        filesNotExchSubdir->setEnabled(true);
+        filesUnexchDir->setEnabled(!isExchangeDir(curItem));
+        filesUnexchSubdir->setEnabled(true);
         filesMenu->exec(QCursor::pos());
     }
     if (isSharedDirTreeItem(curItem))
     {
         filesExchDir->setEnabled(false);
         filesExchSubdir->setEnabled(false);
-        filesNotExchDir->setEnabled(true);
-        filesNotExchSubdir->setEnabled(true);
+        filesUnexchDir->setEnabled(true);
+        filesUnexchSubdir->setEnabled(true);
         filesMenu->exec(QCursor::pos());
     }    
 }
@@ -411,7 +422,13 @@ void files_widget::generateSharedTree()
 void files_widget::exchangeDir()
 {
     QTreeWidgetItem* curItem = treeFiles->currentItem();
+    if (!curItem)
+        return;
+
     QString strPath = getDirPath(curItem);
+
+    if (strPath == saveDirPath)
+        return;
 
     if (!dirRules.contains(strPath))
     {
@@ -434,24 +451,49 @@ void files_widget::exchangeDir()
 void files_widget::exchangeSubdir()
 {
     QTreeWidgetItem* curItem = treeFiles->currentItem();
-    QString strPath = getDirPath(curItem);
+    if (!curItem)
+        return;
 
+    QString strPath = getDirPath(curItem);
+    
     QDir dir(strPath);
     QFileInfoList fileList = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllDirs);
 
     setChildExchangeStatus(curItem, true);
     if (!dirRules.contains(strPath))
     {
-        QList<QString> filesList;
-        checkBaseAdd(strPath);
-        dirRules.insert(strPath, filesList);
-        shareDir(strPath, true);
-
-        currentItemChanged(curItem, NULL);
-        while (curItem->parent() != allDirs)
+        if (strPath != saveDirPath)
         {
-            curItem = curItem->parent();
-            curItem->setFont(0, boldFont);
+            QList<QString> filesList;
+            checkBaseAdd(strPath);
+            dirRules.insert(strPath, filesList);
+            shareDir(strPath, true);
+
+            currentItemChanged(curItem, NULL);
+        }
+
+        bool setParentState = true;
+        if (strPath == saveDirPath)
+        {
+            setParentState = false;
+            QFileInfoList::const_iterator iter;
+            for (iter = fileList.begin(); iter != fileList.end(); ++iter)
+            {
+                if (iter->isDir())
+                {
+                    setParentState = true;
+                    break;
+                }
+            }
+        }
+
+        if (setParentState)
+        {
+            while (curItem->parent() != allDirs)
+            {
+                curItem = curItem->parent();
+                curItem->setFont(0, boldFont);
+            }
         }
     }
     exchangeSubdir(fileList);    
@@ -468,13 +510,11 @@ void files_widget::exchangeSubdir(QFileInfoList& fileList)
         if (iter->isDir())
         {
             QString strPath = iter->absoluteFilePath();
-
-            if (strPath.lastIndexOf("/") != (strPath.length() - 1))
-                strPath += "/";
+            addLastSlash(strPath);
 
             QDir dir(strPath);
             QFileInfoList subList = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllDirs);
-            if (!dirRules.contains(strPath))
+            if (!dirRules.contains(strPath) && strPath != saveDirPath)
             {
                 dirRules.insert(strPath, filesList);
                 shareDir(strPath, true);
@@ -485,15 +525,20 @@ void files_widget::exchangeSubdir(QFileInfoList& fileList)
     }
 }
 
-void files_widget::notExchangeDir()
+void files_widget::unexchangeDir()
 {
     QTreeWidgetItem* curItem = treeFiles->currentItem();
+    if (!curItem)
+        return;
  
     QString strPath;
     if (isDirTreeItem(curItem))
         strPath = getDirPath(curItem);
     if (isSharedDirTreeItem(curItem))
         strPath = curItem->data(0, Qt::UserRole).toString();
+
+    if (strPath == saveDirPath)
+        return;
 
     checkBaseRemove(strPath);
     shareDir(strPath, false);
@@ -507,15 +552,18 @@ void files_widget::notExchangeDir()
     }
     else if (isSharedDirTreeItem(curItem))
     {
-        applyExchangeStatus(strPath, false);
+        applyUnexchangeStatus(strPath, false);
     }
 
     generateSharedTree();
 }
 
-void files_widget::notExchangeSubdir()
+void files_widget::unxchangeSubdir()
 {
     QTreeWidgetItem* curItem = treeFiles->currentItem();
+    if (!curItem)
+        return;
+
     QString strPath;
     if (isDirTreeItem(curItem))
         strPath = getDirPath(curItem);
@@ -544,7 +592,7 @@ void files_widget::notExchangeSubdir()
     }
     else if (isSharedDirTreeItem(curItem))
     {
-        applyExchangeStatus(strPath, true);
+        applyUnexchangeStatus(strPath, true);
     }
 
     generateSharedTree();
@@ -552,21 +600,22 @@ void files_widget::notExchangeSubdir()
 
 void files_widget::checkExchangeParentStatus(QTreeWidgetItem* curItem)
 {
-    QString strPath = getDirPath(curItem);
-    if (partOfSharedPath(strPath))
-        curItem->setFont(0, boldFont);
-    else
-        curItem->setFont(0, usualFont);
-
-    while (curItem->parent() != allDirs)
+    do
     {
-        curItem = curItem->parent();
-        strPath = getDirPath(curItem);
+        QString strPath = getDirPath(curItem);
+        if (!strPath.length())
+            return;
         if (dirRules.contains(strPath))
-            break;
-        if (!partOfSharedPath(strPath))
+            return;
+
+        if (partOfSharedPath(strPath))
+            curItem->setFont(0, boldFont);
+        else
             curItem->setFont(0, usualFont);
+
+        curItem = curItem->parent();
     }
+    while (curItem != allDirs);
 }
 
 bool files_widget::isDirTreeItem(QTreeWidgetItem* item)
@@ -582,6 +631,11 @@ bool files_widget::isDirTreeItem(QTreeWidgetItem* item)
         return false;
 
     return true;
+}
+
+bool files_widget::isExchangeDir(QTreeWidgetItem* item)
+{
+    return isDirTreeItem(item) ? (getDirPath(item) == saveDirPath) : false;
 }
 
 bool files_widget::isSharedDirTreeItem(QTreeWidgetItem* item)
@@ -601,6 +655,9 @@ bool files_widget::isSharedDirTreeItem(QTreeWidgetItem* item)
 
 QString files_widget::getDirPath(QTreeWidgetItem* item)
 {
+    if (!isDirTreeItem(item))
+        return "";
+
     QString path = item->text(0) + "/";
 
     QTreeWidgetItem* itemIter = item;
@@ -737,6 +794,9 @@ void files_widget::checkBaseRemove(QString dirPath)
 
 void files_widget::setExchangeStatus(QTreeWidgetItem* item, bool status)
 {
+    if (isExchangeDir(item) && !status)
+        return;
+
     if (status)
     {
         item->setFont(0, boldFont);
@@ -761,6 +821,9 @@ bool files_widget::partOfSharedPath(QString path)
         if (filesIter->startsWith(path))
             return true;
 
+    if (saveDirPath.startsWith(path))
+        return true;
+
     return false;
 }
 
@@ -775,9 +838,23 @@ void files_widget::setChildExchangeStatus(QTreeWidgetItem* item, bool status)
     }
 }
 
-void files_widget::applyExchangeStatus(QString strPath, bool recursive)
+void files_widget::applyUnexchangeStatus(QString strPath, bool recursive)
 {
-    QTreeWidgetItem* curItem = allDirs;
+    QTreeWidgetItem* curItem = NULL;
+
+    if (findTreeItem(curItem, strPath))
+    {
+        if (recursive)
+            setChildExchangeStatus(curItem, false);
+        else
+            setExchangeStatus(curItem, false);
+    }
+    checkExchangeParentStatus(curItem);
+}
+
+bool files_widget::findTreeItem(QTreeWidgetItem*& item, QString strPath)
+{
+    item = allDirs;
     QString begin = strPath.left(strPath.indexOf('/'));
     if (!begin.length())
         begin = "/";
@@ -786,28 +863,33 @@ void files_widget::applyExchangeStatus(QString strPath, bool recursive)
     while (deeper)
     {
         deeper = false;
-        int childCnt = curItem->childCount();
+        int childCnt = item->childCount();
         for (int ii = 0; ii < childCnt; ii++)
         {
-            if (curItem->child(ii)->data(0, Qt::DisplayRole).toString() == begin)
+            if (item->child(ii)->data(0, Qt::DisplayRole).toString() == begin)
             {
-                curItem = curItem->child(ii);
-                begin = end.left(end.indexOf('/'));
-                end = end.right(end.length() - end.indexOf('/') - 1);
+                item = item->child(ii);
+                if (end.indexOf('/') >= 0)
+                {
+                    begin = end.left(end.indexOf('/'));
+                    end = end.right(end.length() - end.indexOf('/') - 1);
+                }
+                else
+                {
+                    begin = "";
+                    deeper = false;
+                    break;
+                }
                 deeper = true;
                 break;
             }
         }
     }
 
-    if (!begin.size())
-    {
-        if (recursive)
-            setChildExchangeStatus(curItem, false);
-        else
-            setExchangeStatus(curItem, false);            
-    }
-    checkExchangeParentStatus(curItem);
+    if (begin.size())
+        return false;
+
+    return true;
 }
 
 void files_widget::removeLastSlash(QString& dirPath)
@@ -816,9 +898,20 @@ void files_widget::removeLastSlash(QString& dirPath)
         dirPath = dirPath.left(dirPath.length() - 1);
 }
 
+void files_widget::addLastSlash(QString& dirPath)
+{
+    if (dirPath.lastIndexOf('/') != (dirPath.length() - 1))
+        dirPath += "/";
+}
+
 void files_widget::addedTransfer(Transfer transfer)
 {
-    transferPath.insert(transfer.hash(), transfer.absolute_files_path().at(0));
+    if (!transferPath.contains(transfer.hash()))
+        transferPath.insert(transfer.hash(), transfer.absolute_files_path().at(0));
+    
+    QTreeWidgetItem* curItem = treeFiles->currentItem();
+    if ( curItem && (curItem == allFiles || isExchangeDir(curItem)) )
+        currentItemChanged(curItem, NULL);
 }
 
 void files_widget::deletedTransfer(QString hash)
@@ -843,7 +936,7 @@ void files_widget::deletedTransfer(QString hash)
     if (fileRules.contains(filePath))
     {
         fileRules.removeOne(filePath);
-        applyExchangeStatus(filePath, false);
+        applyUnexchangeStatus(filePath, false);
     }
     else
     {
@@ -851,8 +944,7 @@ void files_widget::deletedTransfer(QString hash)
         if (file.exists())
         {
             QString dirPath = file.absolutePath();
-            if (dirPath.lastIndexOf('/') != (dirPath.length() - 1))
-                dirPath += "/";
+            addLastSlash(dirPath);
             if (dirRules.contains(dirPath))
             {
                 shareDir(dirPath, false);
@@ -863,4 +955,103 @@ void files_widget::deletedTransfer(QString hash)
     }
 
     currentItemChanged(curItem, NULL);
+}
+
+void files_widget::optionsChanged()
+{
+    Preferences pref;
+    QString newDirPath = pref.getSavePath();
+    addLastSlash(newDirPath);
+    if (newDirPath == saveDirPath)
+        return;
+
+    // Unshare old Incoming directory
+    std::deque<std::string> files;
+    QString dirPath = saveDirPath;
+    removeLastSlash(dirPath);
+
+    QString basePath = saveDirPath;
+    removeLastSlash(basePath);
+    basePath = basePath.left(basePath.lastIndexOf('/'));
+
+    Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+
+    // Share new Incoming directory
+    QTreeWidgetItem* curItem = NULL;
+    if (dirRules.contains(newDirPath))
+    {
+        checkBaseRemove(newDirPath);
+        dirRules.remove(newDirPath);
+        generateSharedTree();
+        shareDir(newDirPath, false);
+    }
+    dirPath = newDirPath;
+    removeLastSlash(dirPath);
+
+    basePath = newDirPath;
+    removeLastSlash(basePath);
+    basePath = basePath.left(basePath.lastIndexOf('/'));
+
+    Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+        
+    QList<QString>::iterator filesIter = fileRules.begin();
+    while (filesIter != fileRules.end())
+    {
+        if (filesIter->startsWith(newDirPath))
+            filesIter = fileRules.erase(filesIter);
+        else
+            ++filesIter;
+    }
+
+    dirPath = saveDirPath;
+    saveDirPath = newDirPath;
+
+    applyUnexchangeStatus(dirPath, false);
+    if (findTreeItem(curItem, saveDirPath))
+    {
+         setExchangeStatus(curItem, true);
+    }
+    checkExchangeParentStatus(curItem);
+}
+
+void files_widget::reshare()
+{
+    qDebug("reshare all files and dirs");
+    std::deque<std::string> files;
+    QString dirPath = saveDirPath;
+    removeLastSlash(dirPath);
+
+    QString basePath = saveDirPath;
+    removeLastSlash(basePath);
+    basePath = basePath.left(basePath.lastIndexOf('/'));
+
+    Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+
+    QList<QString>::iterator filesIter = fileRules.begin();
+    while (filesIter != fileRules.end())
+    {
+        QFileInfo file(*filesIter);
+        if (file.exists() && file.isFile())
+        {
+            Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toUtf8().constData());
+            ++filesIter;
+        }
+        else
+            filesIter = fileRules.erase(filesIter);
+    }
+
+    shared_map::iterator dirIter = dirRules.begin();
+    while (dirIter != dirRules.end())
+    {
+        QFileInfo dir(dirIter.key());
+        if (dir.exists() && dir.isDir())
+            ++dirIter;
+        else
+            dirIter = dirRules.erase(dirIter);
+    }
+
+    for (dirIter = dirRules.begin(); dirIter != dirRules.end(); ++dirIter)
+        shareDir(dirIter.key(), true);
+
+    qDebug("finish resharing");
 }

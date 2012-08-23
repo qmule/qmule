@@ -36,11 +36,13 @@ class files_widget : public QWidget, public Ui::files_widget
     QList<QString> fileRules;
     QMap<QString, QString> transferPath;
 
+    QString saveDirPath;
+
     QMenu*   filesMenu;
     QAction* filesExchDir;
     QAction* filesExchSubdir;
-    QAction* filesNotExchDir;
-    QAction* filesNotExchSubdir;
+    QAction* filesUnexchDir;
+    QAction* filesUnexchSubdir;
 
     QFont usualFont;
     QFont boldFont;
@@ -51,10 +53,12 @@ class files_widget : public QWidget, public Ui::files_widget
 public:
     files_widget(QWidget *parent = 0);
     ~files_widget();
+    void reshare();
 
 private:
     bool    isDirTreeItem(QTreeWidgetItem* item);
     bool    isSharedDirTreeItem(QTreeWidgetItem* item);
+    bool    isExchangeDir(QTreeWidgetItem* item);
     QString getDirPath(QTreeWidgetItem* item);
     void    generateSharedTree();
     void    exchangeSubdir(QFileInfoList& fileList);
@@ -66,7 +70,12 @@ private:
     void    checkBaseAdd(QString dirPath);
     void    checkBaseRemove(QString dirPath);
     void    removeLastSlash(QString& dirPath);
-    void    applyExchangeStatus(QString strPath, bool recursive);
+    void    addLastSlash(QString& dirPath);
+    void    applyUnexchangeStatus(QString strPath, bool recursive);
+    bool    findTreeItem(QTreeWidgetItem*& item, QString strPath);
+
+public slots:
+    void optionsChanged();
 
 private slots:
     void itemExpanded(QTreeWidgetItem* item);
@@ -76,8 +85,8 @@ private slots:
     void displayTreeMenu(const QPoint&);
     void exchangeDir();
     void exchangeSubdir();
-    void notExchangeDir();
-    void notExchangeSubdir();
+    void unexchangeDir();
+    void unxchangeSubdir();
     void applyChanges();
     void addedTransfer(Transfer transfer);
     void deletedTransfer(QString hash);

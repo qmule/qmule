@@ -1416,6 +1416,7 @@ void MainWindow::on_actionOptions_triggered() {
   } else {
     options = new options_imp(this);
     connect(options, SIGNAL(status_changed()), this, SLOT(optionsSaved()));
+    connect(options, SIGNAL(status_changed()), files, SLOT(optionsChanged()));
   }
 }
 
@@ -1626,6 +1627,7 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             else
             {
                 Session::instance()->start();
+                files->reshare();
             }
 
             activateControls(true);
