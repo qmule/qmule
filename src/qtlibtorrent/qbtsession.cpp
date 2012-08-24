@@ -1765,7 +1765,7 @@ void QBtSession::setListeningPort(int port) {
 #if LIBTORRENT_VERSION_MINOR > 15
   error_code ec;
 #endif
-  const QString iface_name = pref.getNetworkInterface();
+  const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterface());
   if (iface_name.isEmpty()) {
 #if LIBTORRENT_VERSION_MINOR > 15
     s->listen_on(ports, ec);

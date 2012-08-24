@@ -35,11 +35,15 @@ private:
   QCheckBox cb_use_icon_theme;
 #endif
   QCheckBox cb_announce_all_trackers;
+  QRegExpValidator m_rev;
   QLineEdit txt_network_address;
 
 public:
-  AdvancedSettings(QWidget *parent=0): QTableWidget(parent) {
+  AdvancedSettings(QWidget *parent=0): QTableWidget(parent)
+  {
     // Set visual appearance
+    m_rev.setRegExp(QRegExp("\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}"));
+    txt_network_address.setValidator(&m_rev);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setAlternatingRowColors(true);
     setColumnCount(2);
@@ -209,18 +213,21 @@ private slots:
     int i = 1;
     foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces())
     {
-        if (iface.flags() & QNetworkInterface::IsLoopBack) continue;
-            combo_iface.addItem(iface.name());
-            combo_iface_mule.addItem(iface.name());
+        if ((iface.flags() & QNetworkInterface::IsLoopBack) ||
+            (!iface.isValid()) ||
+            ((iface.flags() & QNetworkInterface::IsUp) == 0))
+                continue;
+            combo_iface.addItem(iface.humanReadableName());
+            combo_iface_mule.addItem(iface.humanReadableName());
 
       // restore torrent iface
-      if (!current_iface.isEmpty() && iface.name() == current_iface)
+      if (!current_iface.isEmpty() && iface.humanReadableName() == current_iface)
       {
           combo_iface.setCurrentIndex(i);
       }
 
       // restore mule iface
-      if (!current_iface_mule.isEmpty() && iface.name() == current_iface_mule)
+      if (!current_iface_mule.isEmpty() && iface.humanReadableName() == current_iface_mule)
       {
           combo_iface_mule.setCurrentIndex(i);
       }

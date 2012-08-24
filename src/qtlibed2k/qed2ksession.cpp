@@ -218,14 +218,21 @@ void QED2KSession::start()
     m_settings.m_known_file = pref.knownFile().toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
-    const QString iface_name = pref.getNetworkInterfaceMule();
+    const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else
     m_settings.server_hostname = "emule.is74.ru";
 #endif    
-    m_session.reset(new libed2k::session(m_finger, NULL, m_settings));
+    if (iface_name.isEmpty())
+    {
+        m_session.reset(new libed2k::session(m_finger, NULL, m_settings));
+    }
+    else
+    {
+        m_session.reset(new libed2k::session(m_finger, iface_name.toAscii().constData(), m_settings));
+    }
 
     m_session->set_alert_mask(alert::all_categories);
     // start listening on special interface and port and start server connection
@@ -319,7 +326,7 @@ void QED2KSession::configureSession()
     if (new_listenPort != old_listenPort)
     {
         qDebug() << "stop listen on " << old_listenPort << " and start on " << new_listenPort;
-        const QString iface_name = pref.getNetworkInterfaceMule();
+        const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
         if (iface_name.isEmpty())
         {

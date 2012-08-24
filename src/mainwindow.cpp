@@ -240,6 +240,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   // load from catalog link, temporary without deferred proxy
   connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
+  connect(catalog, SIGNAL(filePreviewEvent(QString)), Session::instance(), SLOT(playLink(QString)));
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));

@@ -124,6 +124,8 @@ public:
   static void shutdownComputer(bool sleep=false);
 #endif
 
+  static QString ifaceFromHumanName(const QString& strHumanIface);
+
   static QString parseHtmlLinks(const QString &raw_text);
 
   static quint64 computePathSize(QString path);

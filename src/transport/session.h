@@ -71,6 +71,7 @@ public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);
+    void playLink(const QString& strLink);
 
     /**
       * select appropriate session and run command on it

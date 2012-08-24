@@ -277,8 +277,16 @@ bool Session::isListening() const { return m_btSession.getSession()->is_listenin
 
 void Session::deferPlayMedia(Transfer t)
 {
-    t.prioritize_first_last_piece(true);
-    m_pending_medias.push_back(t.hash());
+    if (t.is_valid())
+    {
+        t.prioritize_first_last_piece(true);
+        m_pending_medias.push_back(t.hash());
+    }
+}
+
+void Session::playLink(const QString& strLink)
+{
+    deferPlayMedia(addLink(strLink));
 }
 
 bool Session::playMedia(Transfer t)
