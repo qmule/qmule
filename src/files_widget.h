@@ -73,6 +73,7 @@ private:
     void    addLastSlash(QString& dirPath);
     void    applyUnexchangeStatus(QString strPath, bool recursive);
     bool    findTreeItem(QTreeWidgetItem*& item, QString strPath);
+    void    removeTransferPath(QString filePath);
 
 public slots:
     void optionsChanged();
