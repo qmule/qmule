@@ -849,6 +849,12 @@ Transfer search_widget::addTransfer(const QModelIndex& index)
 {
     QString hash = selected_data(treeResult, SWDelegate::SW_ID, index).toString();
     QString filename = selected_data(treeResult, SWDelegate::SW_NAME, index).toString();
+    EED2KFileType fileType = GetED2KFileTypeID(filename.toStdString());
+    if (fileType == ED2KFT_EMULECOLLECTION)
+    {
+        filename.replace('\\', '-');
+        filename.replace('/', '-');
+    }
     QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
 
     libed2k::add_transfer_params params;

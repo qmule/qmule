@@ -1111,10 +1111,18 @@ void MainWindow::processParams(const QStringList& params)
       else
       {
         // for torrent we run dialog when it option activated
-        if (useTorrentAdditionDialog && !param.endsWith(".emulecollection"))
+        if (useTorrentAdditionDialog)
         {
-            collection_save_dlg dialog(this, param);
-            dialog.exec();
+            if (param.endsWith(".emulecollection"))
+            {
+                collection_save_dlg dialog(this, param);
+                dialog.exec();
+            }
+            else
+            {
+                torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
+                dialog->showLoad(param);
+            }
         }
         else
         {

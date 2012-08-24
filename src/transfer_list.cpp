@@ -54,8 +54,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     icons[1].addFile(QString::fromUtf8(":/emule/transfer_list/DownloadFiles.png"), QSize(), QIcon::Normal, QIcon::Off);
     icons[2].addFile(QString::fromUtf8(":/emule/transfer_list/Upload.png"), QSize(), QIcon::Normal, QIcon::Off);
     icons[3].addFile(QString::fromUtf8(":/emule/transfer_list/Download.png"), QSize(), QIcon::Normal, QIcon::Off);
-    icons[4].addFile(QString::fromUtf8(":/emule/transfer_list/ClientsKnown.png"), QSize(), QIcon::Normal, QIcon::Off);
-    icons[5].addFile(QString::fromUtf8(":/emule/transfer_list/ClientsOnQueue.png"), QSize(), QIcon::Normal, QIcon::Off);
 
     btnSwitch = new QPushButton("", this);
     btnSwitch->setFlat(true);
@@ -87,18 +85,11 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     horizontalSpacer = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
     horizontalSpacer2 = new QSpacerItem(40, 2, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    topRowButtons[4]->setEnabled(false);
-    topRowButtons[5]->setEnabled(false);
-    bottomRowButtons[2]->setEnabled(false);
-    bottomRowButtons[3]->setEnabled(false);
-
     hboxLayout1->addWidget(btnSwitch);
     hboxLayout1->addWidget(topRowButtons[0]);
     hboxLayout1->addWidget(topRowButtons[1]);
     hboxLayout1->addWidget(topRowButtons[2]);
     hboxLayout1->addWidget(topRowButtons[3]);
-    hboxLayout1->addWidget(topRowButtons[4]);
-    hboxLayout1->addWidget(topRowButtons[5]);
     hboxLayout1->addItem(horizontalSpacer);
 
     topRowButtons[0]->setChecked(true);
@@ -106,8 +97,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     hboxLayout2->addWidget(btnSwitch2);
     hboxLayout2->addWidget(bottomRowButtons[0]);
     hboxLayout2->addWidget(bottomRowButtons[1]);
-    hboxLayout2->addWidget(bottomRowButtons[2]);
-    hboxLayout2->addWidget(bottomRowButtons[3]);
     hboxLayout2->addItem(horizontalSpacer2);
 
     bottomRowButtons[1]->setChecked(true);

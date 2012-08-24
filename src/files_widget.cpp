@@ -926,7 +926,7 @@ void files_widget::addedTransfer(Transfer transfer)
             if (dirRules[dirPath].contains(file.fileName()))
                 dirRules[dirPath].removeOne(file.fileName());
         }
-        else if (dirPath != saveDirPath && dirPath != collectionPath && !fileRules.contains(filePath))
+        else if (dirPath != saveDirPath && !dirPath.startsWith(collectionPath) && !fileRules.contains(filePath))
         {
             fileRules.push_back(filePath);
             findTreeItem(curItem, saveDirPath);

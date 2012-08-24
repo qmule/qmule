@@ -23,7 +23,7 @@ collection_save_dlg::collection_save_dlg(QWidget *parent, QString path)
 
     if (QFile::exists(path))
     {
-        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(path.toLocal8Bit().constData());
+        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(path.toUtf8().constData());
 
         int row = 0;
         foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
