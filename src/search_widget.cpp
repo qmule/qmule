@@ -672,8 +672,9 @@ void search_widget::startSearch()
 
     if (Session::instance()->get_ed2k_session()->isServerConnected())
     {
+        // size was will convert from Mb to bytes for generate search request
         Session::instance()->get_ed2k_session()->searchFiles(
-            searchRequest, nMinSize, nMaxSize, nAvail, nSources,
+            searchRequest, nMinSize*1024*1024, nMaxSize*1024*1024, nAvail, nSources,
             fileType, fileExt, mediaCodec, nBitRate, nDuration);
         nSearchesInProgress = 1;
     }
