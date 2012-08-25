@@ -23,7 +23,8 @@ collection_save_dlg::collection_save_dlg(QWidget *parent, QString path)
 
     if (QFile::exists(path))
     {
-        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(path.toUtf8().constData());
+        // emule collections in libed2k works in local codepage
+        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(path.toLocal8Bit().constData());
 
         int row = 0;
         foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
@@ -80,7 +81,8 @@ void collection_save_dlg::init()
 
     tableFiles->selectAll();
 
-    btnDowload->setDisabled(true);
+    // disable button only nothing to say
+    if (row == 0) btnDowload->setDisabled(true);
     Preferences pref;
     dirPath = pref.getSavePath();
     separator = '/';
