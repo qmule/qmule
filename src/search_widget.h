@@ -53,6 +53,14 @@ struct SearchResult
     void save(Preferences& pref) const;
 };
 
+class SWTabBar : public QTabBar
+{
+public:
+    SWTabBar(QWidget* parent);
+protected:
+    void mousePressEvent(QMouseEvent* event);
+};
+
 class search_widget : public QWidget , private Ui::search_widget
 {
     Q_OBJECT
@@ -64,7 +72,7 @@ private:
     QAction* defValue;
     QAction* defKilos;
     QAction* defMegas;
-    QTabBar* tabSearch;
+    SWTabBar* tabSearch;
 
     std::vector<SearchResult> searchItems;
     std::vector<libed2k::net_identifier> connectedPeers;

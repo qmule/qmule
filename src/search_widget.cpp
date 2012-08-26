@@ -1,6 +1,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QPushButton>
+#include <QMouseEvent>
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QWebFrame>
@@ -127,6 +128,14 @@ void SearchResult::save(Preferences& pref) const
     pref.setValue("Port", netPoint.m_nPort);
 }
 
+SWTabBar::SWTabBar(QWidget* parent): QTabBar(parent){}
+
+void SWTabBar::mousePressEvent(QMouseEvent* event)
+{
+    if(event->button() == Qt::MidButton) emit tabCloseRequested(tabAt(event->pos()));
+    else QTabBar::mousePressEvent(event);
+}
+
 int selected_row(QAbstractItemView* view)
 {
     QModelIndex index = view->currentIndex();
@@ -148,7 +157,7 @@ search_widget::search_widget(QWidget *parent)
 {
     setupUi(this);
 
-    tabSearch = new QTabBar(this);
+    tabSearch = new SWTabBar(this);
     tabSearch->setObjectName(QString::fromUtf8("tabSearch"));
     tabSearch->setTabsClosable(true);
     tabSearch->setShape(QTabBar::RoundedNorth);
