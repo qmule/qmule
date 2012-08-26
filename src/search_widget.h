@@ -163,6 +163,7 @@ private slots:
                                  const std::vector<QED2KSearchResultEntry>& vRes);
     void itemCollapsed(const QModelIndex& index);
     void itemExpanded(const QModelIndex& index);
+    void displayHSMenu(const QPoint&);
 
     void ed2kSearchFinished(const libed2k::net_identifier& np,const QString& hash,
                             const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);

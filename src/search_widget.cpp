@@ -405,9 +405,15 @@ search_widget::search_widget(QWidget *parent)
     connect(treeResult->selectionModel(),
             SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(resultSelectionChanged(const QItemSelection&, const QItemSelection&)));
-    connect(treeResult, SIGNAL(expanded(const QModelIndex&)), this, SLOT(itemExpanded(const QModelIndex&)));
-    connect(treeResult, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(itemCollapsed(const QModelIndex&)));
-    connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(sortChanged(int, Qt::SortOrder)));
+    connect(treeResult, SIGNAL(expanded(const QModelIndex&)),
+            this, SLOT(itemExpanded(const QModelIndex&)));
+    connect(treeResult, SIGNAL(collapsed(const QModelIndex&)),
+            this, SLOT(itemCollapsed(const QModelIndex&)));
+    connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(sortChanged(int, Qt::SortOrder)));
+    treeResult->header()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(treeResult->header(), SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayHSMenu(const QPoint&)));
     connect(treeResult, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(download()));
 
     torrentSearchView = new QWebView();
@@ -1700,6 +1706,32 @@ void search_widget::itemExpanded(const QModelIndex& index)
             }
             dir_iter->bExpanded = true;
         }
+    }
+}
+
+void search_widget::displayHSMenu(const QPoint&)
+{
+    QMenu hideshowColumn(this);
+    hideshowColumn.setTitle(tr("Column visibility"));
+    QList<QAction*> actions;
+    for (int i=0; i < model->columnCount(); ++i)
+    {
+        QAction *myAct = hideshowColumn.addAction(
+            model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+        myAct->setCheckable(true);
+        myAct->setChecked(!treeResult->isColumnHidden(i));
+        actions.append(myAct);
+    }
+    // Call menu
+    QAction *act = hideshowColumn.exec(QCursor::pos());
+    if (act)
+    {
+        int col = actions.indexOf(act);
+        Q_ASSERT(col >= 0);
+        qDebug("Toggling column %d visibility", col);
+        treeResult->setColumnHidden(col, !treeResult->isColumnHidden(col));
+        if (!treeResult->isColumnHidden(col) && treeResult->columnWidth(col) <= 5)
+            treeResult->setColumnWidth(col, 100);
     }
 }
 
