@@ -16,7 +16,7 @@
 transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     : QMainWindow(parent)
 {
-    btnText << tr("Download") << tr("Download") << tr("Upload") << tr("Download") << tr("InQueue") << tr("KnownClient");
+    btnText << tr("Download") << tr("Download") << tr("Upload") << tr("Download");
 
     hSplitter = new QSplitter(Qt::Vertical);
     hSplitter->setChildrenCollapsible(false);
