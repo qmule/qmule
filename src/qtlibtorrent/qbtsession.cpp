@@ -694,9 +694,7 @@ void QBtSession::initWebUi() {
 
 void QBtSession::useAlternativeSpeedsLimit(bool alternative) {
   qDebug() << Q_FUNC_INFO << alternative;
-  // Save new state to remember it on startup
   Preferences pref;
-  pref.setAltBandwidthEnabled(alternative);
   // Apply settings to the bittorrent session
   int down_limit = alternative ? pref.getAltGlobalDownloadLimit() : pref.getGlobalDownloadLimit();
   if (down_limit <= 0) {
