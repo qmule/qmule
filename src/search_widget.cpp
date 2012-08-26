@@ -1,6 +1,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QPushButton>
+#include <QMouseEvent>
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QWebFrame>
@@ -127,6 +128,14 @@ void SearchResult::save(Preferences& pref) const
     pref.setValue("Port", netPoint.m_nPort);
 }
 
+SWTabBar::SWTabBar(QWidget* parent): QTabBar(parent){}
+
+void SWTabBar::mousePressEvent(QMouseEvent* event)
+{
+    if(event->button() == Qt::MidButton) emit tabCloseRequested(tabAt(event->pos()));
+    else QTabBar::mousePressEvent(event);
+}
+
 int selected_row(QAbstractItemView* view)
 {
     QModelIndex index = view->currentIndex();
@@ -148,7 +157,7 @@ search_widget::search_widget(QWidget *parent)
 {
     setupUi(this);
 
-    tabSearch = new QTabBar(this);
+    tabSearch = new SWTabBar(this);
     tabSearch->setObjectName(QString::fromUtf8("tabSearch"));
     tabSearch->setTabsClosable(true);
     tabSearch->setShape(QTabBar::RoundedNorth);
@@ -405,9 +414,15 @@ search_widget::search_widget(QWidget *parent)
     connect(treeResult->selectionModel(),
             SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(resultSelectionChanged(const QItemSelection&, const QItemSelection&)));
-    connect(treeResult, SIGNAL(expanded(const QModelIndex&)), this, SLOT(itemExpanded(const QModelIndex&)));
-    connect(treeResult, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(itemCollapsed(const QModelIndex&)));
-    connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(sortChanged(int, Qt::SortOrder)));
+    connect(treeResult, SIGNAL(expanded(const QModelIndex&)),
+            this, SLOT(itemExpanded(const QModelIndex&)));
+    connect(treeResult, SIGNAL(collapsed(const QModelIndex&)),
+            this, SLOT(itemCollapsed(const QModelIndex&)));
+    connect(treeResult->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(sortChanged(int, Qt::SortOrder)));
+    treeResult->header()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(treeResult->header(), SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayHSMenu(const QPoint&)));
     connect(treeResult, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(download()));
 
     torrentSearchView = new QWebView();
@@ -672,8 +687,9 @@ void search_widget::startSearch()
 
     if (Session::instance()->get_ed2k_session()->isServerConnected())
     {
+        // size was will convert from Mb to bytes for generate search request
         Session::instance()->get_ed2k_session()->searchFiles(
-            searchRequest, nMinSize, nMaxSize, nAvail, nSources,
+            searchRequest, nMinSize*1024*1024, nMaxSize*1024*1024, nAvail, nSources,
             fileType, fileExt, mediaCodec, nBitRate, nDuration);
         nSearchesInProgress = 1;
     }
@@ -849,6 +865,12 @@ Transfer search_widget::addTransfer(const QModelIndex& index)
 {
     QString hash = selected_data(treeResult, SWDelegate::SW_ID, index).toString();
     QString filename = selected_data(treeResult, SWDelegate::SW_NAME, index).toString();
+    EED2KFileType fileType = GetED2KFileTypeID(filename.toStdString());
+    if (fileType == ED2KFT_EMULECOLLECTION)
+    {
+        filename.replace('\\', '-');
+        filename.replace('/', '-');
+    }
     QString filepath = QDir(Preferences().getSavePath()).filePath(filename);
 
     libed2k::add_transfer_params params;
@@ -1693,6 +1715,32 @@ void search_widget::itemExpanded(const QModelIndex& index)
             }
             dir_iter->bExpanded = true;
         }
+    }
+}
+
+void search_widget::displayHSMenu(const QPoint&)
+{
+    QMenu hideshowColumn(this);
+    hideshowColumn.setTitle(tr("Column visibility"));
+    QList<QAction*> actions;
+    for (int i=0; i < model->columnCount(); ++i)
+    {
+        QAction *myAct = hideshowColumn.addAction(
+            model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+        myAct->setCheckable(true);
+        myAct->setChecked(!treeResult->isColumnHidden(i));
+        actions.append(myAct);
+    }
+    // Call menu
+    QAction *act = hideshowColumn.exec(QCursor::pos());
+    if (act)
+    {
+        int col = actions.indexOf(act);
+        Q_ASSERT(col >= 0);
+        qDebug("Toggling column %d visibility", col);
+        treeResult->setColumnHidden(col, !treeResult->isColumnHidden(col));
+        if (!treeResult->isColumnHidden(col) && treeResult->columnWidth(col) <= 5)
+            treeResult->setColumnWidth(col, 100);
     }
 }
 

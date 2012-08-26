@@ -115,6 +115,7 @@ public slots:
 	void enableIPFilter(const QString &filter_path, bool force=false);	
     virtual Transfer addLink(QString strLink, bool resumed = false);
     virtual void addTransferFromFile(const QString& filename);
+    virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
 
 	/**
 	  * number parameters were ignored on zero value

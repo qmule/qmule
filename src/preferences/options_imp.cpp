@@ -416,6 +416,7 @@ void options_imp::saveOptions() {
   pref.includeOverheadInLimits(checkLimitTransportOverhead->isChecked());
   pref.setAltGlobalDownloadLimit(spinDownloadLimitAlt->value());
   pref.setAltGlobalUploadLimit(spinUploadLimitAlt->value());
+  pref.setAltBandwidthEnabled(check_schedule->isChecked());
   pref.setSchedulerEnabled(check_schedule->isChecked());
   pref.setSchedulerStartTime(schedule_from->time());
   pref.setSchedulerEndTime(schedule_to->time());

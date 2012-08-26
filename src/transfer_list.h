@@ -24,8 +24,8 @@ class transfer_list : public  QMainWindow
     Q_OBJECT
 
 private:
-    static const int topRowBtnCnt = 6;
-    static const int bottomRowBtnCnt = 4;
+    static const int topRowBtnCnt = 4;
+    static const int bottomRowBtnCnt = 2;
     
     QStringList btnText;
 

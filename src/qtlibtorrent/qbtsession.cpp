@@ -694,9 +694,7 @@ void QBtSession::initWebUi() {
 
 void QBtSession::useAlternativeSpeedsLimit(bool alternative) {
   qDebug() << Q_FUNC_INFO << alternative;
-  // Save new state to remember it on startup
   Preferences pref;
-  pref.setAltBandwidthEnabled(alternative);
   // Apply settings to the bittorrent session
   int down_limit = alternative ? pref.getAltGlobalDownloadLimit() : pref.getGlobalDownloadLimit();
   if (down_limit <= 0) {
@@ -928,6 +926,11 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
 void QBtSession::addTransferFromFile(const QString& filename)
 {
     addTorrent(filename);
+}
+
+QED2KHandle QBtSession::addTransfer(const libed2k::add_transfer_params&)
+{
+    return QED2KHandle();
 }
 
 // Add a torrent to the Bittorrent session
@@ -1765,7 +1768,7 @@ void QBtSession::setListeningPort(int port) {
 #if LIBTORRENT_VERSION_MINOR > 15
   error_code ec;
 #endif
-  const QString iface_name = pref.getNetworkInterface();
+  const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterface());
   if (iface_name.isEmpty()) {
 #if LIBTORRENT_VERSION_MINOR > 15
     s->listen_on(ports, ec);

@@ -53,7 +53,6 @@ class files_widget : public QWidget, public Ui::files_widget
 public:
     files_widget(QWidget *parent = 0);
     ~files_widget();
-    void reshare();
 
 private:
     bool    isDirTreeItem(QTreeWidgetItem* item);
@@ -77,6 +76,7 @@ private:
 
 public slots:
     void optionsChanged();
+    void reshare();
 
 private slots:
     void itemExpanded(QTreeWidgetItem* item);

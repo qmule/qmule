@@ -5661,7 +5661,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Collection list</source>
-        <translation>Сптсок коллекции</translation>
+        <translation>Список коллекции</translation>
     </message>
     <message>
         <source>Directory name</source>
@@ -6995,6 +6995,17 @@ However, those plugins were disabled.</source>
     <message>
         <source>Files</source>
         <translation type="unfinished">Файлы</translation>
+    </message>
+</context>
+<context>
+    <name>smile_menu</name>
+    <message>
+        <source>smile_menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PushButton</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

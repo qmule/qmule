@@ -216,7 +216,7 @@ QTorrentHandle Session::addTorrent(const QString& path, bool fromScanDir/* = fal
     return m_btSession.addTorrent(path, fromScanDir, from_url, resumed);
 }
 QED2KHandle Session::addTransfer(const libed2k::add_transfer_params& params) {
-    return QED2KHandle(m_edSession.delegate()->add_transfer(params));
+    return m_edSession.addTransfer(params);
 }
 void Session::downloadFromUrl(const QString& url) {
     m_btSession.downloadFromUrl(url);
@@ -277,8 +277,16 @@ bool Session::isListening() const { return m_btSession.getSession()->is_listenin
 
 void Session::deferPlayMedia(Transfer t)
 {
-    t.prioritize_first_last_piece(true);
-    m_pending_medias.push_back(t.hash());
+    if (t.is_valid())
+    {
+        t.prioritize_first_last_piece(true);
+        m_pending_medias.push_back(t.hash());
+    }
+}
+
+void Session::playLink(const QString& strLink)
+{
+    deferPlayMedia(addLink(strLink));
 }
 
 bool Session::playMedia(Transfer t)

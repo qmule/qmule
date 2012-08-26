@@ -10,6 +10,7 @@
 #include <vector>
 #include <queue>
 #include <libtorrent/session_status.hpp>
+#include <libed2k/session.hpp>
 
 #include <transport/transfer.h>
 #include <qtlibtorrent/trackerinfos.h>
@@ -54,6 +55,7 @@ public:
     virtual void saveFastResumeData() = 0;
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
+    virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0; //!< ed2k session only
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -110,6 +112,10 @@ private:
     if (!S::started()) return def;              \
     else return S::call
 
+#define FORWARD_RETURN1(call, arg1, def)  \
+    if (!S::started()) return def;              \
+    else return S::call(arg1)
+
 #define FORWARD_RETURN2(call, arg1, arg2, def)  \
     if (!S::started()) return def;              \
     else return S::call(arg1, arg2)
@@ -162,6 +168,7 @@ public:
 
     Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
+    QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) { DEFER1(addTransfer, atp); return QED2KHandle(); } //!< save call and return empty handle
 
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 

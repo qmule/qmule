@@ -38,6 +38,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QSettings>
+ #include <QNetworkInterface>
 
 #ifdef DISABLE_GUI
 #include <QCoreApplication>
@@ -710,6 +711,7 @@ bool misc::isPreviewable(QString extension) {
   if (extension == "MPE") return true;
   if (extension == "MOV") return true;
   if (extension == "MKV") return true;
+  if (extension == "M4V") return true;
   if (extension == "AIF") return true;
   if (extension == "AIFF") return true;
   if (extension == "AIFC") return true;
@@ -1024,6 +1026,28 @@ QString misc::parseHtmlLinks(const QString &raw_text)
   return result;
 }
 
+
+QString misc::ifaceFromHumanName(const QString& strHumanIface)
+{
+    QString strRes;
+
+    if (strHumanIface.isEmpty()) return strRes;
+
+    foreach (const QNetworkInterface& iface, QNetworkInterface::allInterfaces())
+    {
+        if ((iface.flags() & QNetworkInterface::IsLoopBack) ||
+            (!iface.isValid()) ||
+            ((iface.flags() & QNetworkInterface::IsUp) == 0))
+                continue;
+
+        if (strHumanIface == iface.humanReadableName())
+        {
+            strRes = iface.name();
+        }
+    }
+
+    return strRes;
+}
 
 QStringList misc::getFileLines(const QString& filename)
 {

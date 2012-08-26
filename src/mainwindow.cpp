@@ -240,6 +240,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
 
   // load from catalog link, temporary without deferred proxy
   connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
+  connect(catalog, SIGNAL(filePreviewEvent(QString)), Session::instance(), SLOT(playLink(QString)));
 
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
@@ -1110,10 +1111,18 @@ void MainWindow::processParams(const QStringList& params)
       else
       {
         // for torrent we run dialog when it option activated
-        if (useTorrentAdditionDialog && !param.endsWith(".emulecollection"))
+        if (useTorrentAdditionDialog)
         {
-            collection_save_dlg dialog(this, param);
-            dialog.exec();
+            if (param.endsWith(".emulecollection"))
+            {
+                collection_save_dlg dialog(this, param);
+                dialog.exec();
+            }
+            else
+            {
+                torrentAdditionDialog *dialog = new torrentAdditionDialog(this);
+                dialog->showLoad(param);
+            }
         }
         else
         {
@@ -1627,10 +1636,13 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             else
             {
                 Session::instance()->start();
-                files->reshare();
+                // it is temp and bad code - avoid reshare before transfers will completed
+                // wait 8 seconds
+                QTimer::singleShot(8000, files, SLOT(reshare()));
             }
 
             activateControls(true);
+
             break;
         }
         case 1:

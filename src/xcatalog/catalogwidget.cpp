@@ -382,10 +382,7 @@ void XCatalogWidget::onLinkClicked( const QUrl &link )
     {
 		QByteArray data = QByteArray::fromPercentEncoding ( QByteArray::fromBase64( link.queryItemValue("link").toAscii() ) );
 		QString realLink = QString::fromUtf8(data.constData());
-
-        emit ed2kLinkEvent(realLink,false);
         emit filePreviewEvent(realLink);
-
         return;
     }
 //#endif
