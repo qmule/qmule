@@ -928,6 +928,11 @@ void QBtSession::addTransferFromFile(const QString& filename)
     addTorrent(filename);
 }
 
+QED2KHandle QBtSession::addTransfer(const libed2k::add_transfer_params&)
+{
+    return QED2KHandle();
+}
+
 // Add a torrent to the Bittorrent session
 QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString from_url, bool resumed) {
   QTorrentHandle h;

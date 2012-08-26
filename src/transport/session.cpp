@@ -216,7 +216,7 @@ QTorrentHandle Session::addTorrent(const QString& path, bool fromScanDir/* = fal
     return m_btSession.addTorrent(path, fromScanDir, from_url, resumed);
 }
 QED2KHandle Session::addTransfer(const libed2k::add_transfer_params& params) {
-    return QED2KHandle(m_edSession.delegate()->add_transfer(params));
+    return m_edSession.addTransfer(params);
 }
 void Session::downloadFromUrl(const QString& url) {
     m_btSession.downloadFromUrl(url);

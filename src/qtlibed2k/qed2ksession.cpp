@@ -420,6 +420,12 @@ void QED2KSession::addTransferFromFile(const QString& filename)
     }
 }
 
+QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
+{
+    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.filename().c_str());
+    return QED2KHandle(delegate()->add_transfer(atp));
+}
+
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
 
 void QED2KSession::searchFiles(const QString& strQuery,

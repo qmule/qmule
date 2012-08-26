@@ -161,8 +161,7 @@ void collection_save_dlg::dowload()
         atp.file_path = filepath.toUtf8();
         atp.file_hash = file_data[row].file_hash;        
         atp.file_size = file_data[row].file_size;
-        Session::instance()->get_ed2k_session()->delegate()->add_transfer(atp);
-
+        Session::instance()->addTransfer(atp);
         last_row = row;
     }
     accept();
