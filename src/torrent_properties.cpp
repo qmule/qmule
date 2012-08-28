@@ -99,12 +99,12 @@ void torrent_properties::loadDynamicData()
         dlTotal->setText(misc::friendlyUnit(h.all_time_download()) + " ("+misc::friendlyUnit(h.total_payload_download())+" "+tr("this session")+")");
 
         if (h.upload_limit() <= 0)
-            lbl_uplimit->setText(QString::fromUtf8("-"));
+            lbl_uplimit->setText(QString::fromUtf8("\xE2\x88\x9E"));
         else
             lbl_uplimit->setText(misc::friendlyUnit(h.upload_limit())+tr("/s", "/second (i.e. per second)"));
 
         if (h.download_limit() <= 0)
-            lbl_dllimit->setText(QString::fromUtf8("-"));
+            lbl_dllimit->setText(QString::fromUtf8("\xE2\x88\x9E"));
         else
             lbl_dllimit->setText(misc::friendlyUnit(h.download_limit())+tr("/s", "/second (i.e. per second)"));
 
@@ -124,7 +124,7 @@ void torrent_properties::loadDynamicData()
         // Update ratio info
         const qreal ratio = Session::instance()->getRealRatio(h.hash());
         if (ratio > Session::MAX_RATIO)
-            shareRatio->setText(QString::fromUtf8("-"));
+            shareRatio->setText(QString::fromUtf8("\xE2\x88\x9E"));
         else
             shareRatio->setText(QString(QByteArray::number(ratio, 'f', 2)));
 
