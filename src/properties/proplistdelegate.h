@@ -41,7 +41,6 @@
 #include <QProgressBar>
 #include <QApplication>
 #include "misc.h"
-#include "propertieswidget.h"
 
 #ifdef Q_WS_WIN
 #include <QPlastiqueStyle>
@@ -53,14 +52,12 @@ enum PropColumn {NAME, PCSIZE, PROGRESS, PRIORITY};
 class PropListDelegate: public QItemDelegate {
   Q_OBJECT
 
-private:
-  PropertiesWidget *properties;
 
 signals:
   void filteredFilesChanged() const;
 
 public:
-  PropListDelegate(PropertiesWidget* properties=0, QObject *parent=0) : QItemDelegate(parent), properties(properties) {
+  PropListDelegate(QObject *parent=0) : QItemDelegate(parent) {
   }
 
   ~PropListDelegate() {}
@@ -158,17 +155,10 @@ public:
   }
 
   QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &/* option */, const QModelIndex &index) const {
-    if (index.column() != PRIORITY) return 0;
-    if (properties) {
-      Transfer h = properties->getCurrentTorrent();
-      if (!h.is_valid() || !h.has_metadata() || h.is_seed()) return 0;
-//#if LIBTORRENT_VERSION_MINOR > 15
-//      if (!h.is_valid() || !h.has_metadata() || h.status(0x0).is_seeding) return 0;
-//#else
-//      if (!h.is_valid() || !h.has_metadata() || static_cast<libtorrent::torrent_handle>(h).is_seed()) return 0;
-//#endif
-    }
-    if (index.data().toInt() <= 0) {
+    if (index.column() != PRIORITY) 
+        return 0;
+    if (index.data().toInt() <= 0) 
+    {
       // IGNORED or MIXED
       return 0;
     }

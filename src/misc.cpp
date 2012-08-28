@@ -1281,6 +1281,19 @@ void misc::migrateTorrents()
             qDebug() << "save path is : " << torrentSavePath;
             TorrentTempData::setSavePath(hash, torrentSavePath);
             TorrentTempData::setSeedingMode(hash, completed > 0);
+			
+            std::string prio = dict->dict_find_string_value("prio");
+            std::vector<char> priorities(prio.begin(), prio.end());
+            std::vector<int> file_priorities;
+            for (std::vector<char>::const_iterator iter = priorities.begin(); iter != priorities.end(); ++iter)
+            {
+                if (*iter == 128 || *iter == 0)
+                    file_priorities.push_back(0);
+                else
+                    file_priorities.push_back(1);
+            }
+			TorrentTempData::setFilesPriority(hash, file_priorities);
+
             qDebug() << "add torrent to session " <<  torrentFileName;
             Session::instance()->addTransferFromFile(torrentFileName);
         }
