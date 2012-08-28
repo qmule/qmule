@@ -70,5 +70,6 @@
         <file>search/preview32.png</file>
         <file>search/closeall.png</file>
         <file>search/SearchRelated.png</file>
+        <file>transfer_list/FileInfo.png</file>
     </qresource>
 </RCC>
