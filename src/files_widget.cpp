@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QPainter>
+#include <QClipboard>
 
 #include "files_widget.h"
 #include "preferences.h"
@@ -83,8 +84,9 @@ files_widget::files_widget(QWidget *parent)
     }
 
     model.reset(new QStandardItemModel(0, FW_COLUMNS_NUM));
-    model->setHeaderData(FW_NAME, Qt::Horizontal,           tr("File Name"));
-    model->setHeaderData(FW_SIZE, Qt::Horizontal,           tr("File Size"));
+    model->setHeaderData(FW_NAME, Qt::Horizontal, tr("File Name"));
+    model->setHeaderData(FW_SIZE, Qt::Horizontal, tr("File Size"));
+    model->setHeaderData(FW_ID, Qt::Horizontal,   tr("File ID"));
 
     filterModel.reset(new QSortFilterProxyModel());
     filterModel.data()->setDynamicSortFilter(true);
@@ -142,7 +144,13 @@ files_widget::files_widget(QWidget *parent)
     connect(Session::instance()->get_ed2k_session(), SIGNAL(addedTransfer(Transfer)), this, SLOT(addedTransfer(Transfer)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(deletedTransfer(QString)), this, SLOT(deletedTransfer(QString)));
 
-    tabWidget->hide();
+    connect(tableFiles->selectionModel(),
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(selectedFileChanged(const QItemSelection&, const QItemSelection&)));
+
+    connect(checkForum, SIGNAL(stateChanged(int)), this, SLOT(checkChanged(int)));
+    connect(checkSize, SIGNAL(stateChanged(int)), this, SLOT(checkChanged(int)));
+    connect(btnCopy, SIGNAL(clicked()), this, SLOT(putToClipboard()));
 }
 
 files_widget::~files_widget()
@@ -216,6 +224,7 @@ void files_widget::currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* ol
             model->insertRow(0);
             model->setData(model->index(0, FW_NAME), iter->name());
             model->setData(model->index(0, FW_SIZE), misc::friendlyUnit(iter->actual_size()));
+            model->setData(model->index(0, FW_ID),   iter->hash());
 
             QFileInfo info(iter->save_path() + "/" + iter->name());
             QStandardItem* listItem = model->item(0, FW_NAME);
@@ -254,6 +263,7 @@ void files_widget::currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* ol
         {
             listItem->setCheckState(Qt::PartiallyChecked);
             listItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+            model->setData(model->index(row, FW_ID), getHashByPath(dirPath + iter->fileName()));
             continue;
         }
 
@@ -261,17 +271,24 @@ void files_widget::currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* ol
         if (isDir && !dirRules.contains(dirPath))
         {
             if (fileRules.contains(dirPath + iter->fileName()))
+            {
                 listItem->setCheckState(Qt::Checked);
+                model->setData(model->index(row, FW_ID), getHashByPath(dirPath + iter->fileName()));
+            }
             else
                 listItem->setCheckState(Qt::Unchecked);
         }
         else
         {
             if (dirRules[dirPath].contains(iter->fileName()))
+            {
                 listItem->setCheckState(Qt::Unchecked);
+                model->setData(model->index(row, FW_ID), getHashByPath(dirPath + iter->fileName()));
+            }
             else
                 listItem->setCheckState(Qt::Checked);
         }
+
     }
 
     bProcessFiles = false;
@@ -953,7 +970,10 @@ void files_widget::deletedTransfer(QString hash)
     }
 
     if (!transferPath.contains(hash))
+    {
+        currentItemChanged(curItem, NULL);
         return;
+    }
 
     QString filePath = transferPath.value(hash);
     transferPath.remove(hash);
@@ -1091,4 +1111,86 @@ void files_widget::removeTransferPath(QString filePath)
             return;
         }
     }
+}
+
+void files_widget::selectedFileChanged(const QItemSelection& sel, const QItemSelection& unsel)
+{
+    createED2KLink();
+}
+
+void files_widget::checkChanged(int state)
+{
+    createED2KLink();
+}
+
+void files_widget::putToClipboard()
+{
+    QString text = editLink->toPlainText();
+    if (text.length())
+    {
+        QClipboard *cb = QApplication::clipboard();
+        cb->setText(text);
+    }
+}
+
+void files_widget::createED2KLink()
+{
+    editLink->clear();
+    checkForum->setDisabled(true);
+    checkSize->setDisabled(true);
+    btnCopy->setDisabled(true);
+
+    QModelIndexList selected = tableFiles->selectionModel()->selectedRows();
+    if (selected.empty())
+        return;
+
+    QTreeWidgetItem* curItem = treeFiles->currentItem();
+    if (!curItem)
+        return;
+
+    int row = filterModel->mapToSource(selected.first()).row();
+
+    QStandardItem* itemFile = model->item(row);
+    if (!itemFile || (curItem != allFiles && itemFile->checkState() == Qt::Unchecked))
+        return;
+    QString fileName = itemFile->text();
+
+    QString hash = model->data(model->index(row, FW_ID)).toString();
+    if (!hash.length() || !transferPath.contains(hash))
+        return;
+
+    QFile file(transferPath.value(hash));
+    if (!file.exists())
+        return;
+
+    checkForum->setEnabled(true);
+    btnCopy->setEnabled(true);
+
+    quint64 fileSize = file.size();
+    QString size = QString::number(fileSize);
+
+    QString link = "ed2k://|file|" + QString(QUrl::toPercentEncoding(fileName)) + "|" +
+        size + "|" + hash + "|/";
+
+    if (checkForum->checkState() == Qt::Checked)
+    {
+        link = "[u][b][url=" + link + "]" + fileName + "[/url][/b][/u]";
+        checkSize->setEnabled(true);
+        if (checkSize->checkState() == Qt::Checked)
+            link += " " + misc::friendlyUnit(fileSize);
+    }
+    editLink->appendPlainText(link);
+}
+
+QString files_widget::getHashByPath(QString filePath)
+{
+    for (QMap<QString, QString>::iterator transferIter = transferPath.begin();
+         transferIter != transferPath.end(); ++transferIter)
+    {
+        if (transferIter.value() == filePath)
+        {
+            return transferIter.key();
+        }
+    }
+    return "";
 }
