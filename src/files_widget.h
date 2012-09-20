@@ -19,6 +19,7 @@ enum FW_Columns
 {
     FW_NAME,
     FW_SIZE,
+    FW_ID,
     FW_COLUMNS_NUM
 };
 
@@ -73,6 +74,8 @@ private:
     void    applyUnexchangeStatus(QString strPath, bool recursive);
     bool    findTreeItem(QTreeWidgetItem*& item, QString strPath);
     void    removeTransferPath(QString filePath);
+    void    createED2KLink();
+    QString getHashByPath(QString filePath);
 
 public slots:
     void optionsChanged();
@@ -91,6 +94,9 @@ private slots:
     void applyChanges();
     void addedTransfer(Transfer transfer);
     void deletedTransfer(QString hash);
+    void selectedFileChanged(const QItemSelection& sel, const QItemSelection& unsel);
+    void checkChanged(int state);
+    void putToClipboard();
 };
 
 #endif // FILES_WIDGET_H

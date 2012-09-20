@@ -103,6 +103,7 @@ protected slots:
   void toggleSelectedTorrentsSequentialDownload() const;
   void toggleSelectedFirstLastPiecePrio() const;
   void askNewLabelForSelection();
+  void showProperties();
 
 signals:
   void currentTorrentChanged(const Transfer &h);

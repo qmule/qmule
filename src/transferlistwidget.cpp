@@ -59,6 +59,7 @@
 #include "deletionconfirmationdlg.h"
 #include "propertieswidget.h"
 #include "iconprovider.h"
+#include "torrent_properties.h"
 
 using namespace libtorrent;
 
@@ -692,6 +693,8 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   QAction actionFirstLastPiece_prio(tr("Download first and last piece first"), 0);
   actionFirstLastPiece_prio.setCheckable(true);
   connect(&actionFirstLastPiece_prio, SIGNAL(triggered()), this, SLOT(toggleSelectedFirstLastPiecePrio()));
+  QAction actionProperties(QIcon(":/emule/transfer_list/FileInfo.png"), tr("Properties"), 0);
+  connect(&actionProperties, SIGNAL(triggered()), this, SLOT(showProperties()));
   // End of actions
   QMenu listMenu(this);
   // Enable/disable pause/start action given the DL state
@@ -831,6 +834,8 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   listMenu.addSeparator();
   if (one_has_metadata && one_is_bittorrent)
     listMenu.addAction(&actionCopy_magnet_link);
+  if (one_is_bittorrent && selectedIndexes.size() == 1)
+    listMenu.addAction(&actionProperties);
   // Call menu
   QAction *act = 0;
   act = listMenu.exec(QCursor::pos());
@@ -928,3 +933,12 @@ bool TransferListWidget::loadSettings()
   return ok;
 }
 
+void TransferListWidget::showProperties()
+{
+    const QModelIndexList selectedIndexes = selectionModel()->selectedRows();
+    const QString hash = getHashFromRow(mapToSource(selectedIndexes[0]).row());
+    Transfer h = BTSession->getTransfer(hash);
+
+    torrent_properties dlg(this, h);
+    dlg.exec();
+}
