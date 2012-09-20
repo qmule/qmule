@@ -2468,7 +2468,7 @@ QHash<QString, TrackerInfos> QBtSession::getTrackersInfo(const QString &hash) co
   return trackersInfos.value(hash, QHash<QString, TrackerInfos>());
 }
 
-session_status QBtSession::getSessionStatus() const {
+SessionStatus QBtSession::getSessionStatus() const {
   return s->status();
 }
 

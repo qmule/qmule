@@ -7,18 +7,21 @@
 
 using namespace libtorrent;
 
+
 SessionStatus operator + (const SessionStatus& s1, const SessionStatus& s2){
     SessionStatus s = s1;
-
+/*
     s.has_incoming_connections = s1.has_incoming_connections || s2.has_incoming_connections;
 
     s.upload_rate += s2.upload_rate;
     s.download_rate += s2.download_rate;
     s.total_download += s2.total_download;
     s.total_upload += s2.total_upload;
+    */
 
     s.payload_upload_rate += s2.payload_upload_rate;
     s.payload_download_rate += s2.payload_download_rate;
+    /*
     s.total_payload_download += s2.total_payload_download;
     s.total_payload_upload += s2.total_payload_upload;
 
@@ -52,9 +55,10 @@ SessionStatus operator + (const SessionStatus& s1, const SessionStatus& s2){
 
     s.optimistic_unchoke_counter += s2.optimistic_unchoke_counter;
     s.unchoke_counter += s2.unchoke_counter;
-
+*/
     return s;
 }
+
 
 Session* Session::m_instance = NULL;
 

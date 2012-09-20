@@ -11,11 +11,20 @@
 #include <queue>
 #include <libtorrent/session_status.hpp>
 #include <libed2k/session.hpp>
+#include <libed2k/session_status.hpp>
 
 #include <transport/transfer.h>
 #include <qtlibtorrent/trackerinfos.h>
 
-typedef libtorrent::session_status SessionStatus;
+struct SessionStatus
+{
+    int payload_upload_rate;
+    int payload_download_rate;
+
+    SessionStatus() : payload_upload_rate(0), payload_download_rate(0) {}
+    SessionStatus(const libtorrent::session_status& s) : payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate) {}
+    SessionStatus(const libed2k::session_status& s) : payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate){}
+};
 
 const int MAX_LOG_MESSAGES = 100;
 

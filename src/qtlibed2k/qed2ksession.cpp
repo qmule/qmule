@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
-#include <libtorrent/bencode.hpp>
 #include "qed2ksession.h"
+#include <libed2k/bencode.hpp>
 #include <libed2k/file.hpp>
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
@@ -178,7 +178,7 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             QDir libed2kBackup(misc::ED2KBackupLocation());
             // Remove old fastresume file if it exists
             std::vector<char> out;
-            libtorrent::bencode(back_inserter(out), *p->resume_data);
+            libed2k::bencode(back_inserter(out), *p->resume_data);
             const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
             libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
 
@@ -688,7 +688,7 @@ void QED2KSession::saveFastResumeData()
 
     while (num_resume_data > 0)
     {
-        libed2k::alert const* a = delegate()->wait_for_alert(boost::posix_time::seconds(30));
+        libed2k::alert const* a = delegate()->wait_for_alert(libed2k::seconds(30));
 
         if (a == 0)
         {

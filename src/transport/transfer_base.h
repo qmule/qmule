@@ -5,6 +5,7 @@
 #include <QString>
 
 #include <libtorrent/torrent_handle.hpp>
+#include <libed2k/transfer_handle.hpp>
 
 typedef libtorrent::torrent_status::state_t TransferState;
 typedef libtorrent::torrent_status TransferStatus;
