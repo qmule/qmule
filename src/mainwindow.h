@@ -50,7 +50,6 @@ class downloadFromURL;
 class options_imp;
 class TransferListWidget;
 class TransferListFiltersWidget;
-class PropertiesWidget;
 class status_bar;
 class consoleDlg;
 class TorrentCreatorDlg;

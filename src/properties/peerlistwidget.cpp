@@ -32,14 +32,13 @@
 #include "peerlistdelegate.h"
 #include "reverseresolution.h"
 #include "preferences.h"
-#include "propertieswidget.h"
 #include "geoipmanager.h"
-#include "peeraddition.h"
 #include "speedlimitdlg.h"
 #include "iconprovider.h"
 #include "torrentpersistentdata.h"
 #include "transport/session.h"
 
+#include <QMessageBox>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QSet>

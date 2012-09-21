@@ -41,7 +41,6 @@
 
 class PeerListDelegate;
 class ReverseResolution;
-class PropertiesWidget;
 
 QT_BEGIN_NAMESPACE
 class QSortFilterProxyModel;
