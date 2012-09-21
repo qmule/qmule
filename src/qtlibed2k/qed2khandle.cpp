@@ -36,8 +36,8 @@ QString QED2KHandle::firstFileSavePath() const { return QString(); }
 QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
-TransferState QED2KHandle::state() const { return m_delegate.status().state; }
-TransferStatus QED2KHandle::status() const { return m_delegate.status(); }
+TransferState QED2KHandle::state() const { return libstate2tstate(m_delegate.status().state); }
+TransferStatus QED2KHandle::status() const { return transfer_status2TS(m_delegate.status()); }
 
 TransferInfo QED2KHandle::get_info() const
 {
@@ -97,7 +97,7 @@ bool QED2KHandle::has_metadata() const { return true; }
 bool QED2KHandle::priv() const {return false;}
 bool QED2KHandle::super_seeding() const {return false;}
 bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequential_download(); }
-TransferBitfield QED2KHandle::pieces() const { return m_delegate.status().pieces; }
+TransferBitfield QED2KHandle::pieces() const { return bitfield2TBF(m_delegate.status().pieces); }
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
 TransferSize QED2KHandle::piece_length() const { return libed2k::PIECE_SIZE; }

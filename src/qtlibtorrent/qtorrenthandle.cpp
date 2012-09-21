@@ -164,9 +164,9 @@ float QTorrentHandle::progress() const {
 
 bitfield QTorrentHandle::pieces() const {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).pieces;
+  return bitfield2TBF(torrent_handle::status(0x0).pieces);
 #else
-  return torrent_handle::status().pieces;
+  return bitfield2TBF(torrent_handle::status().pieces);
 #endif
 }
 
@@ -373,20 +373,20 @@ QString QTorrentHandle::orig_filepath_at(unsigned int index) const {
 #endif
 }
 
-torrent_status::state_t QTorrentHandle::state() const {
+TransferState QTorrentHandle::state() const {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).state;
+  return libstate2tstate(torrent_handle::status(0x0).state);
 #else
-  return torrent_handle::status().state;
+  return libstate2tstate(torrent_handle::status().state);
 #endif
 }
 
-libtorrent::torrent_status QTorrentHandle::status() const
+TransferStatus QTorrentHandle::status() const
 {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0);
+  return transfer_status2TS(torrent_handle::status(0x0));
 #else
-  return torrent_handle::status();
+  return transfer_status2TS(torrent_handle::status());
 #endif
 }
 

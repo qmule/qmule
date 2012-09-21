@@ -49,9 +49,9 @@ QString Transfer::comment() const { return m_delegate->comment(); }
 
 QString Transfer::next_announce() const { return m_delegate->next_announce(); }
 
-TransferState Transfer::state() const { return m_delegate->state(); }
+TransferState Transfer::state() const { return libstate2tstate(m_delegate->state()); }
 
-TransferStatus Transfer::status() const { return m_delegate->status(); }
+TransferStatus Transfer::status() const { return transfer_status2TS(m_delegate->status()); }
 
 TransferInfo Transfer::get_info() const { return m_delegate->get_info(); }
 
@@ -136,7 +136,7 @@ bool Transfer::super_seeding() const { return m_delegate->super_seeding(); }
 bool Transfer::is_sequential_download() const {
     return m_delegate->is_sequential_download(); }
 
-TransferBitfield Transfer::pieces() const { return m_delegate->pieces(); }
+TransferBitfield Transfer::pieces() const { return bitfield2TBF(m_delegate->pieces()); }
 
 void Transfer::downloading_pieces(TransferBitfield& bf) const {
     m_delegate->downloading_pieces(bf); }

@@ -93,8 +93,8 @@ public:
   libtorrent::size_type filesize_at(unsigned int index) const;
   QString filepath_at(unsigned int index) const;
   QString orig_filepath_at(unsigned int index) const;
-  libtorrent::torrent_status::state_t state() const;
-  libtorrent::torrent_status status() const;
+  TransferState state() const;
+  TransferStatus status() const;
   libtorrent::torrent_info get_info() const;
   QString creator() const;
   QString comment() const;

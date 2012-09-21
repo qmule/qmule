@@ -7,11 +7,200 @@
 #include <libtorrent/torrent_handle.hpp>
 #include <libed2k/transfer_handle.hpp>
 
-typedef libtorrent::torrent_status::state_t TransferState;
-typedef libtorrent::torrent_status TransferStatus;
+enum TransferState
+{
+    queued_for_checking,
+    checking_files,
+    downloading_metadata,
+    downloading,
+    finished,
+    seeding,
+    allocating,
+    checking_resume_data,
+    unhandled_state
+};
+
+template<typename StateType>
+TransferState libstate2tstate(StateType st)
+{
+    TransferState ts;
+
+    switch (st)
+    {
+        case queued_for_checking:
+            ts = queued_for_checking;
+            break;
+        case checking_files:
+            ts = checking_files;
+            break;
+        case downloading_metadata:
+            ts = downloading_metadata;
+            break;
+        case downloading:
+            ts = downloading;
+            break;
+        case finished:
+            ts = seeding;
+            break;
+        case seeding:
+            break;
+        case allocating:
+            ts = allocating;
+            break;
+        case checking_resume_data:
+            ts = checking_resume_data;
+            break;
+        default:
+            ts = unhandled_state;
+    }
+
+    return (ts);
+}
+
 typedef libtorrent::size_type TransferSize;
-typedef libtorrent::torrent_info TransferInfo;
+
 typedef libtorrent::bitfield TransferBitfield;
+
+template<class BField>
+TransferBitfield bitfield2TBF(const BField& bf)
+{
+    return (TransferBitfield(bf.bytes(), bf.size()));
+}
+
+struct TransferStatus
+{
+    TransferState state;
+    bool paused;
+    float progress;
+    int progress_ppm;
+    std::string error;
+
+    //boost::posix_time::time_duration next_announce;
+    //boost::posix_time::time_duration announce_interval;
+
+    std::string current_tracker;
+
+    TransferSize total_download;
+    TransferSize total_upload;
+    TransferSize total_payload_download;
+    TransferSize total_payload_upload;
+    TransferSize total_failed_bytes;
+    TransferSize total_redundant_bytes;
+
+    int download_rate;
+    int upload_rate;
+
+    int download_payload_rate;
+    int upload_payload_rate;
+
+    int num_seeds;
+    int num_peers;
+    int num_complete;
+    int num_incomplete;
+    int list_seeds;
+    int list_peers;
+    int connect_candidates;
+
+    TransferBitfield pieces;
+    int num_pieces;
+    TransferSize total_done;
+    TransferSize total_wanted_done;
+    TransferSize total_wanted;
+    int distributed_full_copies;
+    int distributed_fraction;
+
+    float distributed_copies;
+    int block_size;
+
+    int num_uploads;
+    int num_connections;
+    int uploads_limit;
+    int connections_limit;
+    //storage_mode_t storage_mode;
+
+    int up_bandwidth_queue;
+    int down_bandwidth_queue;
+    TransferSize all_time_upload;
+    TransferSize all_time_download;
+    int active_time;
+    int finished_time;
+    int seeding_time;
+
+    int seed_rank;
+
+    int last_scrape;
+
+    bool has_incoming;
+
+    int sparse_regions;
+
+    bool seed_mode;
+    bool upload_mode;
+    int priority;
+};
+
+template<typename TS>
+TransferStatus transfer_status2TS(const TS& t)
+{
+    TransferStatus ts;
+    ts.state                   = libstate2tstate(t.state);
+    ts.paused                  = t.paused;
+    ts.progress                = t.progress;
+    ts.progress_ppm            = t.progress_ppm;
+    ts.error                   = t.error;
+    //boost::posix_time::time_duration next_announce;
+    //boost::posix_time::time_duration announce_interval;
+
+    ts.current_tracker = t.current_tracker;
+    ts.total_download = t.total_download;
+    ts.total_upload    = t.total_upload;
+    ts.total_payload_download  = t.total_payload_download;
+    ts.total_payload_upload    = t.total_payload_upload;
+    ts.total_failed_bytes      = t.total_failed_bytes;
+    ts.total_redundant_bytes   = t.total_redundant_bytes;
+    ts.download_rate           = t.download_rate;
+    ts.upload_rate             = t.upload_rate;
+    ts.download_payload_rate   = t.download_payload_rate;
+    ts.upload_payload_rate     = t.upload_payload_rate;
+    ts.num_seeds               = t.num_seeds;
+    ts.num_peers               = t.num_peers;
+    ts.num_complete            = t.num_complete;
+    ts.num_incomplete          = t.num_incomplete;
+    ts.list_seeds              = t.list_seeds;
+    ts.list_peers              = t.list_peers;
+    ts.connect_candidates      = t.connect_candidates;
+    ts.pieces                  = bitfield2TBF(t.pieces);
+    ts.num_pieces              = t.num_pieces;
+    ts.total_done              = t.total_done;
+    ts.total_wanted_done       = t.total_wanted_done;
+    ts.total_wanted            = t.total_wanted;
+    ts.distributed_full_copies = t.distributed_full_copies;
+    ts.distributed_fraction    = t.distributed_fraction;
+    ts.distributed_copies      = t.distributed_copies;
+    ts.block_size              = t.block_size;
+    ts.num_uploads             = t.num_uploads;
+    ts.num_connections         = t.num_connections;
+    ts.uploads_limit           = t.uploads_limit;
+    ts.connections_limit       = t.connections_limit;
+    //storage_mode_t storage_mode;
+    ts.up_bandwidth_queue      = t.up_bandwidth_queue;
+    ts.down_bandwidth_queue    = t.down_bandwidth_queue;
+    ts.all_time_upload         = t.all_time_upload;
+    ts.all_time_download       = t.all_time_download;
+    ts.active_time             = t.active_time;
+    ts.finished_time           = t.finished_time;
+    ts.seeding_time            = t.seeding_time;
+    ts.seed_rank               = t.seed_rank;
+    ts.last_scrape             = t.last_scrape;
+    ts.has_incoming            = t.has_incoming;
+    ts.sparse_regions          = t.sparse_regions;
+    ts.seed_mode               = t.seed_mode;
+    ts.upload_mode             = t.upload_mode;
+    ts.priority                = t.priority;
+    return (ts);
+}
+
+typedef libtorrent::torrent_info TransferInfo;
 typedef libtorrent::peer_info PeerInfo;
 typedef libtorrent::announce_entry AnnounceEntry;
 typedef boost::asio::ip::tcp::endpoint PeerEndpoint;
