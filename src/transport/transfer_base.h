@@ -4,6 +4,7 @@
 
 #include <QString>
 
+#include "misc.h"
 #include <libtorrent/torrent_handle.hpp>
 #include <libed2k/transfer_handle.hpp>
 
@@ -73,7 +74,7 @@ struct TransferStatus
     bool paused;
     float progress;
     int progress_ppm;
-    std::string error;
+    QString error;
 
     //boost::posix_time::time_duration next_announce;
     //boost::posix_time::time_duration announce_interval;
@@ -147,13 +148,13 @@ TransferStatus transfer_status2TS(const TS& t)
     ts.paused                  = t.paused;
     ts.progress                = t.progress;
     ts.progress_ppm            = t.progress_ppm;
-    ts.error                   = t.error;
+    ts.error                   = misc::toQStringU(t.error);
     //boost::posix_time::time_duration next_announce;
     //boost::posix_time::time_duration announce_interval;
 
-    ts.current_tracker = t.current_tracker;
-    ts.total_download = t.total_download;
-    ts.total_upload    = t.total_upload;
+    ts.current_tracker         = t.current_tracker;
+    ts.total_download          = t.total_download;
+    ts.total_upload            = t.total_upload;
     ts.total_payload_download  = t.total_payload_download;
     ts.total_payload_upload    = t.total_payload_upload;
     ts.total_failed_bytes      = t.total_failed_bytes;
@@ -200,8 +201,31 @@ TransferStatus transfer_status2TS(const TS& t)
     return (ts);
 }
 
+struct PeerInfo
+{
+    int connection_type;
+    QString client;
+    float   progress;
+    int payload_down_speed;
+    int payload_up_speed;
+    TransferSize total_download;
+    TransferSize total_upload;
+};
+
+template<typename PF>
+PeerInfo peer_info2PInfo(const PF& p)
+{
+    PeerInfo pf;
+    pf.connection_type      = p.connection_type;
+    pf.client               = misc::toQStringU(p.client);
+    pf.progress             = p.progress;
+    pf.payload_down_speed   = p.payload_down_speed;
+    pf.payload_up_speed     = p.payload_up_speed;
+    pf.total_download       = p.total_download;
+    pf.total_upload         = p.total_upload;
+}
+
 typedef libtorrent::torrent_info TransferInfo;
-typedef libtorrent::peer_info PeerInfo;
 typedef libtorrent::announce_entry AnnounceEntry;
 typedef boost::asio::ip::tcp::endpoint PeerEndpoint;
 

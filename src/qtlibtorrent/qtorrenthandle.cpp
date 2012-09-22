@@ -492,7 +492,8 @@ QStringList QTorrentHandle::absolute_files_path_uneeded() const {
   return res;
 }
 
-void QTorrentHandle::get_peer_info(std::vector<libtorrent::peer_info>& peers) const {
+void QTorrentHandle::get_peer_info(std::vector<PeerInfo>& peers) const
+{
     torrent_handle::get_peer_info(peers);
 }
 std::vector<libtorrent::announce_entry> QTorrentHandle::trackers() const {

@@ -107,7 +107,7 @@ public:
   libtorrent::size_type total_done() const;
   QStringList absolute_files_path() const;
   QStringList absolute_files_path_uneeded() const;
-  void get_peer_info(std::vector<libtorrent::peer_info>& peers) const;
+  void get_peer_info(std::vector<PeerInfo>& peers) const;
   std::vector<libtorrent::announce_entry> trackers() const;
 
   void flush_cache() const;

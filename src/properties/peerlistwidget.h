@@ -35,7 +35,7 @@
 #include <QHash>
 #include <QPointer>
 #include <QSet>
-#include <libtorrent/peer_info.hpp>
+#include "transport/transfer_base.h"
 #include "transport/transfer.h"
 #include "misc.h"
 
@@ -65,7 +65,7 @@ public:
 
 public slots:
   void loadPeers(bool force_hostname_resolution = false);
-  QStandardItem*  addPeer(const QString& ip, const libtorrent::peer_info& peer, QString torrent_name);
+  QStandardItem*  addPeer(const QString& ip, const PeerInfo& peer, QString torrent_name);
   void updatePeer(const QString& ip, const libtorrent::peer_info& peer);
   void handleResolved(const QString &ip, const QString &hostname);
   void updatePeerHostNameResolutionState();
