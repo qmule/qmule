@@ -325,13 +325,13 @@ void PeerListWidget::loadPeers(bool force_hostname_resolution)
         if(torrent_name.isEmpty()) torrent_name = h.name();
 
         boost::system::error_code ec;
-        std::vector<peer_info> peers;
+        std::vector<PeerInfo> peers;
         h.get_peer_info(peers);
-        std::vector<peer_info>::iterator itr;        
+        std::vector<PeerInfo>::iterator itr;        
         
         for(itr = peers.begin(); itr != peers.end(); itr++) 
         {
-            peer_info peer = *itr;
+            PeerInfo peer = *itr;
 
             if (m_showDownload && peer.payload_down_speed == 0)
                 continue;
@@ -385,7 +385,7 @@ void PeerListWidget::showDownload(bool download)
     loadPeers();
 }
 
-QStandardItem* PeerListWidget::addPeer(const QString& ip, const peer_info& peer, QString torrent_name) {
+QStandardItem* PeerListWidget::addPeer(const QString& ip, const PeerInfo& peer, QString torrent_name) {
   int row = m_listModel->rowCount();
   // Adding Peer to peer list
   m_listModel->insertRow(row);
@@ -405,7 +405,7 @@ QStandardItem* PeerListWidget::addPeer(const QString& ip, const peer_info& peer,
     }
   }
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::CONNECTION), getConnectionString(peer.connection_type));
-  m_listModel->setData(m_listModel->index(row, PeerListDelegate::CLIENT), misc::toQStringU(peer.client));
+  m_listModel->setData(m_listModel->index(row, PeerListDelegate::CLIENT), peer.client);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::FILE), torrent_name);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::PROGRESS), peer.progress);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::DOWN_SPEED), peer.payload_down_speed);
@@ -415,7 +415,7 @@ QStandardItem* PeerListWidget::addPeer(const QString& ip, const peer_info& peer,
   return m_listModel->item(row, PeerListDelegate::IP);
 }
 
-void PeerListWidget::updatePeer(const QString& ip, const peer_info& peer) {
+void PeerListWidget::updatePeer(const QString& ip, const PeerInfo& peer) {
   QStandardItem *item = m_peerItems.value(ip);
   int row = item->row();
   if (m_displayFlags) {
@@ -428,7 +428,7 @@ void PeerListWidget::updatePeer(const QString& ip, const peer_info& peer) {
     }
   }
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::CONNECTION), getConnectionString(peer.connection_type));
-  m_listModel->setData(m_listModel->index(row, PeerListDelegate::CLIENT), misc::toQStringU(peer.client));
+  m_listModel->setData(m_listModel->index(row, PeerListDelegate::CLIENT), peer.client);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::PROGRESS), peer.progress);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::DOWN_SPEED), peer.payload_down_speed);
   m_listModel->setData(m_listModel->index(row, PeerListDelegate::UP_SPEED), peer.payload_up_speed);

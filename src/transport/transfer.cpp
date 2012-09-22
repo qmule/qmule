@@ -49,9 +49,9 @@ QString Transfer::comment() const { return m_delegate->comment(); }
 
 QString Transfer::next_announce() const { return m_delegate->next_announce(); }
 
-TransferState Transfer::state() const { return libstate2tstate(m_delegate->state()); }
+TransferState Transfer::state() const { return m_delegate->state(); }
 
-TransferStatus Transfer::status() const { return transfer_status2TS(m_delegate->status()); }
+TransferStatus Transfer::status() const { return m_delegate->status(); }
 
 TransferInfo Transfer::get_info() const { return m_delegate->get_info(); }
 

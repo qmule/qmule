@@ -210,6 +210,8 @@ struct PeerInfo
     int payload_up_speed;
     TransferSize total_download;
     TransferSize total_upload;
+    libed2k::tcp::endpoint ip;
+    char country[2];
 };
 
 template<typename PF>
@@ -223,6 +225,10 @@ PeerInfo peer_info2PInfo(const PF& p)
     pf.payload_up_speed     = p.payload_up_speed;
     pf.total_download       = p.total_download;
     pf.total_upload         = p.total_upload;
+    pf.ip                   = p.ip;
+    pf.country[0]           = p.country[0];
+    pf.country[1]           = p.country[1];
+    return pf;
 }
 
 typedef libtorrent::torrent_info TransferInfo;
