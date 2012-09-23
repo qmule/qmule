@@ -33,8 +33,8 @@
 #include "torrentmodel.h"
 #include "torrentpersistentdata.h"
 #include "transport/session.h"
+#include "qtorrenthandle.h"
 
-using namespace libtorrent;
 
 TorrentModelItem::TorrentModelItem(const Transfer &h) : m_torrent(h)
 {
@@ -56,9 +56,9 @@ TorrentModelItem::State TorrentModelItem::state() const
       return m_torrent.is_seed() ? STATE_PAUSED_UP : STATE_PAUSED_DL;
     }
     if (m_torrent.is_queued()) {
-      if (m_torrent.state() != torrent_status::queued_for_checking
-          && m_torrent.state() != torrent_status::checking_resume_data
-          && m_torrent.state() != torrent_status::checking_files) {
+      if (m_torrent.state() != qt_queued_for_checking
+          && m_torrent.state() != qt_checking_resume_data
+          && m_torrent.state() != qt_checking_files) {
         m_icon = QIcon(":/Icons/skin/queued.png");
         m_fgColor = QColor("grey");
         return m_torrent.is_seed() ? STATE_QUEUED_UP : STATE_QUEUED_DL;
@@ -66,9 +66,9 @@ TorrentModelItem::State TorrentModelItem::state() const
     }
     // Other states
     switch(m_torrent.state()) {
-    case torrent_status::allocating:
-    case torrent_status::downloading_metadata:
-    case torrent_status::downloading: {
+    case qt_allocating:
+    case qt_downloading_metadata:
+    case qt_downloading: {
       if (m_torrent.download_payload_rate() > 0) {
         m_icon = QIcon(":/Icons/skin/downloading.png");
         m_fgColor = QColor("green");
@@ -79,8 +79,8 @@ TorrentModelItem::State TorrentModelItem::state() const
         return STATE_STALLED_DL;
       }
     }
-    case torrent_status::finished:
-    case torrent_status::seeding:
+    case qt_finished:
+    case qt_seeding:
       if (m_torrent.upload_payload_rate() > 0) {
         m_icon = QIcon(":/Icons/skin/uploading.png");
         m_fgColor = QColor("orange");
@@ -90,9 +90,9 @@ TorrentModelItem::State TorrentModelItem::state() const
         m_fgColor = QColor("grey");
         return STATE_STALLED_UP;
       }
-    case torrent_status::queued_for_checking:
-    case torrent_status::checking_resume_data:
-    case torrent_status::checking_files:
+    case qt_queued_for_checking:
+    case qt_checking_resume_data:
+    case qt_checking_files:
       m_icon = QIcon(":/Icons/skin/checking.png");
       m_fgColor = QColor("grey");
       return m_torrent.is_seed() ? STATE_CHECKING_UP : STATE_CHECKING_DL;
@@ -101,7 +101,7 @@ TorrentModelItem::State TorrentModelItem::state() const
       m_fgColor = QColor("red");
       return STATE_INVALID;
     }
-  } catch(invalid_handle&) {
+  } catch(libtorrent::invalid_handle&) {
     m_icon = QIcon(":/Icons/skin/error.png");
     m_fgColor = QColor("red");
     return STATE_INVALID;
@@ -299,7 +299,7 @@ QVariant TorrentModel::data(const QModelIndex &index, int role) const
   try {
     if (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0 && index.column() < columnCount())
       return m_torrents[index.row()]->data(index.column(), role);
-  } catch(invalid_handle&) {}
+  } catch(libtorrent::invalid_handle&) {}
   return QVariant();
 }
 
@@ -315,7 +315,7 @@ bool TorrentModel::setData(const QModelIndex &index, const QVariant &value, int 
         notifyTorrentChanged(index.row());
       return change;
     }
-  } catch(invalid_handle&) {}
+  } catch(libtorrent::invalid_handle&) {}
   return false;
 }
 

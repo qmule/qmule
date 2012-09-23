@@ -10,49 +10,50 @@
 
 enum TransferState
 {
-    queued_for_checking,
-    checking_files,
-    downloading_metadata,
-    downloading,
-    finished,
-    seeding,
-    allocating,
-    checking_resume_data,
-    unhandled_state
+    qt_queued_for_checking,
+    qt_checking_files,
+    qt_downloading_metadata,
+    qt_downloading,
+    qt_finished,
+    qt_seeding,
+    qt_allocating,
+    qt_checking_resume_data,
+    qt_unhandled_state
 };
 
 template<typename StateType>
-TransferState libstate2tstate(StateType st)
+TransferState libstate2tstate(const StateType& st)
 {
     TransferState ts;
 
-    switch (st)
+    switch (st.state)
     {
-        case queued_for_checking:
-            ts = queued_for_checking;
+        case StateType::queued_for_checking:
+            ts = qt_queued_for_checking;
             break;
-        case checking_files:
-            ts = checking_files;
+        case StateType::checking_files:
+            ts = qt_checking_files;
             break;
-        case downloading_metadata:
-            ts = downloading_metadata;
+        case StateType::downloading_metadata:
+            ts = qt_downloading_metadata;
             break;
-        case downloading:
-            ts = downloading;
+        case StateType::downloading:
+            ts = qt_downloading;
             break;
-        case finished:
-            ts = seeding;
+        case StateType::finished:
+            ts = qt_seeding;
             break;
-        case seeding:
+        case StateType::seeding:
+            ts = qt_seeding;
             break;
-        case allocating:
-            ts = allocating;
+        case StateType::allocating:
+            ts = qt_allocating;
             break;
-        case checking_resume_data:
-            ts = checking_resume_data;
+        case StateType::checking_resume_data:
+            ts = qt_checking_resume_data;
             break;
         default:
-            ts = unhandled_state;
+            ts = qt_unhandled_state;
     }
 
     return (ts);
@@ -79,7 +80,7 @@ struct TransferStatus
     //boost::posix_time::time_duration next_announce;
     //boost::posix_time::time_duration announce_interval;
 
-    std::string current_tracker;
+    QString current_tracker;
 
     TransferSize total_download;
     TransferSize total_upload;
@@ -144,7 +145,7 @@ template<typename TS>
 TransferStatus transfer_status2TS(const TS& t)
 {
     TransferStatus ts;
-    ts.state                   = libstate2tstate(t.state);
+    ts.state                   = libstate2tstate(t);
     ts.paused                  = t.paused;
     ts.progress                = t.progress;
     ts.progress_ppm            = t.progress_ppm;
@@ -152,7 +153,7 @@ TransferStatus transfer_status2TS(const TS& t)
     //boost::posix_time::time_duration next_announce;
     //boost::posix_time::time_duration announce_interval;
 
-    ts.current_tracker         = t.current_tracker;
+    ts.current_tracker         = misc::toQStringU(t.current_tracker);
     ts.total_download          = t.total_download;
     ts.total_upload            = t.total_upload;
     ts.total_payload_download  = t.total_payload_download;

@@ -652,8 +652,8 @@ void QED2KSession::saveTempFastResumeData()
         {
             if (!h.is_valid() || !h.has_metadata()) continue;
 
-            if (h.state() == libed2k::transfer_status::checking_files ||
-                  h.state() == libed2k::transfer_status::queued_for_checking) continue;
+            if (h.state() == qt_checking_files ||
+                  h.state() == qt_queued_for_checking) continue;
 
             qDebug("Saving fastresume data for %s", qPrintable(h.name()));
             h.save_resume_data();
@@ -678,7 +678,7 @@ void QED2KSession::saveFastResumeData()
         try
         {
 
-            if (h.state() == libed2k::transfer_status::checking_files || h.state() == libed2k::transfer_status::queued_for_checking) continue;
+            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking) continue;
             h.save_resume_data();
             ++num_resume_data;
         }

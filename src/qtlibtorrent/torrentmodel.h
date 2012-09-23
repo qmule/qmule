@@ -37,7 +37,6 @@
 #include <QIcon>
 #include <QTimer>
 
-#include "qtorrenthandle.h"
 #include "transport/transfer.h"
 
 struct TorrentStatusReport {

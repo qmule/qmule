@@ -327,8 +327,8 @@ void PeerListWidget::loadPeers(bool force_hostname_resolution)
         boost::system::error_code ec;
         std::vector<PeerInfo> peers;
         h.get_peer_info(peers);
-        std::vector<PeerInfo>::iterator itr;        
-        
+        std::vector<PeerInfo>::iterator itr;
+
         for(itr = peers.begin(); itr != peers.end(); itr++) 
         {
             PeerInfo peer = *itr;

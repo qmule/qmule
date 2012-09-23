@@ -375,9 +375,9 @@ QString QTorrentHandle::orig_filepath_at(unsigned int index) const {
 
 TransferState QTorrentHandle::state() const {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return libstate2tstate(torrent_handle::status(0x0).state);
+  return libstate2tstate(torrent_handle::status(0x0));
 #else
-  return libstate2tstate(torrent_handle::status().state);
+  return libstate2tstate(torrent_handle::status());
 #endif
 }
 

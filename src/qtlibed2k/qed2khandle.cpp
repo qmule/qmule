@@ -36,7 +36,7 @@ QString QED2KHandle::firstFileSavePath() const { return QString(); }
 QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
-TransferState QED2KHandle::state() const { return libstate2tstate(m_delegate.status().state); }
+TransferState QED2KHandle::state() const { return libstate2tstate(m_delegate.status()); }
 TransferStatus QED2KHandle::status() const { return transfer_status2TS(m_delegate.status()); }
 
 TransferInfo QED2KHandle::get_info() const
