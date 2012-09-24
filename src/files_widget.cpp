@@ -8,7 +8,7 @@
 
 #include "files_widget.h"
 #include "preferences.h"
-#include "libed2k/types.hpp"
+#include "libed2k/size_type.hpp"
 #include "transport/session.h"
 
 files_widget::files_widget(QWidget *parent)
