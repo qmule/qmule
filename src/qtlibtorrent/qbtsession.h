@@ -175,8 +175,6 @@ private slots:
   void processBigRatios();
   void exportTorrentFiles(QString path);  
   void sendNotificationEmail(const QTorrentHandle &h);
-  void autoRunExternalProgram(const QTorrentHandle &h, bool async=true);
-  void cleanUpAutoRunProcess(int);
   void mergeTorrents(QTorrentHandle &h_ex, boost::intrusive_ptr<libtorrent::torrent_info> t);
   void exportTorrentFile(const QTorrentHandle &h);
   void initWebUi();

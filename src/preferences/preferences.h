@@ -335,6 +335,8 @@ public:
     setValue(QString::fromUtf8("Preferences/Downloads/TorrentExport"), path);
   }
 
+  // mail notifications -- disabled
+#if 0
   bool isMailNotificationEnabled() const {
     return value(QString::fromUtf8("Preferences/MailNotification/enabled"), false).toBool();
   }
@@ -390,6 +392,7 @@ public:
   void setMailNotificationSMTPPassword(const QString &password) {
     setValue(QString::fromUtf8("Preferences/MailNotification/password"), password);
   }
+#endif
 
   int getActionOnDblClOnTorrentDl() const {
     return value(QString::fromUtf8("Preferences/Downloads/DblClOnTorDl"), 0).toInt();

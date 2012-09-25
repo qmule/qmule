@@ -164,13 +164,7 @@ options_imp::options_imp(QWidget *parent):
   connect(checkTempFolder, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(addScanFolderButton, SIGNAL(clicked()), this, SLOT(enableApplyButton()));
   connect(removeScanFolderButton, SIGNAL(clicked()), this, SLOT(enableApplyButton()));
-  connect(groupMailNotification, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(dest_email_txt, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(smtp_server_txt, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(checkSmtpSSL, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(groupMailNotifAuth, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(mailNotifUsername, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(mailNotifPassword, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
+
   connect(autoRunBox, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(autoRun_txt, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
   // Connection tab
@@ -393,13 +387,6 @@ void options_imp::saveOptions() {
   export_dir.replace("\\", "/");
 #endif
   pref.setExportDir(export_dir);
-  pref.setMailNotificationEnabled(groupMailNotification->isChecked());
-  pref.setMailNotificationEmail(dest_email_txt->text());
-  pref.setMailNotificationSMTP(smtp_server_txt->text());
-  pref.setMailNotificationSMTPSSL(checkSmtpSSL->isChecked());
-  pref.setMailNotificationSMTPAuth(groupMailNotifAuth->isChecked());
-  pref.setMailNotificationSMTPUsername(mailNotifUsername->text());
-  pref.setMailNotificationSMTPPassword(mailNotifPassword->text());
   pref.setAutoRunEnabled(autoRunBox->isChecked());
   pref.setAutoRunProgram(autoRun_txt->text());
   pref.setActionOnDblClOnTorrentDl(getActionOnDblClOnTorrentDl());
@@ -579,13 +566,7 @@ void options_imp::loadOptions() {
 #endif
     textExportDir->setText(strValue);
   }
-  groupMailNotification->setChecked(pref.isMailNotificationEnabled());
-  dest_email_txt->setText(pref.getMailNotificationEmail());
-  smtp_server_txt->setText(pref.getMailNotificationSMTP());
-  checkSmtpSSL->setChecked(pref.getMailNotificationSMTPSSL());
-  groupMailNotifAuth->setChecked(pref.getMailNotificationSMTPAuth());
-  mailNotifUsername->setText(pref.getMailNotificationSMTPUsername());
-  mailNotifPassword->setText(pref.getMailNotificationSMTPPassword());
+
   autoRunBox->setChecked(pref.isAutoRunEnabled());
   autoRun_txt->setText(pref.getAutoRunProgram());
   intValue = pref.getActionOnDblClOnTorrentDl();

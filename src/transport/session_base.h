@@ -64,12 +64,14 @@ public:
     virtual void addConsoleMessage(
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
+    virtual void autoRunExternalProgram(const Transfer &t);
 
 public slots:
     virtual void pauseTransfer(const QString& hash);
     virtual void resumeTransfer(const QString& hash);
     virtual void pauseAllTransfers();
     virtual void resumeAllTransfers();
+    virtual void cleanUpAutoRunProcess(int);
 
     /**
       * return minimum progress in transfers

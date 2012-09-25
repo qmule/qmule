@@ -157,7 +157,7 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -177,8 +177,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>486</width>
-             <height>685</height>
+             <width>464</width>
+             <height>602</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -522,9 +522,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>500</width>
-             <height>930</height>
+             <y>-319</y>
+             <width>464</width>
+             <height>635</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -849,91 +849,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupMailNotification">
-              <property name="title">
-               <string>Email notification upon download completion</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_21">
-               <item>
-                <layout class="QFormLayout" name="formLayout">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_2">
-                   <property name="text">
-                    <string>Destination email:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="dest_email_txt"/>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_3">
-                   <property name="text">
-                    <string>SMTP server:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="smtp_server_txt"/>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QGroupBox" name="groupMailNotifAuth">
-                   <property name="title">
-                    <string>Authentication</string>
-                   </property>
-                   <property name="checkable">
-                    <bool>true</bool>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <layout class="QFormLayout" name="formLayout_2">
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_7">
-                      <property name="text">
-                       <string>Username:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="mailNotifUsername"/>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_8">
-                      <property name="text">
-                       <string>Password:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="mailNotifPassword">
-                      <property name="echoMode">
-                       <enum>QLineEdit::Password</enum>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QCheckBox" name="checkSmtpSSL">
-                   <property name="text">
-                    <string>This server requires a secure connection (SSL)</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QGroupBox" name="autoRunBox">
               <property name="title">
                <string>Run an external program on torrent completion</string>
@@ -983,8 +898,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>486</width>
-             <height>522</height>
+             <width>365</width>
+             <height>463</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1427,8 +1342,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>486</width>
-             <height>456</height>
+             <width>278</width>
+             <height>407</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -1839,8 +1754,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
-             <height>412</height>
+             <width>365</width>
+             <height>264</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -2053,8 +1968,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>540</width>
-             <height>520</height>
+             <width>430</width>
+             <height>455</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2464,8 +2379,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
-             <height>412</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>

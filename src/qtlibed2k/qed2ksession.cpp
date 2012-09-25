@@ -630,6 +630,12 @@ void QED2KSession::readAlerts()
         {
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
+        else if (libed2k::finished_transfer_alert* p =
+                 dynamic_cast<libed2k::finished_transfer_alert*>(a.get()))
+        {
+            //Preferences pref;
+            //if (pref.isAutoRunEnabled()) autoRunExternalProgram(Transfer(QED2KHandle(p->m_handle)));
+        }
         else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
         {
             writeResumeData(p);
