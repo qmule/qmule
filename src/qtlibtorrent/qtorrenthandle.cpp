@@ -661,7 +661,7 @@ QString QTorrentHandle::firstFileSavePath() const {
   // Remove .!qB extension
   if (fsave_path.endsWith(".!qB", Qt::CaseInsensitive))
     fsave_path.chop(4);
-  return fsave_path;
+  return QFileInfo(fsave_path).path();
 }
 
 bool QTorrentHandle::has_error() const {
