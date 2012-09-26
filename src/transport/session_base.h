@@ -114,12 +114,26 @@ private:
     if (!S::started()) return def;              \
     else return S::call
 
-#define FORWARD_RETURN1(call, arg1, def)  \
+#define FORWARD_RETURN1(call, arg1, def)        \
     if (!S::started()) return def;              \
     else return S::call(arg1)
 
 #define FORWARD_RETURN2(call, arg1, arg2, def)  \
     if (!S::started()) return def;              \
+    else return S::call(arg1, arg2)
+
+#define DEFER_RETURN1(call, arg1, def)                                  \
+    if (!S::started()) {                                                \
+        m_deferred.push(boost::bind(&S::call, this, arg1));             \
+        return def;                                                     \
+    }                                                                   \
+    else return S::call(arg1)
+
+#define DEFER_RETURN2(call, arg1, arg2, def)                            \
+    if (!S::started()) {                                                \
+        m_deferred.push(boost::bind(&S::call, this, arg1, arg2));       \
+        return def;                                                     \
+    }                                                                   \
     else return S::call(arg1, arg2)
 
 template <typename S>
@@ -167,11 +181,11 @@ public:
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
     void saveFastResumeData() { DEFER0(saveFastResumeData); }
-
-    Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
+    Transfer addLink(QString strLink, bool resumed = false) {
+        DEFER_RETURN2(addLink, strLink, resumed, Transfer()); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
-    QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) { DEFER1(addTransfer, atp); return QED2KHandle(); } //!< save call and return empty handle
-
+    QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
+        DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 
 private:
