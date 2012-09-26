@@ -1314,16 +1314,13 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
 
 void search_widget::download()
 {
-    if (selected_row(treeResult) < 0)
-    {
-        ERR("download button should be disabled when result isn't selected");
+    if (tabSearch->currentIndex() < 0 || selected_row(treeResult) < 0 ||
+        searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
         return;
-    }
 
-    bool bDirs = false;
-    if (tabSearch->currentIndex() >= 0 && (searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS || 
-                                           searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS))
-        bDirs = true;
+    bool bDirs =
+        searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS ||
+        searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS;
 
     QModelIndexList selected = treeResult->selectionModel()->selectedRows();
     QModelIndexList::const_iterator iter;
