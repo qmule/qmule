@@ -82,7 +82,6 @@ signals:
     void addedTransfer(Transfer t);
     void pausedTransfer(Transfer t);
     void resumedTransfer(Transfer t);
-    void finishedTransfer(Transfer t);
     void deletedTransfer(QString hash);
     void transferAboutToBeRemoved(Transfer t);
     void newConsoleMessage(const QString &msg);
