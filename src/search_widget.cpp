@@ -385,6 +385,7 @@ search_widget::search_widget(QWidget *parent)
 
     btnDownload->setDefaultAction(fileDownload);
     btnPreview->setDefaultAction(filePreview);
+    btnCloseAll->setDefaultAction(closeAll);
 
     btnDownload->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnPreview->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -1314,9 +1315,18 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
 
 void search_widget::download()
 {
-    if (tabSearch->currentIndex() < 0 || selected_row(treeResult) < 0 ||
-        searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+    if (tabSearch->currentIndex() < 0 || selected_row(treeResult) < 0)
+    {
+        ERR("download button should be disabled when result isn't selected");
         return;
+    }
+
+    // Possible only with double click.
+    if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+    {
+        initPeer();
+        return;
+    }
 
     bool bDirs =
         searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS ||

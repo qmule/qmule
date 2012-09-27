@@ -1350,7 +1350,7 @@
             <item>
              <widget class="QGroupBox" name="bandwidthBox">
               <property name="title">
-               <string>Global Rate Limits</string>
+               <string>Torrent Rate Limits</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_7">
                <item row="0" column="0">
@@ -1488,7 +1488,7 @@
             <item>
              <widget class="QGroupBox" name="groupBox_6">
               <property name="title">
-               <string>Alternative Global Rate Limits</string>
+               <string>Alternative Torrent Rate Limits</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_11">
                <item>
