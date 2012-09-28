@@ -129,6 +129,7 @@ Session::Session()
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)), this, SIGNAL(finishedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
