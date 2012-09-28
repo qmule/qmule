@@ -2579,8 +2579,16 @@ void QBtSession::applyEncryptionSettings(pe_settings se) {
 void QBtSession::startUpTransfers() {
   qDebug("Resuming unfinished torrents");
   const QDir torrentBackup(misc::BTBackupLocation());
-  const QStringList known_torrents = TorrentPersistentData::knownTorrents();
+  QStringList torrents = TorrentPersistentData::knownTorrents();
 
+  QStringList known_torrents;
+  foreach(const QString& strHash, torrents)
+  {
+      if (misc::isSHA1Hash(strHash))
+      {
+          known_torrents << strHash;
+      }
+  }
   // Safety measure because some people reported torrent loss since
   // we switch the v1.5 way of resuming torrents on startup
   QStringList filters;
