@@ -109,6 +109,7 @@ public:
 public slots:
   void addTransferFromFile(const QString& filename);
   QED2KHandle addTransfer(const libed2k::add_transfer_params&);
+  void shareByED2K(const QTorrentHandle& h, bool unshare);
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
   Transfer addLink(QString strLink, bool resumed=false);
   void loadSessionState();

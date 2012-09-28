@@ -12,6 +12,8 @@
 
 #include <QNetworkInterface>
 #include <QMessageBox>
+#include <QDir>
+#include <QDirIterator>
 
 #include "preferences.h"
 
@@ -424,6 +426,48 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.filename().c_str());
     return QED2KHandle(delegate()->add_transfer(atp));
+}
+
+void QED2KSession::shareByED2K(const QTorrentHandle& h, bool unshare)
+{
+    QDir save_path(h.save_path());
+    int num_files = h.num_files();
+    std::set<QString> roots;
+    std::deque<std::string> excludes;
+
+    for (int i = 0; i < num_files; ++i)
+        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+
+    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
+    {
+        QString path = save_path.filePath(*i);  // never contains last separator
+        QFileInfo info(path);
+
+        if (info.isFile())
+        {
+            delegate()->share_file(path.toUtf8().constData(), unshare);
+        }
+        else if (info.isDir())
+        {
+            QStringList dlist;
+            dlist << path;
+            QDirIterator it(path, QDirIterator::Subdirectories);
+
+            while(it.hasNext())
+            {
+                QDir d = QFileInfo(it.next()).dir();
+                dlist << d.path();
+            }
+
+            dlist.removeDuplicates();
+
+            foreach(const QString& str, dlist)
+            {
+                delegate()->share_dir(
+                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
+            }
+        }
+    }
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }

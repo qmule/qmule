@@ -65,6 +65,7 @@ public:
 
     void deferPlayMedia(Transfer t);
     bool playMedia(Transfer t);
+    void shareByED2K(const QTorrentHandle& h, bool unshare);
 
 public slots:
     void playPendingMedia();
@@ -110,8 +111,6 @@ private:
     Session();
     SessionBase* delegate(const QString& hash) const;
     SessionBase* delegate(const Transfer& t) const;
-
-    void shareByED2K(const QTorrentHandle& h, bool unshare);
 
     template<typename Functor>
     void for_each(const Functor& f)
