@@ -513,7 +513,7 @@ void MainWindow::balloonClicked() {
 
 // called when a transfer has started
 void MainWindow::addedTransfer(const Transfer& h) const {
-  if (!TorrentPersistentData::isKnownTorrent(h.hash()))
+  if (TorrentPersistentData::getAddedDate(h.hash()).secsTo(QDateTime::currentDateTime()) <= 1)
     showNotificationBaloon(
       tr("Download starting"),
       tr("%1 has started downloading.", "e.g: xxx.avi has started downloading.").arg(h.name()));

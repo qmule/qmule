@@ -415,7 +415,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
             atp.file_hash = ece.m_filehash;
             atp.file_path = filepath.toUtf8();
             atp.file_size = ece.m_filesize;
-            delegate()->add_transfer(atp);
+            addTransfer(atp);
         }
     }
 }

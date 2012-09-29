@@ -790,7 +790,6 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
   foreach (const QString &file, files) {
     QFile::remove(torrentBackup.absoluteFilePath(file));
   }
-  TorrentPersistentData::deletePersistentData(hash);
   // Remove tracker errors
   trackersInfos.remove(hash);
   if (delete_local_files)

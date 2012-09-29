@@ -4,6 +4,7 @@
 #include <QDirIterator>
 
 #include "transport/session.h"
+#include "torrentpersistentdata.h"
 
 using namespace libtorrent;
 
@@ -227,6 +228,7 @@ void Session::processDownloadedFile(const QString& url, const QString& path) {
 }
 void Session::deleteTransfer(const QString& hash, bool delete_files) {
     delegate(hash)->deleteTransfer(hash, delete_files);
+    TorrentPersistentData::deletePersistentData(hash);
 }
 void Session::recheckTransfer(const QString& hash) {
     delegate(hash)->recheckTransfer(hash);
