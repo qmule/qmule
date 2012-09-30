@@ -152,7 +152,8 @@ protected slots:
   void addTorrent(QString path);
   void addUnauthenticatedTracker(const QPair<Transfer,QString> &tracker);
   void processDownloadedFiles(QString path, QString url);
-  void finishedTorrent(const Transfer& h) const;
+  void addedTransfer(const Transfer& h) const;
+  void finishedTransfer(const Transfer& h) const;
   void askRecursiveTorrentDownloadConfirmation(const QTorrentHandle &h);
   // Options slots
   void on_actionOptions_triggered();

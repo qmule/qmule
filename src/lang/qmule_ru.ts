@@ -1986,6 +1986,15 @@ Do you want to associate qMule to torrent files and Magnet links?</source>
         <translation type="obsolete">Передачи (%1)</translation>
     </message>
     <message>
+        <source>Download starting</source>
+        <translation>Начало загрузки</translation>
+    </message>
+    <message>
+        <source>%1 has started downloading.</source>
+        <comment>e.g: xxx.avi has started downloading.</comment>
+        <translation>скачивание %1 началось.</translation>
+    </message>
+    <message>
         <source>Download completion</source>
         <translation>Завершение загрузок</translation>
     </message>

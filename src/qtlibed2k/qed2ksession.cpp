@@ -417,7 +417,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
             atp.file_hash = ece.m_filehash;
             atp.file_path = filepath.toUtf8();
             atp.file_size = ece.m_filesize;
-            delegate()->add_transfer(atp);
+            addTransfer(atp);
         }
     }
 }
@@ -677,8 +677,12 @@ void QED2KSession::readAlerts()
         else if (libed2k::finished_transfer_alert* p =
                  dynamic_cast<libed2k::finished_transfer_alert*>(a.get()))
         {
+            if (p->m_had_picker)
+                emit finishedTransfer(Transfer(QED2KHandle(p->m_handle)));
+
             Preferences pref;
-            if (pref.isAutoRunEnabled() && p->m_had_picker) autoRunExternalProgram(Transfer(QED2KHandle(p->m_handle)));
+            if (pref.isAutoRunEnabled() && p->m_had_picker)
+                autoRunExternalProgram(Transfer(QED2KHandle(p->m_handle)));
         }
         else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
         {
