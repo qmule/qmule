@@ -113,7 +113,8 @@ public slots:
   void updateAltSpeedsBtn(bool alternative);
   void deleteSession();
   void on_actionOpen_triggered();
-  void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
+  void addConsoleMessage(
+      const QString& msg, QColor color = QApplication::palette().color(QPalette::WindowText)) const;
 
 protected slots:
   // GUI related slots

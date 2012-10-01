@@ -1334,6 +1334,9 @@ void MainWindow::showNotificationBaloon(QString title, QString msg) const {
 #endif
   if (systrayIcon && QSystemTrayIcon::supportsMessages())
     systrayIcon->showMessage(title, msg, QSystemTrayIcon::Information, TIME_TRAY_BALLOON);
+
+  // forward all notifications to the console
+  addConsoleMessage(msg);
 }
 
 /*****************************************************
@@ -1726,8 +1729,8 @@ void MainWindow::authRequest()
 #endif
 }
 
-void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/)
-{    
+void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/) const
+{
     status->addHtmlLogMessage("<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>");
 }
 
