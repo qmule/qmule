@@ -1763,8 +1763,8 @@ No further notices will be issued.</source>
     </message>
     <message>
         <source>Preview file</source>
-        <translatorcomment>Имхо правильнее чем файл предпросмотра</translatorcomment>
-        <translation type="obsolete">Предпросмотр файла</translation>
+        <translatorcomment>Имхо правильнее чем файл просмотра</translatorcomment>
+        <translation type="obsolete">Просмотр файла</translation>
     </message>
     <message>
         <source>Clear log</source>
@@ -3175,7 +3175,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Sorry, we can&apos;t preview this file</source>
-        <translation>Извините, предпросмотр этого файла невозможен</translation>
+        <translation>Извините, просмотр этого файла невозможен</translation>
     </message>
 </context>
 <context>
@@ -5281,7 +5281,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Download in sequential order (slower but good for previewing)</source>
-        <translation>Загружать последовательно (медленнее но удобнее для предпросмотра)</translation>
+        <translation>Загружать последовательно (медленнее но удобнее для просмотра)</translation>
     </message>
     <message>
         <source>Skip file checking and start seeding immediately</source>
@@ -6675,19 +6675,19 @@ However, those plugins were disabled.</source>
     <name>preview</name>
     <message>
         <source>Preview selection</source>
-        <translation>Выбор предпросмотра</translation>
+        <translation>Выбор просмотра</translation>
     </message>
     <message>
         <source>File preview</source>
-        <translation>Предпросмотр файла</translation>
+        <translation>Просмотр файла</translation>
     </message>
     <message>
         <source>The following files support previewing, &lt;br&gt;please select one of them:</source>
-        <translation>Следующие файлы поддерживают предпросмотр, &lt;br&gt;выберите один из них:</translation>
+        <translation>Следующие файлы поддерживают просмотр, &lt;br&gt;выберите один из них:</translation>
     </message>
     <message>
         <source>Preview</source>
-        <translation>Предпросмотр</translation>
+        <translation>Просмотр</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -6698,11 +6698,11 @@ However, those plugins were disabled.</source>
     <name>previewSelect</name>
     <message>
         <source>Preview impossible</source>
-        <translation type="obsolete">Предпросмотр невозможен</translation>
+        <translation type="obsolete">Просмотр невозможен</translation>
     </message>
     <message>
         <source>Sorry, we can&apos;t preview this file</source>
-        <translation type="obsolete">Извините, предпросмотр этого файла невозможен</translation>
+        <translation type="obsolete">Извините, просмотр этого файла невозможен</translation>
     </message>
     <message>
         <source>Name</source>
