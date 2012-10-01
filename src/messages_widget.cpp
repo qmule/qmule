@@ -135,7 +135,7 @@ messages_widget::messages_widget(QWidget *parent)
     connect(listFriends, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
     connect(tabWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayTabMenu(const QPoint&)));
     
-    connect(userAdd, SIGNAL(triggered()), this, SLOT(addFriend()));
+    connect(userAdd, SIGNAL(triggered()), this, SLOT(addFriendDlg()));
     connect(userSendMessage, SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userDelete, SIGNAL(triggered()), this, SLOT(deleteFriend()));    
     connect(userBrowseFiles, SIGNAL(triggered()), this, SLOT(requestUserDirs()));
@@ -740,6 +740,9 @@ void messages_widget::setFriendIcon(const libed2k::net_identifier& np, bool conn
 
 void messages_widget::friendSelected(const QModelIndex& index, const QModelIndex& prev)
 {
+    if (!index.isValid())
+        return;
+
     int num = index.row();
     QED2KPeerHandle peer = QED2KPeerHandle::findPeerHandle(friends[num].netPoint);
 
