@@ -824,7 +824,8 @@ bool QBtSession::loadFastResumeData(const QString &hash, std::vector<char> &buf)
   const QByteArray content = fastresume_file.readAll();
   const int content_size = content.size();
   buf.resize(content_size);
-  memcpy(&buf[0], content.data(), content_size);
+  // check size to avoid windows runtime error
+  if (content_size > 0) memcpy(&buf[0], content.data(), content_size);
   return true;
 }
 
@@ -1472,17 +1473,20 @@ void QBtSession::loadSessionState() {
   const qint64 content_size = state_file.bytesAvailable();
   if (content_size <= 0) return;
   in.resize(content_size);
-  state_file.read(&in[0], content_size);
+  if (content_size > 0) state_file.read(&in[0], content_size); // avoid windows rtl error
   // bdecode
   lazy_entry e;
-#if LIBTORRENT_VERSION_MINOR > 15
-  error_code ec;
-  lazy_bdecode(&in[0], &in[0] + in.size(), e, ec);
-  if (!ec) {
-#else
-  if (lazy_bdecode(&in[0], &in[0] + in.size(), e) == 0) {
-#endif
-    s->load_state(e);
+  if (content_size > 0)
+  {
+    #if LIBTORRENT_VERSION_MINOR > 15
+      error_code ec;
+      lazy_bdecode(&in[0], &in[0] + in.size(), e, ec);
+      if (!ec) {
+    #else
+      if (lazy_bdecode(&in[0], &in[0] + in.size(), e) == 0) {
+    #endif
+        s->load_state(e);
+      }
   }
 }
 
@@ -2693,7 +2697,7 @@ entry QBtSession::generateFilePriorityResumeData(boost::intrusive_ptr<torrent_in
 
   entry::string_type pieces;
   pieces.resize(t->num_pieces());
-  std::memset(&pieces[0], 0, pieces.size());
+  if (pieces.size() > 0) std::memset(&pieces[0], 0, pieces.size());
   rd["pieces"] = entry(pieces);
 
   entry ret(rd);

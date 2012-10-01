@@ -630,7 +630,7 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::peer_captcha_request_alert*>(a.get()))
         {
             QPixmap pm;
-            pm.loadFromData((const uchar*)&p->m_captcha[0], p->m_captcha.size());
+            if (!p->m_captcha.empty()) pm.loadFromData((const uchar*)&p->m_captcha[0], p->m_captcha.size()); // avoid windows rtl error
             emit peerCaptchaRequest(p->m_np, md4toQString(p->m_hash), pm);
         }
         else if (libed2k::peer_captcha_result_alert* p =
