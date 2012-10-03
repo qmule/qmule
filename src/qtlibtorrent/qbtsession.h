@@ -188,7 +188,6 @@ signals:
   void torrentAboutToBeRemoved(const QTorrentHandle &h, bool del_files);
   void pausedTorrent(const QTorrentHandle& h);
   void finishedTorrent(const QTorrentHandle& h);
-  void fullDiskError(const QTorrentHandle& h, QString msg);
   void trackerError(const QString &hash, QString time, QString msg);
   void trackerAuthenticationRequired(const QTorrentHandle& h);
   void newDownloadedTorrent(QString path, QString url);

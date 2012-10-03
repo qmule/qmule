@@ -688,6 +688,19 @@ void QED2KSession::readAlerts()
         {
             writeResumeData(p);
         }
+        else if (libed2k::file_error_alert* p = dynamic_cast<libed2k::file_error_alert*>(a.get()))
+        {
+            qDebug() << "file error: ";
+            QED2KHandle h(p->m_handle);
+            if (h.is_valid())
+            {
+                qDebug() << "pause transfer";
+                h.pause();
+                emit pausedTransfer(Transfer(h));
+                addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
+                addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
+            }
+        }
 
         a = m_session->pop_alert();
     }
