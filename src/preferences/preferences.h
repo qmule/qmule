@@ -1225,14 +1225,6 @@ public:
     setValue(QString::fromUtf8("Preferences/Connection/ResolvePeerCountries"), resolve);
   }
 
-  bool resolvePeerHostNames() const {
-    return value(QString::fromUtf8("Preferences/Connection/ResolvePeerHostNames"), false).toBool();
-  }
-
-  void resolvePeerHostNames(bool resolve) {
-    setValue(QString::fromUtf8("Preferences/Connection/ResolvePeerHostNames"), resolve);
-  }
-
   int getMaxHalfOpenConnections() const {
     const int val = value(QString::fromUtf8("Preferences/Connection/MaxHalfOpenConnec"), 50).toInt();
     if (val <= 0) return -1;

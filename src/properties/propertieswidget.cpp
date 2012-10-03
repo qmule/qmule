@@ -312,7 +312,6 @@ void PropertiesWidget::saveSettings() {
 
 void PropertiesWidget::reloadPreferences() {
   // Take program preferences into consideration
-  peersList->updatePeerHostNameResolutionState();
   peersList->updatePeerCountryResolutionState();
 }
 

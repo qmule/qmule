@@ -11,6 +11,7 @@
 #include "search_widget.h"
 #include "search_filter.h"
 #include "preferences.h"
+#include "user_properties.h"
 
 #include "libed2k/file.hpp"
 #include "transport/session.h"
@@ -401,6 +402,7 @@ search_widget::search_widget(QWidget *parent)
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
     connect(userAddToFriends,  SIGNAL(triggered()), this, SLOT(addToFriends()));
+    connect(userDetails,  SIGNAL(triggered()), this, SLOT(getUserDetails()));
 
     connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
     connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
@@ -1883,4 +1885,14 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
     else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
 
     return QSortFilterProxyModel::lessThan(left, right);
+}
+
+void search_widget::getUserDetails()
+{
+    QED2KSearchResultEntry entry;
+    if (findSelectedUser(entry))
+    {
+        user_properties dlg(this, QED2KPeerHandle::getPeerHandle(entry.m_network_point).getUserName(), entry.m_network_point);
+        dlg.exec();
+    }
 }

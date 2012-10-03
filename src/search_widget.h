@@ -158,6 +158,7 @@ private slots:
     void initPeer();
     void sendMessage();
     void addToFriends();
+    void getUserDetails();
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);

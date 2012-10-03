@@ -161,7 +161,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Resolve peer host names</source>
-        <translation>Определить имя хоста пира</translation>
+        <translation type="obsolete">Определить имя хоста пира</translation>
     </message>
     <message>
         <source>Maximum number of half-open connections [0: Disabled]</source>
@@ -2209,7 +2209,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished">Сервис</translation>
+        <translation>Сервис</translation>
     </message>
     <message>
         <source>Connect</source>
@@ -2409,6 +2409,22 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <source>Upload time</source>
         <comment>i.e: time of upload</comment>
         <translation>Время отдачи</translation>
+    </message>
+    <message>
+        <source>Add to friends</source>
+        <translation>Добавить в друзья</translation>
+    </message>
+    <message>
+        <source>Browse files</source>
+        <translation>Просмотреть файлы</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Послать сообщение</translation>
+    </message>
+    <message>
+        <source>Details...</source>
+        <translation>Детали...</translation>
     </message>
 </context>
 <context>
@@ -5639,7 +5655,7 @@ Do you want to install it now?</source>
     <message>
         <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
         <comment>%1 is a number</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Успешно прочитан данный фильтр IP: %1 правил применено.</translation>
     </message>
     <message>
         <source>Error: Failed to parse the provided IP filter.</source>

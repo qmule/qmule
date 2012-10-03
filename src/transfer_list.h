@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMainWindow>
+#include "libed2k/packet_struct.hpp"
 
 class MainWindow;
 class TransferListWidget;
@@ -79,6 +80,12 @@ private slots:
     void btnBottomClick();
 
     void refreshPeers();
+    void addPeerToFriends(const QString& user_name, const libed2k::net_identifier& np);
+    void sendMessageToPeer(const QString& user_name, const libed2k::net_identifier& np);
+
+signals:
+    void addFriend(const QString& user_name, const libed2k::net_identifier& np);
+    void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
 };
 
 #endif // TRANSFER_LIST_H
