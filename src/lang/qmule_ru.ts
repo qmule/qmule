@@ -5055,6 +5055,10 @@ Do you want to install it now?</source>
         <source>Limit share ratio...</source>
         <translation>Ограничить коэффициент раздачи...</translation>
     </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
 </context>
 <context>
     <name>UpDownRatioDlg</name>
@@ -6037,6 +6041,29 @@ Do you want to install it now?</source>
     <message>
         <source>Unknown error</source>
         <translation type="obsolete">Неизвестная ошибка</translation>
+    </message>
+</context>
+<context>
+    <name>ed2k_link_maker</name>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>Make forum link</source>
+        <translation>Создать ссылку для форума</translation>
+    </message>
+    <message>
+        <source>Add file size</source>
+        <translation>Добавить размер файла</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
     </message>
 </context>
 <context>

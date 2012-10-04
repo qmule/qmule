@@ -11,6 +11,7 @@
 #include "search_widget.h"
 #include "search_filter.h"
 #include "preferences.h"
+#include "ed2k_link_maker.h"
 
 #include "libed2k/file.hpp"
 #include "transport/session.h"
@@ -383,14 +384,21 @@ search_widget::search_widget(QWidget *parent)
     fileSearchRelated->setText(tr("Search related files"));
     fileSearchRelated->setIcon(QIcon(":/emule/search/SearchRelated.png"));
 
+    fileED2KLink = new QAction(this);
+    fileED2KLink->setObjectName(QString::fromUtf8("ED2K link"));
+    fileED2KLink->setText(tr("ED2K link"));
+    fileED2KLink->setIcon(QIcon(":/emule/common/eD2kLink.png"));
+
     btnDownload->setDefaultAction(fileDownload);
     btnPreview->setDefaultAction(filePreview);
+    btnCloseAll->setDefaultAction(closeAll);
 
     btnDownload->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnPreview->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     fileMenu->addAction(fileDownload);
     fileMenu->addAction(filePreview);
+    fileMenu->addAction(fileED2KLink);
     fileMenu->addSeparator();
     fileMenu->addAction(fileSearchRelated);
 
@@ -400,10 +408,12 @@ search_widget::search_widget(QWidget *parent)
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
     connect(userAddToFriends,  SIGNAL(triggered()), this, SLOT(addToFriends()));
+    connect(userDetails,  SIGNAL(triggered()), this, SLOT(getUserDetails()));
 
     connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
     connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
     connect(fileSearchRelated,  SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
+    connect(fileED2KLink,  SIGNAL(triggered()), this, SLOT(createED2KLink()));
 
     connect(Session::instance()->get_ed2k_session(),
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
@@ -1261,6 +1271,9 @@ void search_widget::displayListMenu(const QPoint&)
         fileSearchRelated->setEnabled(
             selected.size() == 1 &&
             !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
+        fileED2KLink->setEnabled(
+            selected.size() == 1 &&
+            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
         fileMenu->exec(QCursor::pos());
     }
 }
@@ -1876,4 +1889,21 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
     else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
 
     return QSortFilterProxyModel::lessThan(left, right);
+}
+
+void search_widget::createED2KLink()
+{
+    if (selected_row(treeResult) < 0)
+    {
+        return;
+    }
+
+    QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+
+    QString file_name = selected_data(treeResult, SWDelegate::SW_NAME, selected[0]).toString();
+    QString hash = selected_data(treeResult, SWDelegate::SW_ID, selected[0]).toString();
+    quint64 file_size = selected_data(treeResult, SWDelegate::SW_SIZE, selected[0]).toULongLong();
+
+    ed2k_link_maker dlg(file_name, hash, file_size, this);
+    dlg.exec();
 }
