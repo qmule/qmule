@@ -104,6 +104,7 @@ protected slots:
   void toggleSelectedFirstLastPiecePrio() const;
   void askNewLabelForSelection();
   void showProperties();
+  void createED2KLink();
 
 signals:
   void currentTorrentChanged(const Transfer &h);

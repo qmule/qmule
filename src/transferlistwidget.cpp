@@ -60,6 +60,7 @@
 #include "propertieswidget.h"
 #include "iconprovider.h"
 #include "torrent_properties.h"
+#include "ed2k_link_maker.h"
 
 using namespace libtorrent;
 
@@ -695,6 +696,9 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionFirstLastPiece_prio, SIGNAL(triggered()), this, SLOT(toggleSelectedFirstLastPiecePrio()));
   QAction actionProperties(QIcon(":/emule/transfer_list/FileInfo.png"), tr("Properties"), 0);
   connect(&actionProperties, SIGNAL(triggered()), this, SLOT(showProperties()));
+  QAction actionED2KLink(QIcon(":/emule/common/eD2kLink.png"), tr("ED2K link"), 0);
+  connect(&actionED2KLink, SIGNAL(triggered()), this, SLOT(createED2KLink()));
+
   // End of actions
   QMenu listMenu(this);
   // Enable/disable pause/start action given the DL state
@@ -803,6 +807,10 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   if (has_preview) {
     listMenu.addAction(&actionPreview_file);
     added_preview_action = true;
+  }
+  if (!one_is_bittorrent && selectedIndexes.size() == 1)
+  {
+      listMenu.addAction(&actionED2KLink);
   }
   if (one_not_seed && one_has_metadata) {
     if (all_same_sequential_download_mode) {
@@ -940,5 +948,17 @@ void TransferListWidget::showProperties()
     Transfer h = BTSession->getTransfer(hash);
 
     torrent_properties dlg(this, h);
+    dlg.exec();
+}
+
+void TransferListWidget::createED2KLink()
+{
+    const QModelIndexList selectedIndexes = selectionModel()->selectedRows();
+    const QString hash = getHashFromRow(mapToSource(selectedIndexes[0]).row());
+    Transfer h = BTSession->getTransfer(hash);
+    const QString file_name = h.filename_at(0);
+    quint64 file_size = h.filesize_at(0);
+
+    ed2k_link_maker dlg(file_name, hash, file_size, this);
     dlg.exec();
 }

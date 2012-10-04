@@ -71,5 +71,6 @@
         <file>search/closeall.png</file>
         <file>search/SearchRelated.png</file>
         <file>transfer_list/FileInfo.png</file>
+        <file>common/eD2kLink.png</file>
     </qresource>
 </RCC>

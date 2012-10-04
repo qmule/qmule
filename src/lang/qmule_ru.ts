@@ -5092,6 +5092,10 @@ Do you want to install it now?</source>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
 </context>
 <context>
     <name>UpDownRatioDlg</name>
@@ -6077,6 +6081,29 @@ Do you want to install it now?</source>
     </message>
 </context>
 <context>
+    <name>ed2k_link_maker</name>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>Make forum link</source>
+        <translation>Создать ссылку для форума</translation>
+    </message>
+    <message>
+        <source>Add file size</source>
+        <translation>Добавить размер файла</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
     <name>engineSelect</name>
     <message>
         <source>Search plugins</source>
@@ -7048,6 +7075,10 @@ However, those plugins were disabled.</source>
     <message>
         <source>Column visibility</source>
         <translation>Отображение колонок</translation>
+    </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
     </message>
 </context>
 <context>
