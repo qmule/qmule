@@ -2265,15 +2265,9 @@ void QBtSession::readAlerts() {
       if (h.is_valid())
       {
           h.pause();
-             qDebug() << "File Error: " << misc::toQStringU(p->message());
-             addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
-             addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
-             // TODO - is signal need?
-             //if (h.is_valid())
-             //{
-                //emit fileErrorAlert(h, misc::toQString(p->message()));
-                emit pausedTorrent(h);
-             //}
+          qDebug() << "File Error: " << misc::toQStringU(p->message());
+          addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
+          addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
       }
     }
     else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get())) {
