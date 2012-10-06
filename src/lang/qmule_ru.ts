@@ -5096,6 +5096,10 @@ Do you want to install it now?</source>
         <source>ED2K link</source>
         <translation>ED2K ссылка</translation>
     </message>
+    <message>
+        <source>View file...</source>
+        <translation>Просмотр файла...</translation>
+    </message>
 </context>
 <context>
     <name>UpDownRatioDlg</name>
