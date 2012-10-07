@@ -296,8 +296,7 @@ void Session::playLink(const QString& strLink)
 bool Session::playMedia(Transfer t)
 {
     if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))) &&
-        (t.first_last_piece_first() || t.is_seed()))
+        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))))
     {
         TransferBitfield pieces = t.pieces();
         int last_piece = pieces.size() - 1;
@@ -305,7 +304,7 @@ bool Session::playMedia(Transfer t)
         if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
         {
             t.set_sequential_download(true);
-            return (t.progress() >= 0.05 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
+            return (QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
         }
     }
 

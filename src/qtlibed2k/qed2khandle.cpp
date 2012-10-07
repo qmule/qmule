@@ -159,13 +159,13 @@ void QED2KHandle::rename_file(int index, const QString& new_name) const {
 void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
 void QED2KHandle::prioritize_first_last_piece(bool p) const
 {
-    int prio = p ? 7 : 1;
-
+    int hprio = p ? 7 : 1;
     int last_piece = m_delegate.num_pieces() - 1;
     int penult_piece = std::max(last_piece - 1, 0);
-    m_delegate.set_piece_priority(0, prio);
-    m_delegate.set_piece_priority(last_piece, prio);
-    m_delegate.set_piece_priority(penult_piece, prio);
+
+    m_delegate.set_piece_priority(0, hprio);
+    m_delegate.set_piece_priority(penult_piece, hprio);
+    m_delegate.set_piece_priority(last_piece, hprio);
 }
 void QED2KHandle::set_tracker_login(const QString& login, const QString& passwd) const {}
 void QED2KHandle::flush_cache() const {}
