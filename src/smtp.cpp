@@ -122,23 +122,23 @@ void Smtp::sendMail(const QString &from, const QString &to, const QString &subje
   this->from = from;
   rcpt = to;
   // Authentication
-  if (pref.getMailNotificationSMTPAuth()) {
-    username = pref.getMailNotificationSMTPUsername();
-    password = pref.getMailNotificationSMTPPassword();
-  }
+  //if (pref.getMailNotificationSMTPAuth()) {
+  //  username = pref.getMailNotificationSMTPUsername();
+  //  password = pref.getMailNotificationSMTPPassword();
+  //}
 
   // Connect to SMTP server
-#ifndef QT_NO_OPENSSL
-  if (pref.getMailNotificationSMTPSSL()) {
-    socket->connectToHostEncrypted(pref.getMailNotificationSMTP(), DEFAULT_PORT_SSL);
-    use_ssl = true;
-  } else {
-#endif
-    socket->connectToHost(pref.getMailNotificationSMTP(), DEFAULT_PORT);
-    use_ssl = false;
-#ifndef QT_NO_OPENSSL
-  }
-#endif
+//#ifndef QT_NO_OPENSSL
+  //if (pref.getMailNotificationSMTPSSL()) {
+  //  socket->connectToHostEncrypted(pref.getMailNotificationSMTP(), DEFAULT_PORT_SSL);
+  //  use_ssl = true;
+  //} else {
+//#endif
+  //  socket->connectToHost(pref.getMailNotificationSMTP(), DEFAULT_PORT);
+  //  use_ssl = false;
+//#ifndef QT_NO_OPENSSL
+  //}
+//#endif
 }
 
 void Smtp::readyRead()

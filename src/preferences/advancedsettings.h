@@ -13,7 +13,7 @@
 #include "preferences.h"
 
 enum AdvSettingsCols {PROPERTY, VALUE};
-enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, RESOLVE_HOSTS, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, MULE_NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
+enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, MULE_NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
                     #if defined(Q_WS_X11)
                       USE_ICON_THEME,
                     #endif
@@ -26,7 +26,7 @@ class AdvancedSettings: public QTableWidget {
 
 private:
   QSpinBox spin_cache, outgoing_ports_min, outgoing_ports_max, spin_list_refresh, spin_maxhalfopen, spin_tracker_port;
-  QCheckBox cb_ignore_limits_lan, cb_recheck_completed, cb_resolve_countries, cb_resolve_hosts,
+  QCheckBox cb_ignore_limits_lan, cb_recheck_completed, cb_resolve_countries,
   cb_super_seeding, cb_program_notifications, cb_tracker_status, cb_confirm_torrent_deletion,
   cb_enable_tracker_ext;
   QComboBox combo_iface;  
@@ -77,7 +77,6 @@ public slots:
     pref.setRefreshInterval(spin_list_refresh.value());
     // Peer resolution
     pref.resolvePeerCountries(cb_resolve_countries.isChecked());
-    pref.resolvePeerHostNames(cb_resolve_hosts.isChecked());
     // Max Half-Open connections
     pref.setMaxHalfOpenConnections(spin_maxhalfopen.value());
     // Super seeding
@@ -193,9 +192,6 @@ private slots:
     // Resolve Peer countries
     cb_resolve_countries.setChecked(pref.resolvePeerCountries());
     setRow(RESOLVE_COUNTRIES, tr("Resolve peer countries (GeoIP)"), &cb_resolve_countries);
-    // Resolve peer hosts
-    cb_resolve_hosts.setChecked(pref.resolvePeerHostNames());
-    setRow(RESOLVE_HOSTS, tr("Resolve peer host names"), &cb_resolve_hosts);
     // Max Half Open connections
     spin_maxhalfopen.setMinimum(0);
     spin_maxhalfopen.setMaximum(99999);

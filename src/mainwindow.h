@@ -112,7 +112,8 @@ public slots:
   void updateAltSpeedsBtn(bool alternative);
   void deleteSession();
   void on_actionOpen_triggered();
-  void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
+  void addConsoleMessage(
+      const QString& msg, QColor color = QApplication::palette().color(QPalette::WindowText)) const;
 
 protected slots:
   // GUI related slots
@@ -151,7 +152,8 @@ protected slots:
   void addTorrent(QString path);
   void addUnauthenticatedTracker(const QPair<Transfer,QString> &tracker);
   void processDownloadedFiles(QString path, QString url);
-  void finishedTorrent(const Transfer& h) const;
+  void addedTransfer(const Transfer& h) const;
+  void finishedTransfer(const Transfer& h) const;
   void askRecursiveTorrentDownloadConfirmation(const QTorrentHandle &h);
   // Options slots
   void on_actionOptions_triggered();

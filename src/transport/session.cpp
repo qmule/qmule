@@ -4,6 +4,7 @@
 #include <QDirIterator>
 
 #include "transport/session.h"
+#include "torrentpersistentdata.h"
 
 using namespace libtorrent;
 
@@ -133,6 +134,7 @@ Session::Session()
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)), this, SIGNAL(finishedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
@@ -230,6 +232,7 @@ void Session::processDownloadedFile(const QString& url, const QString& path) {
 }
 void Session::deleteTransfer(const QString& hash, bool delete_files) {
     delegate(hash)->deleteTransfer(hash, delete_files);
+    TorrentPersistentData::deletePersistentData(hash);
 }
 void Session::recheckTransfer(const QString& hash) {
     delegate(hash)->recheckTransfer(hash);
@@ -404,42 +407,5 @@ void Session::saveFastResumeData()
 
 void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 {
-    QDir save_path(h.save_path());
-    int num_files = h.num_files();
-    std::set<QString> roots;
-    std::deque<std::string> excludes;
-
-    for (int i = 0; i < num_files; ++i)
-        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
-
-    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
-    {
-        QString path = save_path.filePath(*i);  // never contains last separator
-        QFileInfo info(path);
-
-        if (info.isFile())
-        {
-            m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
-        }
-        else if (info.isDir())
-        {
-            QStringList dlist;
-            dlist << path;
-            QDirIterator it(path, QDirIterator::Subdirectories);
-
-            while(it.hasNext())
-            {
-                QDir d = QFileInfo(it.next()).dir();
-                dlist << d.path();
-            }
-
-            dlist.removeDuplicates();
-
-            foreach(const QString& str, dlist)
-            {
-                m_edSession.delegate()->share_dir(
-                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
-            }
-        }
-    }
+    m_edSession.shareByED2K(h, unshare);
 }

@@ -176,6 +176,9 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     connect(actionDelete, SIGNAL(triggered()), transferList, SLOT(deleteSelectedTorrents()));
     connect(actionStart, SIGNAL(triggered()), transferList, SLOT(startSelectedTorrents()));
     connect(actionPause, SIGNAL(triggered()), transferList, SLOT(pauseSelectedTorrents()));
+      
+    connect(peersList, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(sendMessageToPeer(const QString&, const libed2k::net_identifier&)));
+    connect(peersList, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addPeerToFriends(const QString&, const libed2k::net_identifier&)));
 }
 
 transfer_list::~transfer_list()
@@ -399,4 +402,14 @@ void transfer_list::ProcessBottomButton(int btn_num)
 void transfer_list::refreshPeers()
 {
     peersList->loadPeers();
+}
+
+void transfer_list::addPeerToFriends(const QString& user_name, const libed2k::net_identifier& np)
+{
+    emit addFriend(user_name, np);
+}
+
+void transfer_list::sendMessageToPeer(const QString& user_name, const libed2k::net_identifier& np)
+{
+    emit sendMessage(user_name, np);
 }

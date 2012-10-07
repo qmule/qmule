@@ -171,8 +171,10 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   // Creating Bittorrent session
   connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)),
           this, SLOT(fullDiskError(Transfer, QString)));
+  connect(Session::instance(), SIGNAL(addedTransfer(Transfer)),
+          this, SLOT(addedTransfer(Transfer)));
   connect(Session::instance(), SIGNAL(finishedTransfer(Transfer)),
-          this, SLOT(finishedTorrent(Transfer)));
+          this, SLOT(finishedTransfer(Transfer)));
   connect(Session::instance(), SIGNAL(trackerAuthenticationRequired(Transfer)),
           this, SLOT(trackerAuthenticationRequired(Transfer)));
   connect(Session::instance(), SIGNAL(newDownloadedTransfer(QString, QString)),
@@ -235,6 +237,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
   connect(search, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
+  connect(transfer_List, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
+  connect(transfer_List, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
 
   // load from catalog link, temporary without deferred proxy
   connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
@@ -507,16 +511,30 @@ void MainWindow::balloonClicked() {
   }
 }
 
-// called when a torrent has finished
-void MainWindow::finishedTorrent(const Transfer& h) const {
+// called when a transfer has started
+void MainWindow::addedTransfer(const Transfer& h) const {
+  if (TorrentPersistentData::getAddedDate(h.hash()).secsTo(QDateTime::currentDateTime()) <= 1
+      && !h.is_seed())
+    showNotificationBaloon(
+      tr("Download starting"),
+      tr("%1 has started downloading.", "e.g: xxx.avi has started downloading.").arg(h.name()));
+}
+
+// called when a transfer has finished
+void MainWindow::finishedTransfer(const Transfer& h) const {
   if (!TorrentPersistentData::isSeed(h.hash()))
-    showNotificationBaloon(tr("Download completion"), tr("%1 has finished downloading.", "e.g: xxx.avi has finished downloading.").arg(h.name()));
+    showNotificationBaloon(
+      tr("Download completion"),
+      tr("%1 has finished downloading.", "e.g: xxx.avi has finished downloading.").arg(h.name()));
 }
 
 // Notification when disk is full
 void MainWindow::fullDiskError(const Transfer& h, QString msg) const {
-  if (!h.is_valid()) return;
-  showNotificationBaloon(tr("I/O Error", "i.e: Input/Output Error"), tr("An I/O error occured for torrent %1.\n Reason: %2", "e.g: An error occured for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
+  if (h.is_valid())
+    showNotificationBaloon(
+      tr("I/O Error", "i.e: Input/Output Error"),
+      tr("An I/O error occured for torrent %1.\n Reason: %2",
+         "e.g: An error occured for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
 }
 
 void MainWindow::createKeyboardShortcuts() {
@@ -1316,6 +1334,9 @@ void MainWindow::showNotificationBaloon(QString title, QString msg) const {
 #endif
   if (systrayIcon && QSystemTrayIcon::supportsMessages())
     systrayIcon->showMessage(title, msg, QSystemTrayIcon::Information, TIME_TRAY_BALLOON);
+
+  // forward all notifications to the console
+  addConsoleMessage(msg);
 }
 
 /*****************************************************
@@ -1708,8 +1729,8 @@ void MainWindow::authRequest()
 #endif
 }
 
-void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/)
-{    
+void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/) const
+{
     status->addHtmlLogMessage("<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>");
 }
 

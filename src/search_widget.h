@@ -100,6 +100,7 @@ private:
     QAction* fileDownload;
     QAction* filePreview;
     QAction* fileSearchRelated;
+    QAction* fileED2KLink;
 
     QIcon iconAny;
     QIcon iconArchive;
@@ -158,11 +159,13 @@ private slots:
     void initPeer();
     void sendMessage();
     void addToFriends();
+    void getUserDetails();
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);
     void download();
     void preview();
+    void createED2KLink();
     void requestUserDirs();
     void processUserDirs(const libed2k::net_identifier& np, const QString& hash, const QStringList& strList);
     void processUserFiles(const libed2k::net_identifier& np, const QString& hash,

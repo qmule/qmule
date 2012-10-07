@@ -161,7 +161,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Resolve peer host names</source>
-        <translation>Определить имя хоста пира</translation>
+        <translation type="obsolete">Определить имя хоста пира</translation>
     </message>
     <message>
         <source>Maximum number of half-open connections [0: Disabled]</source>
@@ -710,7 +710,7 @@ You should get this information from your Web browser preferences.</source>
     </message>
     <message>
         <source>Your dynamic DNS was successfully updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ваш динамический DNS адрес был успешно обновлён.</translation>
     </message>
     <message>
         <source>Dynamic DNS error: qBittorrent was blacklisted by the service, please report a bug at http://bugs.qbittorrent.org.</source>
@@ -1078,11 +1078,11 @@ You should get this information from your Web browser preferences.</source>
     <name>FilterLineEdit</name>
     <message>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр</translation>
     </message>
     <message>
         <source>Clear text</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить текст</translation>
     </message>
 </context>
 <context>
@@ -1986,6 +1986,15 @@ Do you want to associate qMule to torrent files and Magnet links?</source>
         <translation type="obsolete">Передачи (%1)</translation>
     </message>
     <message>
+        <source>Download starting</source>
+        <translation>Начало загрузки</translation>
+    </message>
+    <message>
+        <source>%1 has started downloading.</source>
+        <comment>e.g: xxx.avi has started downloading.</comment>
+        <translation>скачивание %1 началось.</translation>
+    </message>
+    <message>
         <source>Download completion</source>
         <translation>Завершение загрузок</translation>
     </message>
@@ -2200,7 +2209,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервис</translation>
     </message>
     <message>
         <source>Connect</source>
@@ -2208,7 +2217,7 @@ Would you like to update qMule to version %1?</source>
     </message>
     <message>
         <source>Catalog</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог</translation>
     </message>
     <message>
         <source>Transfer</source>
@@ -2394,12 +2403,28 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>File Name</source>
         <comment>i.e: File Name</comment>
-        <translation type="unfinished">Имя файла</translation>
+        <translation>Имя файла</translation>
     </message>
     <message>
         <source>Upload time</source>
         <comment>i.e: time of upload</comment>
-        <translation type="unfinished"></translation>
+        <translation>Время отдачи</translation>
+    </message>
+    <message>
+        <source>Add to friends</source>
+        <translation>Добавить в друзья</translation>
+    </message>
+    <message>
+        <source>Browse files</source>
+        <translation>Просмотреть файлы</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Послать сообщение</translation>
+    </message>
+    <message>
+        <source>Details...</source>
+        <translation>Детали...</translation>
     </message>
 </context>
 <context>
@@ -2823,15 +2848,15 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Email notification upon download completion</source>
-        <translation>Сообщать об окончании загрузки по Email</translation>
+        <translation type="obsolete">Сообщать об окончании загрузки по Email</translation>
     </message>
     <message>
         <source>Destination email:</source>
-        <translation>Email для сообщения:</translation>
+        <translation type="obsolete">Email для сообщения:</translation>
     </message>
     <message>
         <source>SMTP server:</source>
-        <translation>SMTP сервер:</translation>
+        <translation type="obsolete">SMTP сервер:</translation>
     </message>
     <message>
         <source>Run an external program on torrent completion</source>
@@ -2963,7 +2988,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>This server requires a secure connection (SSL)</source>
-        <translation>Этот сервер требует защищённое соединение (SSL)</translation>
+        <translation type="obsolete">Этот сервер требует защищённое соединение (SSL)</translation>
     </message>
     <message>
         <source>User Interface Language:</source>
@@ -3031,7 +3056,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Global Rate Limits</source>
-        <translation>Глобальные ограничения скорости</translation>
+        <translation type="obsolete">Глобальные ограничения скорости</translation>
     </message>
     <message>
         <source>Apply rate limit to uTP connections</source>
@@ -3043,7 +3068,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Alternative Global Rate Limits</source>
-        <translation>Альтернативные ограничения скорости</translation>
+        <translation type="obsolete">Альтернативные ограничения скорости</translation>
     </message>
     <message>
         <source>Schedule the use of alternative rate limits</source>
@@ -3135,7 +3160,15 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use qMule for cmule collections</source>
-        <translation type="unfinished"></translation>
+        <translation>Исполезовать qMule для eMule коллекций</translation>
+    </message>
+    <message>
+        <source>Torrent Rate Limits</source>
+        <translation>Ограничения скорости торрент закачек</translation>
+    </message>
+    <message>
+        <source>Alternative Torrent Rate Limits</source>
+        <translation>Альтернативные ограничения скорости торрент закачек</translation>
     </message>
 </context>
 <context>
@@ -4349,19 +4382,19 @@ Do you want to install it now?</source>
     <name>TorrentContentModel</name>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation type="unfinished">Размер</translation>
+        <translation>Размер</translation>
     </message>
     <message>
         <source>Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Прогресс</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Приоритет</translation>
+        <translation>Приоритет</translation>
     </message>
 </context>
 <context>
@@ -5055,6 +5088,18 @@ Do you want to install it now?</source>
         <source>Limit share ratio...</source>
         <translation>Ограничить коэффициент раздачи...</translation>
     </message>
+    <message>
+        <source>Properties</source>
+        <translation>Свойства</translation>
+    </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>View file...</source>
+        <translation>Просмотр файла...</translation>
+    </message>
 </context>
 <context>
     <name>UpDownRatioDlg</name>
@@ -5327,7 +5372,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>4662</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5618,7 +5663,7 @@ Do you want to install it now?</source>
     <message>
         <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
         <comment>%1 is a number</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Успешно прочитан данный фильтр IP: %1 правил применено.</translation>
     </message>
     <message>
         <source>Error: Failed to parse the provided IP filter.</source>
@@ -5735,7 +5780,7 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>Deletion confirmation - qBittorrent</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтверждение удаления - qMule</translation>
     </message>
 </context>
 <context>
@@ -6040,6 +6085,29 @@ Do you want to install it now?</source>
     </message>
 </context>
 <context>
+    <name>ed2k_link_maker</name>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>Make forum link</source>
+        <translation>Создать ссылку для форума</translation>
+    </message>
+    <message>
+        <source>Add file size</source>
+        <translation>Добавить размер файла</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
     <name>engineSelect</name>
     <message>
         <source>Search plugins</source>
@@ -6191,78 +6259,90 @@ However, those plugins were disabled.</source>
     <name>files_widget</name>
     <message>
         <source>files_widget</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tab 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tab 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All exchange files</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы обмена</translation>
     </message>
     <message>
         <source>All dirs</source>
-        <translation type="unfinished"></translation>
+        <translation>Все папки</translation>
     </message>
     <message>
         <source>File Name</source>
-        <translation type="unfinished">Имя файла</translation>
+        <translation>Имя файла</translation>
     </message>
     <message>
         <source>File Size</source>
-        <translation type="unfinished">Размер</translation>
+        <translation>Размер файла</translation>
     </message>
     <message>
         <source>Exchange Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Файлы обмена</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>Применить</translation>
     </message>
     <message>
         <source>Exchange folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Папки обмена</translation>
     </message>
     <message>
         <source>Exchange files</source>
-        <translation type="unfinished"></translation>
+        <translation>Файлы обмена</translation>
     </message>
     <message>
         <source>Exchange dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Обмениваться папкой</translation>
     </message>
     <message>
         <source>Exchange with subdirs</source>
-        <translation type="unfinished"></translation>
+        <translation>Обмениваться папкой вместе с подпапками</translation>
     </message>
     <message>
         <source>Don&apos;t exchange dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Не обмениваться папкой</translation>
     </message>
     <message>
         <source>Don&apos;t exchange with subdirs</source>
-        <translation type="unfinished"></translation>
+        <translation>Не обмениваться вместе с подпапками</translation>
+    </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>Make forum link</source>
+        <translation>Создать ссылку для форума</translation>
+    </message>
+    <message>
+        <source>Add file size</source>
+        <translation>Добавить размер файла</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <source>File ID</source>
+        <translation>Хэш файла</translation>
     </message>
 </context>
 <context>
     <name>info_dlg</name>
     <message>
         <source>Infodlg</source>
-        <translation type="unfinished">Информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <source>Familiar</source>
-        <translation type="unfinished">Ознакомлен</translation>
+        <translation>Ознакомлен</translation>
     </message>
 </context>
 <context>
@@ -6471,22 +6551,22 @@ However, those plugins were disabled.</source>
     <message>
         <source>KiB</source>
         <comment>kibibytes (1024 bytes)</comment>
-        <translation type="unfinished">Кб</translation>
+        <translation>Кб</translation>
     </message>
     <message>
         <source>MiB</source>
         <comment>mebibytes (1024 kibibytes)</comment>
-        <translation type="unfinished">Мб</translation>
+        <translation>Мб</translation>
     </message>
     <message>
         <source>GiB</source>
         <comment>gibibytes (1024 mibibytes)</comment>
-        <translation type="unfinished">Гб</translation>
+        <translation>Гб</translation>
     </message>
     <message>
         <source>TiB</source>
         <comment>tebibytes (1024 gibibytes)</comment>
-        <translation type="unfinished">Тб</translation>
+        <translation>Тб</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -6616,7 +6696,7 @@ However, those plugins were disabled.</source>
     <message>
         <source>Successfully parsed the provided IP filter: %1 rules were applied.</source>
         <comment>%1 is a number</comment>
-        <translation type="unfinished"></translation>
+        <translation>Успешно прочитан данный фильтр IP: %1 правил применено.</translation>
     </message>
 </context>
 <context>
@@ -6994,7 +7074,15 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Files</source>
-        <translation type="unfinished">Файлы</translation>
+        <translation>Файлы</translation>
+    </message>
+    <message>
+        <source>Column visibility</source>
+        <translation>Отображение колонок</translation>
+    </message>
+    <message>
+        <source>ED2K link</source>
+        <translation>ED2K ссылка</translation>
     </message>
 </context>
 <context>
@@ -7012,11 +7100,11 @@ However, those plugins were disabled.</source>
     <name>status_bar</name>
     <message>
         <source>status_bar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>eD2K:Connected</source>
-        <translation type="unfinished">eD2K:Соединен</translation>
+        <translation>eD2K:Соединен</translation>
     </message>
     <message>
         <source>eD2K:Disconnected</source>
@@ -7245,42 +7333,181 @@ eD2K Server</source>
     </message>
 </context>
 <context>
+    <name>torrent_properties</name>
+    <message>
+        <source>Properties</source>
+        <translation>Свойства</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <source>Downloaded:</source>
+        <translation>Скачано:</translation>
+    </message>
+    <message>
+        <source>Availability:</source>
+        <translation>Доступность:</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Передано</translation>
+    </message>
+    <message>
+        <source>Uploaded:</source>
+        <translation>Отдано:</translation>
+    </message>
+    <message>
+        <source>UP limit:</source>
+        <translation>Отд. огр:</translation>
+    </message>
+    <message>
+        <source>Share ratio:</source>
+        <translation>Соотношение раздачи:</translation>
+    </message>
+    <message>
+        <source>DL limit:</source>
+        <translation>Загр. огр:</translation>
+    </message>
+    <message>
+        <source>Connections:</source>
+        <translation>Соединения:</translation>
+    </message>
+    <message>
+        <source>Wasted:</source>
+        <translation>Потрачено:</translation>
+    </message>
+    <message>
+        <source>Time active:</source>
+        <extracomment>Time (duration) the torrent is active (not paused)</extracomment>
+        <translation>Время активности:</translation>
+    </message>
+    <message>
+        <source>Reannounce in:</source>
+        <translation>Переанонсировать через:</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Информация</translation>
+    </message>
+    <message>
+        <source>Save path:</source>
+        <translation>Путь сохранения:</translation>
+    </message>
+    <message>
+        <source>Created on:</source>
+        <translation>Создан на:</translation>
+    </message>
+    <message>
+        <source>Torrent hash:</source>
+        <translation>Хэш torrentа:</translation>
+    </message>
+    <message>
+        <source>Pieces size:</source>
+        <translation>Размер кусочков:</translation>
+    </message>
+    <message>
+        <source>Comment:</source>
+        <translation>Комментарий:</translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation>Содержание</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Выбрать все</translation>
+    </message>
+    <message>
+        <source>Select None</source>
+        <translation>Выбрать ничего</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Обычный</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Высокий</translation>
+    </message>
+    <message>
+        <source>Maximum</source>
+        <translation>Максимальный</translation>
+    </message>
+    <message>
+        <source>Do not download</source>
+        <translation>Не загружать</translation>
+    </message>
+    <message>
+        <source>this session</source>
+        <translation>эта сессия</translation>
+    </message>
+    <message>
+        <source>/s</source>
+        <comment>/second (i.e. per second)</comment>
+        <translation>/с</translation>
+    </message>
+    <message>
+        <source>Seeded for %1</source>
+        <comment>e.g. Seeded for 3m10s</comment>
+        <translation>Раздается %1</translation>
+    </message>
+    <message>
+        <source>%1 max</source>
+        <comment>e.g. 10 max</comment>
+        <translation>%1 макс</translation>
+    </message>
+    <message>
+        <source>I/O Error</source>
+        <translation>Ошибка ввода/вывода</translation>
+    </message>
+    <message>
+        <source>This file does not exist yet.</source>
+        <translation>Этот файл пока не существует.</translation>
+    </message>
+    <message>
+        <source>This folder does not exist yet.</source>
+        <translation>Эта папка пока не существует.</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
+    </message>
+</context>
+<context>
     <name>transfer_list</name>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Приём</translation>
     </message>
     <message>
         <source>Upload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InQueue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>KnownClient</source>
-        <translation type="unfinished"></translation>
+        <translation>Отдача</translation>
     </message>
     <message>
         <source>Add torrent file</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить торрент</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <source>Resume</source>
-        <translation type="unfinished">Возобновить</translation>
+        <translation>Возобновить</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished">Приостановить</translation>
+        <translation>Приостановить</translation>
     </message>
     <message>
         <source>Split window</source>
-        <translation type="unfinished"></translation>
+        <translation>Разделить окно</translation>
     </message>
 </context>
 <context>

@@ -29,10 +29,10 @@ QString QED2KHandle::name() const { return misc::toQStringU(m_delegate.filepath(
 
 QString QED2KHandle::save_path() const
 {
-	return misc::toQStringU(m_delegate.filepath().parent_path().string()).replace("\\", "/");
+    return misc::toQStringU(m_delegate.save_path().string()).replace("\\", "/");
 }
 
-QString QED2KHandle::firstFileSavePath() const { return QString(); }
+QString QED2KHandle::firstFileSavePath() const { return save_path(); }
 QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }

@@ -517,6 +517,19 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QToolButton" name="btnCloseAll">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Close all</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

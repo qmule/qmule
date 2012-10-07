@@ -26,7 +26,7 @@ Release:LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Release -L$$(CRYPTOPP_ROOT)
 #Point this to the ed2klib lib folder
 Debug:LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
 Release:LIBS += -L$$(LIBED2K_ROOT)/Win32/Release
-#DEFINES += _BIND_TO_CURRENT_VCLIBS_VERSION=1
+Release:DEFINES += _BIND_TO_CURRENT_VCLIBS_VERSION=1
 
 
 # LIBTORRENT DEFINES

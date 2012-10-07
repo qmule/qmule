@@ -12,6 +12,8 @@
 
 #include <QNetworkInterface>
 #include <QMessageBox>
+#include <QDir>
+#include <QDirIterator>
 
 #include "preferences.h"
 
@@ -415,7 +417,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
             atp.file_hash = ece.m_filehash;
             atp.file_path = filepath.toUtf8();
             atp.file_size = ece.m_filesize;
-            delegate()->add_transfer(atp);
+            addTransfer(atp);
         }
     }
 }
@@ -424,6 +426,48 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.filename().c_str());
     return QED2KHandle(delegate()->add_transfer(atp));
+}
+
+void QED2KSession::shareByED2K(const QTorrentHandle& h, bool unshare)
+{
+    QDir save_path(h.save_path());
+    int num_files = h.num_files();
+    std::set<QString> roots;
+    std::deque<std::string> excludes;
+
+    for (int i = 0; i < num_files; ++i)
+        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+
+    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
+    {
+        QString path = save_path.filePath(*i);  // never contains last separator
+        QFileInfo info(path);
+
+        if (info.isFile())
+        {
+            delegate()->share_file(path.toUtf8().constData(), unshare);
+        }
+        else if (info.isDir())
+        {
+            QStringList dlist;
+            dlist << path;
+            QDirIterator it(path, QDirIterator::Subdirectories);
+
+            while(it.hasNext())
+            {
+                QDir d = QFileInfo(it.next()).dir();
+                dlist << d.path();
+            }
+
+            dlist.removeDuplicates();
+
+            foreach(const QString& str, dlist)
+            {
+                delegate()->share_dir(
+                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
+            }
+        }
+    }
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
@@ -586,7 +630,7 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::peer_captcha_request_alert*>(a.get()))
         {
             QPixmap pm;
-            pm.loadFromData((const uchar*)&p->m_captcha[0], p->m_captcha.size());
+            if (!p->m_captcha.empty()) pm.loadFromData((const uchar*)&p->m_captcha[0], p->m_captcha.size()); // avoid windows rtl error
             emit peerCaptchaRequest(p->m_np, md4toQString(p->m_hash), pm);
         }
         else if (libed2k::peer_captcha_result_alert* p =
@@ -630,9 +674,30 @@ void QED2KSession::readAlerts()
         {
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
+        else if (libed2k::finished_transfer_alert* p =
+                 dynamic_cast<libed2k::finished_transfer_alert*>(a.get()))
+        {
+            if (p->m_had_picker)
+                emit finishedTransfer(Transfer(QED2KHandle(p->m_handle)));
+
+            Preferences pref;
+            if (pref.isAutoRunEnabled() && p->m_had_picker)
+                autoRunExternalProgram(Transfer(QED2KHandle(p->m_handle)));
+        }
         else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
         {
             writeResumeData(p);
+        }
+        else if (libed2k::file_error_alert* p = dynamic_cast<libed2k::file_error_alert*>(a.get()))
+        {
+            QED2KHandle h(p->m_handle);
+
+            if (h.is_valid())
+            {
+                h.pause();
+                addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
+                addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
+            }
         }
 
         a = m_session->pop_alert();

@@ -64,7 +64,8 @@ public:
     virtual void saveFastResumeData() = 0;
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
-    virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0; //!< ed2k session only
+    virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0;   //!< ed2k session only
+    virtual void shareByED2K(const QTorrentHandle& h, bool unshare) = 0;        //!< ed2k session only
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -73,12 +74,14 @@ public:
     virtual void addConsoleMessage(
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
+    virtual void autoRunExternalProgram(const Transfer &t);
 
 public slots:
     virtual void pauseTransfer(const QString& hash);
     virtual void resumeTransfer(const QString& hash);
     virtual void pauseAllTransfers();
     virtual void resumeAllTransfers();
+    virtual void cleanUpAutoRunProcess(int);
 
     /**
       * return minimum progress in transfers
@@ -89,6 +92,7 @@ signals:
     void addedTransfer(Transfer t);
     void pausedTransfer(Transfer t);
     void resumedTransfer(Transfer t);
+    void finishedTransfer(Transfer t);
     void deletedTransfer(QString hash);
     void transferAboutToBeRemoved(Transfer t);
     void newConsoleMessage(const QString &msg);
@@ -121,12 +125,26 @@ private:
     if (!S::started()) return def;              \
     else return S::call
 
-#define FORWARD_RETURN1(call, arg1, def)  \
+#define FORWARD_RETURN1(call, arg1, def)        \
     if (!S::started()) return def;              \
     else return S::call(arg1)
 
 #define FORWARD_RETURN2(call, arg1, arg2, def)  \
     if (!S::started()) return def;              \
+    else return S::call(arg1, arg2)
+
+#define DEFER_RETURN1(call, arg1, def)                                  \
+    if (!S::started()) {                                                \
+        m_deferred.push(boost::bind(&S::call, this, arg1));             \
+        return def;                                                     \
+    }                                                                   \
+    else return S::call(arg1)
+
+#define DEFER_RETURN2(call, arg1, arg2, def)                            \
+    if (!S::started()) {                                                \
+        m_deferred.push(boost::bind(&S::call, this, arg1, arg2));       \
+        return def;                                                     \
+    }                                                                   \
     else return S::call(arg1, arg2)
 
 template <typename S>
@@ -174,11 +192,12 @@ public:
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
     void saveFastResumeData() { DEFER0(saveFastResumeData); }
-
-    Transfer addLink(QString strLink, bool resumed = false) { FORWARD_RETURN2(addLink, strLink, resumed, Transfer()); }
+    Transfer addLink(QString strLink, bool resumed = false) {
+        DEFER_RETURN2(addLink, strLink, resumed, Transfer()); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
-    QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) { DEFER1(addTransfer, atp); return QED2KHandle(); } //!< save call and return empty handle
-
+    void shareByED2K(const QTorrentHandle& h, bool unshare) { DEFER2(shareByED2K, h, unshare); }
+    QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
+        DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 
 private:
