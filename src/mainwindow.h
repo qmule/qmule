@@ -128,7 +128,7 @@ protected slots:
   void readSettings();
   void on_actionExit_triggered();
   void createTrayIcon();
-  void fullDiskError(const Transfer& h, QString msg) const;
+  void fileError(const Transfer& h, QString msg) const;
   void handleDownloadFromUrlFailure(QString, QString) const;
   void createSystrayDelayed();
   void tab_changed(int);

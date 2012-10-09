@@ -582,10 +582,6 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Примечание: новые URL сидов были добавлены к существующему торренту.</translation>
     </message>
     <message>
-        <source>An I/O error occured, &apos;%1&apos; paused.</source>
-        <translation type="obsolete">Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
-    </message>
-    <message>
         <source>Removing torrent %1...</source>
         <translation type="obsolete">Удаление торрента %1...</translation>
     </message>
@@ -1125,8 +1121,7 @@ You should get this information from your Web browser preferences.</source>
     </message>
     <message>
         <source>I/O Error</source>
-        <comment>i.e: Input/Output Error</comment>
-        <translation type="obsolete">Ошибка ввода/вывода</translation>
+        <translation>Ошибка ввода/вывода</translation>
     </message>
     <message>
         <source>Search</source>
@@ -1135,14 +1130,6 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>RSS</source>
         <translation type="obsolete">RSS</translation>
-    </message>
-    <message>
-        <source>An I/O error occured for torrent %1.
- Reason: %2</source>
-        <comment>e.g: An error occured for torrent xxx.avi.
- Reason: disk is full.</comment>
-        <translation type="obsolete">Произошла ошибка ввода/вывода для торрента %1.
-Причина: %2</translation>
     </message>
     <message>
         <source>Alt+1</source>
@@ -2005,16 +1992,17 @@ Do you want to associate qMule to torrent files and Magnet links?</source>
     </message>
     <message>
         <source>I/O Error</source>
-        <comment>i.e: Input/Output Error</comment>
         <translation>Ошибка ввода/вывода</translation>
     </message>
     <message>
-        <source>An I/O error occured for torrent %1.
- Reason: %2</source>
-        <comment>e.g: An error occured for torrent xxx.avi.
- Reason: disk is full.</comment>
-        <translation>Произошла ошибка ввода/вывода для торрента %1.
+        <source>An I/O error occured for %1.
+Reason: %2</source>
+        <translation>Произошла ошибка ввода/вывода для %1.
 Причина: %2</translation>
+    </message>
+    <message>
+        <source>No space left on device</source>
+        <translation>Недостаточно места на диске</translation>
     </message>
     <message>
         <source>Alt+1</source>
@@ -3676,14 +3664,6 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>[qMule] %1 has finished downloading</source>
         <translation type="obsolete">[qMule] скачивание %1 завершено</translation>
-    </message>
-    <message>
-        <source>An I/O error occured, &apos;%1&apos; paused.</source>
-        <translation type="obsolete">Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
-    </message>
-    <message>
-        <source>Reason: %1</source>
-        <translation type="obsolete">Причина: %1</translation>
     </message>
     <message>
         <source>UPnP/NAT-PMP: Port mapping failure, message: %1</source>
@@ -5626,14 +5606,6 @@ Do you want to install it now?</source>
     <message>
         <source>qBittorrent will now exit unless you cancel within the next 15 seconds...</source>
         <translation type="obsolete">Сейчас qBittorrent будет завершен, если вы не отмените это в течение следующих 15 секунд...</translation>
-    </message>
-    <message>
-        <source>An I/O error occured, &apos;%1&apos; paused.</source>
-        <translation type="unfinished">Ошибка Ввода/Вывода: &apos;%1&apos; приостановлен.</translation>
-    </message>
-    <message>
-        <source>Reason: %1</source>
-        <translation type="unfinished">Причина: %1</translation>
     </message>
     <message>
         <source>UPnP/NAT-PMP: Port mapping failure, message: %1</source>

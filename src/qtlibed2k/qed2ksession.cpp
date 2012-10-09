@@ -694,9 +694,8 @@ void QED2KSession::readAlerts()
 
             if (h.is_valid())
             {
+                emit fileError(Transfer(h), misc::toQStringU(p->message()));
                 h.pause();
-                addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
-                addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
             }
         }
 

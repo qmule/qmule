@@ -1314,20 +1314,6 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="529"/>
-        <source>I/O Error</source>
-        <comment>i.e: Input/Output Error</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="529"/>
-        <source>An I/O error occured for torrent %1.
- Reason: %2</source>
-        <comment>e.g: An error occured for torrent xxx.avi.
- Reason: disk is full.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../mainwindow.cpp" line="536"/>
         <source>Alt+1</source>
         <comment>shortcut to switch to first tab</comment>
@@ -2953,17 +2939,6 @@ Would you like to update qMule to version %1?</source>
     <message>
         <location filename="../qtlibtorrent/qbtsession.cpp" line="2124"/>
         <source>[qMule] %1 has finished downloading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qtlibtorrent/qbtsession.cpp" line="2374"/>
-        <source>An I/O error occured, &apos;%1&apos; paused.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qtlibtorrent/qbtsession.cpp" line="2375"/>
-        <location filename="../qtlibtorrent/qbtsession.cpp" line="2486"/>
-        <source>Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

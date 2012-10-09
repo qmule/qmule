@@ -22,8 +22,10 @@ struct SessionStatus
     int payload_download_rate;
 
     SessionStatus() : payload_upload_rate(0), payload_download_rate(0) {}
-    SessionStatus(const libtorrent::session_status& s) : payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate) {}
-    SessionStatus(const libed2k::session_status& s) : payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate){}
+    SessionStatus(const libtorrent::session_status& s) :
+        payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate) {}
+    SessionStatus(const libed2k::session_status& s) :
+        payload_upload_rate(s.payload_upload_rate), payload_download_rate(s.payload_download_rate) {}
 };
 
 const int MAX_LOG_MESSAGES = 100;
@@ -96,6 +98,7 @@ signals:
     void deletedTransfer(QString hash);
     void transferAboutToBeRemoved(Transfer t);
     void newConsoleMessage(const QString &msg);
+    void fileError(Transfer t, QString msg);
 
 private:
     QStringList consoleMessages;

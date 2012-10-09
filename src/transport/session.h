@@ -81,9 +81,7 @@ public slots:
     virtual void addTransferFromFile(const QString& filename);
 
 signals:
-    void finishedTransfer(Transfer t);
     void metadataReceived(Transfer t);
-    void fullDiskError(Transfer t, QString msg);
     void transferFinishedChecking(Transfer t);
     void trackerAuthenticationRequired(Transfer t);
     void newDownloadedTransfer(QString path, QString url);
@@ -98,7 +96,6 @@ private slots:
     void on_pausedTorrent(const QTorrentHandle& h);
     void on_finishedTorrent(const QTorrentHandle& h);
     void on_metadataReceived(const QTorrentHandle& h);
-    void on_fullDiskError(const QTorrentHandle& h, QString msg);
     void on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files);
     void on_torrentFinishedChecking(const QTorrentHandle& h);
     void on_trackerAuthenticationRequired(const QTorrentHandle& h);

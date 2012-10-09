@@ -169,8 +169,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
   actionLock_qMule->setMenu(lockMenu);
   // Creating Bittorrent session
-  connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)),
-          this, SLOT(fullDiskError(Transfer, QString)));
+  connect(Session::instance(), SIGNAL(fileError(Transfer, QString)),
+          this, SLOT(fileError(Transfer, QString)));
   connect(Session::instance(), SIGNAL(addedTransfer(Transfer)),
           this, SLOT(addedTransfer(Transfer)));
   connect(Session::instance(), SIGNAL(finishedTransfer(Transfer)),
@@ -529,12 +529,10 @@ void MainWindow::finishedTransfer(const Transfer& h) const {
 }
 
 // Notification when disk is full
-void MainWindow::fullDiskError(const Transfer& h, QString msg) const {
-  if (h.is_valid())
+void MainWindow::fileError(const Transfer& h, QString msg) const {
     showNotificationBaloon(
-      tr("I/O Error", "i.e: Input/Output Error"),
-      tr("An I/O error occured for torrent %1.\n Reason: %2",
-         "e.g: An error occured for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
+        tr("I/O Error"),
+        tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(tr(msg.toAscii().data())));
 }
 
 void MainWindow::createKeyboardShortcuts() {
