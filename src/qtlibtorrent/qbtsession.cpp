@@ -2264,7 +2264,7 @@ void QBtSession::readAlerts() {
 
       if (h.is_valid())
       {
-          emit fileError(Transfer(h), misc::toQStringU(p->message()));
+          emit fileError(Transfer(h), misc::toQStringU(p->error.message()));
           h.pause();
       }
     }
