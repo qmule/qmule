@@ -2001,10 +2001,6 @@ Reason: %2</source>
 Причина: %2</translation>
     </message>
     <message>
-        <source>No space left on device</source>
-        <translation>Недостаточно места на диске</translation>
-    </message>
-    <message>
         <source>Alt+1</source>
         <comment>shortcut to switch to first tab</comment>
         <translation>Alt+1</translation>
