@@ -528,11 +528,11 @@ void MainWindow::finishedTransfer(const Transfer& h) const {
       tr("%1 has finished downloading.", "e.g: xxx.avi has finished downloading.").arg(h.name()));
 }
 
-// Notification when disk is full
+// Notification when disk is full and other disk errors
 void MainWindow::fileError(const Transfer& h, QString msg) const {
     showNotificationBaloon(
         tr("I/O Error"),
-        tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(tr(msg.toAscii().data())));
+        tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(msg));
 }
 
 void MainWindow::createKeyboardShortcuts() {

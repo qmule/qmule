@@ -2264,7 +2264,7 @@ void QBtSession::readAlerts() {
 
       if (h.is_valid())
       {
-          emit fileError(Transfer(h), misc::toQStringU(p->error.message()));
+          emit fileError(Transfer(h), QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
           h.pause();
       }
     }
