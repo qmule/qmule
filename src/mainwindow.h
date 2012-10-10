@@ -128,7 +128,7 @@ protected slots:
   void readSettings();
   void on_actionExit_triggered();
   void createTrayIcon();
-  void fileError(const Transfer& h, QString msg) const;
+  void fileError(const Transfer& h, QString msg);
   void handleDownloadFromUrlFailure(QString, QString) const;
   void createSystrayDelayed();
   void tab_changed(int);
@@ -242,6 +242,7 @@ private:
   QIcon icon_CurTray;
 
   ConeectionState connectioh_state;
+  QDateTime       m_last_file_error;
 
 private slots:
     void on_actionSpeed_in_title_bar_triggered();

@@ -103,6 +103,7 @@ using namespace libtorrent;
 MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
   setupUi(this);
 
+  m_last_file_error = QDateTime::currentDateTime().addSecs(-1); // imagine last file error event was 1 seconds in past
   m_tbar.reset(new taskbar_iface(this, 99));
 #ifdef Q_WS_WIN
   m_nTaskbarButtonCreated = RegisterWindowMessage(L"TaskbarButtonCreated");
@@ -529,10 +530,18 @@ void MainWindow::finishedTransfer(const Transfer& h) const {
 }
 
 // Notification when disk is full and other disk errors
-void MainWindow::fileError(const Transfer& h, QString msg) const {
-    showNotificationBaloon(
-        tr("I/O Error"),
-        tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(msg));
+void MainWindow::fileError(const Transfer& h, QString msg)
+{
+    QDateTime cdt = QDateTime::currentDateTime();
+
+    if (m_last_file_error.secsTo(cdt) > 1)
+    {
+        showNotificationBaloon(
+            tr("I/O Error"),
+            tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(msg));
+    }
+
+    m_last_file_error = cdt;
 }
 
 void MainWindow::createKeyboardShortcuts() {
