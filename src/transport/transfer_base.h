@@ -77,9 +77,6 @@ struct TransferStatus
     int progress_ppm;
     QString error;
 
-    //boost::posix_time::time_duration next_announce;
-    //boost::posix_time::time_duration announce_interval;
-
     QString current_tracker;
 
     TransferSize total_download;
@@ -118,7 +115,6 @@ struct TransferStatus
     int num_connections;
     int uploads_limit;
     int connections_limit;
-    //storage_mode_t storage_mode;
 
     int up_bandwidth_queue;
     int down_bandwidth_queue;
@@ -139,6 +135,59 @@ struct TransferStatus
     bool seed_mode;
     bool upload_mode;
     int priority;
+
+    TransferStatus() :
+        state(qt_unhandled_state),
+        paused(false),
+        progress(0),
+        progress_ppm(0),
+        error(QString()),
+        current_tracker(QString()),
+        total_download(0),
+        total_upload(0),
+        total_payload_download(0),
+        total_payload_upload(0),
+        total_failed_bytes(0),
+        total_redundant_bytes(0),
+        download_rate(0),
+        upload_rate(0),
+        download_payload_rate(0),
+        upload_payload_rate(0),
+        num_seeds(0),
+        num_peers(0),
+        num_complete(0),
+        num_incomplete(0),
+        list_seeds(0),
+        list_peers(0),
+        connect_candidates(0),
+        // TransferBitfield pieces;
+        num_pieces(0),
+        total_done(0),
+        total_wanted_done(0),
+        total_wanted(0),
+        distributed_full_copies(0),
+        distributed_fraction(0),
+        distributed_copies(0),
+        block_size(0),
+        num_uploads(0),
+        num_connections(0),
+        uploads_limit(0),
+        connections_limit(0),
+        up_bandwidth_queue(0),
+        down_bandwidth_queue(0),
+        all_time_upload(0),
+        all_time_download(0),
+        active_time(0),
+        finished_time(0),
+        seeding_time(0),
+        seed_rank(0),
+        last_scrape(0),
+        has_incoming(false),
+        sparse_regions(0),
+        seed_mode(false),
+        upload_mode(false),
+        priority(0)
+    {}
 };
 
 template<typename TS>
@@ -150,8 +199,6 @@ TransferStatus transfer_status2TS(const TS& t)
     ts.progress                = t.progress;
     ts.progress_ppm            = t.progress_ppm;
     ts.error                   = misc::toQStringU(t.error);
-    //boost::posix_time::time_duration next_announce;
-    //boost::posix_time::time_duration announce_interval;
 
     ts.current_tracker         = misc::toQStringU(t.current_tracker);
     ts.total_download          = t.total_download;
@@ -205,7 +252,6 @@ TransferStatus transfer_status2TS(const TS& t)
 struct PeerInfo
 {
     int connection_type;
-    QString client;
     float   progress;
     int payload_down_speed;
     int payload_up_speed;
@@ -213,6 +259,20 @@ struct PeerInfo
     TransferSize total_upload;
     libed2k::tcp::endpoint ip;
     char country[2];
+    QString client;
+
+    PeerInfo() :
+        connection_type(0),
+        progress(0),
+        payload_down_speed(0),
+        payload_up_speed(0),
+        total_download(0),
+        total_upload(0)
+    {
+        country[0] = '\x00';
+        country[1] = '\x00';
+    }
+
 };
 
 template<typename PF>
