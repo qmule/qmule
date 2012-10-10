@@ -178,7 +178,12 @@ std::vector<AnnounceEntry> Transfer::trackers() const {
 
 void Transfer::pause() const { m_delegate->pause(); }
 
-void Transfer::resume() const { m_delegate->resume(); }
+void Transfer::resume() const {
+    m_delegate->resume();
+    // force reset upload mode on resume
+    if (m_delegate->status().upload_mode)
+        m_delegate->set_upload_mode(false);
+}
 
 void Transfer::move_storage(const QString& path) const { m_delegate->move_storage(path); }
 

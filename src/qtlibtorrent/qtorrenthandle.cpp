@@ -919,6 +919,8 @@ void QTorrentHandle::rename_file(int index, const QString& name) const {
   torrent_handle::rename_file(index, std::string(name.toUtf8().constData()));
 }
 
+void QTorrentHandle::set_upload_mode(bool b) const { torrent_handle::set_upload_mode(b); }
+
 //
 // Operators
 //

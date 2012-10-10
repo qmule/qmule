@@ -330,6 +330,7 @@ public:
     virtual void queue_position_bottom() const = 0;
     virtual void super_seeding(bool ss) const = 0;
     virtual void set_sequential_download(bool sd) const = 0;
+    virtual void set_upload_mode(bool b) const = 0;
 };
 
 #endif

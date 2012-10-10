@@ -164,6 +164,7 @@ public:
   bool save_torrent_file(const QString& path) const;
   void prioritize_files(const std::vector<int>& files) const;
   void file_priority(int index, int priority) const;
+  void set_upload_mode(bool b) const;
 
   //
   // Operators
