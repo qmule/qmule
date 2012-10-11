@@ -219,6 +219,7 @@ void QED2KSession::start()
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
     m_settings.m_known_file = pref.knownFile().toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
+    m_settings.mod_name = misc::productName().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 

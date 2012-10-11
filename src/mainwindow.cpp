@@ -113,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   Preferences pref;
   pref.migrate();
   ui_locked = pref.isUILocked();
-  setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
+  setWindowTitle(misc::productName());
   displaySpeedInTitle = pref.speedInTitleBar();
   // Clean exit on log out
   connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteSession()));
