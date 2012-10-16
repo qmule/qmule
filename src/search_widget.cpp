@@ -718,6 +718,7 @@ void search_widget::startSearch()
 void search_widget::continueSearch()
 {
     btnStart->setEnabled(false);
+    btnCloseAll->setEnabled(false);
     btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
 
@@ -732,7 +733,8 @@ void search_widget::cancelSearch()
 {
     Session::instance()->get_ed2k_session()->cancelSearch();
 
-    btnStart->setEnabled(true);
+    btnStart->setDisabled(comboName->currentText().isEmpty());
+    btnCloseAll->setEnabled(true);
     btnCancel->setEnabled(false);
     btnMore->setEnabled(false);
 
@@ -786,7 +788,8 @@ void search_widget::processSearchResult(
         return;
 
     tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
-    btnStart->setEnabled(nSearchesInProgress == 0);
+    btnStart->setEnabled((nSearchesInProgress == 0) && (!comboName->currentText().isEmpty()));
+    btnCloseAll->setEnabled(nSearchesInProgress == 0);
     btnCancel->setEnabled(nSearchesInProgress != 0);
 
     if (obMoreResult)
@@ -923,6 +926,7 @@ void search_widget::prepareNewSearch(
 
     clearSearchTable();
     btnStart->setEnabled(false);
+    btnCloseAll->setEnabled(false);
     btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
 }
@@ -933,7 +937,7 @@ void search_widget::closeTab(int index)
     {
         nCurTabSearch = -1;
 
-        btnStart->setEnabled(true);
+        btnStart->setDisabled(comboName->currentText().isEmpty());
         btnCancel->setEnabled(false);
         btnMore->setEnabled(false);
 
@@ -1168,6 +1172,7 @@ void search_widget::closeAllTabs()
     }
 
     closeAll->setDisabled(true);
+    btnMore->setDisabled(true);
     searchFilter->hide();
 }
 
