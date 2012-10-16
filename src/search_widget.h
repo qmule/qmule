@@ -179,7 +179,6 @@ private slots:
     void ed2kSearchFinished(const libed2k::net_identifier& np,const QString& hash,
                             const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
     void torrentSearchFinished(bool ok);
-
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
     void addFriend(const QString& user_name, const libed2k::net_identifier& np);
