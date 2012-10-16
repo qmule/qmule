@@ -7147,7 +7147,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Verbose</source>
-        <translation></translation>
+        <translation>Детали</translation>
     </message>
     <message>
         <source>My info</source>
