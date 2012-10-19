@@ -787,8 +787,24 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
   QStringList filters;
   filters << hash+".*";
   const QStringList files = torrentBackup.entryList(filters, QDir::Files, QDir::Unsorted);
-  foreach (const QString &file, files) {
-    QFile::remove(torrentBackup.absoluteFilePath(file));
+  foreach (const QString &file, files)
+  {
+      qDebug() << "remove file " << torrentBackup.absoluteFilePath(file);
+      QFile f(torrentBackup.absoluteFilePath(file));
+
+      if (!f.remove())
+      {
+          qDebug() << "unable remove file: " << f.errorString();
+
+          if (f.setPermissions(QFile::ReadOwner | QFile::WriteOwner))
+          {
+              qDebug() << "erase file after set permissions";
+              if (!f.remove())
+              {
+                  qDebug() << "unable to remove file " << f.errorString();
+              }
+          }
+      }
   }
   // Remove tracker errors
   trackersInfos.remove(hash);
