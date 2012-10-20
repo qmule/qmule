@@ -242,6 +242,7 @@ private:
   QIcon icon_CurTray;
 
   ConeectionState connectioh_state;
+  bool            m_bDisconnectBtnPressed;
   QDateTime       m_last_file_error;
 
 private slots:

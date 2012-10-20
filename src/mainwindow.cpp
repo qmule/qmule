@@ -103,6 +103,7 @@ using namespace libtorrent;
 MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
   setupUi(this);
 
+  m_bDisconnectBtnPressed = false;
   m_last_file_error = QDateTime::currentDateTime().addSecs(-1); // imagine last file error event was 1 seconds in past
   m_tbar.reset(new taskbar_iface(this, 99));
 #ifdef Q_WS_WIN
@@ -1062,6 +1063,7 @@ void MainWindow::on_actionConnect_triggered()
     confirmBox.addButton(tr("No"), QMessageBox::NoRole);
     QPushButton *yesBtn = confirmBox.addButton(tr("Yes"), QMessageBox::YesRole);
     confirmBox.setDefaultButton(yesBtn);
+    m_bDisconnectBtnPressed = false;
 
     switch (connectioh_state)
     {
@@ -1076,6 +1078,7 @@ void MainWindow::on_actionConnect_triggered()
             confirmBox.exec();
             if (confirmBox.clickedButton() && confirmBox.clickedButton() == yesBtn)
             {
+                m_bDisconnectBtnPressed = true; // mark user press button
                 Session::instance()->get_ed2k_session()->stopServerConnection();
             }
 
@@ -1814,6 +1817,12 @@ void MainWindow::ed2kConnectionClosed(QString strError)
     setDisconnectedStatus();
 
     statusBar->setStatusMsg(strError);
+
+    if (!m_bDisconnectBtnPressed)
+    {
+        // start new connection iteration
+        on_actionConnect_triggered();
+    }
 }
 
 
