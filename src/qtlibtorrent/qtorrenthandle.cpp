@@ -164,9 +164,9 @@ float QTorrentHandle::progress() const {
 
 bitfield QTorrentHandle::pieces() const {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).pieces;
+  return bitfield2TBF(torrent_handle::status(0x0).pieces);
 #else
-  return torrent_handle::status().pieces;
+  return bitfield2TBF(torrent_handle::status().pieces);
 #endif
 }
 
@@ -373,20 +373,20 @@ QString QTorrentHandle::orig_filepath_at(unsigned int index) const {
 #endif
 }
 
-torrent_status::state_t QTorrentHandle::state() const {
+TransferState QTorrentHandle::state() const {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).state;
+  return libstate2tstate(torrent_handle::status(0x0));
 #else
-  return torrent_handle::status().state;
+  return libstate2tstate(torrent_handle::status());
 #endif
 }
 
-libtorrent::torrent_status QTorrentHandle::status() const
+TransferStatus QTorrentHandle::status() const
 {
 #if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0);
+  return transfer_status2TS(torrent_handle::status(0x0));
 #else
-  return torrent_handle::status();
+  return transfer_status2TS(torrent_handle::status());
 #endif
 }
 
@@ -492,8 +492,11 @@ QStringList QTorrentHandle::absolute_files_path_uneeded() const {
   return res;
 }
 
-void QTorrentHandle::get_peer_info(std::vector<libtorrent::peer_info>& peers) const {
-    torrent_handle::get_peer_info(peers);
+void QTorrentHandle::get_peer_info(std::vector<PeerInfo>& peers) const
+{
+    std::vector<libtorrent::peer_info> lt_peers;
+    torrent_handle::get_peer_info(lt_peers);
+    std::transform(lt_peers.begin(), lt_peers.end(), std::back_inserter(peers), peer_info2PInfo<libtorrent::peer_info>);
 }
 std::vector<libtorrent::announce_entry> QTorrentHandle::trackers() const {
     return torrent_handle::trackers();
@@ -915,6 +918,8 @@ void QTorrentHandle::rename_file(int index, const QString& name) const {
   qDebug() << Q_FUNC_INFO << index << name;
   torrent_handle::rename_file(index, std::string(name.toUtf8().constData()));
 }
+
+void QTorrentHandle::set_upload_mode(bool b) const { torrent_handle::set_upload_mode(b); }
 
 //
 // Operators

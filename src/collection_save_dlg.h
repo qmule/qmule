@@ -9,7 +9,7 @@ struct FileData
 {
     QString             file_name;
     libed2k::md4_hash   file_hash;
-    libed2k::fsize_t    file_size;
+    libed2k::size_type  file_size;
 };
 
 class collection_save_dlg : public QDialog, public Ui::collection_save_dlg

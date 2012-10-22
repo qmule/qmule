@@ -50,7 +50,6 @@ class downloadFromURL;
 class options_imp;
 class TransferListWidget;
 class TransferListFiltersWidget;
-class PropertiesWidget;
 class status_bar;
 class consoleDlg;
 class TorrentCreatorDlg;
@@ -129,7 +128,7 @@ protected slots:
   void readSettings();
   void on_actionExit_triggered();
   void createTrayIcon();
-  void fullDiskError(const Transfer& h, QString msg) const;
+  void fileError(const Transfer& h, QString msg);
   void handleDownloadFromUrlFailure(QString, QString) const;
   void createSystrayDelayed();
   void tab_changed(int);
@@ -243,6 +242,8 @@ private:
   QIcon icon_CurTray;
 
   ConeectionState connectioh_state;
+  bool            m_bDisconnectBtnPressed;
+  QDateTime       m_last_file_error;
 
 private slots:
     void on_actionSpeed_in_title_bar_triggered();

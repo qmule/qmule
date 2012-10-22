@@ -62,11 +62,9 @@
 #include "options_imp.h"
 #include "speedlimitdlg.h"
 #include "preferences.h"
-#include "trackerlist.h"
 #include "peerlistwidget.h"
 #include "torrentpersistentdata.h"
 #include "transferlistfilterswidget.h"
-#include "propertieswidget.h"
 #include "hidabletabwidget.h"
 #include "qinisettings.h"
 #include "torrentimportdlg.h"
@@ -105,6 +103,8 @@ using namespace libtorrent;
 MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
   setupUi(this);
 
+  m_bDisconnectBtnPressed = false;
+  m_last_file_error = QDateTime::currentDateTime().addSecs(-1); // imagine last file error event was 1 seconds in past
   m_tbar.reset(new taskbar_iface(this, 99));
 #ifdef Q_WS_WIN
   m_nTaskbarButtonCreated = RegisterWindowMessage(L"TaskbarButtonCreated");
@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   Preferences pref;
   pref.migrate();
   ui_locked = pref.isUILocked();
-  setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
+  setWindowTitle(misc::productName());
   displaySpeedInTitle = pref.speedInTitleBar();
   // Clean exit on log out
   connect(static_cast<SessionApplication*>(qApp), SIGNAL(sessionIsShuttingDown()), this, SLOT(deleteSession()));
@@ -171,8 +171,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
   actionLock_qMule->setMenu(lockMenu);
   // Creating Bittorrent session
-  connect(Session::instance(), SIGNAL(fullDiskError(Transfer, QString)),
-          this, SLOT(fullDiskError(Transfer, QString)));
+  connect(Session::instance(), SIGNAL(fileError(Transfer, QString)),
+          this, SLOT(fileError(Transfer, QString)));
   connect(Session::instance(), SIGNAL(addedTransfer(Transfer)),
           this, SLOT(addedTransfer(Transfer)));
   connect(Session::instance(), SIGNAL(finishedTransfer(Transfer)),
@@ -530,13 +530,19 @@ void MainWindow::finishedTransfer(const Transfer& h) const {
       tr("%1 has finished downloading.", "e.g: xxx.avi has finished downloading.").arg(h.name()));
 }
 
-// Notification when disk is full
-void MainWindow::fullDiskError(const Transfer& h, QString msg) const {
-  if (h.is_valid())
-    showNotificationBaloon(
-      tr("I/O Error", "i.e: Input/Output Error"),
-      tr("An I/O error occured for torrent %1.\n Reason: %2",
-         "e.g: An error occured for torrent xxx.avi.\n Reason: disk is full.").arg(h.name()).arg(msg));
+// Notification when disk is full and other disk errors
+void MainWindow::fileError(const Transfer& h, QString msg)
+{
+    QDateTime cdt = QDateTime::currentDateTime();
+
+    if (m_last_file_error.secsTo(cdt) > 1)
+    {
+        showNotificationBaloon(
+            tr("I/O Error"),
+            tr("An I/O error occured for %1.\nReason: %2").arg(h.name()).arg(msg));
+    }
+
+    m_last_file_error = cdt;
 }
 
 void MainWindow::createKeyboardShortcuts() {
@@ -1057,6 +1063,7 @@ void MainWindow::on_actionConnect_triggered()
     confirmBox.addButton(tr("No"), QMessageBox::NoRole);
     QPushButton *yesBtn = confirmBox.addButton(tr("Yes"), QMessageBox::YesRole);
     confirmBox.setDefaultButton(yesBtn);
+    m_bDisconnectBtnPressed = false;
 
     switch (connectioh_state)
     {
@@ -1071,6 +1078,7 @@ void MainWindow::on_actionConnect_triggered()
             confirmBox.exec();
             if (confirmBox.clickedButton() && confirmBox.clickedButton() == yesBtn)
             {
+                m_bDisconnectBtnPressed = true; // mark user press button
                 Session::instance()->get_ed2k_session()->stopServerConnection();
             }
 
@@ -1809,6 +1817,12 @@ void MainWindow::ed2kConnectionClosed(QString strError)
     setDisconnectedStatus();
 
     statusBar->setStatusMsg(strError);
+
+    if (!m_bDisconnectBtnPressed)
+    {
+        // start new connection iteration
+        on_actionConnect_triggered();
+    }
 }
 
 

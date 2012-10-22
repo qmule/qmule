@@ -93,8 +93,8 @@ public:
   libtorrent::size_type filesize_at(unsigned int index) const;
   QString filepath_at(unsigned int index) const;
   QString orig_filepath_at(unsigned int index) const;
-  libtorrent::torrent_status::state_t state() const;
-  libtorrent::torrent_status status() const;
+  TransferState state() const;
+  TransferStatus status() const;
   libtorrent::torrent_info get_info() const;
   QString creator() const;
   QString comment() const;
@@ -107,7 +107,7 @@ public:
   libtorrent::size_type total_done() const;
   QStringList absolute_files_path() const;
   QStringList absolute_files_path_uneeded() const;
-  void get_peer_info(std::vector<libtorrent::peer_info>& peers) const;
+  void get_peer_info(std::vector<PeerInfo>& peers) const;
   std::vector<libtorrent::announce_entry> trackers() const;
 
   void flush_cache() const;
@@ -164,6 +164,7 @@ public:
   bool save_torrent_file(const QString& path) const;
   void prioritize_files(const std::vector<int>& files) const;
   void file_priority(int index, int priority) const;
+  void set_upload_mode(bool b) const;
 
   //
   // Operators

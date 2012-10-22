@@ -88,11 +88,9 @@ public:
   std::vector<Transfer> getTransfers() const;
   qreal getPayloadDownloadRate() const;
   qreal getPayloadUploadRate() const;
-  libtorrent::session_status getSessionStatus() const;
+  SessionStatus getSessionStatus() const;
   QHash<QString, TrackerInfos> getTrackersInfo(const QString &hash) const;
   bool hasDownloadingTorrents() const;
-  //int getMaximumActiveDownloads() const;
-  //int getMaximumActiveTorrents() const;  
   inline QStringList getPeerBanMessages() const { return peerBanMessages; }
   inline libtorrent::session* getSession() const { return s; }
   inline bool useTemporaryFolder() const { return !defaultTempPath.isEmpty(); }

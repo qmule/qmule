@@ -8,18 +8,21 @@
 
 using namespace libtorrent;
 
+
 SessionStatus operator + (const SessionStatus& s1, const SessionStatus& s2){
     SessionStatus s = s1;
-
+/*
     s.has_incoming_connections = s1.has_incoming_connections || s2.has_incoming_connections;
 
     s.upload_rate += s2.upload_rate;
     s.download_rate += s2.download_rate;
     s.total_download += s2.total_download;
     s.total_upload += s2.total_upload;
+    */
 
     s.payload_upload_rate += s2.payload_upload_rate;
     s.payload_download_rate += s2.payload_download_rate;
+    /*
     s.total_payload_download += s2.total_payload_download;
     s.total_payload_upload += s2.total_payload_upload;
 
@@ -53,9 +56,10 @@ SessionStatus operator + (const SessionStatus& s1, const SessionStatus& s2){
 
     s.optimistic_unchoke_counter += s2.optimistic_unchoke_counter;
     s.unchoke_counter += s2.unchoke_counter;
-
+*/
     return s;
 }
+
 
 Session* Session::m_instance = NULL;
 
@@ -94,8 +98,6 @@ Session::Session()
             this, SLOT(on_finishedTorrent(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(metadataReceived(QTorrentHandle)),
             this, SLOT(on_metadataReceived(QTorrentHandle)));
-    connect(&m_btSession, SIGNAL(fullDiskError(QTorrentHandle, QString)),
-            this, SLOT(on_fullDiskError(QTorrentHandle, QString)));
     connect(&m_btSession, SIGNAL(torrentAboutToBeRemoved(QTorrentHandle, bool)),
             this, SLOT(on_torrentAboutToBeRemoved(QTorrentHandle, bool)));
     connect(&m_btSession, SIGNAL(torrentFinishedChecking(QTorrentHandle)),
@@ -116,6 +118,8 @@ Session::Session()
             this, SIGNAL(newConsoleMessage(QString)));
     connect(&m_btSession, SIGNAL(newBanMessage(QString)),
             this, SIGNAL(newBanMessage(QString)));
+    connect(&m_btSession, SIGNAL(fileError(Transfer, QString)),
+            this, SIGNAL(fileError(Transfer, QString)));
 
     // periodic save temp fast resume data
     m_alerts_reading.reset(new QTimer(this));
@@ -130,10 +134,13 @@ Session::Session()
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
-    connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)), this, SIGNAL(finishedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)),
+            this, SIGNAL(finishedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
+    connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
+            this, SIGNAL(fileError(Transfer, QString)));
 
     m_speedMonitor.reset(new TorrentSpeedMonitor(this));
     m_speedMonitor->start();
@@ -295,8 +302,7 @@ void Session::playLink(const QString& strLink)
 bool Session::playMedia(Transfer t)
 {
     if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))) &&
-        (t.first_last_piece_first() || t.is_seed()))
+        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))))
     {
         TransferBitfield pieces = t.pieces();
         int last_piece = pieces.size() - 1;
@@ -304,7 +310,7 @@ bool Session::playMedia(Transfer t)
         if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
         {
             t.set_sequential_download(true);
-            return (t.progress() >= 0.05 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
+            return (QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
         }
     }
 
@@ -368,9 +374,6 @@ void Session::on_finishedTorrent(const QTorrentHandle& h)
     shareByED2K(h, false);
 }
 void Session::on_metadataReceived(const QTorrentHandle& h) { emit metadataReceived(Transfer(h)); }
-void Session::on_fullDiskError(const QTorrentHandle& h, QString msg) {
-    emit fullDiskError(Transfer(h), msg);
-}
 void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files)
 {
     if (del_files) shareByED2K(h, true);

@@ -69,6 +69,11 @@ private:
   misc(); // Forbidden
 
 public:
+  static QString productName()
+  {
+      return tr("%1 %2", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION);
+  }
+
   static inline QString toQString(const std::string &str) {
     return QString::fromLocal8Bit(str.c_str());
   }

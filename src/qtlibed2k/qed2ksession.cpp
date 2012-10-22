@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
-#include <libtorrent/bencode.hpp>
 #include "qed2ksession.h"
+#include <libed2k/bencode.hpp>
 #include <libed2k/file.hpp>
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
@@ -180,7 +180,7 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             QDir libed2kBackup(misc::ED2KBackupLocation());
             // Remove old fastresume file if it exists
             std::vector<char> out;
-            libtorrent::bencode(back_inserter(out), *p->resume_data);
+            libed2k::bencode(back_inserter(out), *p->resume_data);
             const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
             libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
 
@@ -213,12 +213,13 @@ void QED2KSession::start()
     Preferences pref;
     // set zero to port for stop automatically listening
     m_settings.listen_port = pref.listenPort();
-    m_settings.server_reconnect_timeout = -1;
+    m_settings.server_reconnect_timeout = -1; // do not attempt to reconnect after connection failed because auth need before
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
     m_settings.m_known_file = pref.knownFile().toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
+    m_settings.mod_name = misc::productName().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
@@ -694,9 +695,8 @@ void QED2KSession::readAlerts()
 
             if (h.is_valid())
             {
+                emit fileError(Transfer(h), QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
                 h.pause();
-                addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
-                addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
             }
         }
 
@@ -717,8 +717,8 @@ void QED2KSession::saveTempFastResumeData()
         {
             if (!h.is_valid() || !h.has_metadata()) continue;
 
-            if (h.state() == libed2k::transfer_status::checking_files ||
-                  h.state() == libed2k::transfer_status::queued_for_checking) continue;
+            if (h.state() == qt_checking_files ||
+                  h.state() == qt_queued_for_checking) continue;
 
             qDebug("Saving fastresume data for %s", qPrintable(h.name()));
             h.save_resume_data();
@@ -743,7 +743,7 @@ void QED2KSession::saveFastResumeData()
         try
         {
 
-            if (h.state() == libed2k::transfer_status::checking_files || h.state() == libed2k::transfer_status::queued_for_checking) continue;
+            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking) continue;
             h.save_resume_data();
             ++num_resume_data;
         }
@@ -753,7 +753,7 @@ void QED2KSession::saveFastResumeData()
 
     while (num_resume_data > 0)
     {
-        libed2k::alert const* a = delegate()->wait_for_alert(boost::posix_time::seconds(30));
+        libed2k::alert const* a = delegate()->wait_for_alert(libed2k::seconds(30));
 
         if (a == 0)
         {

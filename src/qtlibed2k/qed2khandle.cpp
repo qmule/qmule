@@ -36,8 +36,8 @@ QString QED2KHandle::firstFileSavePath() const { return save_path(); }
 QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
-TransferState QED2KHandle::state() const { return m_delegate.status().state; }
-TransferStatus QED2KHandle::status() const { return m_delegate.status(); }
+TransferState QED2KHandle::state() const { return libstate2tstate(m_delegate.status()); }
+TransferStatus QED2KHandle::status() const { return transfer_status2TS(m_delegate.status()); }
 
 TransferInfo QED2KHandle::get_info() const
 {
@@ -97,7 +97,7 @@ bool QED2KHandle::has_metadata() const { return true; }
 bool QED2KHandle::priv() const {return false;}
 bool QED2KHandle::super_seeding() const {return false;}
 bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequential_download(); }
-TransferBitfield QED2KHandle::pieces() const { return m_delegate.status().pieces; }
+TransferBitfield QED2KHandle::pieces() const { return bitfield2TBF(m_delegate.status().pieces); }
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
 TransferSize QED2KHandle::piece_length() const { return libed2k::PIECE_SIZE; }
@@ -133,8 +133,11 @@ QStringList QED2KHandle::absolute_files_path() const {
     res << filepath_at(0);
     return res;
 }
-void QED2KHandle::get_peer_info(std::vector<PeerInfo>& infos) const {
-    m_delegate.get_peer_info(infos);
+void QED2KHandle::get_peer_info(std::vector<PeerInfo>& infos) const 
+{
+    std::vector<libed2k::peer_info> ed_infos;
+    m_delegate.get_peer_info(ed_infos);
+    std::transform(ed_infos.begin(), ed_infos.end(), std::back_inserter(infos), peer_info2PInfo<libed2k::peer_info>);
 }
 std::vector<AnnounceEntry> QED2KHandle::trackers() const { return std::vector<AnnounceEntry>(); }
 void QED2KHandle::pause() const { m_delegate.pause(); }
@@ -156,13 +159,13 @@ void QED2KHandle::rename_file(int index, const QString& new_name) const {
 void QED2KHandle::prioritize_files(const std::vector<int>& priorities) const {}
 void QED2KHandle::prioritize_first_last_piece(bool p) const
 {
-    int prio = p ? 7 : 1;
-
+    int hprio = p ? 7 : 1;
     int last_piece = m_delegate.num_pieces() - 1;
     int penult_piece = std::max(last_piece - 1, 0);
-    m_delegate.set_piece_priority(0, prio);
-    m_delegate.set_piece_priority(last_piece, prio);
-    m_delegate.set_piece_priority(penult_piece, prio);
+
+    m_delegate.set_piece_priority(0, hprio);
+    m_delegate.set_piece_priority(penult_piece, hprio);
+    m_delegate.set_piece_priority(last_piece, hprio);
 }
 void QED2KHandle::set_tracker_login(const QString& login, const QString& passwd) const {}
 void QED2KHandle::flush_cache() const {}
@@ -182,3 +185,4 @@ void QED2KHandle::queue_position_bottom() const {}
 void QED2KHandle::super_seeding(bool ss) const {}
 void QED2KHandle::set_sequential_download(bool sd) const { m_delegate.set_sequential_download(sd); }
 void QED2KHandle::save_resume_data() const { m_delegate.save_resume_data(); }
+void QED2KHandle::set_upload_mode(bool b) const { m_delegate.set_upload_mode(b); }

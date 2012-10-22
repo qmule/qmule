@@ -1162,14 +1162,14 @@ void search_widget::clearSearchTable()
 
 void search_widget::closeAllTabs()
 {
-    searchItems.clear();
-    clearSearchTable();
-
     for (int indx = tabSearch->count() - 1; indx != -1; --indx)
     {
         qDebug() << "close tab " << indx;
         tabSearch->removeTab(indx);
     }
+
+    searchItems.clear();
+    clearSearchTable();
 
     closeAll->setDisabled(true);
     btnMore->setDisabled(true);

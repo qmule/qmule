@@ -787,8 +787,24 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
   QStringList filters;
   filters << hash+".*";
   const QStringList files = torrentBackup.entryList(filters, QDir::Files, QDir::Unsorted);
-  foreach (const QString &file, files) {
-    QFile::remove(torrentBackup.absoluteFilePath(file));
+  foreach (const QString &file, files)
+  {
+      qDebug() << "remove file " << torrentBackup.absoluteFilePath(file);
+      QFile f(torrentBackup.absoluteFilePath(file));
+
+      if (!f.remove())
+      {
+          qDebug() << "unable remove file: " << f.errorString();
+
+          if (f.setPermissions(QFile::ReadOwner | QFile::WriteOwner))
+          {
+              qDebug() << "erase file after set permissions";
+              if (!f.remove())
+              {
+                  qDebug() << "unable to remove file " << f.errorString();
+              }
+          }
+      }
   }
   // Remove tracker errors
   trackersInfos.remove(hash);
@@ -2264,10 +2280,8 @@ void QBtSession::readAlerts() {
 
       if (h.is_valid())
       {
+          emit fileError(Transfer(h), QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
           h.pause();
-          qDebug() << "File Error: " << misc::toQStringU(p->message());
-          addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
-          addConsoleMessage(tr("Reason: %1").arg(misc::toQStringU(p->message())));
       }
     }
     else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get())) {
@@ -2444,7 +2458,7 @@ QHash<QString, TrackerInfos> QBtSession::getTrackersInfo(const QString &hash) co
   return trackersInfos.value(hash, QHash<QString, TrackerInfos>());
 }
 
-session_status QBtSession::getSessionStatus() const {
+SessionStatus QBtSession::getSessionStatus() const {
   return s->status();
 }
 

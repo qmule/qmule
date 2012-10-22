@@ -57,7 +57,6 @@
 #include "preferences.h"
 #include "torrentmodel.h"
 #include "deletionconfirmationdlg.h"
-#include "propertieswidget.h"
 #include "iconprovider.h"
 #include "torrent_properties.h"
 #include "ed2k_link_maker.h"
