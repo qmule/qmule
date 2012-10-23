@@ -718,7 +718,6 @@ void search_widget::startSearch()
 void search_widget::continueSearch()
 {
     btnStart->setEnabled(false);
-    btnCloseAll->setEnabled(false);
     btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
 
@@ -734,7 +733,6 @@ void search_widget::cancelSearch()
     Session::instance()->get_ed2k_session()->cancelSearch();
 
     btnStart->setDisabled(comboName->currentText().isEmpty());
-    btnCloseAll->setEnabled(true);
     btnCancel->setEnabled(false);
     btnMore->setEnabled(false);
 
@@ -788,8 +786,7 @@ void search_widget::processSearchResult(
         return;
 
     tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
-    btnStart->setEnabled((nSearchesInProgress == 0) && (!comboName->currentText().isEmpty()));
-    btnCloseAll->setEnabled(nSearchesInProgress == 0);
+    btnStart->setEnabled((nSearchesInProgress == 0) && (!comboName->currentText().isEmpty()));    
     btnCancel->setEnabled(nSearchesInProgress != 0);
 
     if (obMoreResult)
@@ -914,7 +911,6 @@ void search_widget::prepareNewSearch(
     {
         tabSearch->show();
         searchFilter->show();
-        closeAll->setEnabled(true);
     }
 
     nCurTabSearch = tabSearch->addTab(icon, reqType + reqText);
@@ -926,9 +922,9 @@ void search_widget::prepareNewSearch(
 
     clearSearchTable();
     btnStart->setEnabled(false);
-    btnCloseAll->setEnabled(false);
     btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
+    btnCloseAll->setEnabled(true);
 }
 
 void search_widget::closeTab(int index)
@@ -947,12 +943,12 @@ void search_widget::closeTab(int index)
     
     if (searchItems.size() > index)
         searchItems.erase(searchItems.begin() + index);
-    
+        
     if (!tabSearch->count())
     {
         clearSearchTable();
         searchFilter->hide();
-        closeAll->setDisabled(true);
+        btnCloseAll->setDisabled(true);
     }
     else
         selectTab(tabSearch->currentIndex());
@@ -1165,15 +1161,11 @@ void search_widget::closeAllTabs()
     for (int indx = tabSearch->count() - 1; indx != -1; --indx)
     {
         qDebug() << "close tab " << indx;
-        tabSearch->removeTab(indx);
+        closeTab(indx);
     }
 
     searchItems.clear();
     clearSearchTable();
-
-    closeAll->setDisabled(true);
-    btnMore->setDisabled(true);
-    searchFilter->hide();
 }
 
 void search_widget::setSizeType()
@@ -1583,6 +1575,7 @@ void search_widget::processUserDirs(const libed2k::net_identifier& np, const QSt
     clearSearchTable();
 
     nCurTabSearch = tabSearch->addTab(iconUserFiles, tr("Files: ") + userName);
+    btnCloseAll->setEnabled(true);
     tabSearch->setCurrentIndex(nCurTabSearch);
 
     for (constIterator = strList.constBegin(); constIterator != strList.constEnd(); ++constIterator)
