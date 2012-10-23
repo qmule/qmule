@@ -583,14 +583,14 @@ void search_widget::startSearch()
         return;
 
     bool bOk = false;
-    int nMinSize = tableCond->item(0, 1)->text().toInt(&bOk);
+    quint64 nMinSize = tableCond->item(0, 1)->text().toLongLong(&bOk);
     if (!bOk && tableCond->item(0, 1)->text().length() > 0)
     {
         showErrorParamMsg(0);
         return;
     }
 
-    int nMaxSize = tableCond->item(1, 1)->text().toInt(&bOk);
+    quint64 nMaxSize = tableCond->item(1, 1)->text().toLongLong(&bOk);
     if (!bOk && tableCond->item(1, 1)->text().length() > 0)
     {
         showErrorParamMsg(1);
