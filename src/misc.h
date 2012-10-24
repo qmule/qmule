@@ -71,7 +71,8 @@ private:
 public:
   static QString productName()
   {
-      return tr("%1 %2", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION);
+      static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
+      return tr("%1 %2: %3", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION).arg(strBuildDate);
   }
 
   static inline QString toQString(const std::string &str) {
