@@ -42,9 +42,10 @@ shared_files_tree::shared_files_tree(QObject *parent) :
 
 void shared_files_tree::filesystem_changed(const QString &path, const FileInfoList& updates)
 {
-    QVector<QString> rowsToUpdate;
-    QStringList newFiles;
     QFileSystemNode* parentNode = node(path, false);
+
+    int nMin = -1;
+    int nMax = -1;
 
     for (int i = 0; i < updates.count(); ++i)
     {
@@ -88,74 +89,35 @@ void shared_files_tree::filesystem_changed(const QString &path, const FileInfoLi
             continue;
         }
 
+        // update node
         if (*node != info )
         {
-            node->populate(info);
-            /*
-            bypassFilters.remove(node);
-            // brand new information.
-            if (filtersAcceptsNode(node))
+            if (nMin == -1)
             {
-                if (!node->isVisible)
-                {
-                    newFiles.append(fileName);
-                }
-                else
-                {
-                    rowsToUpdate.append(fileName);
-                }
+                nMin = node->m_order;
             }
-            else
+            else if (nMin > node->m_order)
             {
-                if (node->isVisible)
-                {
-                    int visibleLocation = parentNode->visibleLocation(fileName);
-                    removeVisibleFile(parentNode, visibleLocation);
-                }
-                else
-                {
-                    // The file is not visible, don't do anything
-                }
+                nMin = node->m_order;
             }
-            */
+
+            if (nMax == -1)
+            {
+                nMax = node->m_order;
+            }
+            else if (nMax < node->m_order)
+            {
+                nMax = node->m_order;
+            }
+
+            node->populate(info);        
         }
     }
 
-    // bundle up all of the changed signals into as few as possible.
-    qSort(rowsToUpdate.begin(), rowsToUpdate.end());
-    QString min;
-    QString max;
-
-    /*
-    for (int i = 0; i < rowsToUpdate.count(); ++i)
+    if (nMin != -1 && nMax != -1)
     {
-        QString value = rowsToUpdate.at(i);
-        max = value;
-        min = value;
-        int visibleMin = parentNode->visibleLocation(min);
-        int visibleMax = parentNode->visibleLocation(max);
-        if (visibleMin >= 0
-            && visibleMin < parentNode->visibleChildren.count()
-            && parentNode->visibleChildren.at(visibleMin) == min
-            && visibleMax >= 0) {
-            QModelIndex bottom = q->index(translateVisibleLocation(parentNode, visibleMin), 0, parentIndex);
-            QModelIndex top = q->index(translateVisibleLocation(parentNode, visibleMax), 3, parentIndex);
-            emit q->dataChanged(bottom, top);
-        }
-
+        // TODO emit data changed signal
     }
-
-    if (newFiles.count() > 0)
-    {
-        addVisibleFiles(parentNode, newFiles);
-    }
-
-    if (newFiles.count() > 0 || (sortColumn != 0 && rowsToUpdate.count() > 0))
-    {
-        forceSort = true;
-        delayedSort();
-    }
-    */
 }
 
 
@@ -233,7 +195,7 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
         pathElements.prepend(QLatin1String("/"));
 #endif
 
-    QFileSystemNode *parent = &m_root; //node(index);
+    QFileSystemNode *parent = &m_root;
 
     for (int i = 0; i < pathElements.count(); ++i)
     {
@@ -275,9 +237,19 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
             node = parent->children.value(element);
         }
 
-        Q_ASSERT(node);
+        Q_ASSERT(node);        
 
-
+        // when current node hasn't information - get parent directory and fetch info
+        if (!node->hasInformation() && fetch)
+        {
+            QString dir = filePath(parent);
+            Fetching f;
+            f.dir = dir;
+            f.file = element;
+            f.node = node;
+            toFetch.append(f);
+            //p->fetchingTimer.start(0, const_cast<QFileSystemModel*>(q));
+        }
 
         /*
         if (!node->isVisible)
@@ -319,13 +291,21 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(int index)
 void shared_files_tree::removeNode(QFileSystemNode *parentNode, const QString& name)
 {
     QFileSystemNode* pNode = parentNode->children.take(name);
+    Q_ASSERT(pNode);
+    unsigned int order = pNode->m_order;
+
+    foreach(QFileSystemNode* pn, parentNode->children)
+    {
+        pn->updateOrder(order);
+    }
+
     delete pNode;
 }
 
 shared_files_tree::QFileSystemNode* shared_files_tree::addNode(QFileSystemNode *parentNode, const QString &fileName, const QFileInfo &info)
 {
     // In the common case, itemLocation == count() so check there first
-    QFileSystemNode *node = new QFileSystemNode(fileName, parentNode);
+    QFileSystemNode *node = new QFileSystemNode(parentNode->children.size(), fileName, parentNode);
 #ifndef QT_NO_FILESYSTEMWATCHER
     node->populate(info);
 #endif

@@ -10,6 +10,7 @@
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QDir>
+#include <QBasicTimer>
 #include "qfileinfogatherer.h"
 
 class shared_files_tree : public QObject
@@ -19,8 +20,9 @@ public:
     class QFileSystemNode
     {
     public:
-        QFileSystemNode(const QString &filename = QString(), QFileSystemNode *p = 0)
-            : fileName(filename), populatedChildren(false), isVisible(false), parent(p), info(0) {}
+        QFileSystemNode(int order = -1, const QString &filename = QString(), QFileSystemNode *p = 0)
+            : fileName(filename), m_order(order), populatedChildren(false), parent(p), info(0) {}
+
         ~QFileSystemNode()
         {            
             qDeleteAll(children);
@@ -104,12 +106,6 @@ public:
             (*info) = fileInfo;
         }
 
-        // children shouldn't normally be accessed directly, use node()
-        inline int visibleLocation(QString childName)
-        {
-            return visibleChildren.indexOf(childName);
-        }
-
         void updateIcon(QFileIconProvider *iconProvider, const QString &path)
         {
             if (info)
@@ -144,10 +140,23 @@ public:
             }
         }
 
-        bool populatedChildren;
-        bool isVisible;
-        QHash<QString, QFileSystemNode *> children;
-        QList<QString> visibleChildren;
+        /**
+          * compare current node order and deleted node order
+          * when current node order great this node moved one position down
+         */
+        void updateOrder(int order)
+        {
+            if (m_order >= order)
+            {
+                --m_order;
+            }
+
+            Q_ASSERT(m_order > -1);
+        }
+
+        int     m_order;
+        bool    populatedChildren;
+        QHash<QString, QFileSystemNode *> children;        
         QFileSystemNode *parent;
         QExtendedInformation *info;
     };
@@ -187,6 +196,17 @@ private:
     QFileSystemNode m_root;
     QDir            m_rootDir;
     QFileInfoGatherer m_fileinfo_gatherer;
+
+    QBasicTimer fetchingTimer;
+
+    struct Fetching
+    {
+        QString dir;
+        QString file;
+        const QFileSystemNode *node;
+    };
+
+    QList<Fetching> toFetch;
 signals:
     
 public slots:
