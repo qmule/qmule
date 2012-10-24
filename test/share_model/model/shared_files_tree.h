@@ -146,7 +146,7 @@ public:
 
         bool populatedChildren;
         bool isVisible;
-        QHash<QString,QFileSystemNode *> children;
+        QHash<QString, QFileSystemNode *> children;
         QList<QString> visibleChildren;
         QFileSystemNode *parent;
         QExtendedInformation *info;
@@ -157,7 +157,14 @@ public:
     /**
       * generate tree nodes from root last node in path
      */
-    QFileSystemNode* node(const QString& path);
+    QFileSystemNode* node(const QString& path, bool fetch);
+
+    /**
+      * return root node
+     */
+    QFileSystemNode* rootNode() { return &m_root; }
+
+    QFileSystemNode* node(int index);
 
     void removeNode(QFileSystemNode *parentNode, const QString& name);
     QFileSystemNode* addNode(QFileSystemNode *parentNode, const QString &fileName, const QFileInfo &info);
@@ -179,10 +186,12 @@ public:
 private:
     QFileSystemNode m_root;
     QDir            m_rootDir;
-    QFileInfoGatherer m_info_gatherer;
+    QFileInfoGatherer m_fileinfo_gatherer;
 signals:
     
 public slots:
+private slots:
+    void filesystem_changed(const QString& path, const FileInfoList& updates);
     
 };
 

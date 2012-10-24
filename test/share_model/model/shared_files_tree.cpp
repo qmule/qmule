@@ -40,8 +40,126 @@ shared_files_tree::shared_files_tree(QObject *parent) :
 {
 }
 
+void shared_files_tree::filesystem_changed(const QString &path, const FileInfoList& updates)
+{
+    QVector<QString> rowsToUpdate;
+    QStringList newFiles;
+    QFileSystemNode* parentNode = node(path, false);
 
-shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path)
+    for (int i = 0; i < updates.count(); ++i)
+    {
+        QString fileName = updates.at(i).first;
+        Q_ASSERT(!fileName.isEmpty());
+
+        QExtendedInformation info = m_fileinfo_gatherer.getInfo(updates.at(i).second);
+        bool previouslyHere = parentNode->children.contains(fileName);
+
+        if (!previouslyHere)
+        {
+            addNode(parentNode, fileName, info.fileInfo());
+        }
+
+        shared_files_tree::QFileSystemNode * node = parentNode->children.value(fileName);
+        bool isCaseSensitive = parentNode->caseSensitive();
+
+        if (isCaseSensitive)
+        {
+            if (node->fileName != fileName)
+                continue;
+        }
+        else
+        {
+            if (QString::compare(node->fileName, fileName, Qt::CaseInsensitive) != 0)
+                continue;
+        }
+
+        if (isCaseSensitive)
+        {
+            Q_ASSERT(node->fileName == fileName);
+        }
+        else
+        {
+            node->fileName = fileName;
+        }
+
+        if (info.size() == -1 && !info.isSymLink())
+        {
+            removeNode(parentNode, fileName);
+            continue;
+        }
+
+        if (*node != info )
+        {
+            node->populate(info);
+            /*
+            bypassFilters.remove(node);
+            // brand new information.
+            if (filtersAcceptsNode(node))
+            {
+                if (!node->isVisible)
+                {
+                    newFiles.append(fileName);
+                }
+                else
+                {
+                    rowsToUpdate.append(fileName);
+                }
+            }
+            else
+            {
+                if (node->isVisible)
+                {
+                    int visibleLocation = parentNode->visibleLocation(fileName);
+                    removeVisibleFile(parentNode, visibleLocation);
+                }
+                else
+                {
+                    // The file is not visible, don't do anything
+                }
+            }
+            */
+        }
+    }
+
+    // bundle up all of the changed signals into as few as possible.
+    qSort(rowsToUpdate.begin(), rowsToUpdate.end());
+    QString min;
+    QString max;
+
+    /*
+    for (int i = 0; i < rowsToUpdate.count(); ++i)
+    {
+        QString value = rowsToUpdate.at(i);
+        max = value;
+        min = value;
+        int visibleMin = parentNode->visibleLocation(min);
+        int visibleMax = parentNode->visibleLocation(max);
+        if (visibleMin >= 0
+            && visibleMin < parentNode->visibleChildren.count()
+            && parentNode->visibleChildren.at(visibleMin) == min
+            && visibleMax >= 0) {
+            QModelIndex bottom = q->index(translateVisibleLocation(parentNode, visibleMin), 0, parentIndex);
+            QModelIndex top = q->index(translateVisibleLocation(parentNode, visibleMax), 3, parentIndex);
+            emit q->dataChanged(bottom, top);
+        }
+
+    }
+
+    if (newFiles.count() > 0)
+    {
+        addVisibleFiles(parentNode, newFiles);
+    }
+
+    if (newFiles.count() > 0 || (sortColumn != 0 && rowsToUpdate.count() > 0))
+    {
+        forceSort = true;
+        delayedSort();
+    }
+    */
+}
+
+
+shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path, bool fetch)
 {
     if (path.isEmpty() || path == myComputer() || path.startsWith(QLatin1Char(':')))
         return const_cast<QFileSystemNode*>(&m_root);
@@ -149,7 +267,7 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path)
 
             node = addNode(parent, element, info);
 #ifndef QT_NO_FILESYSTEMWATCHER
-            node->populate(m_info_gatherer.getInfo(info));
+            node->populate(m_fileinfo_gatherer.getInfo(info));
 #endif
         }
         else
@@ -158,6 +276,8 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path)
         }
 
         Q_ASSERT(node);
+
+
 
         /*
         if (!node->isVisible)
@@ -189,6 +309,11 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path)
     }
 
     return parent;
+}
+
+shared_files_tree::QFileSystemNode* shared_files_tree::node(int index)
+{
+
 }
 
 void shared_files_tree::removeNode(QFileSystemNode *parentNode, const QString& name)

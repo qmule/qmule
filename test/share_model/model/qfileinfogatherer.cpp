@@ -292,13 +292,19 @@ void QFileInfoGatherer::getFileInfos(const QString &path, const QStringList &fil
         fetchedRoot = true;
 #endif
         QFileInfoList infoList;
-        if (files.isEmpty()) {
+
+        if (files.isEmpty())
+        {
             infoList = QDir::drives();
-        } else {
+        }
+        else
+        {
             for (int i = 0; i < files.count(); ++i)
                 infoList << QFileInfo(files.at(i));
         }
-        for (int i = infoList.count() - 1; i >= 0; --i) {
+
+        for (int i = infoList.count() - 1; i >= 0; --i)
+        {
             QString driveName = translateDriveName(infoList.at(i));
             QList<QPair<QString,QFileInfo> > updatedFiles;
             updatedFiles.append(QPair<QString,QFileInfo>(driveName, infoList.at(i)));
@@ -311,37 +317,45 @@ void QFileInfoGatherer::getFileInfos(const QString &path, const QStringList &fil
     base.start();
     QFileInfo fileInfo;
     bool firstTime = true;
-    QList<QPair<QString, QFileInfo> > updatedFiles;
+    FileInfoList updatedFiles;
     QStringList filesToCheck = files;
 
     QString itPath = QDir::fromNativeSeparators(files.isEmpty() ? path : QLatin1String(""));
     QDirIterator dirIt(itPath, QDir::AllEntries | QDir::System | QDir::Hidden);
     QStringList allFiles;
-    while(!abort && dirIt.hasNext()) {
+
+    while(!abort && dirIt.hasNext())
+    {
         dirIt.next();
         fileInfo = dirIt.fileInfo();
         allFiles.append(fileInfo.fileName());
-	fetch(fileInfo, base, firstTime, updatedFiles, path);
+        fetch(fileInfo, base, firstTime, updatedFiles, path);
     }
+
     if (!allFiles.isEmpty())
         emit newListOfFiles(path, allFiles);
 
     QStringList::const_iterator filesIt = filesToCheck.constBegin();
-    while(!abort && filesIt != filesToCheck.constEnd()) {
+    while(!abort && filesIt != filesToCheck.constEnd())
+    {
         fileInfo.setFile(path + QDir::separator() + *filesIt);
         ++filesIt;
         fetch(fileInfo, base, firstTime, updatedFiles, path);
     }
+
     if (!updatedFiles.isEmpty())
         emit updates(path, updatedFiles);
     emit directoryLoaded(path);
 }
 
-void QFileInfoGatherer::fetch(const QFileInfo &fileInfo, QElapsedTimer &base, bool &firstTime, QList<QPair<QString, QFileInfo> > &updatedFiles, const QString &path) {
+void QFileInfoGatherer::fetch(const QFileInfo &fileInfo, QElapsedTimer &base, bool &firstTime, FileInfoList& updatedFiles, const QString &path)
+{
     updatedFiles.append(QPair<QString, QFileInfo>(fileInfo.fileName(), fileInfo));
     QElapsedTimer current;
     current.start();
-    if ((firstTime && updatedFiles.count() > 100) || base.msecsTo(current) > 1000) {
+
+    if ((firstTime && updatedFiles.count() > 100) || base.msecsTo(current) > 1000)
+    {
         emit updates(path, updatedFiles);
         updatedFiles.clear();
         base = current;

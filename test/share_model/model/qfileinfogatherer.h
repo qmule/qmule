@@ -65,6 +65,8 @@
 #include <QDir>
 #include <QElapsedTimer>
 
+typedef QList<QPair<QString, QFileInfo> > FileInfoList;
+
 class QExtendedInformation
 {
 public:
@@ -140,7 +142,7 @@ class QFileInfoGatherer : public QThread
 Q_OBJECT
 
 Q_SIGNALS:
-    void updates(const QString &directory, const QList<QPair<QString, QFileInfo> > &updates);
+    void updates(const QString &directory, const FileInfoList& updates);
     void newListOfFiles(const QString &directory, const QStringList &listOfFiles) const;
     void nameResolved(const QString &fileName, const QString &resolvedName) const;
     void directoryLoaded(const QString &path);
@@ -167,7 +169,7 @@ protected:
     void getFileInfos(const QString &path, const QStringList &files);
 
 private:
-    void fetch(const QFileInfo &info, QElapsedTimer &base, bool &firstTime, QList<QPair<QString, QFileInfo> > &updatedFiles, const QString &path);
+    void fetch(const QFileInfo &info, QElapsedTimer &base, bool &firstTime, FileInfoList& updatedFiles, const QString &path);
     QString translateDriveName(const QFileInfo &drive) const;
 
     QMutex mutex;
