@@ -1243,7 +1243,9 @@ void search_widget::displayListMenu(const QPoint&)
     if (tabSearch->currentIndex() < 0)
         return;
 
-    if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+    RESULT_TYPE resultType = searchItems[tabSearch->currentIndex()].resultType;
+
+    if (resultType == RT_CLIENTS)
     {
         userDetails->setEnabled(false);
         userAddToFriends->setEnabled(false);
@@ -1271,7 +1273,7 @@ void search_widget::displayListMenu(const QPoint&)
 
         userMenu->exec(QCursor::pos());
     }
-    else if (searchItems[tabSearch->currentIndex()].resultType == RT_FILES)
+    else
     {
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
         fileSearchRelated->setEnabled(
