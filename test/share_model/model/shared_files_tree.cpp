@@ -1,3 +1,5 @@
+#include <QTimerEvent>
+#include <QDebug>
 #include "shared_files_tree.h"
 
 #ifdef Q_OS_WIN32
@@ -123,6 +125,8 @@ void shared_files_tree::filesystem_changed(const QString &path, const FileInfoLi
 
 shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path, bool fetch)
 {
+    qDebug() << "get node for: " << path;
+
     if (path.isEmpty() || path == myComputer() || path.startsWith(QLatin1Char(':')))
         return const_cast<QFileSystemNode*>(&m_root);
 
@@ -180,12 +184,14 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
 
 #if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
     {
-        if (!pathElements.at(0).contains(QLatin1String(":"))) {
+        if (!pathElements.at(0).contains(QLatin1String(":")))
+        {
             // The reason we express it like this instead of with anonymous, temporary
             // variables, is to workaround a compiler crash with Q_CC_NOKIAX86.
             QString rootPath = QDir(longPath).rootPath();
             pathElements.prepend(rootPath);
         }
+
         if (pathElements.at(0).endsWith(QLatin1Char('/')))
             pathElements[0].chop(1);
     }
@@ -196,6 +202,7 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
 #endif
 
     QFileSystemNode *parent = &m_root;
+    qDebug() << pathElements;
 
     for (int i = 0; i < pathElements.count(); ++i)
     {
@@ -242,13 +249,14 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
         // when current node hasn't information - get parent directory and fetch info
         if (!node->hasInformation() && fetch)
         {
+            qDebug() << "fetch info {" << node->fileName << "}";
             QString dir = filePath(parent);
             Fetching f;
             f.dir = dir;
             f.file = element;
             f.node = node;
             toFetch.append(f);
-            //p->fetchingTimer.start(0, const_cast<QFileSystemModel*>(q));
+            m_ftm.start(0, const_cast<shared_files_tree*>(this));
         }
 
         /*
@@ -283,9 +291,45 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
     return parent;
 }
 
-shared_files_tree::QFileSystemNode* shared_files_tree::node(int index)
+void shared_files_tree::timerEvent(QTimerEvent* event)
 {
+    if (event->timerId() == m_ftm.timerId())
+    {
+        qDebug() << "timer event, targets: " << toFetch.count();
+        m_ftm.stop();
+    #ifndef QT_NO_FILESYSTEMWATCHER
+        for (int i = 0; i < toFetch.count(); ++i)
+        {
+            const QFileSystemNode *node = toFetch.at(i).node;
 
+            if (!node->hasInformation())
+            {
+                m_fileinfo_gatherer.fetchExtendedInformation(toFetch.at(i).dir,
+                                                 QStringList(toFetch.at(i).file));
+            }
+            else
+            {
+                qDebug() << "yah!, you saved a little gerbil soul";
+            }
+        }
+    #endif
+        toFetch.clear();
+    }
+}
+
+shared_files_tree::QFileSystemNode* shared_files_tree::node(QFileSystemNode* parent, int index)
+{
+    QFileSystemNode* node = rootNode();
+    foreach(QFileSystemNode* p, parent->children)
+    {
+        if (p->m_order == index)
+        {
+            node = p;
+            break;
+        }
+    }
+
+    return (node);
 }
 
 void shared_files_tree::removeNode(QFileSystemNode *parentNode, const QString& name)
@@ -304,6 +348,7 @@ void shared_files_tree::removeNode(QFileSystemNode *parentNode, const QString& n
 
 shared_files_tree::QFileSystemNode* shared_files_tree::addNode(QFileSystemNode *parentNode, const QString &fileName, const QFileInfo &info)
 {
+    qDebug() << parentNode->fileName << " add node {" << fileName << "}";
     // In the common case, itemLocation == count() so check there first
     QFileSystemNode *node = new QFileSystemNode(parentNode->children.size(), fileName, parentNode);
 #ifndef QT_NO_FILESYSTEMWATCHER

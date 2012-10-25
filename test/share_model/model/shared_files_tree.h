@@ -173,9 +173,16 @@ public:
      */
     QFileSystemNode* rootNode() { return &m_root; }
 
-    QFileSystemNode* node(int index);
+    /**
+      * search in children by index
+     */
+    QFileSystemNode* node(QFileSystemNode* parent, int index);
 
+    /**
+      * remove child and update indexes
+     */
     void removeNode(QFileSystemNode *parentNode, const QString& name);
+
     QFileSystemNode* addNode(QFileSystemNode *parentNode, const QString &fileName, const QFileInfo &info);
     QString filePath(QFileSystemNode* node) const;
 
@@ -207,6 +214,9 @@ private:
     };
 
     QList<Fetching> toFetch;
+
+    QBasicTimer m_ftm;
+    void timerEvent(QTimerEvent *);
 signals:
     
 public slots:
