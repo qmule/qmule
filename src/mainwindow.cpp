@@ -200,6 +200,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   menuStatus->addAction(actionMessages);
   menuStatus->addAction(actionOptions);
   menuStatus->addSeparator();
+  menuStatus->addAction(actionOpenDownloadPath);
 
   actionTools->setMenu(menuStatus);
   if(QToolButton * btn = qobject_cast<QToolButton *>(toolBar->widgetForAction(actionTools)))
@@ -236,7 +237,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionSearch, SIGNAL(triggered()), this, SLOT(on_actionSearch_triggerd()));
   connect(actionCatalog, SIGNAL(triggered()), this, SLOT(on_actionCatalog_triggerd()));
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
-  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
+  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));  
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
   connect(search, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
   connect(transfer_List, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
@@ -1890,4 +1891,10 @@ void MainWindow::setDisconnectedStatus()
     if (systrayIcon) {
         systrayIcon->setIcon(getSystrayIcon());
     }
+}
+
+void MainWindow::on_actionOpenDownloadPath_triggered()
+{
+    Preferences pref;
+    QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
 }

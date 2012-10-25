@@ -1785,6 +1785,10 @@ No further notices will be issued.</source>
         <source>&amp;Options...</source>
         <translation>&amp;Настройки...</translation>
     </message>
+	<message>
+	    <source>OpenDownloadPath</source>
+		<translation>Открыть папку загруженных файлов</translation>
+	</message>
     <message>
         <source>Add &amp;URL...</source>
         <translation type="obsolete">Добавить &amp;URL...</translation>
