@@ -70,6 +70,7 @@ public slots:
   void topPrioSelectedTorrents();
   void bottomPrioSelectedTorrents();
   void copySelectedMagnetURIs() const;
+  void showAddED2KLinkDialog() const;
   void openSelectedTorrentsFolder() const;
   void recheckSelectedTorrents();
   void setDlLimitSelectedTorrents();

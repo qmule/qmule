@@ -408,6 +408,9 @@ void TransferListWidget::hidePriorityColumn(bool hide) {
   setColumnHidden(TorrentModelItem::TR_PRIORITY, hide);
 }
 
+void TransferListWidget::showAddED2KLinkDialog() const {
+}
+
 void TransferListWidget::openSelectedTorrentsFolder() const {
   QStringList pathsList;
   const QStringList hashes = getSelectedTorrentsHashes();
@@ -421,6 +424,11 @@ void TransferListWidget::openSelectedTorrentsFolder() const {
         QDesktopServices::openUrl(QUrl::fromLocalFile(savePath));
       }
     }
+  }
+  // open default download folder when there's no selection
+  if (hashes.size() == 0) {
+    Preferences pref;
+    QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
   }
 }
 
@@ -652,8 +660,6 @@ void TransferListWidget::removeLabelFromRows(QString label) {
 
 void TransferListWidget::displayListMenu(const QPoint&) {
   QModelIndexList selectedIndexes = selectionModel()->selectedRows();
-  // don't show menu when no selection
-  if (selectedIndexes.size() == 0) return;
 
   // Create actions
   QAction actionStart(IconProvider::instance()->getIcon("media-playback-start"), tr("Resume", "Resume/start the torrent"), 0);
@@ -672,6 +678,8 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionSet_upload_limit, SIGNAL(triggered()), this, SLOT(setUpLimitSelectedTorrents()));
   QAction actionSet_download_limit(QIcon(QString::fromUtf8(":/Icons/skin/download.png")), tr("Limit download rate..."), 0);
   connect(&actionSet_download_limit, SIGNAL(triggered()), this, SLOT(setDlLimitSelectedTorrents()));
+  QAction actionAddED2KLink(QIcon(QString::fromUtf8(":/emule/common/eD2kLink.png")), tr("Add ED2K link"), 0);
+  connect(&actionAddED2KLink, SIGNAL(triggered()), this, SLOT(showAddED2KLinkDialog()));
   QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
   connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedTorrentsFolder()));
   QAction actionIncreasePriority(IconProvider::instance()->getIcon("go-up"), tr("Move up", "i.e. move up in the queue"), 0);
@@ -773,27 +781,34 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     first = false;
     if (has_pause && has_start && has_preview && one_not_seed) break;
   }
-  listMenu.addSeparator();
-  listMenu.addAction(&actionDelete);
-  listMenu.addSeparator();
-  listMenu.addAction(&actionSetTorrentPath);
+  if (selectedIndexes.size() > 0) {
+    listMenu.addSeparator();
+    listMenu.addAction(&actionDelete);
+    listMenu.addSeparator();
+    listMenu.addAction(&actionSetTorrentPath);
+  }
   if (selectedIndexes.size() == 1)
     listMenu.addAction(&actionRename);
   // Label Menu
   QStringList customLabels = getCustomLabels();
   customLabels.sort();
   QList<QAction*> labelActions;
-  QMenu *labelMenu = listMenu.addMenu(IconProvider::instance()->getIcon("view-categories"), tr("Label"));
-  labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("list-add"), tr("New...", "New label..."));
-  labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("edit-clear"), tr("Reset", "Reset label"));
-  labelMenu->addSeparator();
-  foreach (const QString &label, customLabels) {
-    labelActions << labelMenu->addAction(IconProvider::instance()->getIcon("inode-directory"), label);
+  if (selectedIndexes.size() > 0) {
+    QMenu *labelMenu = listMenu.addMenu(
+        IconProvider::instance()->getIcon("view-categories"), tr("Label"));
+    labelActions << labelMenu->addAction(
+        IconProvider::instance()->getIcon("list-add"), tr("New...", "New label..."));
+    labelActions << labelMenu->addAction(
+        IconProvider::instance()->getIcon("edit-clear"), tr("Reset", "Reset label"));
+    labelMenu->addSeparator();
+    foreach (const QString &label, customLabels) {
+      labelActions << labelMenu->addAction(
+          IconProvider::instance()->getIcon("inode-directory"), label);
+    }
+    // temporary disable label actions
+    foreach (QAction* a, labelActions)
+      a->setEnabled(false);
   }
-
-  // temporary disable label actions
-  foreach (QAction* a, labelActions)
-    a->setEnabled(false);
 
   if (one_is_bittorrent)
   {
@@ -844,6 +859,10 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     listMenu.addSeparator();
   if (one_has_metadata && one_is_bittorrent) {
     listMenu.addAction(&actionForce_recheck);
+    listMenu.addSeparator();
+  }
+  if (selectedIndexes.size() == 0) {
+    listMenu.addAction(&actionAddED2KLink);
     listMenu.addSeparator();
   }
   listMenu.addAction(&actionOpen_destination_folder);
