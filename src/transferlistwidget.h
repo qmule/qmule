@@ -82,7 +82,7 @@ public slots:
   void applyNameFilter(QString name);
   void applyStatusFilter(int f);
   void applyLabelFilter(QString label);
-  void previewFile(QString filePath);
+  void previewFile(Transfer t, int fileIndex);
   void removeLabelFromRows(QString label);
   void renameSelectedTorrent();
 

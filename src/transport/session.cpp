@@ -285,24 +285,24 @@ bool Session::isLSDEnabled() const { return m_btSession.isLSDEnabled(); }
 bool Session::isQueueingEnabled() const { return m_btSession.isQueueingEnabled(); }
 bool Session::isListening() const { return m_btSession.getSession()->is_listening(); }
 
-void Session::deferPlayMedia(Transfer t)
+void Session::deferPlayMedia(Transfer t, int fileIndex)
 {
-    if (t.is_valid())
+    if (t.is_valid() && !playMedia(t, fileIndex))
     {
         t.prioritize_first_last_piece(true);
-        m_pending_medias.push_back(t.hash());
+        m_pending_medias.insert(qMakePair(t.hash(), fileIndex));
     }
 }
 
 void Session::playLink(const QString& strLink)
 {
-    deferPlayMedia(addLink(strLink));
+    deferPlayMedia(addLink(strLink), 0);
 }
 
-bool Session::playMedia(Transfer t)
+bool Session::playMedia(Transfer t, int fileIndex)
 {
     if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))))
+        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(fileIndex))))
     {
         TransferBitfield pieces = t.pieces();
         int last_piece = pieces.size() - 1;
@@ -310,7 +310,7 @@ bool Session::playMedia(Transfer t)
         if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
         {
             t.set_sequential_download(true);
-            return (QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
+            return (QDesktopServices::openUrl(QUrl::fromLocalFile(t.absolute_files_path().at(fileIndex))));
         }
     }
 
@@ -319,11 +319,11 @@ bool Session::playMedia(Transfer t)
 
 void Session::playPendingMedia()
 {
-    for (std::vector<QString>::iterator i = m_pending_medias.begin(); i != m_pending_medias.end();)
+    for (std::set<QPair<QString, int> >::iterator i = m_pending_medias.begin(); i != m_pending_medias.end();)
     {
-        Transfer t = getTransfer(*i);
-        if (!t.is_valid() || playMedia(t))
-            i = m_pending_medias.erase(i);
+        Transfer t = getTransfer(i->first);
+        if (!t.is_valid() || playMedia(t, i->second))
+            m_pending_medias.erase(i++);
         else
             ++i;
     }

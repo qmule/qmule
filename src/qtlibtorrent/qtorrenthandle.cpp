@@ -69,7 +69,7 @@ static QString boostTimeToQString(const boost::posix_time::ptime &boostDate) {
 }
 #endif
 
-static QPair<int, int> get_file_extremity_pieces(const torrent_info& t, int file_index)
+static QList<int> get_file_extremity_pieces(const torrent_info& t, int file_index)
 {
   const int num_pieces = t.num_pieces();
   const int piece_size = t.piece_length();
@@ -85,7 +85,16 @@ static QPair<int, int> get_file_extremity_pieces(const torrent_info& t, int file
   Q_ASSERT(last_piece >= 0 && last_piece < num_pieces);
   qDebug("last piece of the file is %d/%d", last_piece, num_pieces - 1);
 
-  return qMakePair(first_piece, last_piece);
+  const int preview_size = 10 * 1024 * 1024; // 10M
+  const int preview_pieces = std::min<int>(ceil(preview_size / (float) piece_size), num_pieces_in_file);
+  Q_ASSERT(preview_pieces > 0 && preview_pieces <= num_pieces_in_file);
+
+  QList<int> result;
+  for (int p = 0; p < preview_pieces; ++p) {
+    result.append(first_piece + p);
+    result.append(last_piece - p);
+  }
+  return result;
 }
 
 QTorrentHandle::QTorrentHandle(const torrent_handle& h): torrent_handle(h) {}
@@ -227,11 +236,9 @@ bool QTorrentHandle::first_last_piece_first() const {
   if (index >= t.num_files()) // No media file
     return false;
 
-
-  QPair<int, int> extremities = get_file_extremity_pieces (t, index);
-
-  return (torrent_handle::piece_priority(extremities.first) == 7)
-      && (torrent_handle::piece_priority(extremities.second) == 7);
+  QList<int> extremities = get_file_extremity_pieces (t, index);
+  foreach (int e, extremities) if (torrent_handle::piece_priority(e) != 7) return false;
+  return true;
 }
 
 size_type QTorrentHandle::total_wanted_done() const {
@@ -895,9 +902,9 @@ void QTorrentHandle::prioritize_first_last_piece(int file_index, bool b) const {
   // Determine the priority to set
   int prio = b ? 7 : torrent_handle::file_priority(file_index);
 
-  QPair<int, int> extremities = get_file_extremity_pieces (get_torrent_info(), file_index);
-  piece_priority(extremities.first, prio);
-  piece_priority(extremities.second, prio);
+  QList<int> extremities = get_file_extremity_pieces(get_torrent_info(), file_index);
+  foreach (int e, extremities)
+    piece_priority(e, prio);
 }
 
 void QTorrentHandle::prioritize_first_last_piece(bool b) const {

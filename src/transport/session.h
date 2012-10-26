@@ -63,8 +63,8 @@ public:
     bool isQueueingEnabled() const;
     bool isListening() const;
 
-    void deferPlayMedia(Transfer t);
-    bool playMedia(Transfer t);
+    void deferPlayMedia(Transfer t, int fileIndex);
+    bool playMedia(Transfer t, int fileIndex);
     void shareByED2K(const QTorrentHandle& h, bool unshare);
 
 public slots:
@@ -125,7 +125,7 @@ private:
     QScopedPointer<QTimer>  m_periodic_resume;
     QScopedPointer<QTimer>  m_alerts_reading;
 
-    std::vector<QString> m_pending_medias;
+    std::set<QPair<QString, int> > m_pending_medias;
 };
 
 #endif

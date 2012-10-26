@@ -147,8 +147,8 @@ TorrentModel* TransferListWidget::getSourceModel() const {
   return listModel;
 }
 
-void TransferListWidget::previewFile(QString filePath) {
-  QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+void TransferListWidget::previewFile(Transfer t, int fileIndex) {
+    BTSession->deferPlayMedia(t, fileIndex);
 }
 
 void TransferListWidget::setRefreshInterval(int t) {
@@ -206,7 +206,7 @@ void TransferListWidget::torrentDoubleClicked(const QModelIndex& index) {
     }
     break;
   case OPEN_DEST:
-    QString link = h.num_files() == 1 ? h.filepath_at(0) : h.save_path();
+    QString link = h.num_files() == 1 ? h.absolute_files_path().at(0) : h.save_path();
     QDesktopServices::openUrl(QUrl::fromLocalFile(link));
     break;
   }

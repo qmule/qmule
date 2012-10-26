@@ -1434,7 +1434,7 @@ void search_widget::preview()
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
         if (misc::isPreviewable(misc::file_extension(filename))) {
             Transfer t = addTransfer(*iter);
-            Session::instance()->deferPlayMedia(t);
+            Session::instance()->deferPlayMedia(t, 0);
         }
     }
 }
