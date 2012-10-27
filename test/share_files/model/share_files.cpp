@@ -38,74 +38,223 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
-QString NodeStatus2String(SharedFiles::FileNode::NodeStatus ns)
+QString NodeStatus2String(FileNode::NodeStatus ns)
 {
     static QString strs[] = { QString("N"), QString("S"), QString("U") };
     return strs[ns];
 }
 
-SharedFiles::FileNode::FileNode(FileNode* parent, const QString& filename, bool dir) :
+FileNode::FileNode(DirNode* parent, const QString& filename) :
     m_parent(parent),
-    m_filename(filename),
-    m_dir(dir),
     m_status(FileNode::ns_none),
-    m_populated(false)
+    m_filename(filename)
 {
 }
 
-SharedFiles::FileNode::~FileNode()
+FileNode::~FileNode()
+{
+}
+
+void FileNode::share(bool recursive)
+{
+    Q_UNUSED(recursive);
+
+    // avoid hash twice!
+    if (m_status != ns_shared)
+    {
+        m_status = ns_shared;
+        // TODO - send request to parameters maker
+    }
+}
+
+void FileNode::unshare(bool recursive)
+{
+    Q_UNUSED(recursive);
+
+    if (m_status != ns_unshared)
+    {
+        if (is_transfer_associated())
+        {
+            // TODO - remove transfer
+        }
+        else
+        {
+            // TODO - send cancel request to parameters maker
+        }
+
+        m_status = ns_unshared;
+
+        // inform collection
+        m_parent->check_items();
+    }
+}
+
+void FileNode::associate_transfer(const QString& hash)
+{
+    if (m_status == ns_unshared)
+    {
+        // collision - user canceled share after request was sended and before answer
+        // TODO - remove transfer
+        return;
+    }
+
+    m_hash = hash;
+    // inform directory we have changes
+    m_parent->check_items();
+}
+
+QString FileNode::filepath() const
+{
+    QStringList path;
+    const DirNode* parent = m_parent;
+    path << m_filename;
+
+    while(parent && !parent->is_root())
+    {
+        path.prepend(parent->filename());
+        parent = parent->m_parent;
+    }
+
+    QString fullPath = QDir::fromNativeSeparators(path.join(QDir::separator()));
+
+#if !defined(Q_OS_WIN) || defined(Q_OS_WINCE)
+    if ((fullPath.length() > 2) && fullPath[0] == QLatin1Char('/') && fullPath[1] == QLatin1Char('/'))
+        fullPath = fullPath.mid(1);
+#endif
+
+#if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
+    if (fullPath.length() == 2 && fullPath.endsWith(QLatin1Char(':')))
+        fullPath.append(QLatin1Char('/'));
+#endif
+
+    return fullPath;
+}
+
+DirNode::DirNode(DirNode* parent, const QString& filename) : FileNode(parent, filename), m_populated(false)
+{
+}
+
+DirNode::~DirNode()
 {
     foreach(FileNode* p, m_file_children.values()) { delete p; }
-    foreach(FileNode* p, m_dir_children.values()) { delete p; }
+    foreach(DirNode* p, m_dir_children.values()) { delete p; }
 }
 
-void SharedFiles::FileNode::share(bool recursive)
+void DirNode::share(bool recursive)
 {
-    m_status = ns_shared;
     populate();
 
-    foreach(FileNode* p, m_file_children.values())
+    if (m_status != ns_shared)
     {
-        p->share(recursive);
-    }
+        m_status = ns_shared;
 
-    if (recursive)
-    {
-        foreach(FileNode* p, m_dir_children.values())
+        foreach(FileNode* p, m_file_children.values())
         {
             p->share(recursive);
+        }
+
+        // possibly all files were completed already
+        check_items();
+
+        foreach(DirNode* p, m_dir_children.values())
+        {
+            if (recursive)
+            {
+                p->share(recursive);
+            }
+            p->update_names();
         }
     }
 }
 
-void SharedFiles::FileNode::unshare(bool recursive)
+void DirNode::unshare(bool recursive)
 {
-    m_status = ns_unshared;
-
-    foreach(FileNode* p, m_file_children.values())
+    if (m_status != ns_unshared)
     {
-        p->share(recursive);
-    }
+        // to avoid cycle - unshare dir self firstly
+        m_status = ns_unshared;
 
-    if (recursive)
-    {
-        foreach(FileNode* p, m_dir_children.values())
+        if (is_transfer_associated())
         {
-            p->share(recursive);
+            // TODO - remove transfer
+        }
+
+        foreach(FileNode* p, m_file_children.values())
+        {
+            p->unshare(recursive);
+        }
+
+        foreach(DirNode* p, m_dir_children.values())
+        {
+            if (recursive)
+            {
+                p->unshare(recursive);
+            }
+            else
+            {
+                // we must update names on all children collections
+                p->update_names();
+            }
         }
     }
 }
 
-QString SharedFiles::FileNode::collection_name() const
+void DirNode::associate_transfer(const QString& hash)
+{
+    if (m_status != ns_unshared)
+    {
+        m_hash = hash;
+        // we must not inform parent because it is directory now
+    }
+}
+
+void DirNode::update_names()
+{
+    if (is_transfer_associated())
+    {
+        // TODO - re-calculate collection name
+    }
+}
+
+void DirNode::check_items()
+{
+    // collection would hash, but hasn't transfer yet
+    if (status() == ns_shared)
+    {
+        // we have transfer on old data - remove it
+        if (is_transfer_associated())
+        {
+            // TODO - cancel transfer
+        }
+
+        bool pending = false;
+        // check children only directory wait params on self
+        foreach(const FileNode* p, m_file_children.values())
+        {
+            if (p->status() == ns_shared && !p->is_transfer_associated())
+            {
+                pending = true;
+                break;
+            }
+        }
+
+        if (!pending)
+        {
+            // TODO - prepare collection and hash it
+        }
+    }
+}
+
+QString DirNode::collection_name() const
 {
     QStringList name_list;
-    const FileNode* parent = this;
+    const DirNode* parent = this;
 
-    while(parent)
+    while(parent && !parent->is_root())
     {
-        if (parent->m_status == ns_shared)
+        if (parent->status() == ns_shared)
         {
-            name_list.prepend(parent->m_filename);
+            name_list.prepend(parent->filename());
         }
 
         parent = parent->m_parent;
@@ -121,84 +270,27 @@ QString SharedFiles::FileNode::collection_name() const
     return res;
 }
 
-
-QString SharedFiles::FileNode::filepath() const
-{
-    QStringList path;
-    const FileNode* parent = this;
-
-    while(parent)
-    {
-        path.prepend(parent->m_filename);
-        parent = parent->m_parent;
-    }
-
-    QString fullPath = QDir::fromNativeSeparators(path.join(QDir::separator()));
-    qDebug() << path;
-    qDebug() << "orig: " << fullPath;
-
-#if !defined(Q_OS_WIN) || defined(Q_OS_WINCE)
-    if ((fullPath.length() > 2) && fullPath[0] == QLatin1Char('/') && fullPath[1] == QLatin1Char('/'))
-        fullPath = fullPath.mid(1);
-#endif
-
-#if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
-    if (fullPath.length() == 2 && fullPath.endsWith(QLatin1Char(':')))
-        fullPath.append(QLatin1Char('/'));
-#endif
-
-    return fullPath;
-}
-
-SharedFiles::FileNode* SharedFiles::FileNode::file(const QString& filename)
+FileNode* DirNode::child(const QString& filename)
 {
     return m_file_children.value(filename);
 }
 
-void SharedFiles::FileNode::update_names()
+void DirNode::add_node(FileNode* node)
 {
-
-    foreach(FileNode* p, m_dir_children.values())
+    if (node->is_dir())
     {
-        p->update_names();
-    }
-}
-
-void SharedFiles::FileNode::add_node(FileNode* node)
-{
-    if (node->m_dir)
-    {
-        m_dir_children.insert(node->m_filename, node);
+        m_dir_children.insert(node->filename(), static_cast<DirNode*>(node));
     }
     else
     {
-        m_file_children.insert(node->m_filename, node);
+        m_file_children.insert(node->filename(), node);
     }
 }
 
-bool SharedFiles::FileNode::children_in_progress() const
+void DirNode::populate()
 {
-    bool res = false;
+    if (m_populated) return;
 
-    if (m_status == ns_shared)
-    {
-        // check children only directory wait params on self
-        foreach(const FileNode* p, m_file_children.values())
-        {
-            if (p->ns_shared && !p->m_dir)
-            {
-                res = true;
-                break;
-            }
-        }
-    }
-
-    return res;
-}
-
-void SharedFiles::FileNode::populate()
-{
-    if (m_populated || !m_dir) return;
     QString path = filepath();
     qDebug() << "populate " << path;
 
@@ -224,25 +316,23 @@ void SharedFiles::FileNode::populate()
 
     foreach(const QString& str, dirs)
     {
-        m_dir_children.insert(str, new FileNode(this, str, true));
+        m_dir_children.insert(str, new DirNode(this, str));
     }
 
     foreach(const QString& str, files)
     {
-        m_file_children.insert(str, new FileNode(this, str, false));
+        m_file_children.insert(str, new FileNode(this, str));
     }
 
     m_populated = true;
 }
 
-SharedFiles::SharedFiles(): m_root(NULL, "", true)
-{}
-
-SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
+FileNode* Session::node(const QString& filepath)
 {
     if (filepath.isEmpty() || filepath == tr("My Computer") ||
             filepath == tr("Computer") || filepath.startsWith(QLatin1Char(':')))
-        return const_cast<FileNode*>(&m_root);
+
+        return (&m_root);
 
 #ifdef Q_OS_WIN32
     QString longPath = qt_GetLongPathName(filepath);
@@ -262,7 +352,7 @@ SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
         && QDir::fromNativeSeparators(longPath) != QLatin1String("/")
 #endif
         )
-        return const_cast<FileNode*>(&m_root);
+        return (&m_root);
 
 #if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
     {
@@ -283,13 +373,13 @@ SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
         pathElements.prepend(QLatin1String("/"));
 #endif
 
-    FileNode *parent = &m_root;
+    DirNode *parent = &m_root;
     qDebug() << pathElements;
 
     for (int i = 0; i < pathElements.count(); ++i)
     {
         QString element = pathElements.at(i);
-        FileNode* node;
+        DirNode* node;
 #ifdef Q_OS_WIN
         // On Windows, "filename......." and "filename" are equivalent Task #133928
         while (element.endsWith(QLatin1Char('.')))
@@ -306,13 +396,14 @@ SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
             // Someone might call ::index("file://cookie/monster/doesn't/like/veggies"),
             // a path that doesn't exists, I.E. don't blindly create directories.
             QFileInfo info(absolutePath);
+
             if (!info.exists())
             {
                 qDebug() << "absolute path " << absolutePath << " is not exists";
-                return const_cast<FileNode*>(&m_root);
+                return (&m_root);
             }
 
-            node = new FileNode(parent, element, true);
+            node = new DirNode(parent, element);
             parent->add_node(node);
         }
 
@@ -322,43 +413,78 @@ SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
 
     parent->populate();
 
+    FileNode* f = parent;
+
     if (fi.isFile())
     {
         qDebug() << "load filename";
-        parent = parent->file(fi.fileName());
-        if (!parent) parent = &m_root;
+        f = parent->child(fi.fileName());
+        if (!f) f = &m_root;
     }
 
-    return parent;
+    return f;
 }
 
-bool SharedFiles::associate_transfer(const Transfer& transfer)
+bool Session::associate_transfer(const Transfer& transfer)
 {
     FileNode* p = node(transfer.m_filepath);
 
     if (p != &m_root)
     {
-        p->m_hash = transfer.m_hash;
+        if (p->status() == FileNode::ns_unshared)
+        {
+            // transfer must be erased!
+        }
+
+        p->set_hash(transfer.m_hash);
     }
 
-    return !p->m_hash.isEmpty();
+    return !p->hash().isEmpty();
 }
 
-
-QDebug operator<<(QDebug dbg, const SharedFiles::FileNode* node)
+void Session::deleteTransfer(const QString& hash, bool delete_files)
 {
-    dbg.nospace() << "{" << (node->m_dir?"D:":"F:") << node->m_filename
-                  << "(" << NodeStatus2String(node->m_status) << ")"
-                  << "ppl:" << (node->m_populated?"Y":"N");
 
-    foreach(const SharedFiles::FileNode* p, node->m_dir_children)
-    {
-        dbg.nospace() << p;
-    }
+}
 
-    foreach(const SharedFiles::FileNode* p, node->m_file_children)
+void Session::addTransfer(Transfer t)
+{
+
+}
+
+void Session::on_transfer_added(Transfer)
+{
+
+}
+
+void Session::on_transfer_removed(QString hash)
+{
+
+}
+
+void Session::on_made_parameters()
+{
+
+}
+
+QDebug operator<<(QDebug dbg, const FileNode* node)
+{
+    dbg.nospace() << "{" << (node->is_dir()?"D:":"F:") << node->filename()
+                  << "(" << NodeStatus2String(node->status()) << ")";
+
+    if (const DirNode* dnode = dynamic_cast<const DirNode*>(node))
     {
-        dbg.nospace() << p;
+        dbg.nospace() << "ppl:" << (dnode->is_populated()?"Y":"N");
+
+        foreach(const DirNode* p, dnode->m_dir_children)
+        {
+            dbg.nospace() << p;
+        }
+
+        foreach(const FileNode* p, dnode->m_file_children)
+        {
+            dbg.nospace() << p;
+        }
     }
 
     dbg.nospace() << "}";

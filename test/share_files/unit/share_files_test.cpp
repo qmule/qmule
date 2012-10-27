@@ -55,26 +55,30 @@ void share_files_test::prepare_filesystem()
 
 void share_files_test::simple_nodes()
 {
-    QString base = QDir::currentPath() + QDir::separator() + "tmp";
-    SharedFiles sf;
 
-    SharedFiles::FileNode* p1 = sf.node(base);
+    QString base = QDir::currentPath() + QDir::separator() + "tmp";
+    Session sf;
+
+    FileNode* p1 = sf.node(base);
     QVERIFY(p1);
-    SharedFiles::FileNode* p2 = sf.node(base);
+    FileNode* p2 = sf.node(base);
     QVERIFY(p2);
+    QVERIFY(p1->is_dir());
+    QVERIFY(p2->is_dir());
 
     qDebug() << p1;
     qDebug() << p2;
-    QCOMPARE(*p1, *p2);
-    QVERIFY(!p1->m_filename.isEmpty());
+
+    QVERIFY(!p1->filename().isEmpty());
 
     QVERIFY(sf.node(base + QDir::separator() + "dir0/dir1/level_file0"));
-    SharedFiles::FileNode* p = sf.node(base);
+    FileNode* p = sf.node(base);
     QVERIFY(p);
     QVERIFY(p->collection_name().isEmpty());    // is not shared - collection name empty
     qDebug() << "fpath: " << p->filepath();
     QCOMPARE(QDir(base), QDir(p->filepath()));
-
+    p1->share(false);
+    p2->share(true);
 }
 
 void share_files_test::finalize_filesystem()
