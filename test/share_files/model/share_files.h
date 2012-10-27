@@ -53,6 +53,21 @@ signals:
   *                       -> FileNode
   *                            FileNode
   *                              ...
+  *
+  * Scenarious:
+  * 1. share file:   if file is not shared it calls params maker for params, on params signal generate transfer,
+  *                  associate it and informs parent by check_items call
+  * 2. unshare file: when file shared it removes transfer or call cancel params to params maker, set state to unshared
+  *                  and informs parent.
+  *
+  * 3. share dir:    doesn't check self state, for each file execute share and next execute check_items
+  *                  if call recursive it will delegates to child directories. In any case for child directories
+  *                  will be execute update_names method for refresh collection names down
+  * 4. unshare dir:  check self state, firstly drop self transfer/params_maker and status to avoid multiple calls check_items,
+  *                  next unshare each child file
+  *                  For recursive call delegate unshare to child dirs. For not recursive call executes update_names down
+  *                  to refresh collection names.
+  *
  */
 
 class Session;
@@ -85,7 +100,7 @@ public:
     virtual bool is_root() const { return false; }
     QString filename() const { return m_filename; }
     NodeStatus status() const { return m_status; }
-    bool is_transfer_associated() const { return !m_hash.isEmpty(); }
+    bool has_associated_transfer() const { return !m_hash.isEmpty(); }
     QString hash() const { return m_hash; }
     void set_hash(const QString& hash) { m_hash = hash; }
 protected:

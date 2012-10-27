@@ -73,7 +73,7 @@ void FileNode::unshare(bool recursive)
 
     if (m_status != ns_unshared)
     {
-        if (is_transfer_associated())
+        if (has_associated_transfer())
         {
             // TODO - remove transfer
         }
@@ -142,28 +142,29 @@ DirNode::~DirNode()
 
 void DirNode::share(bool recursive)
 {
+    // execute without check current state
+    // we can re-share files were unshared after directory was shared
+
     populate();
 
-    if (m_status != ns_shared)
-    {
-        m_status = ns_shared;
+    m_status = ns_shared;
 
-        foreach(FileNode* p, m_file_children.values())
+    foreach(FileNode* p, m_file_children.values())
+    {
+        p->share(recursive);
+    }
+
+    // possibly all files were completed already
+    check_items();
+
+    foreach(DirNode* p, m_dir_children.values())
+    {
+        if (recursive)
         {
             p->share(recursive);
         }
 
-        // possibly all files were completed already
-        check_items();
-
-        foreach(DirNode* p, m_dir_children.values())
-        {
-            if (recursive)
-            {
-                p->share(recursive);
-            }
-            p->update_names();
-        }
+        p->update_names();
     }
 }
 
@@ -174,7 +175,7 @@ void DirNode::unshare(bool recursive)
         // to avoid cycle - unshare dir self firstly
         m_status = ns_unshared;
 
-        if (is_transfer_associated())
+        if (has_associated_transfer())
         {
             // TODO - remove transfer
         }
@@ -210,7 +211,7 @@ void DirNode::associate_transfer(const QString& hash)
 
 void DirNode::update_names()
 {
-    if (is_transfer_associated())
+    if (has_associated_transfer())
     {
         // TODO - re-calculate collection name
     }
@@ -222,16 +223,20 @@ void DirNode::check_items()
     if (status() == ns_shared)
     {
         // we have transfer on old data - remove it
-        if (is_transfer_associated())
+        if (has_associated_transfer())
         {
             // TODO - cancel transfer
         }
+        else
+        {
+            // TODO - cancel hashing
+        }
 
         bool pending = false;
-        // check children only directory wait params on self
+        // check children
         foreach(const FileNode* p, m_file_children.values())
         {
-            if (p->status() == ns_shared && !p->is_transfer_associated())
+            if (p->status() == ns_shared && !p->has_associated_transfer())
             {
                 pending = true;
                 break;

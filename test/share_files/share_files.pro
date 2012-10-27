@@ -10,8 +10,7 @@ INCLUDEPATH += . unit
 
 include (model/model.pri)
 # Input
-HEADERS += mainwindow.h \
-           unit/share_files_test.h
+HEADERS += unit/share_files_test.h
 
 SOURCES += main.cpp \
            unit/share_files_test.cpp
