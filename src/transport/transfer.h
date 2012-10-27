@@ -77,13 +77,15 @@ public:
     TransferBitfield pieces() const;
     void downloading_pieces(TransferBitfield& bf) const;
     void piece_availability(std::vector<int>& avail) const;
+    std::vector<int> piece_priorities() const;
     TransferSize piece_length() const;
-    bool first_last_piece_first() const;
+    bool extremity_pieces_first() const;
     void file_progress(std::vector<TransferSize>& fp) const;
     std::vector<int> file_priorities() const;
     QString filepath_at(unsigned int index) const;
     QString filename_at(unsigned int index) const;
     TransferSize filesize_at(unsigned int index) const;
+    std::vector<int> file_extremity_pieces_at(unsigned int index) const;
     QStringList url_seeds() const;
     QStringList absolute_files_path() const;
     void get_peer_info(std::vector<PeerInfo>& peers) const;
@@ -94,7 +96,8 @@ public:
     void move_storage(const QString& path) const;
     void rename_file(unsigned int index, const QString& new_name) const;
     void prioritize_files(const std::vector<int> priorities) const;
-    void prioritize_first_last_piece(bool p) const;
+    void prioritize_extremity_pieces(bool p) const;
+    void prioritize_extremity_pieces(bool p, unsigned int index) const;
     void set_tracker_login(const QString& login, const QString& passwd) const;
     void flush_cache() const;
     void force_recheck() const;

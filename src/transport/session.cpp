@@ -78,7 +78,7 @@ void Session::drop()
 }
 
 Session::~Session()
-{    
+{
 }
 
 Session::Session()
@@ -289,7 +289,9 @@ void Session::deferPlayMedia(Transfer t, int fileIndex)
 {
     if (t.is_valid() && !playMedia(t, fileIndex))
     {
-        t.prioritize_first_last_piece(true);
+        qDebug() << "Defer playing file: " << t.filename_at(fileIndex);
+        t.set_sequential_download(false);
+        t.prioritize_extremity_pieces(true, fileIndex);
         m_pending_medias.insert(qMakePair(t.hash(), fileIndex));
     }
 }
@@ -302,16 +304,16 @@ void Session::playLink(const QString& strLink)
 bool Session::playMedia(Transfer t, int fileIndex)
 {
     if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(fileIndex))))
+        misc::isPreviewable(misc::file_extension(t.filename_at(fileIndex))))
     {
         TransferBitfield pieces = t.pieces();
-        int last_piece = pieces.size() - 1;
-        int penult_piece = std::max(last_piece - 1, 0);
-        if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
-        {
-            t.set_sequential_download(true);
-            return (QDesktopServices::openUrl(QUrl::fromLocalFile(t.absolute_files_path().at(fileIndex))));
-        }
+        const std::vector<int> extremity_pieces = t.file_extremity_pieces_at(fileIndex);
+
+        // check we have all boundary pieces for the file
+        foreach (int p, extremity_pieces) if (!pieces[p]) return false;
+
+        t.set_sequential_download(true);
+        return QDesktopServices::openUrl(QUrl::fromLocalFile(t.absolute_files_path().at(fileIndex)));
     }
 
     return false;

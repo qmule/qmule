@@ -93,6 +93,7 @@ public:
   libtorrent::size_type filesize_at(unsigned int index) const;
   QString filepath_at(unsigned int index) const;
   QString orig_filepath_at(unsigned int index) const;
+  std::vector<int> file_extremity_pieces_at(unsigned int index) const;
   TransferState state() const;
   TransferStatus status() const;
   libtorrent::torrent_info get_info() const;
@@ -138,13 +139,14 @@ public:
   qlonglong next_announce_s() const;
   bool priv() const;
   bool super_seeding() const;
-  bool first_last_piece_first() const;
+  bool extremity_pieces_first() const;
   QString root_path() const;
   QString firstFileSavePath() const;
   bool has_error() const;
   QString error() const;
   void downloading_pieces(libtorrent::bitfield& bf) const;
   void piece_availability(std::vector<int>& avail) const;
+  std::vector<int> piece_priorities() const;
   bool has_metadata() const;
   float distributed_copies() const;
   void file_progress(std::vector<libtorrent::size_type>& fp) const;
@@ -159,7 +161,8 @@ public:
   void add_url_seed(const QString& seed) const;
   void set_tracker_login(const QString& username, const QString& password) const;
   void move_storage(const QString& path) const;
-  void prioritize_first_last_piece(bool b) const;
+  void prioritize_extremity_pieces(bool b) const;
+  void prioritize_extremity_pieces(bool b, unsigned int file_index) const;
   void rename_file(int index, const QString& name) const;
   bool save_torrent_file(const QString& path) const;
   void prioritize_files(const std::vector<int>& files) const;
@@ -170,9 +173,6 @@ public:
   // Operators
   //
   bool operator ==(const QTorrentHandle& new_h) const;
-
-private:
-  void prioritize_first_last_piece(int file_index, bool b) const;
 };
 
 #endif

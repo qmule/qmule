@@ -69,34 +69,6 @@ static QString boostTimeToQString(const boost::posix_time::ptime &boostDate) {
 }
 #endif
 
-static QList<int> get_file_extremity_pieces(const torrent_info& t, int file_index)
-{
-  const int num_pieces = t.num_pieces();
-  const int piece_size = t.piece_length();
-  const file_entry& file = t.file_at(file_index);
-
-  // Determine the first and last piece of the file
-  int first_piece = floor((file.offset + 1) / (float) piece_size);
-  Q_ASSERT(first_piece >= 0 && first_piece < num_pieces);
-  qDebug("First piece of the file is %d/%d", first_piece, num_pieces - 1);
-
-  int num_pieces_in_file = ceil(file.size / (float) piece_size);
-  int last_piece = first_piece + num_pieces_in_file - 1;
-  Q_ASSERT(last_piece >= 0 && last_piece < num_pieces);
-  qDebug("last piece of the file is %d/%d", last_piece, num_pieces - 1);
-
-  const int preview_size = 10 * 1024 * 1024; // 10M
-  const int preview_pieces = std::min<int>(ceil(preview_size / (float) piece_size), num_pieces_in_file);
-  Q_ASSERT(preview_pieces > 0 && preview_pieces <= num_pieces_in_file);
-
-  QList<int> result;
-  for (int p = 0; p < preview_pieces; ++p) {
-    result.append(first_piece + p);
-    result.append(last_piece - p);
-  }
-  return result;
-}
-
 QTorrentHandle::QTorrentHandle(const torrent_handle& h): torrent_handle(h) {}
 
 bool QTorrentHandle::operator==(const TransferBase& t) const {
@@ -217,28 +189,26 @@ int QTorrentHandle::num_pieces() const {
   return torrent_handle::get_torrent_info().num_pieces();
 }
 
-bool QTorrentHandle::first_last_piece_first() const {
+bool QTorrentHandle::extremity_pieces_first() const {
   const torrent_info& t = get_torrent_info();
+  std::vector<int> piece_priorities = torrent_handle::piece_priorities();
 
-  // Get int first media file
-  int index = 0;
-  for (index = 0; index < t.num_files(); ++index) {
+  for (int index = 0; index < t.num_files(); ++index) {
 #if LIBTORRENT_VERSION_MINOR > 15
     QString path = misc::toQStringU(t.file_at(index).path);
 #else
     QString path = misc::toQStringU(t.file_at(index).path.string());
 #endif
     const QString ext = misc::file_extension(path);
-    if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0)
-      break;
+    if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0) {
+      const std::vector<int> extremities = file_extremity_pieces_at(index);
+      int sum_prio = 0;
+      foreach (int e, extremities) sum_prio += piece_priorities[e];
+      if (sum_prio == 7 * extremities.size()) return true;
+    }
   }
 
-  if (index >= t.num_files()) // No media file
-    return false;
-
-  QList<int> extremities = get_file_extremity_pieces (t, index);
-  foreach (int e, extremities) if (torrent_handle::piece_priority(e) != 7) return false;
-  return true;
+  return false;
 }
 
 size_type QTorrentHandle::total_wanted_done() const {
@@ -378,6 +348,32 @@ QString QTorrentHandle::orig_filepath_at(unsigned int index) const {
 #else
   return misc::toQStringU(torrent_handle::get_torrent_info().orig_files().at(index).path.string());
 #endif
+}
+
+std::vector<int> QTorrentHandle::file_extremity_pieces_at(unsigned int index) const {
+  const torrent_info& t = get_torrent_info();
+  const int num_pieces = t.num_pieces();
+  const int piece_size = t.piece_length();
+  const file_entry& file = t.file_at(index);
+
+  // Determine the first and last piece of the file
+  int first_piece = floor((file.offset + 1) / (float)piece_size);
+  Q_ASSERT(first_piece >= 0 && first_piece < num_pieces);
+
+  int num_pieces_in_file = ceil(file.size / (float)piece_size);
+  int last_piece = first_piece + num_pieces_in_file - 1;
+  Q_ASSERT(last_piece >= 0 && last_piece < num_pieces);
+
+  const int preview_size = 10 * 1024 * 1024; // 10M
+  const int preview_pieces = std::min<int>(ceil(preview_size / (float)piece_size), num_pieces_in_file);
+  Q_ASSERT(preview_pieces > 0 && preview_pieces <= num_pieces_in_file);
+
+  std::vector<int> result;
+  for (int p = 0; p < preview_pieces; ++p) {
+    result.push_back(first_piece + p);
+    result.push_back(last_piece - p);
+  }
+  return result;
 }
 
 TransferState QTorrentHandle::state() const {
@@ -704,6 +700,10 @@ void QTorrentHandle::piece_availability(std::vector<int>& avail) const {
     torrent_handle::piece_availability(avail);
 }
 
+std::vector<int> QTorrentHandle::piece_priorities() const {
+    return torrent_handle::piece_priorities();
+}
+
 bool QTorrentHandle::has_metadata() const {
 #if LIBTORRENT_VERSION_MINOR > 15
   return torrent_handle::status(query_distributed_copies).has_metadata;
@@ -898,16 +898,16 @@ void QTorrentHandle::prioritize_files(const vector<int> &files) const {
   }
 }
 
-void QTorrentHandle::prioritize_first_last_piece(int file_index, bool b) const {
+void QTorrentHandle::prioritize_extremity_pieces(bool b, unsigned int file_index) const {
   // Determine the priority to set
   int prio = b ? 7 : torrent_handle::file_priority(file_index);
 
-  QList<int> extremities = get_file_extremity_pieces(get_torrent_info(), file_index);
+  const std::vector<int> extremities = file_extremity_pieces_at(file_index);
   foreach (int e, extremities)
     piece_priority(e, prio);
 }
 
-void QTorrentHandle::prioritize_first_last_piece(bool b) const {
+void QTorrentHandle::prioritize_extremity_pieces(bool b) const {
   if (!has_metadata()) return;
   // Download first and last pieces first for all media files in the torrent
   const uint nbfiles = num_files();
@@ -915,8 +915,7 @@ void QTorrentHandle::prioritize_first_last_piece(bool b) const {
     const QString path = filepath_at(index);
     const QString ext = misc::file_extension(path);
     if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0) {
-      qDebug() << "File" << path << "is previewable, toggle downloading of first/last pieces first";
-      prioritize_first_last_piece(index, b);
+        prioritize_extremity_pieces(b, index);
     }
   }
 }

@@ -1268,7 +1268,7 @@ void QBtSession::loadTorrentTempData(QTorrentHandle &h, QString savePath, bool m
 #endif
 
       // Prioritize first/last piece
-      h.prioritize_first_last_piece(TorrentTempData::isSequential(hash));
+      h.prioritize_extremity_pieces(TorrentTempData::isSequential(hash));
 
       // Update file names
       const QStringList files_path = TorrentTempData::getFilesPath(hash);

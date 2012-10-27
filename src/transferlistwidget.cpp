@@ -583,7 +583,7 @@ void TransferListWidget::toggleSelectedTorrentsSequentialDownload() const {
       bool was_sequential = h.is_sequential_download();
       h.set_sequential_download(!was_sequential);
       if (!was_sequential)
-        h.prioritize_first_last_piece(true);
+        h.prioritize_extremity_pieces(true);
     }
   }
 }
@@ -593,7 +593,7 @@ void TransferListWidget::toggleSelectedFirstLastPiecePrio() const {
   foreach (const QString &hash, hashes) {
     Transfer h = BTSession->getTransfer(hash);
     if (h.is_valid() && h.has_metadata()) {
-      h.prioritize_first_last_piece(!h.first_last_piece_first());
+      h.prioritize_extremity_pieces(!h.extremity_pieces_first());
     }
   }
 }
@@ -740,12 +740,12 @@ void TransferListWidget::displayListMenu(const QPoint&) {
       if (h.has_metadata()) {
         if (first) {
           sequential_download_mode = h.is_sequential_download();
-          prioritize_first_last = h.first_last_piece_first();
+          prioritize_first_last = h.extremity_pieces_first();
         } else {
           if (sequential_download_mode != h.is_sequential_download()) {
             all_same_sequential_download_mode = false;
           }
-          if (prioritize_first_last != h.first_last_piece_first()) {
+          if (prioritize_first_last != h.extremity_pieces_first()) {
             all_same_prio_firstlast = false;
           }
         }

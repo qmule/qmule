@@ -355,13 +355,15 @@ public:
     virtual TransferBitfield pieces() const = 0;
     virtual void downloading_pieces(TransferBitfield& bf) const = 0;
     virtual void piece_availability(std::vector<int>& avail) const = 0;
+    virtual std::vector<int> piece_priorities() const = 0;
     virtual TransferSize piece_length() const = 0;
-    virtual bool first_last_piece_first() const = 0;
+    virtual bool extremity_pieces_first() const = 0;
     virtual void file_progress(std::vector<TransferSize>& fp) const = 0;
     virtual std::vector<int> file_priorities() const = 0;
     virtual QString filepath_at(unsigned int index) const = 0;
     virtual QString filename_at(unsigned int index) const = 0;
     virtual TransferSize filesize_at(unsigned int index) const = 0;
+    virtual std::vector<int> file_extremity_pieces_at(unsigned int index) const = 0;
     virtual QStringList url_seeds() const = 0;
     virtual QStringList absolute_files_path() const = 0;
     virtual void get_peer_info(std::vector<PeerInfo>& peers) const = 0;
@@ -372,7 +374,8 @@ public:
     virtual void move_storage(const QString& path) const = 0;
     virtual void rename_file(int index, const QString& new_name) const = 0;
     virtual void prioritize_files(const std::vector<int>& priorities) const = 0;
-    virtual void prioritize_first_last_piece(bool p) const = 0;
+    virtual void prioritize_extremity_pieces(bool p) const = 0;
+    virtual void prioritize_extremity_pieces(bool p, unsigned int index) const = 0;
     virtual void set_tracker_login(const QString& login, const QString& passwd) const = 0;
     virtual void flush_cache() const = 0;
     virtual void force_recheck() const = 0;

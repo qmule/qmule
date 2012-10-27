@@ -169,8 +169,7 @@ public:
         FORWARD_RETURN(getTransfers(), std::vector<Transfer>()); }
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const {
         FORWARD_RETURN(getMaxRatioPerTransfer(hash, use_global), 0); }
-    SessionStatus getSessionStatus() const {
-        FORWARD_RETURN(getSessionStatus(), SessionStatus()); }
+    SessionStatus getSessionStatus() const { FORWARD_RETURN(getSessionStatus(), SessionStatus()); }
     void changeLabelInSavePath(
         const Transfer& t, const QString& old_label, const QString& new_label) {
         DEFER3(changeLabelInSavePath, t, old_label, new_label); }

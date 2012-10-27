@@ -655,13 +655,13 @@ bool PropertiesWidget::applyPriorities() {
   qDebug("Saving files priorities");
   const std::vector<int> priorities = PropListModel->model()->getFilesPriorities(h.get_info().num_files());
   // Save first/last piece first option state
-  bool first_last_piece_first = h.first_last_piece_first();
+  bool extremity_pieces_first = h.extremity_pieces_first();
   // Prioritize the files
   qDebug("prioritize files: %d", priorities[0]);
   h.prioritize_files(priorities);
   // Restore first/last piece first option if necessary
-  if (first_last_piece_first)
-    h.prioritize_first_last_piece(true);
+  if (extremity_pieces_first)
+    h.prioritize_extremity_pieces(true);
   return true;
 }
 
