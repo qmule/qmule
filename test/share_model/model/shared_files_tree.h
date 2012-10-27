@@ -11,7 +11,46 @@
 #include <QFileIconProvider>
 #include <QDir>
 #include <QBasicTimer>
+#include <QDebug>
 #include "qfileinfogatherer.h"
+
+class SharedFiles : public QObject
+{
+    Q_OBJECT
+public:
+    struct FileNode
+    {
+        FileNode*   m_parent;
+        QString     m_filename;
+        bool        m_dir;
+        bool        m_wait_params;
+        bool        m_populated;
+        QHash<QString, FileNode*> m_file_children;
+        QHash<QString, FileNode*> m_dir_children;
+
+        FileNode(FileNode* parent, const QString& filename, bool dir);
+        ~FileNode();
+
+        void share(bool recursive);
+        void unshare(bool recursive);
+
+        QString collection_name() const;
+        QString filepath() const;
+        FileNode* file(const QString& filename);
+
+        /**
+          * node waits for params to execute add transfer
+         */
+        bool wait_children_params() const;
+        void populate();
+    };
+
+    SharedFiles();
+    FileNode* node(const QString& filepath);
+    const FileNode* root() const { return &m_root; }
+private:
+    FileNode    m_root;
+};
 
 class shared_files_tree : public QObject
 {
@@ -184,7 +223,12 @@ public:
     void removeNode(QFileSystemNode *parentNode, const QString& name);
 
     QFileSystemNode* addNode(QFileSystemNode *parentNode, const QString &fileName, const QFileInfo &info);
-    QString filePath(QFileSystemNode* node) const;
+    QString filePath(const QFileSystemNode* node) const;
+
+    /**
+      * enumerate directory content
+     */
+    void list(const QFileSystemNode* node);
 
     inline static QString myComputer()
     {
@@ -199,10 +243,10 @@ public:
 #endif
     }
 
+    QFileInfoGatherer m_fileinfo_gatherer;
 private:
     QFileSystemNode m_root;
-    QDir            m_rootDir;
-    QFileInfoGatherer m_fileinfo_gatherer;
+    QDir            m_rootDir;    
 
     QBasicTimer fetchingTimer;
 
@@ -217,12 +261,11 @@ private:
 
     QBasicTimer m_ftm;
     void timerEvent(QTimerEvent *);
-signals:
-    
-public slots:
+
 private slots:
-    void filesystem_changed(const QString& path, const FileInfoList& updates);
-    
+    void filesystem_changed(const QString& path, const FileInfoList& updates);    
 };
+
+QDebug operator<<(QDebug dbg, const shared_files_tree::QFileSystemNode* node);
 
 #endif // SHARED_FILES_TREE_H

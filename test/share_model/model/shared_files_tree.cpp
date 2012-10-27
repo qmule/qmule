@@ -1,5 +1,6 @@
 #include <QTimerEvent>
-#include <QDebug>
+#include <QDirIterator>
+#include <QFileSystemModel>
 #include "shared_files_tree.h"
 
 #ifdef Q_OS_WIN32
@@ -36,6 +37,277 @@ static QString qt_GetLongPathName(const QString &strShortPath)
     }
 }
 #endif
+
+SharedFiles::FileNode::FileNode(FileNode* parent, const QString& filename, bool dir) :
+    m_parent(parent),
+    m_filename(filename),
+    m_dir(dir),
+    m_wait_params(false),
+    m_populated(false)
+{
+}
+
+SharedFiles::FileNode::~FileNode()
+{
+    foreach(FileNode* p, m_file_children.values()) { delete p; }
+    foreach(FileNode* p, m_dir_children.values()) { delete p; }
+}
+
+void SharedFiles::FileNode::share(bool recursive)
+{
+    populate();
+
+    foreach(FileNode* p, m_file_children.values())
+    {
+        p->share(recursive);
+    }
+
+    if (recursive)
+    {
+        foreach(FileNode* p, m_dir_children.values())
+        {
+            p->share(recursive);
+        }
+    }
+}
+
+void SharedFiles::FileNode::unshare(bool recursive)
+{
+    foreach(FileNode* p, m_file_children.values())
+    {
+        p->share(recursive);
+    }
+
+    if (recursive)
+    {
+        foreach(FileNode* p, m_dir_children.values())
+        {
+            p->share(recursive);
+        }
+    }
+}
+
+QString SharedFiles::FileNode::collection_name() const
+{
+    QStringList name_list;
+    const FileNode* parent = this;
+
+    while(parent)
+    {
+        if (parent->m_wait_params)
+        {
+            name_list.prepend(parent->m_filename);
+        }
+
+        parent = parent->m_parent;
+    }
+
+    return (name_list.join(QString("-")) + QString::number(m_file_children.count()));
+}
+
+
+QString SharedFiles::FileNode::filepath() const
+{
+    QStringList path;
+    const FileNode* parent = this;
+
+    while(parent)
+    {
+        path.prepend(parent->m_filename);
+        parent = parent->m_parent;
+    }
+
+    QString fullPath = QDir::fromNativeSeparators(path.join(QDir::separator()));
+
+#if !defined(Q_OS_WIN) || defined(Q_OS_WINCE)
+    if ((fullPath.length() > 2) && fullPath[0] == QLatin1Char('/') && fullPath[1] == QLatin1Char('/'))
+        fullPath = fullPath.mid(1);
+#endif
+
+#if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
+    if (fullPath.length() == 2 && fullPath.endsWith(QLatin1Char(':')))
+        fullPath.append(QLatin1Char('/'));
+#endif
+
+    return fullPath;
+}
+
+SharedFiles::FileNode* SharedFiles::FileNode::file(const QString& filename)
+{
+    return m_file_children.value(filename);
+}
+
+bool SharedFiles::FileNode::wait_children_params() const
+{
+    bool res = false;
+
+    if (m_wait_params)
+    {
+        // check children only directory wait params on self
+        foreach(const FileNode* p, m_file_children.values())
+        {
+            if (p->m_wait_params && !p->m_dir)
+            {
+                res = true;
+                break;
+            }
+        }
+    }
+
+    return res;
+}
+
+void SharedFiles::FileNode::populate()
+{
+    if (m_populated || !m_dir) return;
+    QString path = filepath();
+
+    QString itPath = QDir::fromNativeSeparators(path);
+    QDirIterator dirIt(itPath, QDir::AllEntries | QDir::System | QDir::Hidden);
+    QStringList dirs;
+    QStringList files;
+
+    while(dirIt.hasNext())
+    {
+        dirIt.next();
+        QFileInfo fileInfo = dirIt.fileInfo();
+
+        if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
+        {
+            dirs << fileInfo.fileName();
+        }
+        else if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
+        {
+            files << fileInfo.fileName();
+        }
+    }
+
+    foreach(const QString& str, dirs)
+    {
+        m_dir_children.insert(str, new FileNode(this, str, true));
+    }
+
+    foreach(const QString& str, files)
+    {
+        m_file_children.insert(str, new FileNode(this, str, false));
+    }
+
+    m_populated = true;
+}
+
+
+SharedFiles::SharedFiles(): m_root(NULL, "", true)
+{}
+
+SharedFiles::FileNode* SharedFiles::node(const QString& filepath)
+{
+    qDebug() << "get node for: " << filepath;
+
+    if (filepath.isEmpty() || filepath == tr("My Computer") ||
+            filepath == tr("Computer") || filepath.startsWith(QLatin1Char(':')))
+        return const_cast<FileNode*>(&m_root);
+
+#ifdef Q_OS_WIN32
+    QString longPath = qt_GetLongPathName(filepath);
+#else
+    QString longPath = filepath;
+#endif
+
+    QFileInfo fi(longPath);
+
+    QString absolutePath = QDir(longPath).absolutePath();
+
+    // ### TODO can we use bool QAbstractFileEngine::caseSensitive() const?
+    QStringList pathElements = absolutePath.split(QLatin1Char('/'), QString::SkipEmptyParts);
+
+    if ((pathElements.isEmpty())
+#if (!defined(Q_OS_WIN) || defined(Q_OS_WINCE)) && !defined(Q_OS_SYMBIAN)
+        && QDir::fromNativeSeparators(longPath) != QLatin1String("/")
+#endif
+        )
+        return const_cast<FileNode*>(&m_root);
+
+#if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
+    {
+        if (!pathElements.at(0).contains(QLatin1String(":")))
+        {
+            // The reason we express it like this instead of with anonymous, temporary
+            // variables, is to workaround a compiler crash with Q_CC_NOKIAX86.
+            QString rootPath = QDir(longPath).rootPath();
+            pathElements.prepend(rootPath);
+        }
+
+        if (pathElements.at(0).endsWith(QLatin1Char('/')))
+            pathElements[0].chop(1);
+    }
+#else
+    // add the "/" item, since it is a valid path element on Unix
+    if (absolutePath[0] == QLatin1Char('/'))
+        pathElements.prepend(QLatin1String("/"));
+#endif
+
+    FileNode *parent = &m_root;
+    qDebug() << pathElements;
+
+    for (int i = 0; i < pathElements.count(); ++i)
+    {
+        QString element = pathElements.at(i);
+        FileNode* node;
+#ifdef Q_OS_WIN
+        // On Windows, "filename......." and "filename" are equivalent Task #133928
+        while (element.endsWith(QLatin1Char('.')))
+            element.chop(1);
+#endif
+        bool alreadyExists = parent->m_dir_children.contains(element);
+
+        if (!alreadyExists)
+        {
+            // Someone might call ::index("file://cookie/monster/doesn't/like/veggies"),
+            // a path that doesn't exists, I.E. don't blindly create directories.
+            QFileInfo info(absolutePath);
+            if (!info.exists())
+                return const_cast<FileNode*>(&m_root);
+            node = new FileNode(parent, element, true);
+        }
+        else
+        {
+            node = parent->m_dir_children.value(element);
+        }
+
+        Q_ASSERT(node);
+        parent = node;
+    }
+
+    parent->populate();
+
+    if (!fi.fileName().isEmpty())
+    {
+        parent = parent->file(fi.fileName());
+        if (!parent) parent = &m_root;
+    }
+
+    return parent;
+}
+
+QDebug operator<<(QDebug dbg, const shared_files_tree::QFileSystemNode* node)
+{
+    dbg.nospace() << "N:" << node->fileName << "{";
+
+    if (node->info)
+    {
+        dbg.nospace() << node->type() << ", size: " << node->size() << ", children: ";
+    }
+
+    foreach(const shared_files_tree::QFileSystemNode* p, node->children)
+    {
+        dbg.nospace() << p;
+    }
+
+    dbg.nospace() << "}";
+
+    return dbg.space();
+}
+
 
 shared_files_tree::shared_files_tree(QObject *parent) :
     QObject(parent)
@@ -152,35 +424,6 @@ shared_files_tree::QFileSystemNode* shared_files_tree::node(const QString& path,
 #endif
         )
         return const_cast<QFileSystemNode*>(&m_root);
-
-    /*
-    QModelIndex index = QModelIndex(); // start with "My Computer"
-#if defined(Q_OS_WIN) && !defined(Q_OS_WINCE)
-    if (absolutePath.startsWith(QLatin1String("//"))) { // UNC path
-        QString host = QLatin1String("\\\\") + pathElements.first();
-        if (absolutePath == QDir::fromNativeSeparators(host))
-            absolutePath.append(QLatin1Char('/'));
-        if (longPath.endsWith(QLatin1Char('/')) && !absolutePath.endsWith(QLatin1Char('/')))
-            absolutePath.append(QLatin1Char('/'));
-        int r = 0;
-        QFileSystemModelPrivate::QFileSystemNode *rootNode = const_cast<QFileSystemModelPrivate::QFileSystemNode*>(&root);
-        if (!root.children.contains(host.toLower())) {
-            if (pathElements.count() == 1 && !absolutePath.endsWith(QLatin1Char('/')))
-                return rootNode;
-            QFileInfo info(host);
-            if (!info.exists())
-                return rootNode;
-            QFileSystemModelPrivate *p = const_cast<QFileSystemModelPrivate*>(this);
-            p->addNode(rootNode, host,info);
-            p->addVisibleFiles(rootNode, QStringList(host));
-        }
-        r = rootNode->visibleLocation(host);
-        r = translateVisibleLocation(rootNode, r);
-        index = q->index(r, 0, QModelIndex());
-        pathElements.pop_front();
-    } else
-#endif
-*/
 
 #if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
     {
@@ -373,10 +616,10 @@ shared_files_tree::QFileSystemNode* shared_files_tree::addNode(QFileSystemNode *
     return node;
 }
 
-QString shared_files_tree::filePath(QFileSystemNode *node) const
+QString shared_files_tree::filePath(const QFileSystemNode *node) const
 {
     QStringList path;
-    QFileSystemNode* parent = node;
+    const QFileSystemNode* parent = node;
 
     while(parent)
     {
@@ -397,4 +640,9 @@ QString shared_files_tree::filePath(QFileSystemNode *node) const
 #endif
 
     return fullPath;
+}
+
+void shared_files_tree::list(const QFileSystemNode* node)
+{
+    m_fileinfo_gatherer.list(filePath(node));
 }
