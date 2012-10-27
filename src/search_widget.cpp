@@ -875,7 +875,7 @@ Transfer search_widget::addTransfer(const QModelIndex& index)
 
     libed2k::add_transfer_params params;
     params.file_hash = libed2k::md4_hash::fromString(hash.toStdString());
-    params.file_path = filepath.toUtf8().constData();
+    params.m_filepath = filepath.toUtf8().constData();
     params.file_size = selected_data(treeResult, SWDelegate::SW_SIZE, index).toULongLong();
     params.seed_mode = false;
     params.num_complete_sources = selected_data(treeResult, SWDelegate::SW_SOURCES, index).toInt();

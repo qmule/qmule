@@ -420,7 +420,8 @@ void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 
         if (info.isFile())
         {
-            m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
+            // TODO - replace by new share
+            //m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
         }
         else if (info.isDir())
         {
@@ -438,8 +439,9 @@ void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 
             foreach(const QString& str, dlist)
             {
-                m_edSession.delegate()->share_dir(
-                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
+                // TODO - replace by new share
+                //m_edSession.delegate()->share_dir(
+                //    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
             }
         }
     }

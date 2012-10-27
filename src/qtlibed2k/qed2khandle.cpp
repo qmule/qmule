@@ -25,11 +25,11 @@ bool QED2KHandle::operator<(const TransferBase& t) const
 }
 
 QString QED2KHandle::hash() const { return misc::toQString(m_delegate.hash()); }
-QString QED2KHandle::name() const { return misc::toQStringU(m_delegate.filepath().filename()); }
+QString QED2KHandle::name() const { return misc::toQStringU(m_delegate.name()); }
 
 QString QED2KHandle::save_path() const
 {
-	return misc::toQStringU(m_delegate.filepath().parent_path().string()).replace("\\", "/");
+    return misc::toQStringU(m_delegate.save_path()).replace("\\", "/"); // why replace ?
 }
 
 QString QED2KHandle::firstFileSavePath() const { return QString(); }
@@ -118,15 +118,21 @@ void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {
     fp.push_back(pieces().count() * libed2k::PIECE_SIZE);
 }
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
-QString QED2KHandle::filepath_at(unsigned int index) const {
-    return misc::toQStringU(m_delegate.filepath().string());
+
+QString QED2KHandle::filepath_at(unsigned int index) const
+{
+    return misc::toQStringU(libed2k::combine_path(m_delegate.save_path(), m_delegate.name()));
 }
-QString QED2KHandle::filename_at(unsigned int index) const {
-    return misc::toQStringU(m_delegate.filepath().filename());
+
+QString QED2KHandle::filename_at(unsigned int index) const
+{
+    return misc::toQStringU(m_delegate.name());
 }
-TransferSize QED2KHandle::filesize_at(unsigned int index) const {
-    return m_delegate.filesize();
+TransferSize QED2KHandle::filesize_at(unsigned int index) const
+{
+    return m_delegate.size();
 }
+
 QStringList QED2KHandle::url_seeds() const { return QStringList(); }
 QStringList QED2KHandle::absolute_files_path() const {
     QStringList res;

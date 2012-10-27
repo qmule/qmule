@@ -325,7 +325,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             if (!fileRules.contains(filePath))
             {
                 fileRules.push_back(filePath);
-                Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toUtf8().constData());
+                //Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toUtf8().constData());
                 curItem->setFont(0, boldFont);
                 while (curItem->parent() != allDirs)
                 {
@@ -340,7 +340,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             {
                 fileRules.removeOne(filePath);
                 removeTransferPath(filePath);
-                Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toUtf8().constData());
+                //Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toUtf8().constData());
                 checkExchangeParentStatus(curItem);
             }
         }
@@ -354,7 +354,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
             {
                 files.removeOne(fileName);
                 QString filePath = dirPath + fileName;
-                Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toUtf8().constData());
+                //Session::instance()->get_ed2k_session()->delegate()->share_file(filePath.toUtf8().constData());
             }
         }
         else
@@ -364,7 +364,7 @@ void files_widget::tableItemChanged(QStandardItem* item)
                 files.push_back(fileName);
                 QString filePath = dirPath + fileName;
                 removeTransferPath(filePath);
-                Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toUtf8().constData());
+                //Session::instance()->get_ed2k_session()->delegate()->unshare_file(filePath.toUtf8().constData());
             }
         }        
     }
@@ -728,8 +728,8 @@ void files_widget::shareDir(QString dirPath, bool bShare)
     for (filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
         files.push_back(filesIter->toStdString());
 
-    Session::instance()->get_ed2k_session()->delegate()->share_dir(
-        basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files, !bShare);
+    //Session::instance()->get_ed2k_session()->delegate()->share_dir(
+    //    basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files, !bShare);
 }
 
 void files_widget::checkBaseAdd(QString dirPath)
@@ -760,8 +760,8 @@ void files_widget::checkBaseAdd(QString dirPath)
                 for (QList<QString>::const_iterator filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
                     files.push_back(filesIter->toStdString());
                 removeLastSlash(curDirPath);
-                Session::instance()->get_ed2k_session()->delegate()->unshare_dir(curBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
-                Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+                //Session::instance()->get_ed2k_session()->delegate()->unshare_dir(curBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+                //Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
             }
             else
                 break;
@@ -805,8 +805,8 @@ void files_widget::checkBaseRemove(QString dirPath)
             for (QList<QString>::const_iterator filesIter = dirFiles.begin(); filesIter != dirFiles.end(); ++filesIter)
                 files.push_back(filesIter->toStdString());
             removeLastSlash(curDirPath);
-            Session::instance()->get_ed2k_session()->delegate()->unshare_dir(oldBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
-            Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+            //Session::instance()->get_ed2k_session()->delegate()->unshare_dir(oldBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
+            //Session::instance()->get_ed2k_session()->delegate()->share_dir(newBase.toUtf8().constData(), curDirPath.toUtf8().constData(), files);
         }
     }
 }
@@ -1018,7 +1018,7 @@ void files_widget::optionsChanged()
     removeLastSlash(basePath);
     basePath = basePath.left(basePath.lastIndexOf('/'));
 
-    Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+    //Session::instance()->get_ed2k_session()->delegate()->unshare_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
 
     // Share new Incoming directory
     QTreeWidgetItem* curItem = NULL;
@@ -1036,7 +1036,7 @@ void files_widget::optionsChanged()
     removeLastSlash(basePath);
     basePath = basePath.left(basePath.lastIndexOf('/'));
 
-    Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+    //Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
         
     QList<QString>::iterator filesIter = fileRules.begin();
     while (filesIter != fileRules.end())
@@ -1069,7 +1069,7 @@ void files_widget::reshare()
     removeLastSlash(basePath);
     basePath = basePath.left(basePath.lastIndexOf('/'));
 
-    Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
+    //Session::instance()->get_ed2k_session()->delegate()->share_dir(basePath.toUtf8().constData(), dirPath.toUtf8().constData(), files);
 
     QList<QString>::iterator filesIter = fileRules.begin();
     while (filesIter != fileRules.end())
@@ -1077,7 +1077,7 @@ void files_widget::reshare()
         QFileInfo file(*filesIter);
         if (file.exists() && file.isFile())
         {
-            Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toUtf8().constData());
+            //Session::instance()->get_ed2k_session()->delegate()->share_file(filesIter->toUtf8().constData());
             ++filesIter;
         }
         else

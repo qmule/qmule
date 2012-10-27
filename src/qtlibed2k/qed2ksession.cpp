@@ -180,7 +180,7 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             std::vector<char> out;
             libed2k::bencode(back_inserter(out), *p->resume_data);
             const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
-            libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
+            libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.save_path(), p->m_handle.name(), p->m_handle.size(), out);
 
             std::ofstream fs(filepath.toLocal8Bit(), std::ios_base::out | std::ios_base::binary);
 
@@ -393,7 +393,7 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
         QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
-        atp.file_path = filepath.toUtf8();
+        atp.m_filepath = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
         return QED2KHandle(delegate()->add_transfer(atp));
     }
@@ -413,7 +413,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
             qDebug() << "add transfer " << filepath;
             libed2k::add_transfer_params atp;
             atp.file_hash = ece.m_filehash;
-            atp.file_path = filepath.toUtf8();
+            atp.m_filepath = filepath.toUtf8().constData();
             atp.file_size = ece.m_filesize;
             delegate()->add_transfer(atp);
         }
@@ -422,7 +422,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
-    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.filename().c_str());
+    qDebug() << "add transfer for " << QString::fromUtf8(atp.m_filepath.c_str());
     return QED2KHandle(delegate()->add_transfer(atp));
 }
 
@@ -567,6 +567,7 @@ void QED2KSession::readAlerts()
         else if (libed2k::mule_listen_failed_alert* p =
                  dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
         {
+            Q_UNUSED(p)
             // TODO - process signal - it means we have different client on same port
         }
         else if (libed2k::peer_connected_alert* p = dynamic_cast<libed2k::peer_connected_alert*>(a.get()))
@@ -760,7 +761,7 @@ void QED2KSession::loadFastResumeData()
                         // add transfer
                         libed2k::add_transfer_params params;
                         params.seed_mode = false;
-                        params.file_path = trd.m_filepath.m_collection;
+                        params.m_filepath = trd.m_filepath.m_collection;
                         params.file_size = trd.m_filesize;
                         params.file_hash = trd.m_hash;
 

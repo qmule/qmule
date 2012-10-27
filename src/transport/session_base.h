@@ -10,7 +10,7 @@
 #include <vector>
 #include <queue>
 #include <libtorrent/session_status.hpp>
-#include <libed2k/session.hpp>
+#include <libed2k/add_transfer_params.hpp>
 #include <libed2k/session_status.hpp>
 
 #include <transport/transfer.h>
