@@ -5077,8 +5077,16 @@ Do you want to install it now?</source>
         <translation>ED2K ссылка</translation>
     </message>
     <message>
-        <source>Add ED2K link</source>
-        <translation>Добавить ED2K ссылку...</translation>
+        <source>Add link...</source>
+        <translation>Добавить ссылку...</translation>
+    </message>
+    <message>
+        <source>ED2K/magnet link:</source>
+        <translation>ED2K/magnet ссылка:</translation>
+    </message>
+    <message>
+        <source>Incorrect link</source>
+        <translation>Некорректная ссылка</translation>
     </message>
     <message>
         <source>View file...</source>

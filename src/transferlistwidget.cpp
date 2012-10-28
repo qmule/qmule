@@ -408,7 +408,20 @@ void TransferListWidget::hidePriorityColumn(bool hide) {
   setColumnHidden(TorrentModelItem::TR_PRIORITY, hide);
 }
 
-void TransferListWidget::showAddED2KLinkDialog() const {
+void TransferListWidget::addLinkDialog() {
+  Transfer t;
+  bool ok;
+  QString link;
+
+  do {
+    link = QInputDialog::getText(
+      this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
+    if (ok && !link.isEmpty()) {
+      t = BTSession->addLink(link, false);
+      if (!t.is_valid())
+        QMessageBox::critical(this, tr("Incorrect link"), tr("Incorrect link"));
+    }
+  } while(ok && !t.is_valid());
 }
 
 void TransferListWidget::openSelectedTorrentsFolder() const {
@@ -678,8 +691,8 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionSet_upload_limit, SIGNAL(triggered()), this, SLOT(setUpLimitSelectedTorrents()));
   QAction actionSet_download_limit(QIcon(QString::fromUtf8(":/Icons/skin/download.png")), tr("Limit download rate..."), 0);
   connect(&actionSet_download_limit, SIGNAL(triggered()), this, SLOT(setDlLimitSelectedTorrents()));
-  QAction actionAddED2KLink(QIcon(QString::fromUtf8(":/emule/common/eD2kLink.png")), tr("Add ED2K link"), 0);
-  connect(&actionAddED2KLink, SIGNAL(triggered()), this, SLOT(showAddED2KLinkDialog()));
+  QAction actionAddLink(QIcon(QString::fromUtf8(":/emule/common/eD2kLink.png")), tr("Add link..."), 0);
+  connect(&actionAddLink, SIGNAL(triggered()), this, SLOT(addLinkDialog()));
   QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
   connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedTorrentsFolder()));
   QAction actionIncreasePriority(IconProvider::instance()->getIcon("go-up"), tr("Move up", "i.e. move up in the queue"), 0);
@@ -862,7 +875,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     listMenu.addSeparator();
   }
   if (selectedIndexes.size() == 0) {
-    listMenu.addAction(&actionAddED2KLink);
+    listMenu.addAction(&actionAddLink);
     listMenu.addSeparator();
   }
   listMenu.addAction(&actionOpen_destination_folder);
