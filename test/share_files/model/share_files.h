@@ -45,6 +45,12 @@ signals:
     void parameters_complete(Transfer t);
 };
 
+// fake add transfer params
+struct add_transfer_params
+{
+
+};
+
 /**
   * SharedFiles schema:
   * RootNode --> DirNode --> DirNode --> DirNode ...
@@ -81,11 +87,11 @@ public:
       * when node unshared it means all incoming signals like add transfer or params complete will ignore
       * transfer also will deleted
      */
-    enum NodeStatus
+    enum NodeCommand
     {
-        ns_none,
-        ns_shared,
-        ns_unshared
+        nc_none,
+        nc_share,
+        nc_unshare
     };
 
     FileNode(DirNode* parent, const QString& filename);
@@ -93,20 +99,23 @@ public:
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
-    virtual void associate_transfer(const QString& hash);
+    virtual void associate_transfer(const QString& hash);    
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
+    virtual bool in_progress() const { return ((m_command == nc_share) && !has_associated_transfer()); }
+    void set_transfer_params(const add_transfer_params& atp);
     QString filename() const { return m_filename; }
-    NodeStatus status() const { return m_status; }
+    NodeCommand last_command() const { return m_command; }
     bool has_associated_transfer() const { return !m_hash.isEmpty(); }
     QString hash() const { return m_hash; }
     void set_hash(const QString& hash) { m_hash = hash; }
 protected:
-    DirNode*    m_parent;
-    NodeStatus  m_status;
+    DirNode*    m_parent;    
+    NodeCommand  m_command;
     QString     m_filename;
+    add_transfer_params* m_atp;
     QString     m_hash;
 };
 

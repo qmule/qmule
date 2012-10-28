@@ -38,7 +38,7 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
-QString NodeStatus2String(FileNode::NodeStatus ns)
+QString NodeCommand2String(FileNode::NodeCommand ns)
 {
     static QString strs[] = { QString("N"), QString("S"), QString("U") };
     return strs[ns];
@@ -46,8 +46,9 @@ QString NodeStatus2String(FileNode::NodeStatus ns)
 
 FileNode::FileNode(DirNode* parent, const QString& filename) :
     m_parent(parent),
-    m_status(FileNode::ns_none),
-    m_filename(filename)
+    m_command(FileNode::nc_none),
+    m_filename(filename),
+    m_atp(NULL)
 {
 }
 
@@ -60,10 +61,18 @@ void FileNode::share(bool recursive)
     Q_UNUSED(recursive);
 
     // avoid hash twice!
-    if (m_status != ns_shared)
+    if (m_command != nc_share)
     {
-        m_status = ns_shared;
-        // TODO - send request to parameters maker
+        m_command = nc_share;
+
+        if (m_atp)
+        {
+            // TODO add transfer
+        }
+        else
+        {
+            // TODO - send request to parameters maker
+        }
     }
 }
 
@@ -71,7 +80,7 @@ void FileNode::unshare(bool recursive)
 {
     Q_UNUSED(recursive);
 
-    if (m_status != ns_unshared)
+    if (m_command != nc_unshare)
     {
         if (has_associated_transfer())
         {
@@ -82,7 +91,7 @@ void FileNode::unshare(bool recursive)
             // TODO - send cancel request to parameters maker
         }
 
-        m_status = ns_unshared;
+        m_command = nc_unshare;
 
         // inform collection
         m_parent->check_items();
@@ -91,7 +100,7 @@ void FileNode::unshare(bool recursive)
 
 void FileNode::associate_transfer(const QString& hash)
 {
-    if (m_status == ns_unshared)
+    if (m_command == nc_unshare)
     {
         // collision - user canceled share after request was sended and before answer
         // TODO - remove transfer
@@ -130,6 +139,19 @@ QString FileNode::filepath() const
     return fullPath;
 }
 
+void FileNode::set_transfer_params(const add_transfer_params& atp)
+{
+    if (!m_atp) m_atp = new add_transfer_params;
+    *m_atp = atp;
+
+    if (m_command == nc_share)
+    {
+        // TODO add transfer
+    }
+
+    // when status is not shared - we have situation when user cancelled hash, but signal was already submitted
+}
+
 DirNode::DirNode(DirNode* parent, const QString& filename) : FileNode(parent, filename), m_populated(false)
 {
 }
@@ -147,7 +169,7 @@ void DirNode::share(bool recursive)
 
     populate();
 
-    m_status = ns_shared;
+    m_command = nc_share;
 
     foreach(FileNode* p, m_file_children.values())
     {
@@ -170,10 +192,10 @@ void DirNode::share(bool recursive)
 
 void DirNode::unshare(bool recursive)
 {
-    if (m_status != ns_unshared)
+    if (m_command != nc_unshare)
     {
         // to avoid cycle - unshare dir self firstly
-        m_status = ns_unshared;
+        m_command = nc_unshare;
 
         if (has_associated_transfer())
         {
@@ -202,7 +224,7 @@ void DirNode::unshare(bool recursive)
 
 void DirNode::associate_transfer(const QString& hash)
 {
-    if (m_status != ns_unshared)
+    if (m_command != nc_unshare)
     {
         m_hash = hash;
         // we must not inform parent because it is directory now
@@ -220,7 +242,7 @@ void DirNode::update_names()
 void DirNode::check_items()
 {
     // collection would hash, but hasn't transfer yet
-    if (status() == ns_shared)
+    if (last_command() == nc_share)
     {
         // we have transfer on old data - remove it
         if (has_associated_transfer())
@@ -236,7 +258,7 @@ void DirNode::check_items()
         // check children
         foreach(const FileNode* p, m_file_children.values())
         {
-            if (p->status() == ns_shared && !p->has_associated_transfer())
+            if (p->in_progress())
             {
                 pending = true;
                 break;
@@ -257,7 +279,7 @@ QString DirNode::collection_name() const
 
     while(parent && !parent->is_root())
     {
-        if (parent->status() == ns_shared)
+        if (parent->last_command() == nc_share)
         {
             name_list.prepend(parent->filename());
         }
@@ -436,7 +458,7 @@ bool Session::associate_transfer(const Transfer& transfer)
 
     if (p != &m_root)
     {
-        if (p->status() == FileNode::ns_unshared)
+        if (p->last_command() == FileNode::nc_unshare)
         {
             // transfer must be erased!
         }
@@ -458,8 +480,7 @@ void Session::addTransfer(Transfer t)
 }
 
 void Session::on_transfer_added(Transfer)
-{
-
+{    
 }
 
 void Session::on_transfer_removed(QString hash)
@@ -475,7 +496,7 @@ void Session::on_made_parameters()
 QDebug operator<<(QDebug dbg, const FileNode* node)
 {
     dbg.nospace() << "{" << (node->is_dir()?"D:":"F:") << node->filename()
-                  << "(" << NodeStatus2String(node->status()) << ")";
+                  << "(" << NodeCommand2String(node->last_command()) << ")";
 
     if (const DirNode* dnode = dynamic_cast<const DirNode*>(node))
     {
