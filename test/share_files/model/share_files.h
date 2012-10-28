@@ -48,7 +48,8 @@ signals:
 // fake add transfer params
 struct add_transfer_params
 {
-
+    QString m_filepath;
+    QString m_hash;
 };
 
 /**
@@ -94,18 +95,18 @@ public:
         nc_unshare
     };
 
-    FileNode(DirNode* parent, const QString& filename);
+    FileNode(DirNode* parent, const QString& filename, Session* session);
     virtual ~FileNode();
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
-    virtual void associate_transfer(const QString& hash);    
+    virtual void associate_transfer(const QString& hash);
+    virtual void set_transfer_params(const add_transfer_params& atp);
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
     virtual bool in_progress() const { return ((m_command == nc_share) && !has_associated_transfer()); }
-    void set_transfer_params(const add_transfer_params& atp);
     QString filename() const { return m_filename; }
     NodeCommand last_command() const { return m_command; }
     bool has_associated_transfer() const { return !m_hash.isEmpty(); }
@@ -113,16 +114,17 @@ public:
     void set_hash(const QString& hash) { m_hash = hash; }
 protected:
     DirNode*    m_parent;    
-    NodeCommand  m_command;
+    NodeCommand m_command;
     QString     m_filename;
     add_transfer_params* m_atp;
+    Session*    m_session;
     QString     m_hash;
 };
 
 class DirNode : public FileNode
 {
 public:
-    DirNode(DirNode* parent, const QString& filename);
+    DirNode(DirNode* parent, const QString& filename, Session* session);
     virtual ~DirNode();
 
     virtual bool is_dir() const { return true; }
@@ -130,6 +132,7 @@ public:
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
     virtual void associate_transfer(const QString& hash);
+    virtual void set_transfer_params(const add_transfer_params& atp);
 
     /**
       * special signal for update names on already shared nodes
@@ -153,10 +156,12 @@ public:
      */
     void check_items();
 private:
-    bool                        m_populated;    //!< directory was refreshed
-    QString                     m_collection;   //!< linked collection file
+    bool                        m_populated;        //!< directory was refreshed
+    bool                        m_hash_asked;       //!< hash was already asked
+    QString                     m_collection_path;  //!< linked collection file
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
+    bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
     friend class Session;
     friend QDebug operator<<(QDebug dbg, const FileNode* node);
 };
@@ -167,7 +172,7 @@ private:
 class RootNode : public DirNode
 {
 public:
-    RootNode() : DirNode(NULL, "") {}
+    RootNode() : DirNode(NULL, "", NULL) {}
     virtual bool is_root() const { return true; }
     virtual bool is_dir() const { Q_ASSERT(false);  return true; }
     virtual void share(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
@@ -190,10 +195,17 @@ private:
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
     TransferParamsMaker         m_maker;
+
+    // parameters maker interface
+    void start_transfer_params_make(const QString& filepath);
+    bool cancel_transfer_params_make(const QString& filepath);
+
 public slots:
     void on_transfer_added(Transfer);
-    void on_transfer_removed(QString hash);
-    void on_made_parameters();
+    void on_transfer_deleted(QString hash);
+    void on_parameters_ready(add_transfer_params atp);
+    friend class FileNode;
+    friend class DirNode;
 };
 
 QDebug operator<<(QDebug dbg, const FileNode* node);

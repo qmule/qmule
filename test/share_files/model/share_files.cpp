@@ -44,7 +44,7 @@ QString NodeCommand2String(FileNode::NodeCommand ns)
     return strs[ns];
 }
 
-FileNode::FileNode(DirNode* parent, const QString& filename) :
+FileNode::FileNode(DirNode* parent, const QString& filename, Session* session) :
     m_parent(parent),
     m_command(FileNode::nc_none),
     m_filename(filename),
@@ -152,7 +152,8 @@ void FileNode::set_transfer_params(const add_transfer_params& atp)
     // when status is not shared - we have situation when user cancelled hash, but signal was already submitted
 }
 
-DirNode::DirNode(DirNode* parent, const QString& filename) : FileNode(parent, filename), m_populated(false)
+DirNode::DirNode(DirNode* parent, const QString& filename, Session* session) :
+    FileNode(parent, filename, session), m_populated(false), m_hash_asked(false)
 {
 }
 
@@ -196,6 +197,7 @@ void DirNode::unshare(bool recursive)
     {
         // to avoid cycle - unshare dir self firstly
         m_command = nc_unshare;
+        m_hash_asked = false;
 
         if (has_associated_transfer())
         {
@@ -231,11 +233,46 @@ void DirNode::associate_transfer(const QString& hash)
     }
 }
 
+void DirNode::set_transfer_params(const add_transfer_params& atp)
+{
+    if (m_command == nc_share)
+    {
+        m_hash_asked = false;
+
+        if (m_rehash)
+        {
+            check_items();
+        }
+        else
+        {
+            add_transfer_params local_atp = atp;
+            QFile cf(atp.m_filepath);
+            cf.rename(atp.m_filepath, m_collection_path);
+
+            if (local_atp.m_filepath != m_collection_path)
+            {
+                local_atp.m_filepath = m_collection_path;
+            }
+
+            // TODO - add transfer using local atp
+        }
+    }
+}
+
 void DirNode::update_names()
 {
-    if (has_associated_transfer())
+    if (m_command == nc_share)
     {
-        // TODO - re-calculate collection name
+        if (has_associated_transfer())
+        {
+            // TODO - remove transfer
+        }
+        else if (m_hash_asked)
+        {
+            // after hash will complete we must his file
+            // change collection filename
+        }
+
     }
 }
 
@@ -244,14 +281,16 @@ void DirNode::check_items()
     // collection would hash, but hasn't transfer yet
     if (last_command() == nc_share)
     {
+        m_rehash = false;
         // we have transfer on old data - remove it
         if (has_associated_transfer())
         {
             // TODO - cancel transfer
         }
-        else
+        else if (m_hash_asked)
         {
-            // TODO - cancel hashing
+            // do not cancel hash request - simple set re-hash
+            m_rehash = true;
         }
 
         bool pending = false;
@@ -268,6 +307,7 @@ void DirNode::check_items()
         if (!pending)
         {
             // TODO - prepare collection and hash it
+            // query hash
         }
     }
 }
@@ -343,12 +383,12 @@ void DirNode::populate()
 
     foreach(const QString& str, dirs)
     {
-        m_dir_children.insert(str, new DirNode(this, str));
+        m_dir_children.insert(str, new DirNode(this, str, m_session));
     }
 
     foreach(const QString& str, files)
     {
-        m_file_children.insert(str, new FileNode(this, str));
+        m_file_children.insert(str, new FileNode(this, str, m_session));
     }
 
     m_populated = true;
@@ -430,7 +470,7 @@ FileNode* Session::node(const QString& filepath)
                 return (&m_root);
             }
 
-            node = new DirNode(parent, element);
+            node = new DirNode(parent, element, this);
             parent->add_node(node);
         }
 
@@ -452,23 +492,6 @@ FileNode* Session::node(const QString& filepath)
     return f;
 }
 
-bool Session::associate_transfer(const Transfer& transfer)
-{
-    FileNode* p = node(transfer.m_filepath);
-
-    if (p != &m_root)
-    {
-        if (p->last_command() == FileNode::nc_unshare)
-        {
-            // transfer must be erased!
-        }
-
-        p->set_hash(transfer.m_hash);
-    }
-
-    return !p->hash().isEmpty();
-}
-
 void Session::deleteTransfer(const QString& hash, bool delete_files)
 {
 
@@ -479,18 +502,43 @@ void Session::addTransfer(Transfer t)
 
 }
 
-void Session::on_transfer_added(Transfer)
+void Session::on_transfer_added(Transfer t)
 {    
+    FileNode* p = node(t.m_filepath);
+
+    if (p != &m_root) // is root - fail?
+    {
+        p->associate_transfer(t.m_hash);
+        m_files.insert(t.m_hash, p);        // store for use on delete
+    }
 }
 
-void Session::on_transfer_removed(QString hash)
-{
-
+void Session::on_transfer_deleted(QString hash)
+{    
+    if (m_files.contains(hash))
+    {
+        m_files.value(hash)->unshare(false);
+    }
 }
 
-void Session::on_made_parameters()
+void Session::on_parameters_ready(add_transfer_params atp)
 {
+    FileNode* p = node(atp.m_filepath);
 
+    if (p != &m_root)
+    {
+        p->set_transfer_params(atp);
+    }
+}
+
+void Session::start_transfer_params_make(const QString& filepath)
+{
+    // ok,
+}
+
+bool Session::cancel_transfer_params_make(const QString& filepath)
+{
+    return true;
 }
 
 QDebug operator<<(QDebug dbg, const FileNode* node)
