@@ -28,6 +28,7 @@ Debug:LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
 Release:LIBS += -L$$(LIBED2K_ROOT)/Win32/Release
 Release:DEFINES += _BIND_TO_CURRENT_VCLIBS_VERSION=1
 
+DEFINES += "\"BUILDDATE=\\\"$$system(date /t && time /t)\\\"\""
 
 # LIBTORRENT DEFINES
 DEFINES += BOOST_ALL_NO_LIB

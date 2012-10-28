@@ -24,6 +24,9 @@ CONFIG(debug, debug|release) {
   DEFINES += NDEBUG
  }
 
+DEFINES += "BUILDDATE='\"$$system(date -R)\"'"
+
+
 # Man page
 nox {
     man.files = ../doc/qbittorrent-nox.1
