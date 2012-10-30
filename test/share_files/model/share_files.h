@@ -83,17 +83,6 @@ class DirNode;
 class FileNode
 {
 public:
-    /**
-      * by default node is hasn't share status
-      * when node unshared it means all incoming signals like add transfer or params complete will ignore
-      * transfer also will deleted
-     */
-    enum NodeCommand
-    {
-        nc_none,
-        nc_share,
-        nc_unshare
-    };
 
     FileNode(DirNode* parent, const QString& filename, Session* session);
     virtual ~FileNode();
@@ -103,22 +92,24 @@ public:
     virtual bool has_metadata() const;
     virtual bool has_transfer() const;
 
-    virtual void set_transfer(const QString& hash);
     virtual void set_metadata(const add_transfer_params& atp, int error);
 
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
+    bool is_active() const { return m_active; }
 
-    QString filename() const { return m_filename; }
-    DirNode*    m_parent;
-protected:   
+    QString filename() const { return m_filename; }    
+    DirNode*    m_parent;    
+protected:
+    bool        m_active;
     QString     m_filename;
     add_transfer_params* m_atp;
     int             m_error;
     Session*    m_session;
     QString     m_hash;
+    friend class Session;
 };
 
 class DirNode : public FileNode
@@ -130,29 +121,27 @@ public:
     virtual bool is_dir() const { return true; }
 
     virtual void share(bool recursive);
-    virtual void unshare(bool recursive);
-    bool has_collection() const { return m_collectioned; }
+    virtual void unshare(bool recursive);    
 
     QString collection_name() const;
     FileNode* child(const QString& filename);
-    void add_node(FileNode* node);
-    bool is_populated() const { return m_populated; }
+    void add_node(FileNode* node);    
 
     /**
       * pupulate directory with items no_share status
      */
     void populate();
 
+    bool is_populated() const { return m_populated; }
+
     /**
       * this method must be called first time in share method for first check
-      * and next every time when we have some changes on item
-      * after all pending children finish sharing directory can finalize processing
+      * and next every time when we have some changes on items
+      * after all pending children were completed we finish sharing directory
      */
     void build_collection();
-private:
-    bool                        m_populated;        //!< directory was refreshed
-    bool                        m_hash_asked;       //!< hash was already asked
-    bool                        m_collectioned;     //!< this directory must has associated collection
+private:       
+    bool                        m_populated;
     FileNode*                   m_collection;       //!< collection node
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
@@ -173,6 +162,9 @@ public:
     virtual void share(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
     virtual void unshare(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
 };
+
+const int no_error = 0;
+const int error_cancel = 1;
 
 /**
   *
@@ -195,10 +187,6 @@ private:
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
     TransferParamsMaker         m_maker;
-
-    // parameters maker interface
-    void start_transfer_params_make(const QString& filepath);
-    bool cancel_transfer_params_make(const QString& filepath);
 
 public slots:
     void on_transfer_added(Transfer);

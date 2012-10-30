@@ -38,14 +38,9 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
-QString NodeCommand2String(FileNode::NodeCommand ns)
-{
-    static QString strs[] = { QString("N"), QString("S"), QString("U") };
-    return strs[ns];
-}
-
-FileNode::FileNode(DirNode* parent, const QString& filename, Session* session) :
+FileNode::FileNode(DirNode* parent, const QString& filename, Session* session) :    
     m_parent(parent),
+    m_active(false),
     m_filename(filename),
     m_atp(NULL),
     m_error(0)
@@ -59,6 +54,7 @@ FileNode::~FileNode()
 void FileNode::share(bool recursive)
 {
     Q_UNUSED(recursive);
+    m_active = true;
 
     if (has_metadata())
     {
@@ -73,6 +69,7 @@ void FileNode::share(bool recursive)
 void FileNode::unshare(bool recursive)
 {
     Q_UNUSED(recursive);
+    m_active = false;
 
     if (has_transfer())
     {
@@ -121,11 +118,6 @@ QString FileNode::filepath() const
     return fullPath;
 }
 
-void FileNode::set_transfer(const QString& hash)
-{
-    m_hash = hash;
-}
-
 void FileNode::set_metadata(const add_transfer_params& atp, int error)
 {
     if (!m_atp) m_atp = new add_transfer_params;
@@ -133,11 +125,9 @@ void FileNode::set_metadata(const add_transfer_params& atp, int error)
     m_error = error;
 }
 
-DirNode::DirNode(DirNode* parent, const QString& filename, Session* session) :
-    FileNode(parent, filename, session),
+DirNode::DirNode(DirNode* parent, const QString& filename, Session* session) :    
+    FileNode(parent, filename, session),    
     m_populated(false),
-    m_hash_asked(false),
-    m_collectioned(false),
     m_collection(NULL)
 {
 }
@@ -150,7 +140,7 @@ DirNode::~DirNode()
 
 void DirNode::share(bool recursive)
 {
-    m_collectioned = true;
+    m_active = true;
     // execute without check current state
     // we can re-share files were unshared after directory was shared
     populate();
@@ -176,7 +166,7 @@ void DirNode::share(bool recursive)
 
 void DirNode::unshare(bool recursive)
 {
-    m_collectioned = false;
+    m_active = false;
 
     foreach(FileNode* p, m_file_children.values())
     {
@@ -200,14 +190,15 @@ void DirNode::unshare(bool recursive)
 void DirNode::build_collection()
 {
     // collection would hash, but hasn't transfer yet
-    if (m_collectioned)
+    if (m_active)
     {
         bool pending = false;
 
         // check children        
         foreach(const FileNode* p, m_file_children.values())
         {
-            if (p->has_transfer())
+            // item in pending state
+            if (p->is_active() && !p->has_transfer())
             {
                 pending = true;
                 break;
@@ -221,6 +212,7 @@ void DirNode::build_collection()
             {
                 m_collection->unshare(false);
             }
+
             // TODO
             //1. create file
             //2. fill file
@@ -237,7 +229,7 @@ QString DirNode::collection_name() const
 
     while(parent && !parent->is_root())
     {
-        if (parent->has_collection())
+        if (parent->is_active())
         {
             name_list.prepend(parent->filename());
         }
@@ -449,9 +441,17 @@ void Session::on_transfer_added(Transfer t)
     if (p != &m_root) // is root - fail?
     {
         m_files.insert(t.m_hash, p);        // store for use on delete
-        p->set_transfer(t.m_hash);
-        DirNode* parent = p->m_parent;
-        if (parent != &m_root) parent->build_collection();
+        p->m_hash = t.m_hash;
+
+        if (!p->is_active())
+        {
+            deleteTransfer(t.m_hash, false);
+        }
+        else
+        {
+            DirNode* parent = p->m_parent;
+            if (parent != &m_root) parent->build_collection();
+        }
     }
 }
 
@@ -461,8 +461,16 @@ void Session::on_transfer_deleted(QString hash)
     {
         FileNode* p = m_files.value(hash);
         p->set_transfer("");
-        DirNode* parent = p->m_parent;
-        if (parent != &m_root) parent->build_collection();
+
+        if (p->is_active())
+        {
+            addTransfer(*(p->m_atp));
+        }
+        else
+        {
+            DirNode* parent = p->m_parent;
+            if (parent != &m_root) parent->build_collection();
+        }
     }
 }
 
@@ -472,19 +480,18 @@ void Session::on_parameters_ready(add_transfer_params atp, int error)
 
     if (p != &m_root)
     {
-        p->set_metadata(atp, error);
-        if (!error)  addTransfer(atp);
+        switch(error)
+        {
+            case no_error:
+                p->set_metadata(atp, error);
+                if (p->is_active()) addTransfer(atp);
+                break;
+            case error_cancel:
+                break;
+            default:
+                break;
+        }
     }
-}
-
-void Session::start_transfer_params_make(const QString& filepath)
-{
-    // ok,
-}
-
-bool Session::cancel_transfer_params_make(const QString& filepath)
-{
-    return true;
 }
 
 QDebug operator<<(QDebug dbg, const FileNode* node)
