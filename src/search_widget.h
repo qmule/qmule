@@ -88,6 +88,7 @@ private:
     QScopedPointer<QSortFilterProxyModel> filterModel;
     SWDelegate* itemDelegate;
     search_filter* searchFilter;
+    QString        m_lastSearchFileType;
 
     QMenu* userMenu;
     QAction* userUpdate;

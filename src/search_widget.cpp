@@ -691,6 +691,8 @@ void search_widget::startSearch()
             break;
     }
 
+    m_lastSearchFileType = fileType;
+
     prepareNewSearch(reqType, comboName->currentText(), resultType, iconSerachActive);
 
     if (checkPlus->checkState() == Qt::Checked)
@@ -701,7 +703,7 @@ void search_widget::startSearch()
         // size was will convert from Mb to bytes for generate search request
         Session::instance()->get_ed2k_session()->searchFiles(
             searchRequest, nMinSize*1024*1024, nMaxSize*1024*1024, nAvail, nSources,
-            fileType, fileExt, mediaCodec, nBitRate, nDuration);
+            fileType, fileExt, mediaCodec, nDuration, nBitRate);
         nSearchesInProgress = 1;
     }
 
@@ -777,6 +779,11 @@ void search_widget::searchRelatedFiles()
     }
 }
 
+bool typeFilter(const std::string strType, QED2KSearchResultEntry entry)
+{
+    return (libed2k::GetFileTypeByName(entry.m_strFilename.toStdString()) != strType);
+}
+
 void search_widget::processSearchResult(
     const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult)
 {
@@ -793,6 +800,16 @@ void search_widget::processSearchResult(
         btnMore->setEnabled(obMoreResult);
 
     searchItems[nCurTabSearch].vecResults.insert(searchItems[nCurTabSearch].vecResults.end(), vRes.begin(), vRes.end());
+
+    if (m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_CDIMAGE) ||
+        m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_ARCHIVE) ||
+        m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_PROGRAM))
+    {
+        searchItems[nCurTabSearch].vecResults.erase(
+                    std::remove_if(searchItems[nCurTabSearch].vecResults.begin(),
+                                   searchItems[nCurTabSearch].vecResults.end(), std::bind1st(std::ptr_fun(&typeFilter), m_lastSearchFileType.toStdString())),
+                    searchItems[nCurTabSearch].vecResults.end());
+    }
 
     quint64 overallSize = 0;
     QString strCaption;
