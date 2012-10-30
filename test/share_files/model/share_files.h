@@ -100,23 +100,23 @@ public:
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
-    virtual void associate_transfer(const QString& hash);
-    virtual void set_transfer_params(const add_transfer_params& atp);
+    virtual bool has_metadata() const;
+    virtual bool has_transfer() const;
+
+    virtual void set_transfer(const QString& hash);
+    virtual void set_metadata(const add_transfer_params& atp, int error);
+
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
-    virtual bool in_progress() const { return ((m_command == nc_share) && !has_associated_transfer()); }
+
     QString filename() const { return m_filename; }
-    NodeCommand last_command() const { return m_command; }
-    bool has_associated_transfer() const { return !m_hash.isEmpty(); }
-    QString hash() const { return m_hash; }
-    void set_hash(const QString& hash) { m_hash = hash; }
-protected:
-    DirNode*    m_parent;    
-    NodeCommand m_command;
+    DirNode*    m_parent;
+protected:   
     QString     m_filename;
     add_transfer_params* m_atp;
+    int             m_error;
     Session*    m_session;
     QString     m_hash;
 };
@@ -131,14 +131,8 @@ public:
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
-    virtual void associate_transfer(const QString& hash);
-    virtual void set_transfer_params(const add_transfer_params& atp);
+    bool has_collection() const { return m_collectioned; }
 
-    /**
-      * special signal for update names on already shared nodes
-      * always recursive
-     */
-    void update_names();
     QString collection_name() const;
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);
@@ -154,11 +148,12 @@ public:
       * and next every time when we have some changes on item
       * after all pending children finish sharing directory can finalize processing
      */
-    void check_items();
+    void build_collection();
 private:
     bool                        m_populated;        //!< directory was refreshed
     bool                        m_hash_asked;       //!< hash was already asked
-    QString                     m_collection_path;  //!< linked collection file
+    bool                        m_collectioned;     //!< this directory must has associated collection
+    FileNode*                   m_collection;       //!< collection node
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
@@ -190,7 +185,12 @@ public:
     bool associate_transfer(const Transfer& transfer);
     const FileNode* root() const { return &m_root; }
     void deleteTransfer(const QString& hash, bool delete_files);
-    void addTransfer(Transfer t);
+    void addTransfer(const add_transfer_params& atp);
+    void makeTransferParamsters(const QString& filepath);
+    void cancelTransferParams(const QString& filepath);
+
+    void share(const QString& filepath, bool recursive);
+    void unshare(const QString& filepath, bool recursive);
 private:
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
@@ -203,7 +203,7 @@ private:
 public slots:
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);
-    void on_parameters_ready(add_transfer_params atp);
+    void on_parameters_ready(add_transfer_params atp, int error);
     friend class FileNode;
     friend class DirNode;
 };
