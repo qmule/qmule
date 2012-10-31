@@ -197,7 +197,7 @@ public:
     * helpers for quiet migration
     * migration functions must return empty values or 0!
    */
-  static QStringList getFileLines(const QString& filename);
+  static QStringList getFileLines(const QString& filename, const char* codec = NULL);
   static QString emuleConfig(const QString& filename);
   static QString emuleConfigFilename();
 
