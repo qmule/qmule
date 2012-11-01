@@ -131,6 +131,9 @@
        <property name="textAlignment">
         <set>AlignHCenter|AlignVCenter|AlignCenter</set>
        </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
       </item>
       <item>
        <property name="text">
@@ -177,8 +180,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>464</width>
-             <height>602</height>
+             <width>338</width>
+             <height>578</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -522,9 +525,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-319</y>
-             <width>464</width>
-             <height>635</height>
+             <y>0</y>
+             <width>465</width>
+             <height>616</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -898,8 +901,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>365</width>
-             <height>463</height>
+             <width>357</width>
+             <height>449</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1342,8 +1345,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>278</width>
-             <height>407</height>
+             <width>275</width>
+             <height>396</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -1754,8 +1757,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>365</width>
-             <height>264</height>
+             <width>357</width>
+             <height>255</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -1968,8 +1971,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>430</width>
-             <height>455</height>
+             <width>418</width>
+             <height>442</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2379,8 +2382,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>26</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>
