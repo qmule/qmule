@@ -6854,7 +6854,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Search results</source>
-        <translation>Результаты поиска</translation>
+        <translation>Результаты поиска   </translation>
     </message>
     <message>
         <source>Download</source>
