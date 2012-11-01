@@ -14,6 +14,11 @@
 #include <QDebug>
 #include "qfileinfogatherer.h"
 
+struct error_code
+{
+    int m_ec;
+};
+
 // fake transfer
 struct Transfer
 {
@@ -49,8 +54,19 @@ signals:
 struct add_transfer_params
 {
     QString m_filepath;
+    quint64 m_filesize;
     QString m_hash;
 };
+
+inline QString genColItem(const QString& filename, quint64 filesize, const QString& hash)
+{
+    return filename + QString("|") + QString::number(filesize) + QString("|") + hash;
+}
+
+inline add_transfer_params file2atp(const QString& filepath)
+{
+    return add_transfer_params();
+}
 
 /**
   * SharedFiles schema:
@@ -89,10 +105,13 @@ public:
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
-    virtual bool has_metadata() const;
-    virtual bool has_transfer() const;
+    virtual bool has_metadata() const { return m_atp != NULL; }
+    virtual bool has_transfer() const { return !m_hash.isEmpty(); }
 
-    virtual void set_metadata(const add_transfer_params& atp, int error);
+    // signal handlers
+    virtual void process_add_transfer(const QString& hash);
+    virtual void process_delete_transfer();
+    virtual void process_add_metadata(const add_transfer_params& atp, const error_code& ec);
 
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
@@ -100,13 +119,14 @@ public:
     virtual bool is_root() const { return false; }
     bool is_active() const { return m_active; }
 
+    QString item_string() const;
     QString filename() const { return m_filename; }    
     DirNode*    m_parent;    
 protected:
     bool        m_active;
     QString     m_filename;
     add_transfer_params* m_atp;
-    int             m_error;
+    error_code  m_error;
     Session*    m_session;
     QString     m_hash;
     friend class Session;
@@ -121,7 +141,11 @@ public:
     virtual bool is_dir() const { return true; }
 
     virtual void share(bool recursive);
-    virtual void unshare(bool recursive);    
+    virtual void unshare(bool recursive);
+
+    // signal handlers
+    virtual void process_delete_transfer();
+    virtual void process_add_metadata(const add_transfer_params& atp, const error_code& ec);
 
     QString collection_name() const;
     FileNode* child(const QString& filename);
@@ -135,14 +159,18 @@ public:
     bool is_populated() const { return m_populated; }
 
     /**
-      * this method must be called first time in share method for first check
-      * and next every time when we have some changes on items
-      * after all pending children were completed we finish sharing directory
+      * drop collection transfer - for each FileNodes operations and parent DirNode
+     */
+    void drop_transfer();
+
+    /**
+      * prepare collection file and add transfer based on it
      */
     void build_collection();
 private:       
     bool                        m_populated;
-    FileNode*                   m_collection;       //!< collection node
+    QString                     m_coll_path;
+    QString                     m_coll_hash;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
@@ -183,6 +211,8 @@ public:
 
     void share(const QString& filepath, bool recursive);
     void unshare(const QString& filepath, bool recursive);
+    QString collectionLocation();
+    void setNode(const QString& hash, FileNode* node);
 private:
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
@@ -191,7 +221,7 @@ private:
 public slots:
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);
-    void on_parameters_ready(add_transfer_params atp, int error);
+    void on_parameters_ready(const add_transfer_params& atp, const error_code& ec);
     friend class FileNode;
     friend class DirNode;
 };
