@@ -348,12 +348,14 @@ void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
 
 Transfer Session::addLink(QString strLink, bool resumed)
 {
-   if (strLink.startsWith("ed2k://"))
-   {
-       return m_edSession.addLink(strLink, resumed);
-   }
+    qDebug() << "add ED2K/magnet link: " << strLink;
 
-   return m_btSession.addLink(strLink, resumed);
+    if (strLink.startsWith("ed2k://"))
+    {
+        return m_edSession.addLink(strLink, resumed);
+    }
+
+    return m_btSession.addLink(strLink, resumed);
 }
 
 void Session::addTransferFromFile(const QString& filename)

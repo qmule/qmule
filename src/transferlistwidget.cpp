@@ -417,7 +417,8 @@ void TransferListWidget::addLinkDialog() {
     link = QInputDialog::getText(
       this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
     if (ok && !link.isEmpty()) {
-      t = BTSession->addLink(link, false);
+      t = BTSession->addLink(
+        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed(), false);
       if (!t.is_valid())
         QMessageBox::critical(this, tr("Incorrect link"), tr("Incorrect link"));
     }

@@ -119,7 +119,14 @@ QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k
         {
             if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_LENGTH))
             {
-                sre.m_nMediaLength = p->asInt();
+                if (p->getType() == libed2k::TAGTYPE_STRING)
+                {
+                    // TODO - possible need store string length
+                }
+                else
+                {
+                    sre.m_nMediaLength = p->asInt();
+                }
             }
         }
 
