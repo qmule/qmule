@@ -151,7 +151,7 @@ QString FileNode::filepath() const
     return fullPath;
 }
 
-QString FileNode::item_string() const
+QString FileNode::string() const
 {
     QString res;
 
@@ -269,19 +269,37 @@ void DirNode::build_collection()
             {
                 if (p->is_active())
                 {
-                    //lines << QUrl::toPercentEncoding(p->item_string());
+                    lines << p->string();
                     Q_ASSERT(!line.isEmpty());
                 }
             }
 
-            QDir cd(m_session->collectionLocation());
-            cd.absoluteFilePath(collection_name() + QString::number(lines.count()) + QString(".emulecollection"));
+            int iteration = 0;
+            // generate unique filename
+            QDir cd(misc::collectionsLocation());
+            QString collection_filepath;
 
-            QFile data(cd.absolutePath());
+            while(collection_filepath.isEmpty())
+            {
+                QString filename = collection_name() + QString("-") + QString::number(lines.count()) + (iteration?(QString("_") + QString::number(iteration)):QString()) +  QString(".emulecollection");
+                QFileInfo fi(cd.filePath(filename));
+
+                if (fi.exists())
+                {
+                    ++iteration;
+                }
+                else
+                {
+                    collection_filepath = fi.absoluteFilePath();
+                }
+            }
+
+            QFile data(collection_filepath);
 
             if (data.open(QFile::WriteOnly | QFile::Truncate))
             {
                  QTextStream out(&data);
+
                  foreach(const QString& line, lines)
                  {
                      out << line << "\n";
@@ -313,14 +331,7 @@ QString DirNode::collection_name() const
         parent = parent->m_parent;
     }
 
-    QString res;
-
-    if (!name_list.isEmpty())
-    {
-        res = name_list.join(QString("-")) + QString::number(m_file_children.count());
-    }
-
-    return res;
+    return (name_list.join(QString("-")));
 }
 
 FileNode* DirNode::child(const QString& filename)
@@ -510,16 +521,6 @@ void Session::unshare(const QString& filepath, bool recursive)
     if (p != &m_root) p->unshare(recursive);
 }
 
-
-QString Session::collectionLocation()
-{
-    // TODO - use collection name without - as directory name
-    //const QString location = QDir::currentPath() + QDir::separator() + "collections" + QDir::separator() + QString::number(++m_location_index);
-    //QDir locationDir(location);
-    //if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
-    //return location;
-}
-
 void Session::setNode(const QString& hash, FileNode* node)
 {
     m_files.insert(hash, node);
@@ -548,12 +549,12 @@ void Session::on_transfer_added(Transfer t)
 
 void Session::on_transfer_deleted(QString hash)
 {        
-    if (m_files.contains(hash))
-    {
-        FileNode* p = m_files.value(hash);
-        Q_ASSERT(p);
-        p->process_delete_transfer();
-    }
+    QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
+    Q_ASSERT(itr != m_files.end());
+    FileNode* p = itr.value();
+    Q_ASSERT(p);
+    m_files.erase(itr);
+    p->process_delete_transfer();
 }
 
 void Session::on_parameters_ready(const add_transfer_params& atp, const error_code& ec)

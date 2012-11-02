@@ -68,6 +68,18 @@ inline add_transfer_params file2atp(const QString& filepath)
     return add_transfer_params();
 }
 
+class misc
+{
+public:
+    static QString collectionsLocation()
+    {
+        const QString location = QDir::currentPath() + QDir::separator() + "collections";
+        QDir locationDir(location);
+        if (!locationDir.exists()) locationDir.mkpath(locationDir.absolutePath());
+        return location;
+    }
+};
+
 /**
   * SharedFiles schema:
   * RootNode --> DirNode --> DirNode --> DirNode ...
@@ -78,12 +90,10 @@ inline add_transfer_params file2atp(const QString& filepath)
   *                              ...
   *
   * Scenarious:
-  * 1. share file:   if file is not shared it calls params maker for params, on params signal generate transfer,
-  *                  associate it and informs parent by check_items call
-  * 2. unshare file: when file shared it removes transfer or call cancel params to params maker, set state to unshared
-  *                  and informs parent.
+  * 1. share file:   if file is not shared set state to active it calls params maker for params, on params signal generate transfer and associate it, inform dir
+  * 2. unshare file: if file shared it removes transfer or call cancel params to params maker, set state to inactive, inform dir
   *
-  * 3. share dir:    doesn't check self state, for each file execute share and next execute check_items
+  * 3. share dir:    doesn't check self state, for each file execute share
   *                  if call recursive it will delegates to child directories. In any case for child directories
   *                  will be execute update_names method for refresh collection names down
   * 4. unshare dir:  check self state, firstly drop self transfer/params_maker and status to avoid multiple calls check_items,
@@ -117,9 +127,10 @@ public:
     virtual QString filepath() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
+    virtual int children() const { return 0; }  // for tests
     bool is_active() const { return m_active; }
 
-    QString item_string() const;
+    QString string() const;
     QString filename() const { return m_filename; }    
     DirNode*    m_parent;    
 protected:
@@ -139,6 +150,7 @@ public:
     virtual ~DirNode();
 
     virtual bool is_dir() const { return true; }
+    virtual int children() const { return m_file_children.count(); }
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
@@ -166,7 +178,7 @@ public:
     /**
       * prepare collection file and add transfer based on it
      */
-    void build_collection();
+    void build_collection();    
 private:       
     bool                        m_populated;
     QString                     m_coll_path;
@@ -211,7 +223,6 @@ public:
 
     void share(const QString& filepath, bool recursive);
     void unshare(const QString& filepath, bool recursive);
-    QString collectionLocation();
     void setNode(const QString& hash, FileNode* node);
 private:
     RootNode    m_root;

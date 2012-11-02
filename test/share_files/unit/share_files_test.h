@@ -15,6 +15,7 @@ private:
 private slots:
     void prepare_filesystem();
     void simple_nodes();
+    void collections_names();
     void finalize_filesystem();
 };
 

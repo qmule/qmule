@@ -54,7 +54,6 @@ void share_files_test::prepare_filesystem()
 
 void share_files_test::simple_nodes()
 {
-/*
     QString base = QDir::currentPath() + QDir::separator() + "tmp";
     Session sf;
 
@@ -78,7 +77,39 @@ void share_files_test::simple_nodes()
     QCOMPARE(QDir(base), QDir(p->filepath()));
     p1->share(false);
     p2->share(true);
-    */
+}
+
+void share_files_test::collections_names()
+{
+    QString base = QDir::currentPath() + QDir::separator() + "tmp";
+    Session sf;
+    FileNode* p3 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/dir3");
+    QVERIFY(p3);
+    QCOMPARE(p3->children(), 4);
+    qDebug() << p3->collection_name();
+    QCOMPARE(p3->collection_name(), QString(""));
+    p3->share(false);
+    QCOMPARE(p3->children(), 4);
+    QCOMPARE(p3->collection_name(), QString("dir3"));
+    p3->unshare(false);
+    QCOMPARE(p3->collection_name(), QString(""));
+    FileNode* p2 = sf.node(base + QDir::separator() + "dir0/dir1/dir2");
+    QVERIFY(p2);
+    p2->share(false);
+    p3->share(false);
+    QCOMPARE(p2->collection_name(), QString("dir2"));
+    QCOMPARE(p3->collection_name(), QString("dir2-dir3"));
+    FileNode* p1 = sf.node(base + QDir::separator() + "dir0/dir1");
+    QVERIFY(p1);
+    p1->share(false);
+    QCOMPARE(p2->collection_name(), QString("dir1-dir2"));
+    QCOMPARE(p3->collection_name(), QString("dir1-dir2-dir3"));
+    QCOMPARE(p2->children(), 3);
+
+    p1->unshare(true);
+    QVERIFY(p3->collection_name().isEmpty());
+    QVERIFY(p2->collection_name().isEmpty());
+    QVERIFY(p1->collection_name().isEmpty());
 }
 
 void share_files_test::finalize_filesystem()
