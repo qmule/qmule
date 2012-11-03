@@ -3,6 +3,7 @@
 
 #include <QtTest/QTest>
 #include <QStringList>
+#include <QDebug>
 
 class share_files_test : public QObject
 {
@@ -16,6 +17,9 @@ private slots:
     void prepare_filesystem();
     void simple_nodes();
     void collections_names();
+    void test_save();
+    void test_load();
+    void test_states();
     void finalize_filesystem();
 };
 

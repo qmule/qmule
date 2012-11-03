@@ -12,10 +12,15 @@
 #include <QDir>
 #include <QBasicTimer>
 #include <QDebug>
+#include <set>
 #include "qfileinfogatherer.h"
+
+const int no_error = 0;
+const int error_cancel = 1;
 
 struct error_code
 {
+    error_code() : m_ec(no_error){}
     int m_ec;
 };
 
@@ -28,31 +33,11 @@ struct Transfer
 
 };
 
-/**
-  * fake maker
- */
-class TransferParamsMaker : public QObject
-{
-    Q_OBJECT
-public:
-    TransferParamsMaker()
-    {
-        m_hash = 123;
-    }
-
-    void make_params(const QString& filepath)
-    {
-        emit parameters_complete(Transfer(QString::number(++m_hash), filepath));
-    }
-private:
-    int m_hash;
-signals:
-    void parameters_complete(Transfer t);
-};
-
 // fake add transfer params
 struct add_transfer_params
 {
+    add_transfer_params(){}
+    add_transfer_params(const QString& filepath, const QString& hash) : m_filepath(filepath), m_filesize(100), m_hash(hash) {}
     QString m_filepath;
     quint64 m_filesize;
     QString m_hash;
@@ -63,10 +48,8 @@ inline QString genColItem(const QString& filename, quint64 filesize, const QStri
     return filename + QString("|") + QString::number(filesize) + QString("|") + hash;
 }
 
-inline add_transfer_params file2atp(const QString& filepath)
-{
-    return add_transfer_params();
-}
+add_transfer_params file2atp(const QString& filepath);
+
 
 class misc
 {
@@ -129,16 +112,18 @@ public:
     virtual bool is_root() const { return false; }
     virtual int children() const { return 0; }  // for tests
     bool is_active() const { return m_active; }
+    int level() const;
+    QString indention() const;
 
     QString string() const;
-    QString filename() const { return m_filename; }    
-    DirNode*    m_parent;    
+    QString filename() const { return m_filename; }
+    DirNode*    m_parent;
 protected:
     bool        m_active;
-    QString     m_filename;
+    QString     m_filename;    
     add_transfer_params* m_atp;
-    error_code  m_error;
     Session*    m_session;
+    error_code  m_error;    
     QString     m_hash;
     friend class Session;
 };
@@ -162,6 +147,7 @@ public:
     QString collection_name() const;
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);    
+    QStringList exclude_files() const;
 
     /**
       * pupulate directory with items no_share status
@@ -173,7 +159,7 @@ public:
     /**
       * drop collection transfer - for each FileNodes operations and parent DirNode
      */
-    void drop_transfer();
+    void update_state();
 
     /**
       * prepare collection file and add transfer based on it
@@ -181,8 +167,6 @@ public:
     void build_collection();    
 private:       
     bool                        m_populated;
-    QString                     m_coll_path;
-    QString                     m_coll_hash;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
@@ -203,9 +187,6 @@ public:
     virtual void unshare(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
 };
 
-const int no_error = 0;
-const int error_cancel = 1;
-
 /**
   *
  */
@@ -221,20 +202,23 @@ public:
     void makeTransferParamsters(const QString& filepath);
     void cancelTransferParams(const QString& filepath);
 
+    void removeDir(DirNode* dir);
+    void addDir(DirNode* dir);
     void share(const QString& filepath, bool recursive);
     void unshare(const QString& filepath, bool recursive);
     void setNode(const QString& hash, FileNode* node);
+    void produce_collections();
+    void save() const;
+    void load();
 private:
+
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
-    TransferParamsMaker         m_maker;
+    std::set<DirNode*>          m_dirs;
 
-public slots:
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);
     void on_parameters_ready(const add_transfer_params& atp, const error_code& ec);
-    friend class FileNode;
-    friend class DirNode;
 };
 
 QDebug operator<<(QDebug dbg, const FileNode* node);

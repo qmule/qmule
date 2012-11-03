@@ -10,7 +10,8 @@ INCLUDEPATH += . unit
 
 include (model/model.pri)
 # Input
-HEADERS += unit/share_files_test.h
+HEADERS += unit/share_files_test.h \
+           ../../src/qinisettings.h
 
 SOURCES += main.cpp \
            unit/share_files_test.cpp
