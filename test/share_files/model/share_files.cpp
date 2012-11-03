@@ -3,6 +3,10 @@
 #include <QFileSystemModel>
 #include <QTextStream>
 #include <QCryptographicHash>
+#ifdef Q_WS_WIN32
+#include <QVarLengthArray>
+#include <windows.h>
+#endif
 #include "share_files.h"
 #include "../../src/qinisettings.h"
 
