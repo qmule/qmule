@@ -744,35 +744,34 @@ void Session::save() const
     pref.endGroup();
 }
 
+bool operator<(const QVector<QString>& v1, const QVector<QString>& v2)
+{
+    return v1.size() < v2.size();
+}
+
 void Session::load()
 {
     Preferences pref;
+    typedef QPair<QString, QVector<QString> > SD;
+    QVector<SD> vf;
+
     pref.beginGroup("SharedDirectories");
     int dcount = pref.beginReadArray("ShareDirs");
+    vf.resize(dcount);
 
     for (int i = 0; i < dcount; ++i)
     {
-        pref.setArrayIndex(i);
-        QString shared_path = pref.value("Path").toString();
-        FileNode* p = node(shared_path);
 
-        if (p != &m_root) p->share(false);
+        pref.setArrayIndex(i);
+        vf[i].first = pref.value("Path").toString();
 
         int fcount = pref.beginReadArray("ExcludeFiles");
+        vf[i].second.resize(fcount);
 
         for (int j = 0; j < fcount; ++ j)
         {
             pref.setArrayIndex(j);
-            QString exclude_filename = pref.value("FileName").toString();
-            QDir filepath(shared_path);
-
-            FileNode* pf = node(filepath.absoluteFilePath(exclude_filename));
-
-            if (pf != &m_root)
-            {
-                qDebug() << "load unshare: " << filepath.absoluteFilePath(exclude_filename);
-                pf->unshare(false);
-            }
+            vf[i].second[j] = pref.value("FileName").toString();
         }
 
         pref.endArray();
@@ -780,6 +779,31 @@ void Session::load()
     }
 
     pref.endArray();
+
+    // sort dirs ASC to avoid update states on sharing
+    std::sort(vf.begin(), vf.end());
+
+    foreach(const SD& item, vf)
+    {
+        FileNode* dir_node = node(item.first);
+
+        if (dir_node != &m_root)
+        {
+            dir_node->share(false);
+            QDir filepath(item.first);
+
+            for(int i = 0; i < item.second.size(); ++i)
+            {
+                FileNode* file_node = node(filepath.absoluteFilePath(item.second[i]));
+
+                if (file_node != &m_root)
+                {
+                    file_node->unshare(false);
+                }
+            }
+        }
+
+    }
 }
 
 
