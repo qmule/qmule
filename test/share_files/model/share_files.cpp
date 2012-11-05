@@ -85,15 +85,19 @@ void FileNode::share(bool recursive)
 
     if (has_metadata())
     {
-        m_session->addTransfer(*m_atp);
+        try
+        {
+            m_session->addTransfer(*m_atp);
+        }
+        catch(...)
+        {
+            // catch dublicate errors
+        }
     }
     else
     {
         m_session->makeTransferParamsters(filepath());
     }
-
-    // inform our container to change state
-    m_parent->update_state();
 }
 
 void FileNode::unshare(bool recursive)
@@ -112,7 +116,7 @@ void FileNode::unshare(bool recursive)
         m_session->cancelTransferParams(filepath());
     }
 
-    m_parent->update_state();
+    m_parent->check_files();
 }
 
 void FileNode::process_add_transfer(const QString& hash)
@@ -121,7 +125,14 @@ void FileNode::process_add_transfer(const QString& hash)
 
     if (!is_active())
     {
-        m_session->deleteTransfer(hash, false);
+        try
+        {
+            m_session->deleteTransfer(hash, false);
+        }
+        catch(...)
+        {
+            // catch dublicate errors
+        }
     }
 }
 
@@ -142,6 +153,7 @@ void FileNode::process_add_metadata(const add_transfer_params& atp, const error_
         if (!m_atp) m_atp = new add_transfer_params;
 
         *m_atp = atp;
+        m_atp->dublicate_is_error = true;
 
         if (is_active())
         {
@@ -226,59 +238,78 @@ DirNode::~DirNode()
 
 void DirNode::share(bool recursive)
 {
-    m_active = true;
-    m_session->addDir(this);
-
-    // execute without check current state
-    // we can re-share files were unshared after directory was shared
-    populate();
-
-    foreach(FileNode* p, m_file_children.values())
+    if (!m_active)
     {
-        p->share(recursive);
-    }
+        m_active = true;
+        m_session->addDir(this);
 
-    foreach(DirNode* p, m_dir_children.values())
-    {
-        if (recursive)
+        // execute without check current state
+        // we can re-share files were unshared after directory was shared
+        populate();
+
+        foreach(FileNode* p, m_file_children.values())
         {
             p->share(recursive);
         }
-        else
+
+        // update state on all children
+        foreach(DirNode* p, m_dir_children.values())
         {
-            p->update_state(); // all included collections must execute rename
+            p->update_state();
+        }
+    }
+
+    // share all what are not shared
+    foreach(DirNode* p, m_dir_children.values())
+    {        
+        if (recursive)
+        {
+            p->share(recursive);
         }
     }
 }
 
 void DirNode::unshare(bool recursive)
 {
-    m_active = false;
-    m_session->removeDir(this);
-
     qDebug() << indention() << "unshare dir: " << filename();
 
-    foreach(FileNode* p, m_file_children.values())
+    if (m_active)
     {
-        p->unshare(recursive);
-    }
+        m_active = false;
+        m_session->removeDir(this);
 
-    foreach(DirNode* p, m_dir_children.values())
-    {
-        if (recursive)
+        if (has_transfer())
+        {
+            m_session->deleteTransfer(m_hash, true);
+        }
+
+        foreach(FileNode* p, m_file_children.values())
         {
             p->unshare(recursive);
         }
-        else
+
+        // on non-recursive we update state because current node state was changed
+        if (!recursive)
         {
-            p->update_state();
+            foreach(DirNode* p, m_dir_children.values())
+            {
+                p->update_state();
+            }
+        }
+    }
+
+    if (recursive)
+    {
+        foreach(DirNode* p, m_dir_children.values())
+        {
+            p->unshare(recursive);
         }
     }
 }
 
 void DirNode::process_delete_transfer()
 {
-    // do nothing
+    m_hash.clear();
 }
 
 void DirNode::process_add_metadata(const add_transfer_params& atp, const error_code& ec)
@@ -288,27 +319,36 @@ void DirNode::process_add_metadata(const add_transfer_params& atp, const error_c
 
 void DirNode::update_state()
 {    
-    if (has_transfer())
+    if (m_active)
     {
-        m_session->deleteTransfer(m_hash, true);
+        if (has_transfer())
+        {
+            m_session->deleteTransfer(m_hash, true);
+        }
     }
 
-    // check included files
-    bool active = false;
-    foreach(const FileNode* node, m_file_children)
+    foreach(DirNode* node, m_dir_children)
     {
-        active = node->is_active();
-        if (active) break;
+        node->update_state();
     }
+}
 
-    if (active)
+void DirNode::check_files()
+{
+    if (m_active)
     {
-        m_session->addDir(this);
-    }
-    else
-    {
-        // directory has now one active file
-        unshare(false);
+        // check included files
+        bool active = false;
+        foreach(const FileNode* node, m_file_children)
+        {
+            active = node->is_active();
+            if (active) break;
+        }
+
+        if (!active)
+        {
+            unshare(false);
+        }
     }
 }
 
@@ -334,12 +374,6 @@ void DirNode::build_collection()
         if (!pending)
         {            
             qDebug() << "collection " << filename() << " ready";
-
-            if (!m_hash.isEmpty())
-            {
-                m_session->deleteTransfer(m_hash, true);
-            }
-
             QStringList lines;
 
             foreach(const FileNode* p, m_file_children.values())
@@ -351,8 +385,6 @@ void DirNode::build_collection()
                     lines << line;
                 }
             }
-
-            // TODO - what when lines is empty?
 
             int iteration = 0;
             // generate unique filename
@@ -390,8 +422,10 @@ void DirNode::build_collection()
                  data.close();
 
                  // hash file and add node
-                 m_session->addTransfer(file2atp(cd.absolutePath()));
-                 m_session->setNode(m_hash, this);  // must assign new transfer hash to our collection, not to original path
+                 // TODO - replace testing code
+                 add_transfer_params atp = file2atp(collection_filepath);   //!< get apt
+                 m_session->setNode(atp.m_hash, this);                      //!< set node
+                 m_session->addTransfer(atp);                               //!< add transfer
             }
         }
     }
@@ -789,12 +823,25 @@ void Session::on_parameters_ready(const add_transfer_params& atp, const error_co
 
 void Session::deleteTransfer(const QString& hash, bool delete_files)
 {
+    bool exists = m_transfers.contains(hash);
+    Q_ASSERT(exists);
+    QString filepath = m_transfers.value(hash);
+    Q_ASSERT(m_transfers.remove(hash));
+
+    if (delete_files) // only on dir nodes in test
+    {
+        qDebug() << "deleteTransfer: " << filepath;
+        QFile f(filepath);
+        Q_ASSERT(f.remove());
+    }
+
     on_transfer_deleted(hash);
 }
 
 void Session::addTransfer(const add_transfer_params& atp)
 {
     Transfer t(atp.m_hash, atp.m_filepath);
+    m_transfers.insert(atp.m_hash, atp.m_filepath); // test code
     on_transfer_added(t);   // immediately signal on add
 }
 

@@ -37,10 +37,15 @@ struct Transfer
 struct add_transfer_params
 {
     add_transfer_params(){}
-    add_transfer_params(const QString& filepath, const QString& hash) : m_filepath(filepath), m_filesize(100), m_hash(hash) {}
+    add_transfer_params(const QString& filepath, const QString& hash) :
+        m_filepath(filepath),
+        m_filesize(100),
+        m_hash(hash),
+        dublicate_is_error(false) {}
     QString m_filepath;
     quint64 m_filesize;
     QString m_hash;
+    bool    dublicate_is_error;
 };
 
 inline QString genColItem(const QString& filename, quint64 filesize, const QString& hash)
@@ -157,9 +162,15 @@ public:
     bool is_populated() const { return m_populated; }
 
     /**
-      * drop collection transfer - for each FileNodes operations and parent DirNode
+      * call when collection share/unshare to inform children
      */
     void update_state();
+
+    /**
+      * will call by file when file change state to unshare
+      * if directory was active - checks it status
+     */
+    void check_files();
 
     /**
       * prepare collection file and add transfer based on it
@@ -215,6 +226,7 @@ private:
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
     std::set<DirNode*>          m_dirs;
+    QHash<QString, QString>     m_transfers; // only for testing
 
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);

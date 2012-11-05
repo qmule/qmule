@@ -20,6 +20,7 @@ private slots:
     void test_save();
     void test_load();
     void test_states();
+    void test_states_updating();
     void finalize_filesystem();
 };
 

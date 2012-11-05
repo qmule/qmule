@@ -190,6 +190,64 @@ void share_files_test::test_states()
     QVERIFY(!p2->is_active());
 }
 
+void share_files_test::test_states_updating()
+{
+    QString base = QDir::currentPath() + QDir::separator() + "tmp";
+    Session sf;
+    FileNode* p4 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/dir3/dir4");
+    QVERIFY(p4);
+    p4->share(false);
+    QVERIFY(!p4->has_transfer());
+    sf.produce_collections();
+    QVERIFY(p4->has_transfer());
+    FileNode* p1 = sf.node(base + QDir::separator() + "dir0/dir1");
+    QVERIFY(p1);
+    p1->share(false);
+    QVERIFY(!p1->has_transfer());
+    QVERIFY(!p4->has_transfer());
+    sf.produce_collections();
+    QVERIFY(p1->has_transfer());
+    QVERIFY(p4->has_transfer());
+
+    // check transfer off when all files were disabled
+    for (int i = 0; i <= 1; ++i)
+    {
+        FileNode* f = sf.node(base + QDir::separator() + "dir0/dir1/level_file" + QString::number(i));
+        QVERIFY(f);
+        QVERIFY(f->is_active());
+        f->unshare(false);
+
+        if (i == 1)
+        {
+            QVERIFY(!p1->has_transfer());
+            QVERIFY(!p4->has_transfer());
+        }
+        else
+        {
+            QVERIFY(p1->has_transfer());
+            QVERIFY(p4->has_transfer());
+        }
+    }
+
+    sf.produce_collections();
+    QVERIFY(!p1->has_transfer());   // no files
+    QVERIFY(p4->has_transfer());
+    QCOMPARE(p4->collection_name(), QString("dir4"));
+    p1->unshare(true);
+    QVERIFY(!p4->has_transfer());
+    p4->share(false);
+    FileNode* p3 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/dir3");
+    QVERIFY(p3);
+    p3->share(true);
+    sf.produce_collections();
+    QVERIFY(p3->has_transfer());
+    QVERIFY(p4->has_transfer());
+    p1->share(true);
+    QVERIFY(!p3->has_transfer());
+    QVERIFY(!p4->has_transfer());
+
+}
+
 void share_files_test::finalize_filesystem()
 {
     while(!m_files.empty())
