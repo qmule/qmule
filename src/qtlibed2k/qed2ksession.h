@@ -96,6 +96,8 @@ public:
     void startServerConnection();
     void stopServerConnection();
     bool isServerConnected() const;
+    void makeTransferParametersAsync(const QString& filepath);
+    std::pair<libed2k::add_transfer_params, libed2k::error_code> makeTransferParameters(const QString& filepath) const;
 
     /**
       * scan ed2k backup directory and load all files were matched name filter
@@ -195,6 +197,8 @@ signals:
      */
     void peerSharedDirectoryFiles(const libed2k::net_identifier& np, const QString& hash,
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
+
+    void transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
 };
 
 }

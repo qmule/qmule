@@ -88,8 +88,7 @@ signals:
     void newDownloadedTransfer(QString path, QString url);
     void downloadFromUrlFailure(QString url, QString reason);
     void alternativeSpeedsModeChanged(bool alternative);
-    void recursiveDownloadPossible(QTorrentHandle t);
-    void savePathChanged(Transfer t);
+    void recursiveDownloadPossible(QTorrentHandle t);    
     void newBanMessage(QString msg);
 
 private slots:

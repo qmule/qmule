@@ -635,6 +635,18 @@ void QED2KSession::readAlerts()
         {
             writeResumeData(p);
         }
+        else if (libed2k::transfer_params_alert* p = dynamic_cast<libed2k::transfer_params_alert*>(a.get()))
+        {
+            emit transferParametersReady(p->m_atp, p->m_ec);
+        }
+        else if (libed2k::file_renamed_alert* p = dynamic_cast<libed2k::file_renamed_alert*>(a.get()))
+        {
+            emit savePathChanged(Transfer(QED2KHandle(p->m_handle)));
+        }
+        else if (libed2k::storage_moved_alert* p = dynamic_cast<libed2k::storage_moved_alert*>(a.get()))
+        {
+            emit savePathChanged(Transfer(QED2KHandle(p->m_handle)));
+        }
 
         a = m_session->pop_alert();
     }
@@ -804,6 +816,17 @@ void QED2KSession::stopServerConnection()
 bool QED2KSession::isServerConnected() const
 {
     return (delegate()->server_conn_online());
+}
+
+void QED2KSession::makeTransferParametersAsync(const QString& filepath)
+{
+    delegate()->make_transfer_parameters(filepath.toUtf8().constData());
+}
+
+std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeTransferParameters(const QString& filepath) const
+{
+    bool cancel = false;
+    return libed2k::file2atp()(filepath.toUtf8().constData(), cancel);
 }
 
 }

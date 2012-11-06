@@ -91,7 +91,8 @@ signals:
     void resumedTransfer(Transfer t);
     void deletedTransfer(QString hash);
     void transferAboutToBeRemoved(Transfer t);
-    void newConsoleMessage(const QString &msg);
+    void newConsoleMessage(const QString &msg);    
+    void savePathChanged(Transfer t);
 
 private:
     QStringList consoleMessages;

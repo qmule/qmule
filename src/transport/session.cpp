@@ -137,6 +137,8 @@ Session::Session()
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
 
+    connect(&m_edSession, SIGNAL(savePathChanged(Transfer)), this, SIGNAL(savePathChanged(Transfer)));
+
     m_speedMonitor.reset(new TorrentSpeedMonitor(this));
     m_speedMonitor->start();
 }

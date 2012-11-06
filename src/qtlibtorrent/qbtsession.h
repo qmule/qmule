@@ -195,7 +195,6 @@ signals:
   void downloadFromUrlFailure(QString url, QString reason);
   void torrentFinishedChecking(const QTorrentHandle& h);
   void metadataReceived(const QTorrentHandle &h);
-  void savePathChanged(const QTorrentHandle &h);  
   void newBanMessage(const QString &msg);
   void alternativeSpeedsModeChanged(bool alternative);
   void recursiveTorrentDownloadPossible(const QTorrentHandle &h);
