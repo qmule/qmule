@@ -19,9 +19,11 @@ private slots:
     void collections_names();
     void test_save();
     void test_load();
+    void test_load_new_files();
     void test_states();
     void test_states_updating();
     void finalize_filesystem();
+    void finalize_collections();
 };
 
 #endif // SHARE_FILES_TEST_H

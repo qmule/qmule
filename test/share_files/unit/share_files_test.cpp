@@ -78,6 +78,7 @@ void share_files_test::simple_nodes()
     QCOMPARE(QDir(base), QDir(p->filepath()));
     p1->share(false);
     p2->share(true);
+    sf->finalize_collections();
 }
 
 void share_files_test::collections_names()
@@ -113,6 +114,7 @@ void share_files_test::collections_names()
     QVERIFY(p2->collection_name().isEmpty());
     qDebug() << "p3 name " << p3->collection_name();
     QVERIFY(p3->collection_name().isEmpty());
+    sf.finalize_collections();
 }
 
 void share_files_test::test_save()
@@ -144,9 +146,18 @@ void share_files_test::test_save()
     f22->unshare(false);
     f23->unshare(false);
 
+    // check save inactive collections
+    FileNode* p0 = sf.node(base + QDir::separator() + "dir0");
+    QVERIFY(p0);
+    p0->share(false);
+    FileNode* f00 = sf.node(base + QDir::separator() + "dir0/level_file0");
+    QVERIFY(f00);
+    f00->unshare(false);
+    QVERIFY(!p0->is_active());
+
     sf.produce_collections();
     sf.save();
-
+    sf.finalize_collections();
 }
 
 void share_files_test::test_load()
@@ -162,11 +173,77 @@ void share_files_test::test_load()
     FileNode* f22 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/level_file0");
     FileNode* f23 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/level_file1");
 
+    FileNode* p0 = sf.node(base + QDir::separator() + "dir0");
+    FileNode* f00 = sf.node(base + QDir::separator() + "dir0/level_file0");
+    QVERIFY(p0);
+    QVERIFY(f00);
+    QVERIFY(!p0->is_active());
+    QVERIFY(!f00->is_active());
+
     QVERIFY(f22);
     QVERIFY(!f22->is_active());
 
     QVERIFY(f23);
     QVERIFY(!f23->is_active());
+    sf.finalize_collections();
+}
+
+void share_files_test::test_load_new_files()
+{
+    QString base = QDir::currentPath() + QDir::separator() + "tmp";
+    Session sf;
+
+    QStringList files;
+    // generate files in dir0
+    for(int i = 0; i < 20; ++i)
+    {
+        QString filepath = QDir::currentPath() + QDir::separator() + "tmp/dir0" + QDir::separator() + "file" + QString::number(i) + QString(".add");
+        files << filepath;
+        std::ofstream of(filepath.toLocal8Bit());
+        of << "some text data" << i;
+    }
+
+    // generate files in dir2
+    for(int i = 0; i < 20; ++i)
+    {
+        QString filepath = QDir::currentPath() + QDir::separator() + "tmp/dir0/dir1/dir2" + QDir::separator() + "file" + QString::number(i) + QString(".add");
+        files << filepath;
+        std::ofstream of(filepath.toLocal8Bit());
+        of << "some text data and text for different hash" << i;
+    }
+
+    sf.load();
+
+    FileNode* p2 = sf.node(base + QDir::separator() + "dir0/dir1/dir2");
+    QVERIFY(p2);
+    QVERIFY(p2->is_active());
+
+    FileNode* p0 = sf.node(base + QDir::separator() + "dir0");
+    QVERIFY(p0);
+    QVERIFY(p0->is_active());
+
+    DirNode* node_0 = dynamic_cast<DirNode*>(p0);
+    DirNode* node_2 = dynamic_cast<DirNode*>(p2);
+    QVERIFY(node_0);
+    QVERIFY(node_2);
+
+    for (int i = 0; i < 20; ++i)
+    {
+        FileNode* file_node_0 = node_0->child(QString("file") + QString::number(i) + QString(".add"));
+        FileNode* file_node_2 = node_0->child(QString("file") + QString::number(i) + QString(".add"));
+        QVERIFY(file_node_0);
+        QVERIFY(file_node_2);
+        QVERIFY(file_node_0->is_active());
+        QVERIFY(file_node_2->is_active());
+    }
+
+    // clear bundle
+    foreach(const QString& s, files)
+    {
+        QFile f(s);
+        QVERIFY(f.remove());
+    }
+    sf.finalize_collections();
 }
 
 void share_files_test::test_states()
@@ -188,6 +265,7 @@ void share_files_test::test_states()
     }
 
     QVERIFY(!p2->is_active());
+    sf.finalize_collections();
 }
 
 void share_files_test::test_states_updating()
@@ -217,22 +295,14 @@ void share_files_test::test_states_updating()
         QVERIFY(f->is_active());
         f->unshare(false);
 
-        if (i == 1)
-        {
-            QVERIFY(!p1->has_transfer());
-            QVERIFY(!p4->has_transfer());
-        }
-        else
-        {
-            QVERIFY(p1->has_transfer());
-            QVERIFY(p4->has_transfer());
-        }
+        QVERIFY(!p1->has_transfer());
+        QVERIFY(p4->has_transfer());
     }
 
     sf.produce_collections();
-    QVERIFY(!p1->has_transfer());   // no files
+    QVERIFY(!p1->has_transfer());   // no files but
     QVERIFY(p4->has_transfer());
-    QCOMPARE(p4->collection_name(), QString("dir4"));
+    QCOMPARE(p4->collection_name(), QString("dir1-dir4"));
     p1->unshare(true);
     QVERIFY(!p4->has_transfer());
     p4->share(false);
@@ -245,7 +315,13 @@ void share_files_test::test_states_updating()
     p1->share(true);
     QVERIFY(!p3->has_transfer());
     QVERIFY(!p4->has_transfer());
-
+    sf.produce_collections();
+    QVERIFY(p1->has_transfer());
+    QVERIFY(p3->has_transfer());
+    QVERIFY(p4->has_transfer());
+    QCOMPARE(p3->collection_name(), QString("dir1-dir2-dir3"));
+    QCOMPARE(p4->collection_name(), QString("dir1-dir2-dir3-dir4"));
+    sf.finalize_collections();
 }
 
 void share_files_test::finalize_filesystem()
@@ -267,4 +343,11 @@ void share_files_test::finalize_filesystem()
 
         m_files.removeAt(indx);
     }
+}
+
+void share_files_test::finalize_collections()
+{
+    Session sf;
+    sf.load();
+    sf.finalize_collections();
 }

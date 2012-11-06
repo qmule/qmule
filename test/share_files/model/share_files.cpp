@@ -98,6 +98,8 @@ void FileNode::share(bool recursive)
     {
         m_session->makeTransferParamsters(filepath());
     }
+
+    m_parent->drop_transfer_by_file();
 }
 
 void FileNode::unshare(bool recursive)
@@ -116,7 +118,7 @@ void FileNode::unshare(bool recursive)
         m_session->cancelTransferParams(filepath());
     }
 
-    m_parent->check_files();
+    m_parent->drop_transfer_by_file();
 }
 
 void FileNode::process_add_transfer(const QString& hash)
@@ -307,6 +309,22 @@ void DirNode::unshare(bool recursive)
     }
 }
 
+bool DirNode::is_active() const
+{
+    bool active = false;
+
+    if (m_active)
+    {
+        foreach(const FileNode* node, m_file_children)
+        {
+            active = node->is_active();
+            if (active) break;
+        }
+    }
+
+    return active;
+}
+
 void DirNode::process_delete_transfer()
 {
     m_hash.clear();
@@ -319,12 +337,9 @@ void DirNode::process_add_metadata(const add_transfer_params& atp, const error_c
 
 void DirNode::update_state()
 {    
-    if (m_active)
+    if (m_active && (has_transfer()))
     {
-        if (has_transfer())
-        {
-            m_session->deleteTransfer(m_hash, true);
-        }
+        m_session->deleteTransfer(m_hash, true);
     }
 
     foreach(DirNode* node, m_dir_children)
@@ -333,117 +348,103 @@ void DirNode::update_state()
     }
 }
 
-void DirNode::check_files()
+void DirNode::drop_transfer_by_file()
 {
-    if (m_active)
+    if (m_active && has_transfer())
     {
-        // check included files
-        bool active = false;
-        foreach(const FileNode* node, m_file_children)
-        {
-            active = node->is_active();
-            if (active) break;
-        }
-
-        if (!active)
-        {
-            unshare(false);
-        }
+        m_session->deleteTransfer(m_hash, true);
     }
 }
 
 void DirNode::build_collection()
 {
     // collection would hash, but hasn't transfer yet
-    if (m_active && !has_transfer())
+    qDebug() << "build collection " << filename();
+    bool pending = false;
+
+    // check children
+    foreach(const FileNode* p, m_file_children.values())
     {
-        qDebug() << "build collection " << filename();
-        bool pending = false;
-
-        // check children        
-        foreach(const FileNode* p, m_file_children.values())
+        // item in pending state
+        if (p->is_active() && !p->has_transfer())
         {
-            // item in pending state
-            if (p->is_active() && !p->has_transfer())
-            {
-                pending = true;
-                break;
-            }
-        }
-
-        if (!pending)
-        {            
-            qDebug() << "collection " << filename() << " ready";
-            QStringList lines;
-
-            foreach(const FileNode* p, m_file_children.values())
-            {
-                if (p->is_active())
-                {
-                    QString line = p->string();
-                    Q_ASSERT(!line.isEmpty());
-                    lines << line;
-                }
-            }
-
-            int iteration = 0;
-            // generate unique filename
-            QDir cd(misc::collectionsLocation());
-            QString collection_filepath;
-
-            while(collection_filepath.isEmpty())
-            {
-                QString filename = collection_name() + QString("-") + QString::number(lines.count()) + (iteration?(QString("_") + QString::number(iteration)):QString()) +  QString(".emulecollection");
-                QFileInfo fi(cd.filePath(filename));
-
-                if (fi.exists())
-                {
-                    ++iteration;
-                }
-                else
-                {
-                    collection_filepath = fi.absoluteFilePath();
-                }
-            }
-
-            qDebug() << "collection filepath " << collection_filepath;
-
-            QFile data(collection_filepath);
-
-            if (data.open(QFile::WriteOnly | QFile::Truncate))
-            {
-                 QTextStream out(&data);
-
-                 foreach(const QString& line, lines)
-                 {
-                     out << line << "\n";
-                 }
-
-                 data.close();
-
-                 // hash file and add node
-                 // TODO - replace testing code
-                 add_transfer_params atp = file2atp(collection_filepath);   //!< get apt
-                 m_session->setNode(atp.m_hash, this);                      //!< set node
-                 m_session->addTransfer(atp);                               //!< add transfer
-            }
+            pending = true;
+            break;
         }
     }
 
+    if (!pending)
+    {
+        qDebug() << "collection " << filename() << " ready";
+        QStringList lines;
+
+        foreach(const FileNode* p, m_file_children.values())
+        {
+            if (p->is_active())
+            {
+                QString line = p->string();
+                Q_ASSERT(!line.isEmpty());
+                lines << line;
+            }
+        }
+
+        int iteration = 0;
+        // generate unique filename
+        QDir cd(misc::collectionsLocation());
+        QString collection_filepath;
+
+        while(collection_filepath.isEmpty())
+        {
+            QString filename = collection_name() + QString("-") + QString::number(lines.count()) + (iteration?(QString("_") + QString::number(iteration)):QString()) +  QString(".emulecollection");
+            QFileInfo fi(cd.filePath(filename));
+
+            if (fi.exists())
+            {
+                ++iteration;
+            }
+            else
+            {
+                collection_filepath = fi.absoluteFilePath();
+            }
+        }
+
+        qDebug() << "collection filepath " << collection_filepath;
+
+        QFile data(collection_filepath);
+
+        if (data.open(QFile::WriteOnly | QFile::Truncate))
+        {
+             QTextStream out(&data);
+
+             foreach(const QString& line, lines)
+             {
+                 out << line << "\n";
+             }
+
+             data.close();
+
+             // hash file and add node
+             // TODO - replace testing code
+             add_transfer_params atp = file2atp(collection_filepath);   //!< get apt
+             m_session->setNode(atp.m_hash, this);                      //!< set node
+             m_session->addTransfer(atp);                               //!< add transfer
+        }
+    }
 }
 
 QString DirNode::collection_name() const
 {
     QString res;
 
-    if (is_active())
+    // check active by user wish, do not check files
+    if (m_active)
     {
         QStringList name_list;
         const DirNode* parent = this;
 
         while(parent && !parent->is_root())
         {
-            if (parent->is_active())
+            if (parent->m_active)
             {
                 name_list.prepend(parent->filename());
             }
@@ -715,29 +716,26 @@ void Session::save() const
         const DirNode* p = *itr;
         qDebug() << "save: " << p->filepath();
 
-        if (p->is_active())
+        pref.setArrayIndex(dir_indx);
+        pref.setValue("Path", p->filepath());
+        QStringList efiles = p->exclude_files();
+
+        if (!efiles.isEmpty())
         {
-            pref.setArrayIndex(dir_indx);
-            pref.setValue("Path", p->filepath());
-            QStringList efiles = p->exclude_files();
+            int file_indx = 0;
+            pref.beginWriteArray("ExcludeFiles", efiles.size());
 
-            if (!efiles.isEmpty())
+            foreach(const QString& efile, efiles)
             {
-                int file_indx = 0;
-                pref.beginWriteArray("ExcludeFiles", efiles.size());
-
-                foreach(const QString& efile, efiles)
-                {
-                    pref.setArrayIndex(file_indx);
-                    pref.setValue("FileName", efile);
-                    ++file_indx;
-                }
-
-                pref.endArray();
+                pref.setArrayIndex(file_indx);
+                pref.setValue("FileName", efile);
+                ++file_indx;
             }
 
-            ++dir_indx;
+            pref.endArray();
         }
+
+        ++dir_indx;
     }
 
     pref.endArray();
@@ -806,6 +804,18 @@ void Session::load()
     }
 }
 
+void Session::finalize_collections()
+{
+    foreach(DirNode* node, m_dirs)
+    {
+        if (node->has_transfer())
+        {
+            deleteTransfer(node->hash(), true);
+            node->process_delete_transfer();
+        }
+    }
+}
+
 
 void Session::on_transfer_added(Transfer t)
 {        
@@ -826,6 +836,7 @@ void Session::on_transfer_added(Transfer t)
     Q_ASSERT(p != &m_root);
 
     p->process_add_transfer(t.m_hash);
+    m_ct.setInterval(10000);
 }
 
 void Session::on_transfer_deleted(QString hash)
@@ -836,6 +847,7 @@ void Session::on_transfer_deleted(QString hash)
     Q_ASSERT(p);
     m_files.erase(itr);
     p->process_delete_transfer();
+    m_ct.setInterval(10000);
 }
 
 void Session::on_parameters_ready(const add_transfer_params& atp, const error_code& ec)
@@ -843,6 +855,7 @@ void Session::on_parameters_ready(const add_transfer_params& atp, const error_co
     FileNode* p = node(atp.m_filepath);
     Q_ASSERT(p != &m_root);
     p->process_add_metadata(atp, ec);
+    m_ct.setInterval(10000);
 }
 
 void Session::deleteTransfer(const QString& hash, bool delete_files)

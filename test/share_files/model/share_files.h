@@ -10,7 +10,7 @@
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QDir>
-#include <QBasicTimer>
+#include <QTimer>
 #include <QDebug>
 #include <set>
 #include "qfileinfogatherer.h"
@@ -116,7 +116,8 @@ public:
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
     virtual int children() const { return 0; }  // for tests
-    bool is_active() const { return m_active; }
+    virtual bool is_active() const { return m_active; }
+    QString hash() const { return m_hash; }
     int level() const;
     QString indention() const;
 
@@ -141,6 +142,7 @@ public:
 
     virtual bool is_dir() const { return true; }
     virtual int children() const { return m_file_children.count(); }
+    virtual bool is_active() const;
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
@@ -170,7 +172,7 @@ public:
       * will call by file when file change state to unshare
       * if directory was active - checks it status
      */
-    void check_files();
+    void drop_transfer_by_file();
 
     /**
       * prepare collection file and add transfer based on it
@@ -221,12 +223,14 @@ public:
     void produce_collections();
     void save() const;
     void load();
+    void finalize_collections();
 private:
 
     RootNode    m_root;
     QHash<QString, FileNode*>   m_files;
     std::set<DirNode*>          m_dirs;
     QHash<QString, QString>     m_transfers; // only for testing
+    QTimer                      m_ct;
 
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);
