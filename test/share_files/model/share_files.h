@@ -178,10 +178,12 @@ public:
       * prepare collection file and add transfer based on it
      */
     void build_collection();    
-private:       
+
     bool                        m_populated;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
+    QVector<FileNode*>          m_file_vector;
+    QVector<DirNode*>           m_dir_vector;
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
     friend class Session;
     friend QDebug operator<<(QDebug dbg, const FileNode* node);
@@ -207,6 +209,7 @@ class Session : public QObject
 {
     Q_OBJECT
 public:
+    Session();
     FileNode* node(const QString& filepath);
     bool associate_transfer(const Transfer& transfer);
     const FileNode* root() const { return &m_root; }
@@ -224,9 +227,9 @@ public:
     void save() const;
     void load();
     void finalize_collections();
-private:
+    DirNode                     m_root;
 
-    RootNode    m_root;
+private:
     QHash<QString, FileNode*>   m_files;
     std::set<DirNode*>          m_dirs;
     QHash<QString, QString>     m_transfers; // only for testing

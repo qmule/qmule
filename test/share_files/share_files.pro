@@ -8,10 +8,17 @@ TARGET =
 DEPENDPATH += . model unit
 INCLUDEPATH += . unit
 
+#DEFINES += TEST
+
 include (model/model.pri)
 # Input
 HEADERS += unit/share_files_test.h \
-           ../../src/qinisettings.h
+           ../../src/qinisettings.h \
+    mainwindow.h
 
 SOURCES += main.cpp \
-           unit/share_files_test.cpp
+           unit/share_files_test.cpp \
+    mainwindow.cpp
+
+FORMS += \
+    mainwindow.ui

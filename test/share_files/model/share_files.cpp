@@ -64,6 +64,20 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
+QString translateDriveName(const QFileInfo &drive)
+{
+    QString driveName = drive.absoluteFilePath();
+#if defined(Q_OS_WIN) && !defined(Q_OS_WINCE)
+    if (driveName.startsWith(QLatin1Char('/'))) // UNC host
+        return drive.fileName();
+#endif
+#if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
+    if (driveName.endsWith(QLatin1Char('/')))
+        driveName.chop(1);
+#endif
+    return driveName;
+}
+
 FileNode::FileNode(DirNode* parent, const QString& filename, Session* session) :    
     m_parent(parent),
     m_active(false),
@@ -468,10 +482,12 @@ void DirNode::add_node(FileNode* node)
     if (node->is_dir())
     {
         m_dir_children.insert(node->filename(), static_cast<DirNode*>(node));
+        m_dir_vector.push_back(static_cast<DirNode*>(node));
     }
     else
     {
         m_file_children.insert(node->filename(), node);
+        m_file_vector.push_back(node);
     }
 }
 
@@ -499,45 +515,60 @@ void DirNode::populate()
 
     QString path = filepath();
     qDebug() << "populate " << path;
-
-    QString itPath = QDir::fromNativeSeparators(path);
-    QDirIterator dirIt(itPath, QDir::NoDotAndDotDot| QDir::AllEntries | QDir::System | QDir::Hidden);
     QStringList dirs;
     QStringList files;
 
-    while(dirIt.hasNext())
+    if (path.isEmpty())
     {
-        dirIt.next();
-        QFileInfo fileInfo = dirIt.fileInfo();
-
-        if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
+        foreach(const QFileInfo& fi, QDir::drives())
         {
-            dirs << fileInfo.fileName();
-            continue;
+            dirs << translateDriveName(fi);
         }
+    }
+    else
+    {
+        QString itPath = QDir::fromNativeSeparators(path);
+        QDirIterator dirIt(itPath, QDir::NoDotAndDotDot| QDir::AllEntries | QDir::System | QDir::Hidden);
 
-        if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
+        while(dirIt.hasNext())
         {
-            files << fileInfo.fileName();
-            continue;
-        }
+            dirIt.next();
+            QFileInfo fileInfo = dirIt.fileInfo();
 
-        qDebug() << "member " << fileInfo.fileName() << " exists";
+            if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
+            {
+                dirs << fileInfo.fileName();
+                continue;
+            }
+
+            if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
+            {
+                files << fileInfo.fileName();
+                continue;
+            }
+
+            qDebug() << "member " << fileInfo.fileName() << " exists";
+        }
     }
 
     foreach(const QString& str, dirs)
     {
         qDebug() << "add member: " << str;
-        m_dir_children.insert(str, new DirNode(this, str, m_session));
+        add_node(new DirNode(this, str, m_session));
     }
 
     foreach(const QString& str, files)
     {
         qDebug() << "add member: " << str;
-        m_file_children.insert(str, new FileNode(this, str, m_session));
+        add_node(new FileNode(this, str, m_session));
     }
 
     m_populated = true;
+}
+
+Session::Session() : m_root(NULL, "", NULL)
+{
+
 }
 
 FileNode* Session::node(const QString& filepath)
