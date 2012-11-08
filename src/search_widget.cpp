@@ -144,14 +144,14 @@ int selected_row(QAbstractItemView* view)
     return index.isValid() ? index.row() : -1;
 }
 
-QVariant selected_data(QAbstractItemView* view, int column)
-{
-    return view->model()->index(selected_row(view), column).data();
-}
-
 QVariant selected_data(QAbstractItemView* view, int column, const QModelIndex& index)
 {
     return view->model()->index(index.row(), column, index.parent()).data();
+}
+
+QVariant selected_data(QAbstractItemView* view, int column)
+{
+    return selected_data(view, column, view->currentIndex());
 }
 
 search_widget::search_widget(QWidget *parent)
