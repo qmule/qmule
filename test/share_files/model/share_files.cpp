@@ -78,13 +78,14 @@ QString translateDriveName(const QFileInfo &drive)
     return driveName;
 }
 
-FileNode::FileNode(DirNode* parent, const QString& filename, Session* session) :    
+FileNode::FileNode(DirNode* parent, const QFileInfo& info, Session* session) :
     m_parent(parent),
     m_active(false),
-    m_filename(filename),
     m_atp(NULL),
+    m_info(info),
     m_session(session)
 {
+    m_filename = m_info.fileName();
 }
 
 FileNode::~FileNode()
@@ -240,9 +241,10 @@ QString FileNode::string() const
     return (res);
 }
 
-DirNode::DirNode(DirNode* parent, const QString& filename, Session* session) :    
-    FileNode(parent, filename, session),    
-    m_populated(false)
+DirNode::DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root /*= false*/) :
+    FileNode(parent, info, session),
+    m_populated(false),
+    m_root(root)
 {
 }
 
@@ -409,7 +411,7 @@ void DirNode::build_collection()
 
         while(collection_filepath.isEmpty())
         {
-            QString filename = collection_name() + QString("-") + QString::number(lines.count()) + (iteration?(QString("_") + QString::number(iteration)):QString()) +  QString(".emulecollection");
+            QString filename = collection_name() + (iteration?(QString("_") + QString::number(iteration)):QString()) + QString("-") + QString::number(lines.count()) + QString(".emulecollection");
             QFileInfo fi(cd.filePath(filename));
 
             if (fi.exists())
@@ -522,7 +524,9 @@ void DirNode::populate()
     {
         foreach(const QFileInfo& fi, QDir::drives())
         {
-            dirs << translateDriveName(fi);
+            DirNode* p = new DirNode(this, fi, m_session);
+            p->m_filename = translateDriveName(fi);
+            add_node(p);
         }
     }
     else
@@ -536,37 +540,26 @@ void DirNode::populate()
             QFileInfo fileInfo = dirIt.fileInfo();
 
             if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
-            {
-                dirs << fileInfo.fileName();
+            {                
+                add_node(new DirNode(this, fileInfo, m_session));
                 continue;
             }
 
             if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
             {
-                files << fileInfo.fileName();
+                add_node(new FileNode(this, fileInfo, m_session));
                 continue;
             }
+
 
             qDebug() << "member " << fileInfo.fileName() << " exists";
         }
     }
 
-    foreach(const QString& str, dirs)
-    {
-        qDebug() << "add member: " << str;
-        add_node(new DirNode(this, str, m_session));
-    }
-
-    foreach(const QString& str, files)
-    {
-        qDebug() << "add member: " << str;
-        add_node(new FileNode(this, str, m_session));
-    }
-
     m_populated = true;
 }
 
-Session::Session() : m_root(NULL, "", NULL)
+Session::Session() : m_root(NULL, QFileInfo(), NULL, true)
 {
 
 }
@@ -620,7 +613,7 @@ FileNode* Session::node(const QString& filepath)
     DirNode *parent = &m_root;
     qDebug() << pathElements;
     QString last_filename = pathElements.back();
-    pathElements.pop_back();
+    pathElements.pop_back();  
 
     for (int i = 0; i < pathElements.count(); ++i)
     {
@@ -639,6 +632,7 @@ FileNode* Session::node(const QString& filepath)
         }
         else
         {
+
             // Someone might call ::index("file://cookie/monster/doesn't/like/veggies"),
             // a path that doesn't exists, I.E. don't blindly create directories.
             QFileInfo info(absolutePath);
@@ -649,7 +643,12 @@ FileNode* Session::node(const QString& filepath)
                 return (&m_root);
             }
 
-            node = new DirNode(parent, element, this);
+            // generate node with fake info and next request real info
+            node = new DirNode(parent, info, this);
+            node->m_filename = element;
+            qDebug() << "node request for: " << node->filepath();
+            QFileInfo node_info(node->filepath());
+            node->m_info = node_info;
             parent->add_node(node);
         }
 
@@ -676,12 +675,12 @@ FileNode* Session::node(const QString& filepath)
 
         if (info.isFile())
         {
-            p = new FileNode(parent, last_filename, this);
+            p = new FileNode(parent, info, this);
             parent->add_node(p);
         }
         else if (info.isDir())
         {
-            p = new DirNode(parent, last_filename, this);
+            p = new DirNode(parent, info, this);
             ((DirNode*)p)->populate();
             parent->add_node(p);
         }

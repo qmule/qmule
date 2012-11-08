@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QDebug>
+#include <QIcon>
 #include <set>
 #include "qfileinfogatherer.h"
 
@@ -91,14 +92,14 @@ public:
   *
  */
 
-class Session;
 class DirNode;
+class Session;
 
 class FileNode
 {
 public:
 
-    FileNode(DirNode* parent, const QString& filename, Session* session);
+    FileNode(DirNode* parent, const QFileInfo& info, Session* session);
     virtual ~FileNode();
 
     virtual void share(bool recursive);
@@ -123,24 +124,28 @@ public:
 
     QString string() const;
     QString filename() const { return m_filename; }
-    DirNode*    m_parent;
-protected:
+    virtual qint64 size_on_disk() const { return m_info.size(); }
+
+    DirNode*    m_parent;    
     bool        m_active;
-    QString     m_filename;    
     add_transfer_params* m_atp;
+    QFileInfo   m_info;
+    QIcon       m_icon;
+    QString     m_displayType;
     Session*    m_session;
     error_code  m_error;    
     QString     m_hash;
-    friend class Session;
+    QString     m_filename;
 };
 
 class DirNode : public FileNode
 {
 public:
-    DirNode(DirNode* parent, const QString& filename, Session* session);
+    DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root = false);
     virtual ~DirNode();
 
     virtual bool is_dir() const { return true; }
+    virtual bool is_root() const { return m_root; }
     virtual int children() const { return m_file_children.count(); }
     virtual bool is_active() const;
 
@@ -155,6 +160,7 @@ public:
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);    
     QStringList exclude_files() const;
+    virtual qint64 size_on_disk() const { return 0; }
 
     /**
       * pupulate directory with items no_share status
@@ -180,6 +186,7 @@ public:
     void build_collection();    
 
     bool                        m_populated;
+    bool                        m_root;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
     QVector<FileNode*>          m_file_vector;
@@ -187,19 +194,6 @@ public:
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
     friend class Session;
     friend QDebug operator<<(QDebug dbg, const FileNode* node);
-};
-
-/**
-  * base node of tree, can't be used for any operations exclude add child nodes
- */
-class RootNode : public DirNode
-{
-public:
-    RootNode() : DirNode(NULL, "", NULL) {}
-    virtual bool is_root() const { return true; }
-    virtual bool is_dir() const { Q_ASSERT(false);  return true; }
-    virtual void share(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
-    virtual void unshare(bool recursive) { Q_UNUSED(recursive); Q_ASSERT(false); }
 };
 
 /**
