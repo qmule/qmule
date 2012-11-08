@@ -1614,15 +1614,15 @@ void search_widget::processUserFiles(
     const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes)
 {
     int nTabCnt = searchItems.size();
-    int nTabNum = 0;
+    int nTabNum = nTabCnt - 1;
     
-    for (; nTabNum < nTabCnt; nTabNum++)
+    for (; nTabNum  >= 0; --nTabNum)
     {
         if (searchItems[nTabNum].netPoint == np)
             break;
     }
 
-    if (nTabNum == nTabCnt)
+    if (nTabNum == -1)
         return;
 
     std::vector<UserDir>& userDirs = searchItems[nTabNum].vecUserDirs;
