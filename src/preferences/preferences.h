@@ -437,7 +437,7 @@ public:
   }
 
   int getGlobalUploadLimit() const {
-    return value("Preferences/Connection/GlobalUPLimit", 50).toInt();
+    return value("Preferences/Connection/GlobalUPLimit", 300).toInt();
   }
 
   void setGlobalUploadLimit(int limit) {
