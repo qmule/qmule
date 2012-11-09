@@ -222,7 +222,6 @@ int TreeModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 int TreeModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return (parent.column() > 0) ? 0 : 4;
-    return 1;
     //if (parent.isValid())
     //         return static_cast<FileNode*>(parent.internalPointer())->columnCount();
    //
@@ -276,6 +275,14 @@ int TreeModel::elements_count(const DirNode* node) const
     }
 
     return res;
+}
+
+void TreeModel::setRootNode(const QModelIndex& index)
+{
+    if (!index.isValid()) return;
+    qDebug() << "set index to " << static_cast<DirNode*>(index.internalPointer())->filepath();
+    m_rootItem = static_cast<DirNode*>(index.internalPointer());
+    reset();
 }
 
 // helper functions
