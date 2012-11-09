@@ -234,6 +234,17 @@ private:
     void on_transfer_added(Transfer);
     void on_transfer_deleted(QString hash);
     void on_parameters_ready(const add_transfer_params& atp, const error_code& ec);
+
+signals:
+    void removeNode(FileNode* node);    //!<
+    void addNode(FileNode* node);       //!<
+    void changeNode(FileNode* node);    //!<
+
+    //!< model signals translation
+    //!< deleteTransfer -> removeNode or changeNode
+    //!< addTransfer    -> addNode or changeNode
+    //!< renameTransfer -> removeNode and addNode
+    //!< paramsReady    -> changeNode
 };
 
 QDebug operator<<(QDebug dbg, const FileNode* node);

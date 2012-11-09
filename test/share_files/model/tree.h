@@ -45,6 +45,7 @@ public:
      bool hasChildren(const QModelIndex & parent = QModelIndex()) const;
 
      void setRootNode(const QModelIndex& index);
+     QModelIndex index(const FileNode* node);
      bool contains_active_children(const QModelIndex& index) const;
      qint64 size(const QModelIndex &index) const;
      QString type(const QModelIndex &index) const;

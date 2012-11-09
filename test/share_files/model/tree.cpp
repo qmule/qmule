@@ -222,11 +222,6 @@ int TreeModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 int TreeModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
     return (parent.column() > 0) ? 0 : 4;
-    //if (parent.isValid())
-    //         return static_cast<FileNode*>(parent.internalPointer())->columnCount();
-   //
-   //      else
-   //          return rootItem->columnCount();
 }
 
 bool TreeModel::hasChildren(const QModelIndex & parent /* = QModelIndex()*/) const
@@ -283,6 +278,58 @@ void TreeModel::setRootNode(const QModelIndex& index)
     qDebug() << "set index to " << static_cast<DirNode*>(index.internalPointer())->filepath();
     m_rootItem = static_cast<DirNode*>(index.internalPointer());
     reset();
+}
+
+QModelIndex TreeModel::index(const FileNode* node)
+{
+
+    DirNode *parentNode = (node ? node->m_parent : 0);
+
+    if (node == m_rootItem || !parentNode)
+        return QModelIndex();
+
+    // get the parent's row
+    Q_ASSERT(node);
+
+    // filter out unnesessary nodes
+    if (m_filter != TreeModel::All)
+    {
+        if ((m_filter == TreeModel::Dir) && !node->is_dir()) return QModelIndex();
+        if ((m_filter == TreeModel::File) && node->is_dir()) return QModelIndex();
+    }
+
+    int row = 0;
+    // search node
+    if (node->is_dir())
+    {
+        foreach(const DirNode* p, parentNode->m_dir_vector)
+        {
+            if (p == node)
+            {
+                break;
+            }
+            ++row;
+        }
+    }
+    else
+    {
+        foreach(const FileNode* p, parentNode->m_file_vector)
+        {
+            if (p == node)
+            {
+                break;
+            }
+            ++row;
+        }
+
+        // correct row when all types requested
+        if (m_filter = TreeModel::All)
+        {
+            row += parentNode->m_dir_vector.size();
+        }
+    }
+
+    return createIndex(row, 0, const_cast<FileNode*>(node));
 }
 
 // helper functions
