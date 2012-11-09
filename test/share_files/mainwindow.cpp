@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);    
     //m_model = new TreeModel((DirNode*)m_sf.node("/home/apavlov"), TreeModel::All);
     m_model = new TreeModel((DirNode*)&m_sf.m_root, TreeModel::All);
+    m_sf.share("/home/apavlov", false);
     ui->treeView->setModel(m_model);
 }
 

@@ -118,6 +118,7 @@ public:
     virtual bool is_root() const { return false; }
     virtual int children() const { return 0; }  // for tests
     virtual bool is_active() const { return m_active; }
+    virtual bool contains_active_children() const { return m_active; }
     QString hash() const { return m_hash; }
     int level() const;
     QString indention() const;
@@ -148,6 +149,7 @@ public:
     virtual bool is_root() const { return m_root; }
     virtual int children() const { return m_file_children.count(); }
     virtual bool is_active() const;
+    virtual bool contains_active_children() const;
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);

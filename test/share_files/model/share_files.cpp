@@ -3,6 +3,7 @@
 #include <QFileSystemModel>
 #include <QTextStream>
 #include <QCryptographicHash>
+#include <algorithm>
 #ifdef Q_WS_WIN32
 #include <QVarLengthArray>
 #include <windows.h>
@@ -335,6 +336,31 @@ bool DirNode::is_active() const
         {
             active = node->is_active();
             if (active) break;
+        }        
+    }
+
+    return active;
+}
+
+bool DirNode::contains_active_children() const
+{
+    bool active = m_active;
+
+    if (!active)
+    {
+        foreach(const FileNode* node, m_file_children)
+        {
+            active = node->contains_active_children();
+            if (active) break;
+        }
+
+        if (!active)
+        {
+            foreach(const DirNode* node, m_dir_children)
+            {
+                active = node->contains_active_children();
+                if (active) break;
+            }
         }
     }
 
@@ -524,9 +550,12 @@ void DirNode::populate()
     {
         foreach(const QFileInfo& fi, QDir::drives())
         {
-            DirNode* p = new DirNode(this, fi, m_session);
-            p->m_filename = translateDriveName(fi);
-            add_node(p);
+            if (!m_dir_children.contains(translateDriveName(fi)))
+            {
+                DirNode* p = new DirNode(this, fi, m_session);
+                p->m_filename = translateDriveName(fi);
+                add_node(p);
+            }
         }
     }
     else

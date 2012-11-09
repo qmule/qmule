@@ -44,6 +44,7 @@ public:
      int columnCount(const QModelIndex &parent = QModelIndex()) const;
      bool hasChildren(const QModelIndex & parent = QModelIndex()) const;
 
+     bool contains_active_children(const QModelIndex& index) const;
      qint64 size(const QModelIndex &index) const;
      QString type(const QModelIndex &index) const;
      QDateTime lastModified(const QModelIndex &index) const;

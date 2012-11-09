@@ -1,5 +1,6 @@
 #include "share_files.h"
 #include "tree.h"
+#include <QFont>
 
 TreeModel::TreeModel(DirNode* root, Filter filter, QObject *parent) : QAbstractItemModel(parent), m_rootItem(root), m_filter(filter)
 {
@@ -55,6 +56,16 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
         if (index.column() == 1)
             return Qt::AlignRight;
         break;
+    case Qt::FontRole:
+        if (index.column() == 0)
+        {
+            if (this->contains_active_children(index))
+            {
+                QFont f;
+                f.setBold(true);
+                return f;
+            }
+        }
     case FilePermissions:
         int p = permissions(index);
         return p;
@@ -268,6 +279,13 @@ int TreeModel::elements_count(const DirNode* node) const
 }
 
 // helper functions
+bool TreeModel::contains_active_children(const QModelIndex& index) const
+{
+    if (!index.isValid()) return 0;
+    return node(index)->contains_active_children();
+}
+
+
 qint64 TreeModel::size(const QModelIndex &index) const
 {
     if (!index.isValid()) return 0;
