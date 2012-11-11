@@ -8,7 +8,7 @@ TARGET =
 DEPENDPATH += . model unit
 INCLUDEPATH += . unit
 
-DEFINES += TEST
+#DEFINES += TEST
 
 include (model/model.pri)
 # Input

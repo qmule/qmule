@@ -12,6 +12,27 @@ TreeModel::~TreeModel()
 
 }
 
+bool TreeModel::setData ( const QModelIndex & index, const QVariant & value, int role/* = Qt::EditRole*/)
+{
+    if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
+    {
+        qDebug() << "execute setData " << value;
+        FileNode* node = static_cast<FileNode*>(index.internalPointer());
+        Q_ASSERT(node);
+
+
+        if (node->is_active())
+        {
+            node->unshare(false);
+        }
+        else
+        {
+            node->share(false);
+
+        }
+    }
+}
+
 QVariant TreeModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
@@ -19,14 +40,20 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
+    case Qt::CheckStateRole:
+        {
+            if (index.column() == DC_STATUS) return active(index);
+        }
+    break;
     case Qt::EditRole:
     case Qt::DisplayRole:
         switch (index.column())
         {
-            case DC_NAME: return displayName(index);
-            case DC_SIZE: return size(index);
-            case DC_TYPE: return type(index);
-            case DC_TIME: return time(index);
+        case DC_STATUS: return QVariant();
+            case DC_NAME:   return displayName(index);
+            case DC_SIZE:   return size(index);
+            case DC_TYPE:   return type(index);
+            case DC_TIME:   return time(index);
             default:
                 qWarning("data: invalid display value column %d", index.column());
             break;
@@ -37,7 +64,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
     case FileNameRole:
         return name(index);
     case Qt::DecorationRole:
-        if (index.column() == 0)
+        if (index.column() == DC_NAME)
         {
             QIcon icon = this->icon(index);
 
@@ -53,11 +80,11 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
 
         break;
     case Qt::TextAlignmentRole:
-        if (index.column() == 1)
+        if (index.column() == DC_SIZE)
             return Qt::AlignRight;
         break;
     case Qt::FontRole:
-        if (index.column() == 0)
+        if (index.column() == DC_NAME)
         {
             if (this->contains_active_children(index))
             {
@@ -78,7 +105,10 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
             return 0;
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    if (index.column() == DC_STATUS) flags |=  Qt::ItemIsUserCheckable;
+    return flags;
 }
 
 QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
@@ -107,11 +137,13 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
     QString returnValue;
     switch (section)
     {
-    case DC_NAME: returnValue = tr("Name");
+    case DC_STATUS: returnValue = tr("Status");
             break;
-    case DC_SIZE: returnValue = tr("Size");
+    case DC_NAME:   returnValue = tr("Name");
             break;
-    case DC_TYPE: returnValue =
+    case DC_SIZE:   returnValue = tr("Size");
+            break;
+    case DC_TYPE:   returnValue =
 #ifdef Q_OS_MAC
                    tr("Kind", "Match OS X Finder");
 #else
@@ -122,7 +154,7 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
     // OS X      - Kind
     // Konqueror - File Type
     // Nautilus  - Type
-    case DC_TIME: returnValue = tr("Date Modified");
+    case DC_TIME:   returnValue = tr("Date Modified");
             break;
     default: return QVariant();
     }
@@ -221,7 +253,7 @@ int TreeModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 
 int TreeModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return (parent.column() > 0) ? 0 : 4;
+    return (parent.column() > 0) ? 0 : 5;
 }
 
 bool TreeModel::hasChildren(const QModelIndex & parent /* = QModelIndex()*/) const
@@ -339,6 +371,11 @@ bool TreeModel::contains_active_children(const QModelIndex& index) const
     return node(index)->contains_active_children();
 }
 
+bool TreeModel::active(const QModelIndex& index) const
+{
+    if (!index.isValid()) return false;
+    return node(index)->is_active();
+}
 
 qint64 TreeModel::size(const QModelIndex &index) const
 {
@@ -463,8 +500,8 @@ void TreeModel::addNode(const FileNode* node)
 
 void TreeModel::changeNode(const FileNode* node)
 {
-    QModelIndex indx = index(node);
-    if (indx.isValid()) emit dataChanged(indx, indx);
+    QModelIndex indx = index(node);    
+    if (indx.isValid()) emit dataChanged(indx, sibling(indx.row(), columnCount() - 1, indx));
 }
 
 void TreeModel::beginRemoveNode(const FileNode* node)
@@ -504,4 +541,67 @@ void TreeModel::beginRemoveNode(const FileNode* node)
 void TreeModel::endRemoveNode()
 {
     endRemoveRows();
+}
+
+QVariant DirModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+    QVariant res;
+
+    if (section == DC_STATUS && role == Qt::DisplayRole)
+    {
+        res = tr("Name");
+    }
+
+    return (res);
+}
+
+QVariant DirModel::data(const QModelIndex &index, int role) const
+{
+    QVariant res;
+
+    if (!index.isValid())
+        return QVariant();
+
+    switch (role)
+    {
+    case Qt::EditRole:
+        break;
+    case Qt::DisplayRole:
+        if (index.column() == DC_STATUS)
+        {
+            res = displayName(index);
+        }
+        break;
+    case Qt::DecorationRole:
+        if (index.column() == DC_STATUS)
+        {
+            QIcon icon = this->icon(index);
+
+            if (icon.isNull())
+            {
+                if (node(index)->is_dir())
+                    icon = m_iconProvider.icon(QFileIconProvider::Folder);
+                else
+                    icon = m_iconProvider.icon(QFileIconProvider::File);
+            }
+
+            res = icon;
+        }
+
+        break;
+    case Qt::FontRole:
+        if (index.column() == DC_STATUS)
+        {
+            if (this->contains_active_children(index))
+            {
+                QFont f;
+                f.setBold(true);
+                res = f;
+            }
+        }
+    default:
+        break;
+    }
+
+    return res;
 }

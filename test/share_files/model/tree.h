@@ -24,7 +24,8 @@ public:
 
      enum DisplayColumns
      {
-         DC_NAME = 0,
+         DC_STATUS = 0,
+         DC_NAME,
          DC_SIZE,
          DC_TYPE,
          DC_TIME
@@ -33,6 +34,7 @@ public:
      TreeModel(DirNode* root, Filter filter, QObject *parent = 0);
      ~TreeModel();
 
+     bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
      QVariant data(const QModelIndex &index, int role) const;
      Qt::ItemFlags flags(const QModelIndex &index) const;
      QVariant headerData(int section, Qt::Orientation orientation,
@@ -47,6 +49,7 @@ public:
      void setRootNode(const QModelIndex& index);
      QModelIndex index(const FileNode* node);
      bool contains_active_children(const QModelIndex& index) const;
+     bool active(const QModelIndex& index) const;
      qint64 size(const QModelIndex &index) const;
      QString type(const QModelIndex &index) const;
      QDateTime lastModified(const QModelIndex &index) const;
@@ -57,7 +60,7 @@ public:
      QString time(const QModelIndex& index) const;
      QFile::Permissions permissions(const QModelIndex &index) const;
      QString size(qint64 bytes) const;
- private:
+protected:
      int elements_count(const DirNode* node) const;
      QVariant displayName(const QModelIndex& index);
      FileNode* node(const QModelIndex& index) const;
@@ -72,6 +75,15 @@ public slots:
 
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
+};
+
+class DirModel : public TreeModel
+{
+public:
+    DirModel(DirNode* root, QObject* parent = 0) : TreeModel(root, TreeModel::Dir, parent){}
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const { return 1; }
 };
 
 

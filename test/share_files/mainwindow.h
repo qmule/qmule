@@ -5,6 +5,7 @@
 #include <QMenu>
 #include "share_files.h"
 #include "tree.h"
+#include "delegate.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,6 +34,7 @@ private:
     QAction*    shareDirR;
     QAction*    unshareDir;
     QAction*    unshareDirR;
+    CheckBoxDelegate* m_cbd;
 private slots:
     void shareDirectory();
     void shareDirectoryR();

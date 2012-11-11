@@ -8,14 +8,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);    
     //m_model = new TreeModel((DirNode*)m_sf.node("/home/apavlov"), TreeModel::All);
-    m_model = new TreeModel((DirNode*)&m_sf.m_root, TreeModel::Dir);
+    m_model = new DirModel((DirNode*)&m_sf.m_root);
     m_fileModel = new TreeModel((DirNode*)&m_sf.m_root, TreeModel::File);
 
     m_sf.share("/home/apavlov", false);
     ui->treeView->setModel(m_model);
     ui->tableView->setModel(m_fileModel);
 
+    //m_cbd = new CheckBoxDelegate(this);
+    //ui->tableView->setItemDelegateForColumn(0, m_cbd);
+    //ui->tableView->setIndexWidget();
 
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     shareDir = new QAction(this);
     shareDir->setObjectName(QString::fromUtf8("shareDir"));
     shareDir->setText(tr("Share directory"));
