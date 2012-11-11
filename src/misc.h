@@ -104,7 +104,7 @@ public:
 
   static inline bool isMD4Hash(const QString& s)
   {
-      return (s.length() == libed2k::md4_hash::hash_size);
+      return (s.length() == 32);
   }
 
   static inline bool isSHA1Hash(const QString& s)

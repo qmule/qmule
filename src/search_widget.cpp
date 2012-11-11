@@ -1286,12 +1286,13 @@ void search_widget::displayListMenu(const QPoint&)
     else
     {
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
-        fileSearchRelated->setEnabled(
+        bool enabled =
             selected.size() == 1 &&
-            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
-        fileED2KLink->setEnabled(
-            selected.size() == 1 &&
-            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
+            misc::isMD4Hash(selected_data(treeResult, SWDelegate::SW_ID).toString()) &&
+            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString());
+
+        fileSearchRelated->setEnabled(enabled);
+        fileED2KLink->setEnabled(enabled);
         fileMenu->exec(QCursor::pos());
     }
 }
