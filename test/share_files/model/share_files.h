@@ -194,8 +194,8 @@ public:
     bool                        m_root;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
-    QVector<FileNode*>          m_file_vector;
-    QVector<DirNode*>           m_dir_vector;
+    QList<FileNode*>            m_file_vector;
+    QList<DirNode*>             m_dir_vector;
     bool                        m_rehash;           //!< flag will set when object gets update_items before hash completed
     friend class Session;
     friend QDebug operator<<(QDebug dbg, const FileNode* node);
@@ -229,7 +229,7 @@ public:
     DirNode                     m_root;
 
 private:
-    QHash<QString, FileNode*>   m_files;
+    QHash<QString, FileNode*>   m_files;    // all registered files with transfers
     std::set<DirNode*>          m_dirs;
     QHash<QString, QString>     m_transfers; // only for testing
     QTimer                      m_ct;

@@ -28,7 +28,8 @@ public:
          DC_NAME,
          DC_SIZE,
          DC_TYPE,
-         DC_TIME
+         DC_TIME,
+         DC_HASH
      };
 
      TreeModel(DirNode* root, Filter filter, QObject *parent = 0);
@@ -48,6 +49,7 @@ public:
 
      void setRootNode(const QModelIndex& index);
      QModelIndex index(const FileNode* node);
+     QString hash(const QModelIndex& index) const;
      bool contains_active_children(const QModelIndex& index) const;
      bool active(const QModelIndex& index) const;
      qint64 size(const QModelIndex &index) const;

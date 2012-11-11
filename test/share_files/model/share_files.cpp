@@ -410,6 +410,8 @@ void DirNode::process_delete_transfer()
 
 void DirNode::process_add_metadata(const add_transfer_params& atp, const error_code& ec)
 {
+    Q_UNUSED(atp);
+    Q_UNUSED(ec);
     // do nothing
 }
 

@@ -20,7 +20,6 @@ bool TreeModel::setData ( const QModelIndex & index, const QVariant & value, int
         FileNode* node = static_cast<FileNode*>(index.internalPointer());
         Q_ASSERT(node);
 
-
         if (node->is_active())
         {
             node->unshare(false);
@@ -54,6 +53,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
             case DC_SIZE:   return size(index);
             case DC_TYPE:   return type(index);
             case DC_TIME:   return time(index);
+            case DC_HASH:   return hash(index);
             default:
                 qWarning("data: invalid display value column %d", index.column());
             break;
@@ -156,6 +156,8 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation,
     // Nautilus  - Type
     case DC_TIME:   returnValue = tr("Date Modified");
             break;
+    case DC_HASH:   returnValue = tr("Transfer hash");
+            break;
     default: return QVariant();
     }
 
@@ -253,7 +255,7 @@ int TreeModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 
 int TreeModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return (parent.column() > 0) ? 0 : 5;
+    return (parent.column() > 0) ? 0 : 6;
 }
 
 bool TreeModel::hasChildren(const QModelIndex & parent /* = QModelIndex()*/) const
@@ -365,6 +367,12 @@ QModelIndex TreeModel::index(const FileNode* node)
 }
 
 // helper functions
+QString TreeModel::hash(const QModelIndex& index) const
+{
+    if (!index.isValid()) return QString();
+    return node(index)->hash();
+}
+
 bool TreeModel::contains_active_children(const QModelIndex& index) const
 {
     if (!index.isValid()) return 0;
