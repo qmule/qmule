@@ -65,6 +65,13 @@ public:
      Filter     m_filter;
      QFileIconProvider  m_iconProvider;
 
+public slots:
+    void removeNode(const FileNode* node);
+    void addNode(const FileNode* node);
+    void changeNode(const FileNode* node);
+
+    void beginRemoveNode(const FileNode* node);
+    void endRemoveNode();
 };
 
 

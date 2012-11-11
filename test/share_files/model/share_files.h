@@ -119,6 +119,7 @@ public:
     virtual int children() const { return 0; }  // for tests
     virtual bool is_active() const { return m_active; }
     virtual bool contains_active_children() const { return m_active; }
+    virtual bool all_active_children() const { return m_active; }
     QString hash() const { return m_hash; }
     int level() const;
     QString indention() const;
@@ -150,6 +151,7 @@ public:
     virtual int children() const { return m_file_children.count(); }
     virtual bool is_active() const;
     virtual bool contains_active_children() const;
+    virtual bool all_active_children() const;
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
@@ -161,6 +163,7 @@ public:
     QString collection_name() const;
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);    
+    void delete_node(const FileNode* node);
     QStringList exclude_files() const;
     virtual qint64 size_on_disk() const { return 0; }
 
@@ -235,16 +238,27 @@ private:
     void on_transfer_deleted(QString hash);
     void on_parameters_ready(const add_transfer_params& atp, const error_code& ec);
 
+    void signal_change_node(const FileNode* node)
+    {
+        emit changeNode(node);
+    }
+
 signals:
-    void removeNode(FileNode* node);    //!<
-    void addNode(FileNode* node);       //!<
-    void changeNode(FileNode* node);    //!<
+    void removeNode(const FileNode* node);    //!<
+    void addNode(const FileNode* node);       //!<
+    void changeNode(const FileNode* node);    //!<
+
+    void beginRemoveNode(const FileNode* node);
+    void endRemoveNode();
 
     //!< model signals translation
     //!< deleteTransfer -> removeNode or changeNode
     //!< addTransfer    -> addNode or changeNode
     //!< renameTransfer -> removeNode and addNode
     //!< paramsReady    -> changeNode
+
+    friend class FileNode;
+    friend class DirNode;
 };
 
 QDebug operator<<(QDebug dbg, const FileNode* node);

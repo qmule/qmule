@@ -324,6 +324,19 @@ void share_files_test::test_states_updating()
     sf.finalize_collections();
 }
 
+void share_files_test::test_helpers()
+{
+    QString base = QDir::currentPath() + QDir::separator() + "tmp";
+    Session sf;
+    FileNode* p4 = sf.node(base + QDir::separator() + "dir0/dir1/dir2/dir3/dir4");
+    QVERIFY(p4);
+    p4->share(false);
+    FileNode* p1 = sf.node(base + QDir::separator() + "dir0/dir1");
+    QVERIFY(p1);
+    QVERIFY(p1->contains_active_children());
+    QVERIFY(!p1->all_active_children());
+}
+
 void share_files_test::finalize_filesystem()
 {
     while(!m_files.empty())

@@ -323,7 +323,7 @@ QModelIndex TreeModel::index(const FileNode* node)
         }
 
         // correct row when all types requested
-        if (m_filter = TreeModel::All)
+        if (m_filter == TreeModel::All)
         {
             row += parentNode->m_dir_vector.size();
         }
@@ -437,4 +437,71 @@ FileNode* TreeModel::node(const QModelIndex& index) const
     FileNode* p = static_cast<FileNode*>(index.internalPointer());
     Q_ASSERT(p);
     return (p);
+}
+
+void TreeModel::removeNode(const FileNode* node)
+{
+    QModelIndex indx = index(node);
+
+    if (indx.isValid())
+    {
+        QModelIndex parentIndx = parent(indx);
+        if (parentIndx.isValid()) removeRow(indx.row(), parentIndx);
+    }
+}
+
+void TreeModel::addNode(const FileNode* node)
+{
+    QModelIndex indx = index(node);
+
+    if (indx.isValid())
+    {
+        QModelIndex parentindx = parent(indx);
+        if (parentindx.isValid()) insertRow(indx.row(), parentindx);
+    }
+}
+
+void TreeModel::changeNode(const FileNode* node)
+{
+    QModelIndex indx = index(node);
+    if (indx.isValid()) emit dataChanged(indx, indx);
+}
+
+void TreeModel::beginRemoveNode(const FileNode* node)
+{
+    qDebug() << "beginRemoveNode";
+    QModelIndex indx = index(node);
+
+    if (indx.isValid())
+    {
+        int row = 0;
+        qDebug() << "index is valid";
+        FileNode* node = static_cast<FileNode*>(indx.internalPointer());
+        DirNode* parent_node = node->m_parent;
+
+        if (node->is_dir())
+        {
+            foreach(DirNode* p, parent_node->m_dir_vector)
+            {
+                if (p == node) break;
+                ++row;
+            }
+        }
+        else
+        {
+            foreach(FileNode* p, parent_node->m_file_vector)
+            {
+                if (p == node) break;
+                ++row;
+            }
+        }
+
+        qDebug() << " model remove row " << row;
+        beginRemoveRows(parent(indx), row, row);
+    }
+}
+
+void TreeModel::endRemoveNode()
+{
+    endRemoveRows();
 }

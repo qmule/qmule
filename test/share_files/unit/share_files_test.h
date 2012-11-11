@@ -22,6 +22,7 @@ private slots:
     void test_load_new_files();
     void test_states();
     void test_states_updating();
+    void test_helpers();
     void finalize_filesystem();
     void finalize_collections();
 };

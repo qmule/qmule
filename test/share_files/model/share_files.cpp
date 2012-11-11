@@ -116,6 +116,7 @@ void FileNode::share(bool recursive)
     }
 
     m_parent->drop_transfer_by_file();
+    m_session->changeNode(this);
 }
 
 void FileNode::unshare(bool recursive)
@@ -135,6 +136,7 @@ void FileNode::unshare(bool recursive)
     }
 
     m_parent->drop_transfer_by_file();
+    m_session->changeNode(this);
 }
 
 void FileNode::process_add_transfer(const QString& hash)
@@ -152,6 +154,8 @@ void FileNode::process_add_transfer(const QString& hash)
             // catch dublicate errors
         }
     }
+
+    m_session->changeNode(this);
 }
 
 void FileNode::process_delete_transfer()
@@ -162,6 +166,8 @@ void FileNode::process_delete_transfer()
     {
         m_session->addTransfer(*m_atp);
     }
+
+    m_session->changeNode(this);
 }
 
 void FileNode::process_add_metadata(const add_transfer_params& atp, const error_code& ec)
@@ -180,6 +186,7 @@ void FileNode::process_add_metadata(const add_transfer_params& atp, const error_
     }
 
     m_error = ec;
+    m_session->changeNode(this);
 }
 
 QString FileNode::filepath() const
@@ -286,6 +293,8 @@ void DirNode::share(bool recursive)
             p->share(recursive);
         }
     }
+
+    m_session->changeNode(this);
 }
 
 void DirNode::unshare(bool recursive)
@@ -324,6 +333,8 @@ void DirNode::unshare(bool recursive)
             p->unshare(recursive);
         }
     }
+
+    m_session->changeNode(this);
 }
 
 bool DirNode::is_active() const
@@ -360,6 +371,31 @@ bool DirNode::contains_active_children() const
             {
                 active = node->contains_active_children();
                 if (active) break;
+            }
+        }
+    }
+
+    return active;
+}
+
+bool DirNode::all_active_children() const
+{
+    bool active = m_active;
+
+    if (active)
+    {
+        foreach(const FileNode* node, m_file_children)
+        {
+            active = node->all_active_children();
+            if (!active) break;
+        }
+
+        if (active)
+        {
+            foreach(const DirNode* node, m_dir_children)
+            {
+                active = (node->is_populated() && node->all_active_children());
+                if (!active) break;
             }
         }
     }
@@ -517,6 +553,23 @@ void DirNode::add_node(FileNode* node)
         m_file_children.insert(node->filename(), node);
         m_file_vector.push_back(node);
     }
+}
+
+void DirNode::delete_node(const FileNode* node)
+{
+    qDebug() << "delete node ";
+    if (node->is_dir())
+    {
+        m_dir_vector.erase(std::remove(m_dir_vector.begin(), m_dir_vector.end(), node), m_dir_vector.end());
+        Q_ASSERT(m_dir_children.take(node->filename()));
+    }
+    else
+    {
+        m_file_vector.erase(std::remove(m_file_vector.begin(), m_file_vector.end(), node), m_file_vector.end());
+        Q_ASSERT(m_file_children.take(node->filename()));
+    }
+
+    delete node;
 }
 
 QStringList DirNode::exclude_files() const
@@ -875,7 +928,6 @@ void Session::finalize_collections()
     }
 }
 
-
 void Session::on_transfer_added(Transfer t)
 {        
     qDebug() << "on transfer added: " << t.m_filepath << " hash " << t.m_hash;
@@ -895,16 +947,28 @@ void Session::on_transfer_added(Transfer t)
     Q_ASSERT(p != &m_root);
 
     p->process_add_transfer(t.m_hash);
+    emit addNode(p);
     m_ct.setInterval(10000);
 }
 
 void Session::on_transfer_deleted(QString hash)
 {        
+    qDebug() << "transfer deleted " << hash;
     QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
     Q_ASSERT(itr != m_files.end());
     FileNode* p = itr.value();
     Q_ASSERT(p);
     m_files.erase(itr);
+
+    DirNode* parent = p->m_parent;
+/*
+    if (parent)
+    {
+        emit beginRemoveNode(p);
+        parent->delete_node(p);
+        emit endRemoveNode();
+    }
+*/
     p->process_delete_transfer();
     m_ct.setInterval(10000);
 }
@@ -914,6 +978,7 @@ void Session::on_parameters_ready(const add_transfer_params& atp, const error_co
     FileNode* p = node(atp.m_filepath);
     Q_ASSERT(p != &m_root);
     p->process_add_metadata(atp, ec);
+    changeNode(p);
     m_ct.setInterval(10000);
 }
 
