@@ -11,25 +11,6 @@ files_widget::files_widget(QWidget *parent)
     setupUi(this);
     /*
 
-    labelIcon->setPixmap(QIcon(":/emule/files/SharedFilesList.ico").pixmap(16, 16));
-    QIcon overlay(":/emule/files/SharedFolderOvl.png");
-    emuleFolder = provider.icon(QFileIconProvider::Folder);
-
-    QSize size = emuleFolder.availableSizes()[0];
-    QImage img(size, QImage::Format_ARGB32);
-    QPainter painter;
-
-    painter.begin(&img);
-
-    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
-
-    painter.drawPixmap(0, 0, emuleFolder.pixmap(size));
-    painter.drawPixmap(0, 0, overlay.pixmap(size));
-
-    painter.end();
-
     emuleFolder = QIcon(QPixmap::fromImage(img));
 
     QList<int> sizes;

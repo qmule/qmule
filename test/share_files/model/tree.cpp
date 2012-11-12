@@ -1,6 +1,8 @@
 #include "share_files.h"
 #include "tree.h"
 #include <QFont>
+#include <QPainter>
+#include <QPixmap>
 
 TreeModel::TreeModel(DirNode* root, Filter filter, QObject *parent) : QAbstractItemModel(parent), m_rootItem(root), m_filter(filter)
 {
@@ -587,7 +589,7 @@ QVariant DirModel::data(const QModelIndex &index, int role) const
         break;
     case Qt::DecorationRole:
         if (index.column() == DC_STATUS)
-        {
+        {            
             QIcon icon = this->icon(index);
 
             if (icon.isNull())
@@ -596,9 +598,21 @@ QVariant DirModel::data(const QModelIndex &index, int role) const
                     icon = m_iconProvider.icon(QFileIconProvider::Folder);
                 else
                     icon = m_iconProvider.icon(QFileIconProvider::File);
-            }
+            }            
 
-            res = icon;
+            if (this->active(index))
+            {
+                // prepare mule head
+                QPixmap pixm = icon.pixmap(icon.availableSizes()[0]);
+                QPainter painter(&pixm);
+                painter.drawPixmap(0, 0, QPixmap("../../src/Icons/emule/files/SharedFolderOvl.png"));
+                painter.end();
+                res = QIcon(pixm);
+            }
+            else
+            {
+                res = icon;
+            }
         }
 
         break;
