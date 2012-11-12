@@ -3,6 +3,9 @@
 
 #include "session_base.h"
 #include "misc.h"
+#include "preferences.h"
+#include <QProcess>
+#include <QDebug>
 
 const qreal SessionBase::MAX_RATIO = 9999.;
 
@@ -110,6 +113,43 @@ bool SessionBase::isFilePreviewPossible(const QString& hash) const
     }
     return false;
 }
+
+
+void SessionBase::autoRunExternalProgram(const Transfer &t)
+{
+    if (!t.is_valid()) return;
+
+    QString program = Preferences().getAutoRunProgram().trimmed();
+    if (program.isEmpty()) return;
+    // Replace %f by torrent path
+    QString transfer_path;
+    if (t.num_files() == 1)
+    {
+        transfer_path = t.firstFileSavePath();
+        qDebug() << " first file save path " << transfer_path;
+    }
+    else
+    {
+        transfer_path = t.save_path();
+        qDebug() << "save path " << transfer_path;
+    }
+
+
+    qDebug() << " transfer name " << t.name();
+    program.replace("%f", transfer_path);
+    // Replace %n by torrent name
+    program.replace("%n", t.name());
+
+    QProcess *process = new QProcess;
+    connect(process, SIGNAL(finished(int)), this, SLOT(cleanUpAutoRunProcess(int)));
+    process->start(program);
+}
+
+void SessionBase::cleanUpAutoRunProcess(int)
+{
+    sender()->deleteLater();
+}
+
 
 float SessionBase::progress() const
 {

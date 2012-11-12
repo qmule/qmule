@@ -53,7 +53,7 @@ public:
   ~PreviewSelect();
 
 signals:
-  void readyToPreviewFile(QString) const;
+  void readyToPreviewFile(Transfer, int) const;
 
 protected slots:
   void on_previewButton_clicked();

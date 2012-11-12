@@ -95,23 +95,17 @@ TransferSize Transfer::total_wanted_done() const { return m_delegate->total_want
 
 TransferSize Transfer::total_wanted() const { return m_delegate->total_wanted(); }
 
-TransferSize Transfer::total_failed_bytes() const {
-    return m_delegate->total_failed_bytes(); }
+TransferSize Transfer::total_failed_bytes() const { return m_delegate->total_failed_bytes(); }
 
-TransferSize Transfer::total_redundant_bytes() const {
-    return m_delegate->total_redundant_bytes(); }
+TransferSize Transfer::total_redundant_bytes() const { return m_delegate->total_redundant_bytes(); }
 
-TransferSize Transfer::total_payload_upload() const {
-    return m_delegate->total_payload_upload(); }
+TransferSize Transfer::total_payload_upload() const { return m_delegate->total_payload_upload(); }
 
-TransferSize Transfer::total_payload_download() const {
-    return m_delegate->total_payload_download(); }
+TransferSize Transfer::total_payload_download() const { return m_delegate->total_payload_download(); }
 
-TransferSize Transfer::all_time_upload() const {
-    return m_delegate->all_time_upload(); }
+TransferSize Transfer::all_time_upload() const { return m_delegate->all_time_upload(); }
 
-TransferSize Transfer::all_time_download() const {
-    return m_delegate->all_time_download(); }
+TransferSize Transfer::all_time_download() const { return m_delegate->all_time_download(); }
 
 qlonglong Transfer::active_time() const { return m_delegate->active_time(); }
 
@@ -133,52 +127,52 @@ bool Transfer::priv() const { return m_delegate->priv(); }
 
 bool Transfer::super_seeding() const { return m_delegate->super_seeding(); }
 
-bool Transfer::is_sequential_download() const {
-    return m_delegate->is_sequential_download(); }
+bool Transfer::is_sequential_download() const {return m_delegate->is_sequential_download(); }
 
 TransferBitfield Transfer::pieces() const { return bitfield2TBF(m_delegate->pieces()); }
 
-void Transfer::downloading_pieces(TransferBitfield& bf) const {
-    m_delegate->downloading_pieces(bf); }
+void Transfer::downloading_pieces(TransferBitfield& bf) const { m_delegate->downloading_pieces(bf); }
 
 void Transfer::piece_availability(std::vector<int>& avail) const {
     m_delegate->piece_availability(avail); }
 
-TransferSize Transfer::piece_length() const {
-    return m_delegate->piece_length(); }
+std::vector<int> Transfer::piece_priorities() const { return m_delegate->piece_priorities(); }
 
-bool Transfer::first_last_piece_first() const {
-    return m_delegate->first_last_piece_first(); }
+TransferSize Transfer::piece_length() const { return m_delegate->piece_length(); }
 
-void Transfer::file_progress(std::vector<TransferSize>& fp) const {
-    m_delegate->file_progress(fp); }
+bool Transfer::extremity_pieces_first() const { return m_delegate->extremity_pieces_first(); }
 
-std::vector<int> Transfer::file_priorities() const {
-    return m_delegate->file_priorities(); }
+void Transfer::file_progress(std::vector<TransferSize>& fp) const { m_delegate->file_progress(fp); }
 
-QString Transfer::filepath_at(unsigned int index) const {
-    return m_delegate->filepath_at(index); }
+std::vector<int> Transfer::file_priorities() const { return m_delegate->file_priorities(); }
 
-QString Transfer::filename_at(unsigned int index) const {
-    return m_delegate->filename_at(index); }
+QString Transfer::filepath_at(unsigned int index) const {return m_delegate->filepath_at(index); }
+
+QString Transfer::filename_at(unsigned int index) const { return m_delegate->filename_at(index); }
 
 TransferSize Transfer::filesize_at(unsigned int index) const {
     return m_delegate->filesize_at(index); }
 
+std::vector<int> Transfer::file_extremity_pieces_at(unsigned int index) const {
+    return m_delegate->file_extremity_pieces_at(index); }
+
 QStringList Transfer::url_seeds() const { return m_delegate->url_seeds(); }
 
-QStringList Transfer::absolute_files_path() const {
-    return m_delegate->absolute_files_path(); }
+QStringList Transfer::absolute_files_path() const { return m_delegate->absolute_files_path(); }
 
 void Transfer::get_peer_info(std::vector<PeerInfo>& peers) const {
     return m_delegate->get_peer_info(peers); }
 
-std::vector<AnnounceEntry> Transfer::trackers() const {
-    return m_delegate->trackers(); }
+std::vector<AnnounceEntry> Transfer::trackers() const { return m_delegate->trackers(); }
 
 void Transfer::pause() const { m_delegate->pause(); }
 
-void Transfer::resume() const { m_delegate->resume(); }
+void Transfer::resume() const {
+    m_delegate->resume();
+    // force reset upload mode on resume
+    if (m_delegate->status().upload_mode)
+        m_delegate->set_upload_mode(false);
+}
 
 void Transfer::move_storage(const QString& path) const { m_delegate->move_storage(path); }
 
@@ -188,8 +182,12 @@ void Transfer::rename_file(unsigned int index, const QString& new_name) const {
 void Transfer::prioritize_files(const std::vector<int> priorities) const {
     m_delegate->prioritize_files(priorities); }
 
-void Transfer::prioritize_first_last_piece(bool p) const {
-    m_delegate->prioritize_first_last_piece(p); }
+void Transfer::prioritize_extremity_pieces(bool p) const {
+    m_delegate->prioritize_extremity_pieces(p); }
+
+void Transfer::prioritize_extremity_pieces(bool p, unsigned int index) const {
+    m_delegate->prioritize_extremity_pieces(p, index);
+}
 
 void Transfer::set_tracker_login(const QString& login, const QString& passwd) const {
     return m_delegate->set_tracker_login(login, passwd); }

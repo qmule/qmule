@@ -6,13 +6,13 @@ include(conf.pri)
   QT += dbus
 }
 
-QMAKE_CXXFLAGS += -Wformat -Wformat-security
+QMAKE_CXXFLAGS += -Wformat -Wformat-security -DBOOST_FILESYSTEM_VERSION=2
 QMAKE_LFLAGS_APP += -rdynamic
 CONFIG += link_pkgconfig
 PKGCONFIG += libtorrent-rasterbar
 INCLUDEPATH += $$(LIBED2K_ROOT)/include 
 INCLUDEPATH += $$(BOOST_ROOT)/include
-LIBS += -lssl -lcrypto -L$$(LIBED2K_ROOT)/lib -led2k -lssl -lboost_thread -lpthread -lboost_system -lcrypto++ -lcryptopp -lrt
+LIBS += -lssl -lcrypto -L$$(LIBED2K_ROOT)/lib -led2k -lssl -lboost_thread -lpthread -lboost_system -lboost_filesystem -lcrypto++ -lcryptopp -lrt
 LIBS += -L$$(BOOST_ROOT)/lib
 
 DEFINES += LIBED2K_USE_BOOST_DATE_TIME
@@ -23,6 +23,9 @@ CONFIG(debug, debug|release) {
 } else {
   DEFINES += NDEBUG
  }
+
+DEFINES += "BUILDDATE='\"$$system(date -R)\"'"
+
 
 # Man page
 nox {

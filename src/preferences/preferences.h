@@ -335,6 +335,8 @@ public:
     setValue(QString::fromUtf8("Preferences/Downloads/TorrentExport"), path);
   }
 
+  // mail notifications -- disabled
+#if 0
   bool isMailNotificationEnabled() const {
     return value(QString::fromUtf8("Preferences/MailNotification/enabled"), false).toBool();
   }
@@ -390,6 +392,7 @@ public:
   void setMailNotificationSMTPPassword(const QString &password) {
     setValue(QString::fromUtf8("Preferences/MailNotification/password"), password);
   }
+#endif
 
   int getActionOnDblClOnTorrentDl() const {
     return value(QString::fromUtf8("Preferences/Downloads/DblClOnTorDl"), 0).toInt();
@@ -434,7 +437,7 @@ public:
   }
 
   int getGlobalUploadLimit() const {
-    return value("Preferences/Connection/GlobalUPLimit", 50).toInt();
+    return value("Preferences/Connection/GlobalUPLimit", 300).toInt();
   }
 
   void setGlobalUploadLimit(int limit) {
@@ -1220,14 +1223,6 @@ public:
 
   void resolvePeerCountries(bool resolve) {
     setValue(QString::fromUtf8("Preferences/Connection/ResolvePeerCountries"), resolve);
-  }
-
-  bool resolvePeerHostNames() const {
-    return value(QString::fromUtf8("Preferences/Connection/ResolvePeerHostNames"), false).toBool();
-  }
-
-  void resolvePeerHostNames(bool resolve) {
-    setValue(QString::fromUtf8("Preferences/Connection/ResolvePeerHostNames"), resolve);
   }
 
   int getMaxHalfOpenConnections() const {

@@ -107,6 +107,7 @@ public:
 public slots:
   void addTransferFromFile(const QString& filename);
   QED2KHandle addTransfer(const libed2k::add_transfer_params&);
+  void shareByED2K(const QTorrentHandle& h, bool unshare);
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
   Transfer addLink(QString strLink, bool resumed=false);
   void loadSessionState();
@@ -173,8 +174,6 @@ private slots:
   void processBigRatios();
   void exportTorrentFiles(QString path);  
   void sendNotificationEmail(const QTorrentHandle &h);
-  void autoRunExternalProgram(const QTorrentHandle &h, bool async=true);
-  void cleanUpAutoRunProcess(int);
   void mergeTorrents(QTorrentHandle &h_ex, boost::intrusive_ptr<libtorrent::torrent_info> t);
   void exportTorrentFile(const QTorrentHandle &h);
   void initWebUi();
@@ -187,7 +186,6 @@ signals:
   void torrentAboutToBeRemoved(const QTorrentHandle &h, bool del_files);
   void pausedTorrent(const QTorrentHandle& h);
   void finishedTorrent(const QTorrentHandle& h);
-  void fullDiskError(const QTorrentHandle& h, QString msg);
   void trackerError(const QString &hash, QString time, QString msg);
   void trackerAuthenticationRequired(const QTorrentHandle& h);
   void newDownloadedTorrent(QString path, QString url);

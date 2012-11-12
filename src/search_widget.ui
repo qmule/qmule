@@ -213,7 +213,7 @@
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
-       <item alignment="Qt::AlignTop">
+       <item>
         <widget class="QPushButton" name="btnStart">
          <property name="enabled">
           <bool>false</bool>
@@ -272,7 +272,7 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignBottom">
+       <item>
         <widget class="QPushButton" name="btnCancel">
          <property name="enabled">
           <bool>false</bool>
@@ -516,6 +516,19 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnCloseAll">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Close all</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

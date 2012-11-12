@@ -787,10 +787,25 @@ void QBtSession::deleteTransfer(const QString &hash, bool delete_local_files) {
   QStringList filters;
   filters << hash+".*";
   const QStringList files = torrentBackup.entryList(filters, QDir::Files, QDir::Unsorted);
-  foreach (const QString &file, files) {
-    QFile::remove(torrentBackup.absoluteFilePath(file));
+  foreach (const QString &file, files)
+  {
+      qDebug() << "remove file " << torrentBackup.absoluteFilePath(file);
+      QFile f(torrentBackup.absoluteFilePath(file));
+
+      if (!f.remove())
+      {
+          qDebug() << "unable remove file: " << f.errorString();
+
+          if (f.setPermissions(QFile::ReadOwner | QFile::WriteOwner))
+          {
+              qDebug() << "erase file after set permissions";
+              if (!f.remove())
+              {
+                  qDebug() << "unable to remove file " << f.errorString();
+              }
+          }
+      }
   }
-  TorrentPersistentData::deletePersistentData(hash);
   // Remove tracker errors
   trackersInfos.remove(hash);
   if (delete_local_files)
@@ -825,7 +840,8 @@ bool QBtSession::loadFastResumeData(const QString &hash, std::vector<char> &buf)
   const QByteArray content = fastresume_file.readAll();
   const int content_size = content.size();
   buf.resize(content_size);
-  memcpy(&buf[0], content.data(), content_size);
+  // check size to avoid windows runtime error
+  if (content_size > 0) memcpy(&buf[0], content.data(), content_size);
   return true;
 }
 
@@ -931,6 +947,11 @@ void QBtSession::addTransferFromFile(const QString& filename)
 QED2KHandle QBtSession::addTransfer(const libed2k::add_transfer_params&)
 {
     return QED2KHandle();
+}
+
+void QBtSession::shareByED2K(const QTorrentHandle& h, bool unshare)
+{
+    // do nothing
 }
 
 // Add a torrent to the Bittorrent session
@@ -1247,7 +1268,7 @@ void QBtSession::loadTorrentTempData(QTorrentHandle &h, QString savePath, bool m
 #endif
 
       // Prioritize first/last piece
-      h.prioritize_first_last_piece(TorrentTempData::isSequential(hash));
+      h.prioritize_extremity_pieces(TorrentTempData::isSequential(hash));
 
       // Update file names
       const QStringList files_path = TorrentTempData::getFilesPath(hash);
@@ -1468,17 +1489,20 @@ void QBtSession::loadSessionState() {
   const qint64 content_size = state_file.bytesAvailable();
   if (content_size <= 0) return;
   in.resize(content_size);
-  state_file.read(&in[0], content_size);
+  if (content_size > 0) state_file.read(&in[0], content_size); // avoid windows rtl error
   // bdecode
   lazy_entry e;
-#if LIBTORRENT_VERSION_MINOR > 15
-  error_code ec;
-  lazy_bdecode(&in[0], &in[0] + in.size(), e, ec);
-  if (!ec) {
-#else
-  if (lazy_bdecode(&in[0], &in[0] + in.size(), e) == 0) {
-#endif
-    s->load_state(e);
+  if (content_size > 0)
+  {
+    #if LIBTORRENT_VERSION_MINOR > 15
+      error_code ec;
+      lazy_bdecode(&in[0], &in[0] + in.size(), e, ec);
+      if (!ec) {
+    #else
+      if (lazy_bdecode(&in[0], &in[0] + in.size(), e) == 0) {
+    #endif
+        s->load_state(e);
+      }
   }
 }
 
@@ -2007,33 +2031,6 @@ void QBtSession::recursiveTorrentDownload(const QTorrentHandle &h) {
   }
 }
 
-void QBtSession::cleanUpAutoRunProcess(int) {
-  sender()->deleteLater();
-}
-
-void QBtSession::autoRunExternalProgram(const QTorrentHandle &h, bool async) {
-  if (!h.is_valid()) return;
-  QString program = Preferences().getAutoRunProgram().trimmed();
-  if (program.isEmpty()) return;
-  // Replace %f by torrent path
-  QString torrent_path;
-  if (h.num_files() == 1)
-    torrent_path = h.firstFileSavePath();
-  else
-    torrent_path = h.save_path();
-  program.replace("%f", torrent_path);
-  // Replace %n by torrent name
-  program.replace("%n", h.name());
-  QProcess *process = new QProcess;
-  if (async) {
-    connect(process, SIGNAL(finished(int)), this, SLOT(cleanUpAutoRunProcess(int)));
-    process->start(program);
-  } else {
-    process->execute(program);
-    delete process;
-  }
-}
-
 void QBtSession::sendNotificationEmail(const QTorrentHandle &h) 
 {
 }
@@ -2115,10 +2112,7 @@ void QBtSession::readAlerts() {
 #endif
           // AutoRun program
           if (pref.isAutoRunEnabled())
-            autoRunExternalProgram(h, will_shutdown);
-          // Mail notification
-          if (pref.isMailNotificationEnabled())
-            sendNotificationEmail(h);
+            autoRunExternalProgram(h);
 #ifndef DISABLE_GUI
           // Auto-Shutdown
           if (will_shutdown) {
@@ -2280,18 +2274,14 @@ void QBtSession::readAlerts() {
 
       }
     }
-    else if (file_error_alert* p = dynamic_cast<file_error_alert*>(a.get())) {
+    else if (file_error_alert* p = dynamic_cast<file_error_alert*>(a.get()))
+    {
       QTorrentHandle h(p->handle);
-      if (h.is_valid()) {
-        h.pause();
-        std::cerr << "File Error: " << p->message().c_str() << std::endl;
-        addConsoleMessage(tr("An I/O error occured, '%1' paused.").arg(h.name()));
-        addConsoleMessage(tr("Reason: %1").arg(misc::toQString(p->message())));
-        if (h.is_valid()) {
-          emit fullDiskError(h, misc::toQString(p->message()));
-          //h.pause();
-          emit pausedTorrent(h);
-        }
+
+      if (h.is_valid())
+      {
+          emit fileError(Transfer(h), QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
+          h.pause();
       }
     }
     else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get())) {
@@ -2609,8 +2599,16 @@ void QBtSession::applyEncryptionSettings(pe_settings se) {
 void QBtSession::startUpTransfers() {
   qDebug("Resuming unfinished torrents");
   const QDir torrentBackup(misc::BTBackupLocation());
-  const QStringList known_torrents = TorrentPersistentData::knownTorrents();
+  QStringList torrents = TorrentPersistentData::knownTorrents();
 
+  QStringList known_torrents;
+  foreach(const QString& strHash, torrents)
+  {
+      if (misc::isSHA1Hash(strHash))
+      {
+          known_torrents << strHash;
+      }
+  }
   // Safety measure because some people reported torrent loss since
   // we switch the v1.5 way of resuming torrents on startup
   QStringList filters;
@@ -2711,7 +2709,7 @@ entry QBtSession::generateFilePriorityResumeData(boost::intrusive_ptr<torrent_in
 
   entry::string_type pieces;
   pieces.resize(t->num_pieces());
-  std::memset(&pieces[0], 0, pieces.size());
+  if (pieces.size() > 0) std::memset(&pieces[0], 0, pieces.size());
   rd["pieces"] = entry(pieces);
 
   entry ret(rd);

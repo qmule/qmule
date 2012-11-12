@@ -77,9 +77,6 @@ struct TransferStatus
     int progress_ppm;
     QString error;
 
-    //boost::posix_time::time_duration next_announce;
-    //boost::posix_time::time_duration announce_interval;
-
     QString current_tracker;
 
     TransferSize total_download;
@@ -118,7 +115,6 @@ struct TransferStatus
     int num_connections;
     int uploads_limit;
     int connections_limit;
-    //storage_mode_t storage_mode;
 
     int up_bandwidth_queue;
     int down_bandwidth_queue;
@@ -139,6 +135,59 @@ struct TransferStatus
     bool seed_mode;
     bool upload_mode;
     int priority;
+
+    TransferStatus() :
+        state(qt_unhandled_state),
+        paused(false),
+        progress(0),
+        progress_ppm(0),
+        error(QString()),
+        current_tracker(QString()),
+        total_download(0),
+        total_upload(0),
+        total_payload_download(0),
+        total_payload_upload(0),
+        total_failed_bytes(0),
+        total_redundant_bytes(0),
+        download_rate(0),
+        upload_rate(0),
+        download_payload_rate(0),
+        upload_payload_rate(0),
+        num_seeds(0),
+        num_peers(0),
+        num_complete(0),
+        num_incomplete(0),
+        list_seeds(0),
+        list_peers(0),
+        connect_candidates(0),
+        // TransferBitfield pieces;
+        num_pieces(0),
+        total_done(0),
+        total_wanted_done(0),
+        total_wanted(0),
+        distributed_full_copies(0),
+        distributed_fraction(0),
+        distributed_copies(0),
+        block_size(0),
+        num_uploads(0),
+        num_connections(0),
+        uploads_limit(0),
+        connections_limit(0),
+        up_bandwidth_queue(0),
+        down_bandwidth_queue(0),
+        all_time_upload(0),
+        all_time_download(0),
+        active_time(0),
+        finished_time(0),
+        seeding_time(0),
+        seed_rank(0),
+        last_scrape(0),
+        has_incoming(false),
+        sparse_regions(0),
+        seed_mode(false),
+        upload_mode(false),
+        priority(0)
+    {}
 };
 
 template<typename TS>
@@ -150,8 +199,6 @@ TransferStatus transfer_status2TS(const TS& t)
     ts.progress                = t.progress;
     ts.progress_ppm            = t.progress_ppm;
     ts.error                   = misc::toQStringU(t.error);
-    //boost::posix_time::time_duration next_announce;
-    //boost::posix_time::time_duration announce_interval;
 
     ts.current_tracker         = misc::toQStringU(t.current_tracker);
     ts.total_download          = t.total_download;
@@ -205,7 +252,6 @@ TransferStatus transfer_status2TS(const TS& t)
 struct PeerInfo
 {
     int connection_type;
-    QString client;
     float   progress;
     int payload_down_speed;
     int payload_up_speed;
@@ -213,6 +259,20 @@ struct PeerInfo
     TransferSize total_upload;
     libed2k::tcp::endpoint ip;
     char country[2];
+    QString client;
+
+    PeerInfo() :
+        connection_type(0),
+        progress(0),
+        payload_down_speed(0),
+        payload_up_speed(0),
+        total_download(0),
+        total_upload(0)
+    {
+        country[0] = '\x00';
+        country[1] = '\x00';
+    }
+
 };
 
 template<typename PF>
@@ -295,13 +355,15 @@ public:
     virtual TransferBitfield pieces() const = 0;
     virtual void downloading_pieces(TransferBitfield& bf) const = 0;
     virtual void piece_availability(std::vector<int>& avail) const = 0;
+    virtual std::vector<int> piece_priorities() const = 0;
     virtual TransferSize piece_length() const = 0;
-    virtual bool first_last_piece_first() const = 0;
+    virtual bool extremity_pieces_first() const = 0;
     virtual void file_progress(std::vector<TransferSize>& fp) const = 0;
     virtual std::vector<int> file_priorities() const = 0;
     virtual QString filepath_at(unsigned int index) const = 0;
     virtual QString filename_at(unsigned int index) const = 0;
     virtual TransferSize filesize_at(unsigned int index) const = 0;
+    virtual std::vector<int> file_extremity_pieces_at(unsigned int index) const = 0;
     virtual QStringList url_seeds() const = 0;
     virtual QStringList absolute_files_path() const = 0;
     virtual void get_peer_info(std::vector<PeerInfo>& peers) const = 0;
@@ -312,7 +374,8 @@ public:
     virtual void move_storage(const QString& path) const = 0;
     virtual void rename_file(int index, const QString& new_name) const = 0;
     virtual void prioritize_files(const std::vector<int>& priorities) const = 0;
-    virtual void prioritize_first_last_piece(bool p) const = 0;
+    virtual void prioritize_extremity_pieces(bool p) const = 0;
+    virtual void prioritize_extremity_pieces(bool p, unsigned int index) const = 0;
     virtual void set_tracker_login(const QString& login, const QString& passwd) const = 0;
     virtual void flush_cache() const = 0;
     virtual void force_recheck() const = 0;
@@ -330,6 +393,7 @@ public:
     virtual void queue_position_bottom() const = 0;
     virtual void super_seeding(bool ss) const = 0;
     virtual void set_sequential_download(bool sd) const = 0;
+    virtual void set_upload_mode(bool b) const = 0;
 };
 
 #endif

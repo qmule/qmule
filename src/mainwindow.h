@@ -112,7 +112,8 @@ public slots:
   void updateAltSpeedsBtn(bool alternative);
   void deleteSession();
   void on_actionOpen_triggered();
-  void addConsoleMessage(const QString& msg, QColor color =QApplication::palette().color(QPalette::WindowText));
+  void addConsoleMessage(
+      const QString& msg, QColor color = QApplication::palette().color(QPalette::WindowText)) const;
 
 protected slots:
   // GUI related slots
@@ -127,7 +128,7 @@ protected slots:
   void readSettings();
   void on_actionExit_triggered();
   void createTrayIcon();
-  void fullDiskError(const Transfer& h, QString msg) const;
+  void fileError(const Transfer& h, QString msg);
   void handleDownloadFromUrlFailure(QString, QString) const;
   void createSystrayDelayed();
   void tab_changed(int);
@@ -151,7 +152,8 @@ protected slots:
   void addTorrent(QString path);
   void addUnauthenticatedTracker(const QPair<Transfer,QString> &tracker);
   void processDownloadedFiles(QString path, QString url);
-  void finishedTorrent(const Transfer& h) const;
+  void addedTransfer(const Transfer& h) const;
+  void finishedTransfer(const Transfer& h) const;
   void askRecursiveTorrentDownloadConfirmation(const QTorrentHandle &h);
   // Options slots
   void on_actionOptions_triggered();
@@ -240,6 +242,8 @@ private:
   QIcon icon_CurTray;
 
   ConeectionState connectioh_state;
+  bool            m_bDisconnectBtnPressed;
+  QDateTime       m_last_file_error;
 
 private slots:
     void on_actionSpeed_in_title_bar_triggered();
@@ -267,6 +271,8 @@ private slots:
     void ed2kServerMessage(QString strMessage);
     void ed2kIdentity(QString strName, QString strDescription);
     void ed2kConnectionClosed(QString strError);
+
+    void on_actionOpenDownloadPath_triggered();
 
 signals:
     void signalAuth(const QString& strRes, const QString& strError);

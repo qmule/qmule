@@ -38,9 +38,9 @@
 #include "transport/transfer_base.h"
 #include "transport/transfer.h"
 #include "misc.h"
+#include "qtlibed2k/qed2ksession.h"
 
 class PeerListDelegate;
-class ReverseResolution;
 
 QT_BEGIN_NAMESPACE
 class QSortFilterProxyModel;
@@ -64,10 +64,10 @@ public:
 
 public slots:
   void loadPeers(bool force_hostname_resolution = false);
-  QStandardItem*  addPeer(const QString& ip, const PeerInfo& peer, QString torrent_name);
+  QStandardItem* addPeer(
+      const QString& ip, const QString& address, const PeerInfo& peer, QString torrent_name);
   void updatePeer(const QString& ip, const PeerInfo& peer);
   void handleResolved(const QString &ip, const QString &hostname);
-  void updatePeerHostNameResolutionState();
   void updatePeerCountryResolutionState();
   void clear();
   void showDownload(bool download = true);
@@ -80,9 +80,15 @@ protected slots:
   void limitDlRateSelectedPeers(const QStringList& peer_ips);
   void banSelectedPeers(const QStringList& peer_ips);
   void handleSortColumnChanged(int col);
+  void addToFriends();
+  void sendMessage();
+  void requestUserDirs();
+  void getPeerDetails();
 
 private:
   static QString getConnectionString(int connection_type);
+  QStandardItem* getSelectedItem();
+  libed2k::net_identifier getPeerNetPoint(QStandardItem* item);
 
 private:
   QStandardItemModel *m_listModel;
@@ -91,9 +97,17 @@ private:
   QHash<QString, QStandardItem*> m_peerItems;
   QHash<QString, boost::asio::ip::tcp::endpoint> m_peerEndpoints;
   QSet<QString> m_missingFlags;
-  QPointer<ReverseResolution> m_resolver;
   bool m_displayFlags;
   bool m_showDownload;
+  QMenu* peerMenu;
+  QAction* peerAddToFriends;
+  QAction* peerBrowseFiles;
+  QAction* peerDetails;
+  QAction* peerSendMessage;
+
+signals:
+    void addFriend(const QString& user_name, const libed2k::net_identifier& np);
+    void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
 };
 
 #endif // PEERLISTWIDGET_H

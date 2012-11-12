@@ -38,7 +38,8 @@
 #include <QDebug>
 #include <QProcess>
 #include <QSettings>
- #include <QNetworkInterface>
+#include <QNetworkInterface>
+#include <QTextCodec>
 
 #ifdef DISABLE_GUI
 #include <QCoreApplication>
@@ -1049,7 +1050,7 @@ QString misc::ifaceFromHumanName(const QString& strHumanIface)
     return strRes;
 }
 
-QStringList misc::getFileLines(const QString& filename)
+QStringList misc::getFileLines(const QString& filename, const char* codec /*= NULL*/)
 {
     QStringList slist;
     QFile textFile(filename);
@@ -1059,9 +1060,8 @@ QStringList misc::getFileLines(const QString& filename)
         return slist;
     }
 
-
     QTextStream textStream(&textFile);
-    textStream.setCodec("UTF-8");
+    if (codec) textStream.setCodec(codec);
     textStream.setAutoDetectUnicode(true);
 
     while (true)
@@ -1113,12 +1113,12 @@ QString misc::emuleConfigFilename()
 
 QStringList misc::emuleSharedFiles()
 {
-    return getFileLines(emuleConfig("sharedfiles.dat"));
+    return getFileLines(emuleConfig("sharedfiles.dat"),  "UTF-16");
 }
 
 QStringList misc::emuleSharedDirs()
 {
-    return getFileLines(emuleConfig("shareddir.dat"));
+    return getFileLines(emuleConfig("shareddir.dat"), "UTF-16");
 }
 
 QString misc::emuleKeyFile()
@@ -1152,7 +1152,9 @@ shared_map misc::migrationShareds()
             emuleSharedFiles().filter(QRegExp("^-")).replaceInStrings(QRegExp("^-"), "");
     QDir dir;
 
-    foreach(dir, emuleSharedDirs())
+    QStringList dirs = emuleSharedDirs();
+    qDebug() << dirs;
+    foreach(dir, dirs)
     {
         shared_map::iterator itr = se.insert(dir.path(), QList<QString>());
         QFileInfo fi;
@@ -1364,9 +1366,9 @@ shared_map misc::migrationShareds()
  }
 
  QString misc::migrationNick(const QString& nick)
- {
+ {     
      QString res = nick;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^Nick"));
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp("^Nick"));
 
      if (!sl.empty())
      {

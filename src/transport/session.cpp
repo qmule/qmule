@@ -4,6 +4,7 @@
 #include <QDirIterator>
 
 #include "transport/session.h"
+#include "torrentpersistentdata.h"
 
 using namespace libtorrent;
 
@@ -77,7 +78,7 @@ void Session::drop()
 }
 
 Session::~Session()
-{    
+{
 }
 
 Session::Session()
@@ -97,8 +98,6 @@ Session::Session()
             this, SLOT(on_finishedTorrent(QTorrentHandle)));
     connect(&m_btSession, SIGNAL(metadataReceived(QTorrentHandle)),
             this, SLOT(on_metadataReceived(QTorrentHandle)));
-    connect(&m_btSession, SIGNAL(fullDiskError(QTorrentHandle, QString)),
-            this, SLOT(on_fullDiskError(QTorrentHandle, QString)));
     connect(&m_btSession, SIGNAL(torrentAboutToBeRemoved(QTorrentHandle, bool)),
             this, SLOT(on_torrentAboutToBeRemoved(QTorrentHandle, bool)));
     connect(&m_btSession, SIGNAL(torrentFinishedChecking(QTorrentHandle)),
@@ -119,6 +118,8 @@ Session::Session()
             this, SIGNAL(newConsoleMessage(QString)));
     connect(&m_btSession, SIGNAL(newBanMessage(QString)),
             this, SIGNAL(newBanMessage(QString)));
+    connect(&m_btSession, SIGNAL(fileError(Transfer, QString)),
+            this, SIGNAL(fileError(Transfer, QString)));
 
     // periodic save temp fast resume data
     m_alerts_reading.reset(new QTimer(this));
@@ -133,9 +134,13 @@ Session::Session()
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(pausedTransfer(Transfer)), this, SIGNAL(pausedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
+    connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)),
+            this, SIGNAL(finishedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
+    connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
+            this, SIGNAL(fileError(Transfer, QString)));
 
     connect(&m_edSession, SIGNAL(savePathChanged(Transfer)), this, SIGNAL(savePathChanged(Transfer)));
 
@@ -232,6 +237,7 @@ void Session::processDownloadedFile(const QString& url, const QString& path) {
 }
 void Session::deleteTransfer(const QString& hash, bool delete_files) {
     delegate(hash)->deleteTransfer(hash, delete_files);
+    TorrentPersistentData::deletePersistentData(hash);
 }
 void Session::recheckTransfer(const QString& hash) {
     delegate(hash)->recheckTransfer(hash);
@@ -281,34 +287,35 @@ bool Session::isLSDEnabled() const { return m_btSession.isLSDEnabled(); }
 bool Session::isQueueingEnabled() const { return m_btSession.isQueueingEnabled(); }
 bool Session::isListening() const { return m_btSession.getSession()->is_listening(); }
 
-void Session::deferPlayMedia(Transfer t)
+void Session::deferPlayMedia(Transfer t, int fileIndex)
 {
-    if (t.is_valid())
+    if (t.is_valid() && !playMedia(t, fileIndex))
     {
-        t.prioritize_first_last_piece(true);
-        m_pending_medias.push_back(t.hash());
+        qDebug() << "Defer playing file: " << t.filename_at(fileIndex);
+        t.set_sequential_download(false);
+        t.prioritize_extremity_pieces(true, fileIndex);
+        m_pending_medias.insert(qMakePair(t.hash(), fileIndex));
     }
 }
 
 void Session::playLink(const QString& strLink)
 {
-    deferPlayMedia(addLink(strLink));
+    deferPlayMedia(addLink(strLink), 0);
 }
 
-bool Session::playMedia(Transfer t)
+bool Session::playMedia(Transfer t, int fileIndex)
 {
     if (t.is_valid() && t.has_metadata() &&
-        t.num_files() == 1 && misc::isPreviewable(misc::file_extension(t.filename_at(0))) &&
-        (t.first_last_piece_first() || t.is_seed()))
+        misc::isPreviewable(misc::file_extension(t.filename_at(fileIndex))))
     {
         TransferBitfield pieces = t.pieces();
-        int last_piece = pieces.size() - 1;
-        int penult_piece = std::max(last_piece - 1, 0);
-        if (pieces[0] && pieces[last_piece] && pieces[penult_piece])
-        {
-            t.set_sequential_download(true);
-            return (t.progress() >= 0.05 && QDesktopServices::openUrl(QUrl::fromLocalFile(t.filepath_at(0))));
-        }
+        const std::vector<int> extremity_pieces = t.file_extremity_pieces_at(fileIndex);
+
+        // check we have all boundary pieces for the file
+        foreach (int p, extremity_pieces) if (!pieces[p]) return false;
+
+        t.set_sequential_download(true);
+        return QDesktopServices::openUrl(QUrl::fromLocalFile(t.absolute_files_path().at(fileIndex)));
     }
 
     return false;
@@ -316,11 +323,11 @@ bool Session::playMedia(Transfer t)
 
 void Session::playPendingMedia()
 {
-    for (std::vector<QString>::iterator i = m_pending_medias.begin(); i != m_pending_medias.end();)
+    for (std::set<QPair<QString, int> >::iterator i = m_pending_medias.begin(); i != m_pending_medias.end();)
     {
-        Transfer t = getTransfer(*i);
-        if (!t.is_valid() || playMedia(t))
-            i = m_pending_medias.erase(i);
+        Transfer t = getTransfer(i->first);
+        if (!t.is_valid() || playMedia(t, i->second))
+            m_pending_medias.erase(i++);
         else
             ++i;
     }
@@ -343,12 +350,14 @@ void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
 
 Transfer Session::addLink(QString strLink, bool resumed)
 {
-   if (strLink.startsWith("ed2k://"))
-   {
-       return m_edSession.addLink(strLink, resumed);
-   }
+    qDebug() << "add ED2K/magnet link: " << strLink;
 
-   return m_btSession.addLink(strLink, resumed);
+    if (strLink.startsWith("ed2k://"))
+    {
+        return m_edSession.addLink(strLink, resumed);
+    }
+
+    return m_btSession.addLink(strLink, resumed);
 }
 
 void Session::addTransferFromFile(const QString& filename)
@@ -371,9 +380,6 @@ void Session::on_finishedTorrent(const QTorrentHandle& h)
     shareByED2K(h, false);
 }
 void Session::on_metadataReceived(const QTorrentHandle& h) { emit metadataReceived(Transfer(h)); }
-void Session::on_fullDiskError(const QTorrentHandle& h, QString msg) {
-    emit fullDiskError(Transfer(h), msg);
-}
 void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files)
 {
     if (del_files) shareByED2K(h, true);
@@ -407,44 +413,5 @@ void Session::saveFastResumeData()
 
 void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
 {
-    QDir save_path(h.save_path());
-    int num_files = h.num_files();
-    std::set<QString> roots;
-    std::deque<std::string> excludes;
-
-    for (int i = 0; i < num_files; ++i)
-        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
-
-    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
-    {
-        QString path = save_path.filePath(*i);  // never contains last separator
-        QFileInfo info(path);
-
-        if (info.isFile())
-        {
-            // TODO - replace by new share
-            //m_edSession.delegate()->share_file(path.toUtf8().constData(), unshare);
-        }
-        else if (info.isDir())
-        {
-            QStringList dlist;
-            dlist << path;
-            QDirIterator it(path, QDirIterator::Subdirectories);
-
-            while(it.hasNext())
-            {
-                QDir d = QFileInfo(it.next()).dir();
-                dlist << d.path();
-            }
-
-            dlist.removeDuplicates();
-
-            foreach(const QString& str, dlist)
-            {
-                // TODO - replace by new share
-                //m_edSession.delegate()->share_dir(
-                //    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
-            }
-        }
-    }
+    m_edSession.shareByED2K(h, unshare);
 }

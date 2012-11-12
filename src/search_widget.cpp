@@ -11,6 +11,8 @@
 #include "search_widget.h"
 #include "search_filter.h"
 #include "preferences.h"
+#include "user_properties.h"
+#include "ed2k_link_maker.h"
 
 #include "libed2k/file.hpp"
 #include "transport/session.h"
@@ -142,14 +144,14 @@ int selected_row(QAbstractItemView* view)
     return index.isValid() ? index.row() : -1;
 }
 
-QVariant selected_data(QAbstractItemView* view, int column)
-{
-    return view->model()->index(selected_row(view), column).data();
-}
-
 QVariant selected_data(QAbstractItemView* view, int column, const QModelIndex& index)
 {
     return view->model()->index(index.row(), column, index.parent()).data();
+}
+
+QVariant selected_data(QAbstractItemView* view, int column)
+{
+    return selected_data(view, column, view->currentIndex());
 }
 
 search_widget::search_widget(QWidget *parent)
@@ -383,14 +385,21 @@ search_widget::search_widget(QWidget *parent)
     fileSearchRelated->setText(tr("Search related files"));
     fileSearchRelated->setIcon(QIcon(":/emule/search/SearchRelated.png"));
 
+    fileED2KLink = new QAction(this);
+    fileED2KLink->setObjectName(QString::fromUtf8("ED2K link"));
+    fileED2KLink->setText(tr("ED2K link"));
+    fileED2KLink->setIcon(QIcon(":/emule/common/eD2kLink.png"));
+
     btnDownload->setDefaultAction(fileDownload);
     btnPreview->setDefaultAction(filePreview);
+    btnCloseAll->setDefaultAction(closeAll);
 
     btnDownload->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnPreview->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     fileMenu->addAction(fileDownload);
     fileMenu->addAction(filePreview);
+    fileMenu->addAction(fileED2KLink);
     fileMenu->addSeparator();
     fileMenu->addAction(fileSearchRelated);
 
@@ -400,10 +409,12 @@ search_widget::search_widget(QWidget *parent)
     connect(userSendMessage,  SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(userBrowseFiles,  SIGNAL(triggered()), this, SLOT(requestUserDirs()));
     connect(userAddToFriends,  SIGNAL(triggered()), this, SLOT(addToFriends()));
+    connect(userDetails,  SIGNAL(triggered()), this, SLOT(getUserDetails()));
 
     connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
     connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
     connect(fileSearchRelated,  SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
+    connect(fileED2KLink,  SIGNAL(triggered()), this, SLOT(createED2KLink()));
 
     connect(Session::instance()->get_ed2k_session(),
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
@@ -572,14 +583,14 @@ void search_widget::startSearch()
         return;
 
     bool bOk = false;
-    int nMinSize = tableCond->item(0, 1)->text().toInt(&bOk);
+    quint64 nMinSize = tableCond->item(0, 1)->text().toLongLong(&bOk);
     if (!bOk && tableCond->item(0, 1)->text().length() > 0)
     {
         showErrorParamMsg(0);
         return;
     }
 
-    int nMaxSize = tableCond->item(1, 1)->text().toInt(&bOk);
+    quint64 nMaxSize = tableCond->item(1, 1)->text().toLongLong(&bOk);
     if (!bOk && tableCond->item(1, 1)->text().length() > 0)
     {
         showErrorParamMsg(1);
@@ -680,6 +691,8 @@ void search_widget::startSearch()
             break;
     }
 
+    m_lastSearchFileType = fileType;
+
     prepareNewSearch(reqType, comboName->currentText(), resultType, iconSerachActive);
 
     if (checkPlus->checkState() == Qt::Checked)
@@ -690,7 +703,7 @@ void search_widget::startSearch()
         // size was will convert from Mb to bytes for generate search request
         Session::instance()->get_ed2k_session()->searchFiles(
             searchRequest, nMinSize*1024*1024, nMaxSize*1024*1024, nAvail, nSources,
-            fileType, fileExt, mediaCodec, nBitRate, nDuration);
+            fileType, fileExt, mediaCodec, nDuration, nBitRate);
         nSearchesInProgress = 1;
     }
 
@@ -721,7 +734,7 @@ void search_widget::cancelSearch()
 {
     Session::instance()->get_ed2k_session()->cancelSearch();
 
-    btnStart->setEnabled(true);
+    btnStart->setDisabled(comboName->currentText().isEmpty());
     btnCancel->setEnabled(false);
     btnMore->setEnabled(false);
 
@@ -766,6 +779,11 @@ void search_widget::searchRelatedFiles()
     }
 }
 
+bool typeFilter(const std::string strType, QED2KSearchResultEntry entry)
+{
+    return (libed2k::GetFileTypeByName(entry.m_strFilename.toStdString()) != strType);
+}
+
 void search_widget::processSearchResult(
     const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult)
 {
@@ -775,13 +793,25 @@ void search_widget::processSearchResult(
         return;
 
     tabSearch->setTabIcon(nCurTabSearch, iconSearchResult);
-    btnStart->setEnabled(nSearchesInProgress == 0);
+    btnStart->setEnabled((nSearchesInProgress == 0) && (!comboName->currentText().isEmpty()));    
     btnCancel->setEnabled(nSearchesInProgress != 0);
 
     if (obMoreResult)
         btnMore->setEnabled(obMoreResult);
 
     searchItems[nCurTabSearch].vecResults.insert(searchItems[nCurTabSearch].vecResults.end(), vRes.begin(), vRes.end());
+
+    if (m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_CDIMAGE) ||
+        m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_ARCHIVE) ||
+        m_lastSearchFileType == QString::fromStdString(libed2k::ED2KFTSTR_PROGRAM))
+    {
+        searchItems[nCurTabSearch].vecResults.erase(
+            std::remove_if(searchItems[nCurTabSearch].vecResults.begin(),
+                           searchItems[nCurTabSearch].vecResults.end(),
+                           std::bind1st(std::ptr_fun(&typeFilter),
+                                        m_lastSearchFileType.toStdString())),
+            searchItems[nCurTabSearch].vecResults.end());
+    }
 
     quint64 overallSize = 0;
     QString strCaption;
@@ -900,7 +930,6 @@ void search_widget::prepareNewSearch(
     {
         tabSearch->show();
         searchFilter->show();
-        closeAll->setEnabled(true);
     }
 
     nCurTabSearch = tabSearch->addTab(icon, reqType + reqText);
@@ -914,6 +943,7 @@ void search_widget::prepareNewSearch(
     btnStart->setEnabled(false);
     btnCancel->setEnabled(true);
     btnMore->setEnabled(false);
+    btnCloseAll->setEnabled(true);
 }
 
 void search_widget::closeTab(int index)
@@ -922,7 +952,7 @@ void search_widget::closeTab(int index)
     {
         nCurTabSearch = -1;
 
-        btnStart->setEnabled(true);
+        btnStart->setDisabled(comboName->currentText().isEmpty());
         btnCancel->setEnabled(false);
         btnMore->setEnabled(false);
 
@@ -932,12 +962,12 @@ void search_widget::closeTab(int index)
     
     if (searchItems.size() > index)
         searchItems.erase(searchItems.begin() + index);
-    
+        
     if (!tabSearch->count())
     {
         clearSearchTable();
         searchFilter->hide();
-        closeAll->setDisabled(true);
+        btnCloseAll->setDisabled(true);
     }
     else
         selectTab(tabSearch->currentIndex());
@@ -1009,7 +1039,6 @@ void search_widget::selectTab(int nTabNum)
             model->setData(model->index(row, SWDelegate::SW_NAME), dir_iter->dirPath);
             model->item(row)->setIcon(iconFolder);
             QModelIndex index = model->index(row, 0);
-            row++;
 
             const std::vector<QED2KSearchResultEntry>& files = dir_iter->vecFiles;
             if (files.size() > 0)
@@ -1147,17 +1176,14 @@ void search_widget::clearSearchTable()
 
 void search_widget::closeAllTabs()
 {
-    searchItems.clear();
-    clearSearchTable();
-
     for (int indx = tabSearch->count() - 1; indx != -1; --indx)
     {
         qDebug() << "close tab " << indx;
-        tabSearch->removeTab(indx);
+        closeTab(indx);
     }
 
-    closeAll->setDisabled(true);
-    searchFilter->hide();
+    searchItems.clear();
+    clearSearchTable();
 }
 
 void search_widget::setSizeType()
@@ -1227,7 +1253,9 @@ void search_widget::displayListMenu(const QPoint&)
     if (tabSearch->currentIndex() < 0)
         return;
 
-    if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+    RESULT_TYPE resultType = searchItems[tabSearch->currentIndex()].resultType;
+
+    if (resultType == RT_CLIENTS)
     {
         userDetails->setEnabled(false);
         userAddToFriends->setEnabled(false);
@@ -1255,12 +1283,16 @@ void search_widget::displayListMenu(const QPoint&)
 
         userMenu->exec(QCursor::pos());
     }
-    else if (searchItems[tabSearch->currentIndex()].resultType == RT_FILES)
+    else
     {
         QModelIndexList selected = treeResult->selectionModel()->selectedRows();
-        fileSearchRelated->setEnabled(
+        bool enabled =
             selected.size() == 1 &&
-            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString()));
+            misc::isMD4Hash(selected_data(treeResult, SWDelegate::SW_ID).toString()) &&
+            !misc::isTorrentLink(selected_data(treeResult, SWDelegate::SW_NAME).toString());
+
+        fileSearchRelated->setEnabled(enabled);
+        fileED2KLink->setEnabled(enabled);
         fileMenu->exec(QCursor::pos());
     }
 }
@@ -1314,16 +1346,22 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
 
 void search_widget::download()
 {
-    if (selected_row(treeResult) < 0)
+    if (tabSearch->currentIndex() < 0 || selected_row(treeResult) < 0)
     {
-        ERR("download button should be disabled when result isn't selected");
+        qDebug("download button should be disabled when result isn't selected");
         return;
     }
 
-    bool bDirs = false;
-    if (tabSearch->currentIndex() >= 0 && (searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS || 
-                                           searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS))
-        bDirs = true;
+    // Possible only with double click.
+    if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
+    {
+        initPeer();
+        return;
+    }
+
+    bool bDirs =
+        searchItems[tabSearch->currentIndex()].resultType == RT_USER_DIRS ||
+        searchItems[tabSearch->currentIndex()].resultType == RT_FOLDERS;
 
     QModelIndexList selected = treeResult->selectionModel()->selectedRows();
     QModelIndexList::const_iterator iter;
@@ -1332,7 +1370,8 @@ void search_widget::download()
     {
         if (bDirs && iter->parent() == treeResult->rootIndex())
         {
-            std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
+            std::vector<QED2KSearchResultEntry> const& vRes =
+                searchItems[tabSearch->currentIndex()].vecResults;
             std::vector<QED2KSearchResultEntry>::const_iterator it;
             std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
             std::vector<UserDir>::iterator dir_iter = userDirs.begin();
@@ -1395,7 +1434,7 @@ void search_widget::preview()
 {
     if (selected_row(treeResult) < 0)
     {
-        ERR("preview button should be disabled when result isn't selected");
+        qDebug("preview button should be disabled when result isn't selected");
         return;
     }
 
@@ -1407,7 +1446,7 @@ void search_widget::preview()
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
         if (misc::isPreviewable(misc::file_extension(filename))) {
             Transfer t = addTransfer(*iter);
-            Session::instance()->deferPlayMedia(t);
+            Session::instance()->deferPlayMedia(t, 0);
         }
     }
 }
@@ -1481,7 +1520,8 @@ void search_widget::setUserPicture(const libed2k::net_identifier& np, QIcon& ico
 
     if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
     {
-        std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
+        std::vector<QED2KSearchResultEntry> const& vRes =
+            searchItems[tabSearch->currentIndex()].vecResults;
         std::vector<QED2KSearchResultEntry>::const_iterator it;
 
         for (it = vRes.begin(); it != vRes.end(); ++it)
@@ -1531,7 +1571,8 @@ void search_widget::requestUserDirs()
     }
 }
 
-void search_widget::processUserDirs(const libed2k::net_identifier& np, const QString& hash, const QStringList& strList)
+void search_widget::processUserDirs(
+    const libed2k::net_identifier& np, const QString& hash, const QStringList& strList)
 {
     QED2KPeerHandle peer = QED2KPeerHandle::getPeerHandle(np);
     QString userName = peer.getUserName();
@@ -1558,6 +1599,7 @@ void search_widget::processUserDirs(const libed2k::net_identifier& np, const QSt
     clearSearchTable();
 
     nCurTabSearch = tabSearch->addTab(iconUserFiles, tr("Files: ") + userName);
+    btnCloseAll->setEnabled(true);
     tabSearch->setCurrentIndex(nCurTabSearch);
 
     for (constIterator = strList.constBegin(); constIterator != strList.constEnd(); ++constIterator)
@@ -1565,23 +1607,23 @@ void search_widget::processUserDirs(const libed2k::net_identifier& np, const QSt
         peer.requestFiles(*constIterator);
     }
 
-
     btnMore->setEnabled(false);
 }
 
-void search_widget::processUserFiles(const libed2k::net_identifier& np, const QString& hash,
-                                     const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes)
+void search_widget::processUserFiles(
+    const libed2k::net_identifier& np, const QString& hash,
+    const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes)
 {
     int nTabCnt = searchItems.size();
-    int nTabNum = 0;
+    int nTabNum = nTabCnt - 1;
     
-    for (; nTabNum < nTabCnt; nTabNum++)
+    for (; nTabNum  >= 0; --nTabNum)
     {
         if (searchItems[nTabNum].netPoint == np)
             break;
     }
 
-    if (nTabNum == nTabCnt)
+    if (nTabNum == -1)
         return;
 
     std::vector<UserDir>& userDirs = searchItems[nTabNum].vecUserDirs;
@@ -1647,8 +1689,8 @@ void search_widget::itemCollapsed(const QModelIndex& index)
         QString hash = model->data(model->index(index.row(), SWDelegate::SW_ID)).toString();
 
         std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
-        std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
-
+        std::vector<QED2KSearchResultEntry> const& vRes =
+            searchItems[tabSearch->currentIndex()].vecResults;
         std::vector<UserDir>::iterator dir_iter = userDirs.begin();
         std::vector<QED2KSearchResultEntry>::const_iterator it;
 
@@ -1696,7 +1738,8 @@ void search_widget::itemExpanded(const QModelIndex& index)
         QModelIndex real_index = filterModel->mapToSource(index);
         QString hash = model->data(model->index(real_index.row(), SWDelegate::SW_ID)).toString();
 
-        std::vector<QED2KSearchResultEntry> const& vRes = searchItems[tabSearch->currentIndex()].vecResults;
+        std::vector<QED2KSearchResultEntry> const& vRes =
+            searchItems[tabSearch->currentIndex()].vecResults;
         std::vector<QED2KSearchResultEntry>::const_iterator it;
         std::vector<UserDir>& userDirs = searchItems[tabSearch->currentIndex()].vecUserDirs;
         std::vector<UserDir>::iterator dir_iter = userDirs.begin();
@@ -1744,8 +1787,9 @@ void search_widget::displayHSMenu(const QPoint&)
     }
 }
 
-void search_widget::processIsModSharedFiles(const libed2k::net_identifier& np, const QString& hash, const QString& dir_hash,
-                                            const std::vector<QED2KSearchResultEntry>& vRes)
+void search_widget::processIsModSharedFiles(
+    const libed2k::net_identifier& np, const QString& hash, const QString& dir_hash,
+    const std::vector<QED2KSearchResultEntry>& vRes)
 {
     for (int ii = 0; ii < searchItems.size(); ii++)
     {
@@ -1877,3 +1921,31 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
 
     return QSortFilterProxyModel::lessThan(left, right);
 }
+
+void search_widget::getUserDetails()
+{
+    QED2KSearchResultEntry entry;
+    if (findSelectedUser(entry))
+    {
+        user_properties dlg(this, QED2KPeerHandle::getPeerHandle(entry.m_network_point).getUserName(), entry.m_network_point);
+        dlg.exec();
+    }
+}
+
+void search_widget::createED2KLink()
+{
+    if (selected_row(treeResult) < 0)
+    {
+        return;
+    }
+
+    QModelIndexList selected = treeResult->selectionModel()->selectedRows();
+
+    QString file_name = selected_data(treeResult, SWDelegate::SW_NAME, selected[0]).toString();
+    QString hash = selected_data(treeResult, SWDelegate::SW_ID, selected[0]).toString();
+    quint64 file_size = selected_data(treeResult, SWDelegate::SW_SIZE, selected[0]).toULongLong();
+
+    ed2k_link_maker dlg(file_name, hash, file_size, this);
+    dlg.exec();
+}
+

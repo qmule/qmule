@@ -63,8 +63,9 @@ public:
     bool isQueueingEnabled() const;
     bool isListening() const;
 
-    void deferPlayMedia(Transfer t);
-    bool playMedia(Transfer t);
+    void deferPlayMedia(Transfer t, int fileIndex);
+    bool playMedia(Transfer t, int fileIndex);
+    void shareByED2K(const QTorrentHandle& h, bool unshare);
 
 public slots:
     void playPendingMedia();
@@ -80,9 +81,7 @@ public slots:
     virtual void addTransferFromFile(const QString& filename);
 
 signals:
-    void finishedTransfer(Transfer t);
     void metadataReceived(Transfer t);
-    void fullDiskError(Transfer t, QString msg);
     void transferFinishedChecking(Transfer t);
     void trackerAuthenticationRequired(Transfer t);
     void newDownloadedTransfer(QString path, QString url);
@@ -96,7 +95,6 @@ private slots:
     void on_pausedTorrent(const QTorrentHandle& h);
     void on_finishedTorrent(const QTorrentHandle& h);
     void on_metadataReceived(const QTorrentHandle& h);
-    void on_fullDiskError(const QTorrentHandle& h, QString msg);
     void on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files);
     void on_torrentFinishedChecking(const QTorrentHandle& h);
     void on_trackerAuthenticationRequired(const QTorrentHandle& h);
@@ -109,8 +107,6 @@ private:
     Session();
     SessionBase* delegate(const QString& hash) const;
     SessionBase* delegate(const Transfer& t) const;
-
-    void shareByED2K(const QTorrentHandle& h, bool unshare);
 
     template<typename Functor>
     void for_each(const Functor& f)
@@ -128,7 +124,7 @@ private:
     QScopedPointer<QTimer>  m_periodic_resume;
     QScopedPointer<QTimer>  m_alerts_reading;
 
-    std::vector<QString> m_pending_medias;
+    std::set<QPair<QString, int> > m_pending_medias;
 };
 
 #endif

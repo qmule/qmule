@@ -386,6 +386,16 @@
     <string>Files</string>
    </property>
   </action>
+  <action name="actionOpenDownloadPath">
+   <property name="icon">
+    <iconset>
+     <normalon>:/emule/common/FolderOpen.ico</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>OpenDownloadPath</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="Icons/emule/emule.qrc"/>

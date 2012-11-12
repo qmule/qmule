@@ -69,6 +69,12 @@ private:
   misc(); // Forbidden
 
 public:
+  static QString productName()
+  {
+      static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
+      return tr("%1 %2: %3", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION).arg(strBuildDate);
+  }
+
   static inline QString toQString(const std::string &str) {
     return QString::fromLocal8Bit(str.c_str());
   }
@@ -98,7 +104,7 @@ public:
 
   static inline bool isMD4Hash(const QString& s)
   {
-      return (s.length() == libed2k::md4_hash::hash_size);
+      return (s.length() == 32);
   }
 
   static inline bool isSHA1Hash(const QString& s)
@@ -191,7 +197,7 @@ public:
     * helpers for quiet migration
     * migration functions must return empty values or 0!
    */
-  static QStringList getFileLines(const QString& filename);
+  static QStringList getFileLines(const QString& filename, const char* codec = NULL);
   static QString emuleConfig(const QString& filename);
   static QString emuleConfigFilename();
 
