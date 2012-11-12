@@ -14,6 +14,8 @@ TreeModel::~TreeModel()
 
 bool TreeModel::setData ( const QModelIndex & index, const QVariant & value, int role/* = Qt::EditRole*/)
 {
+    bool res = false;
+
     if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
     {
         qDebug() << "execute setData " << value;
@@ -27,9 +29,12 @@ bool TreeModel::setData ( const QModelIndex & index, const QVariant & value, int
         else
         {
             node->share(false);
-
         }
+
+        res = true;
     }
+
+    return res;
 }
 
 QVariant TreeModel::data(const QModelIndex &index, int role) const
