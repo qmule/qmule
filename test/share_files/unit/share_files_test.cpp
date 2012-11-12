@@ -153,7 +153,7 @@ void share_files_test::test_save()
     FileNode* f00 = sf.node(base + QDir::separator() + "dir0/level_file0");
     QVERIFY(f00);
     f00->unshare(false);
-    QVERIFY(!p0->is_active());
+    QVERIFY(p0->is_active());   // directory stays active
 
     sf.produce_collections();
     sf.save();
@@ -177,7 +177,7 @@ void share_files_test::test_load()
     FileNode* f00 = sf.node(base + QDir::separator() + "dir0/level_file0");
     QVERIFY(p0);
     QVERIFY(f00);
-    QVERIFY(!p0->is_active());
+    QVERIFY(p0->is_active());       // empty directory was saved as active and was loaded as active
     QVERIFY(!f00->is_active());
 
     QVERIFY(f22);
@@ -264,7 +264,7 @@ void share_files_test::test_states()
         p->unshare(false);
     }
 
-    QVERIFY(!p2->is_active());
+    QVERIFY(p2->is_active());   // directory stays active
     sf.finalize_collections();
 }
 

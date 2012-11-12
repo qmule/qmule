@@ -148,8 +148,7 @@ public:
 
     virtual bool is_dir() const { return true; }
     virtual bool is_root() const { return m_root; }
-    virtual int children() const { return m_file_children.count(); }
-    virtual bool is_active() const;
+    virtual int children() const { return m_file_children.count(); }    
     virtual bool contains_active_children() const;
     virtual bool all_active_children() const;
 

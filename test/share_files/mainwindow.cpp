@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shareDir,  SIGNAL(triggered()), this, SLOT(shareDirectory()));
     connect(shareDirR,  SIGNAL(triggered()), this, SLOT(shareDirectoryR()));
     connect(unshareDir,  SIGNAL(triggered()), this, SLOT(unshareDirectory()));
-    connect(unshareDir,  SIGNAL(triggered()), this, SLOT(unshareDirectoryR()));
+    connect(unshareDirR,  SIGNAL(triggered()), this, SLOT(unshareDirectoryR()));
 
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_model, SLOT(changeNode(const FileNode*)));
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_fileModel, SLOT(changeNode(const FileNode*)));
@@ -74,7 +74,7 @@ void MainWindow::on_treeView_customContextMenuRequested(const QPoint &pos)
 
     if (indx.isValid())
     {
-        const FileNode* node = static_cast<const FileNode*>(indx.internalPointer());
+        const DirNode* node = static_cast<const DirNode*>(indx.internalPointer());
 
         if (node->is_active())
         {

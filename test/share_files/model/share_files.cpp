@@ -337,22 +337,6 @@ void DirNode::unshare(bool recursive)
     m_session->changeNode(this);
 }
 
-bool DirNode::is_active() const
-{
-    bool active = false;
-
-    if (m_active)
-    {
-        foreach(const FileNode* node, m_file_children)
-        {
-            active = node->is_active();
-            if (active) break;
-        }        
-    }
-
-    return active;
-}
-
 bool DirNode::contains_active_children() const
 {
     bool active = m_active;
@@ -442,18 +426,23 @@ void DirNode::build_collection()
     qDebug() << "build collection " << filename();
     bool pending = false;
 
+    int files_count = 0;
     // check children
     foreach(const FileNode* p, m_file_children.values())
-    {
-        // item in pending state
-        if (p->is_active() && !p->has_transfer())
+    {        
+        if (p->is_active())
         {
-            pending = true;
-            break;
+            ++files_count;
+
+            if (!p->has_transfer())
+            {
+                pending = true;
+                break;
+            }
         }
     }
 
-    if (!pending)
+    if (!pending && (files_count > 0))
     {
         qDebug() << "collection " << filename() << " ready";
         QStringList lines;
