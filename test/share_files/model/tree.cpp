@@ -6,7 +6,7 @@
 
 TreeModel::TreeModel(DirNode* root, Filter filter, QObject *parent) : QAbstractItemModel(parent), m_rootItem(root), m_filter(filter)
 {
-
+    m_change = false;
 }
 
 TreeModel::~TreeModel()
@@ -370,6 +370,7 @@ QModelIndex TreeModel::index(const FileNode* node)
         }
     }
 
+    qDebug() << "generate index " << row;
     return createIndex(row, 0, const_cast<FileNode*>(node));
 }
 
@@ -520,14 +521,13 @@ void TreeModel::changeNode(const FileNode* node)
 }
 
 void TreeModel::beginRemoveNode(const FileNode* node)
-{
-    qDebug() << "beginRemoveNode";
+{    
     QModelIndex indx = index(node);
 
+    m_change = false;
     if (indx.isValid())
     {
         int row = 0;
-        qDebug() << "index is valid";
         FileNode* node = static_cast<FileNode*>(indx.internalPointer());
         DirNode* parent_node = node->m_parent;
 
@@ -548,14 +548,50 @@ void TreeModel::beginRemoveNode(const FileNode* node)
             }
         }
 
-        qDebug() << " model remove row " << row;
+        qDebug() << "beginRemoveNode row: " << row;
         beginRemoveRows(parent(indx), row, row);
+        m_change = true;
     }
 }
 
 void TreeModel::endRemoveNode()
 {
-    endRemoveRows();
+    if (m_change) endRemoveRows();
+    m_change = false;
+}
+
+void TreeModel::beginInsertNode(const FileNode* node, int pos)
+{    
+    QModelIndex indx = index(node);
+    m_change = false;
+
+    if (indx.isValid())
+    {
+        int row = 0;
+        qDebug() << "index is valid";
+        FileNode* node = static_cast<FileNode*>(indx.internalPointer());
+        DirNode* parent_node = node->m_parent;
+
+        /*
+        if (node->is_dir())
+        {
+            row += parent_node->m_dir_vector.size();
+        }
+        else
+        {
+            row += parent_node->m_file_vector.size();
+        }
+*/
+        qDebug() << "beginInsertNode row: " << pos;
+        beginInsertRows(index(parent_node), pos, pos);
+        m_change = true;
+    }
+}
+
+void TreeModel::endInsertNode()
+{
+    if (m_change) endInsertRows();
+    m_change = false;
 }
 
 QVariant DirModel::headerData(int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const

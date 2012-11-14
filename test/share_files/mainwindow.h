@@ -34,14 +34,22 @@ private:
     QAction*    shareDirR;
     QAction*    unshareDir;
     QAction*    unshareDirR;
+    QAction*    removeD;
     CheckBoxDelegate* m_cbd;
+
+    QMenu*     m_file_menu;
+    QAction*   removeF;
 private slots:
     void shareDirectory();
     void shareDirectoryR();
     void unshareDirectory();
     void unshareDirectoryR();
+    void removeFile();
+    void removeDir();
     void on_deleteButton_clicked();
     void on_addButton_clicked();
+    void on_tableView_customContextMenuRequested(const QPoint &pos);
+    void on_pushButton_clicked();
 };
 
 #endif // MAINWINDOW_H

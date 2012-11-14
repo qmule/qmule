@@ -237,18 +237,19 @@ private:
     void on_transfer_deleted(QString hash);
     void on_parameters_ready(const add_transfer_params& atp, const error_code& ec);
 
-    void signal_change_node(const FileNode* node)
-    {
-        emit changeNode(node);
-    }
+    void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
+    void signal_endRemoveNode() { emit endRemoveNode();}
+    void signal_beginInsertNode(const FileNode* node, int pos) { emit beginInsertNode(node, pos);}
+    void signal_endInsertNode() { emit endInsertNode();}
+    void signal_changeNode(const FileNode* node) { emit changeNode(node);}
 
 signals:
-    void removeNode(const FileNode* node);    //!<
-    void addNode(const FileNode* node);       //!<
-    void changeNode(const FileNode* node);    //!<
 
+    void changeNode(const FileNode* node);
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
+    void beginInsertNode(const FileNode* node, int pos);
+    void endInsertNode();
 
     //!< model signals translation
     //!< deleteTransfer -> removeNode or changeNode

@@ -69,7 +69,7 @@ protected:
      DirNode*   m_rootItem;
      Filter     m_filter;
      QFileIconProvider  m_iconProvider;
-
+     bool m_change;
 public slots:
     void removeNode(const FileNode* node);
     void addNode(const FileNode* node);
@@ -77,6 +77,8 @@ public slots:
 
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
+    void beginInsertNode(const FileNode* node, int pos);
+    void endInsertNode();
 };
 
 class DirModel : public TreeModel
