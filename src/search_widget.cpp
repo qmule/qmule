@@ -695,7 +695,7 @@ void search_widget::startSearch()
 
     prepareNewSearch(reqType, comboName->currentText(), resultType, iconSerachActive);
 
-    if (checkPlus->checkState() == Qt::Checked)
+    if ((checkPlus->checkState() == Qt::Checked) && (resultType != RT_CLIENTS))
         searchRequest += " NOT +++";
 
     if (Session::instance()->get_ed2k_session()->isServerConnected())
