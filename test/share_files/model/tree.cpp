@@ -11,7 +11,6 @@ TreeModel::TreeModel(DirNode* root, Filter filter, QObject *parent) : QAbstractI
 
 TreeModel::~TreeModel()
 {
-
 }
 
 bool TreeModel::setData ( const QModelIndex & index, const QVariant & value, int role/* = Qt::EditRole*/)

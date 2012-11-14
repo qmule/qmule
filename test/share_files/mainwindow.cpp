@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);    
     //m_model = new TreeModel((DirNode*)m_sf.node("/home/apavlov"), TreeModel::All);
-    m_model = new DirModel((DirNode*)&m_sf.m_root);
-    m_fileModel = new TreeModel((DirNode*)&m_sf.m_root, TreeModel::File);
+    m_model = new DirectoryModel((DirNode*)&m_sf.m_root);
+    m_fileModel = new FileModel((DirNode*)&m_sf.m_root);
 
     m_sf.share("/home/apavlov", false);
     ui->treeView->setModel(m_model);
@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_model, SLOT(changeNode(const FileNode*)));
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_fileModel, SLOT(changeNode(const FileNode*)));
 
+
     connect(&m_sf, SIGNAL(beginRemoveNode(const FileNode*)), m_model, SLOT(beginRemoveNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endRemoveNode()), m_model, SLOT(endRemoveNode()));
     connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*, int)), m_model, SLOT(beginInsertNode(const FileNode*, int)));
@@ -76,8 +77,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_sf, SIGNAL(beginRemoveNode(const FileNode*)), m_fileModel, SLOT(beginRemoveNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endRemoveNode()), m_fileModel, SLOT(endRemoveNode()));
     connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*, int)), m_fileModel, SLOT(beginInsertNode(const FileNode*, int)));
-    connect(&m_sf, SIGNAL(endInsertNode()), m_fileModel, SLOT(endInsertNode()));
+    connect(&m_sf, SIGNAL(endInsertNode()), m_fileModel, SLOT(endInsertNode()));    
 
+    connect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(testOnDeleteSlot(QModelIndex,int,int)));
 }
 
 MainWindow::~MainWindow()
@@ -285,5 +287,13 @@ void MainWindow::on_pushButton_clicked()
             }
         }
 
+    }
+}
+
+void MainWindow::testOnDeleteSlot(const QModelIndex& indx, int start, int end)
+{
+    if (indx.isValid())
+    {
+        m_fileModel->setRootNode(indx);
     }
 }

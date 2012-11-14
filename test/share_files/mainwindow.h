@@ -6,6 +6,8 @@
 #include "share_files.h"
 #include "tree.h"
 #include "delegate.h"
+#include "dir_model.h"
+#include "file_model.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,8 +29,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Session m_sf;
-    TreeModel* m_model;
-    TreeModel* m_fileModel;
+    DirectoryModel* m_model;
+    FileModel*      m_fileModel;
     QMenu*      m_dir_menu;
     QAction*    shareDir;
     QAction*    shareDirR;
@@ -50,6 +52,8 @@ private slots:
     void on_addButton_clicked();
     void on_tableView_customContextMenuRequested(const QPoint &pos);
     void on_pushButton_clicked();
+
+    void testOnDeleteSlot(const QModelIndex&, int, int);
 };
 
 #endif // MAINWINDOW_H

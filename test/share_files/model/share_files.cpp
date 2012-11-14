@@ -484,6 +484,8 @@ void DirNode::drop_transfer_by_file()
     {
         m_session->deleteTransfer(m_hash, true);
     }
+
+    m_session->changeNode(this);
 }
 
 void DirNode::build_collection()
