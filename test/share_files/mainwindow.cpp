@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);    
-    //m_model = new TreeModel((DirNode*)m_sf.node("/home/apavlov"), TreeModel::All);
     m_model = new DirectoryModel((DirNode*)&m_sf.m_root);
     m_fileModel = new FileModel((DirNode*)&m_sf.m_root);
 

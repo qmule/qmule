@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include "share_files.h"
-#include "tree.h"
 #include "delegate.h"
 #include "dir_model.h"
 #include "file_model.h"
