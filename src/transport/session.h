@@ -66,10 +66,10 @@ public:
 
     void deferPlayMedia(Transfer t, int fileIndex);
     bool playMedia(Transfer t, int fileIndex);
-    void shareByED2K(const QTorrentHandle& h, bool unshare);
 
     void saveFileSystem();
     void loadFileSystem();
+    void share(const QString& filepath, bool recursive);
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -111,6 +111,9 @@ private slots:
     void saveTempFastResumeData();
     void readAlerts();
     void saveFastResumeData();
+
+    void on_deletedTransfer(QString);
+    void on_registerNode(Transfer);
 
 private:
     Session();

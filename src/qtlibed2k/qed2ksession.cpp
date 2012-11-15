@@ -435,50 +435,6 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
     return QED2KHandle(delegate()->add_transfer(atp));
 }
 
-void QED2KSession::shareByED2K(const QTorrentHandle& h, bool unshare)
-{
-    QDir save_path(h.save_path());
-    int num_files = h.num_files();
-    std::set<QString> roots;
-    std::deque<std::string> excludes;
-
-    for (int i = 0; i < num_files; ++i)
-        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
-
-    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
-    {
-        QString path = save_path.filePath(*i);  // never contains last separator
-        QFileInfo info(path);
-
-        if (info.isFile())
-        {
-            // TODO - replace by new share
-            //delegate()->share_file(path.toUtf8().constData(), unshare);
-        }
-        else if (info.isDir())
-        {
-            QStringList dlist;
-            dlist << path;
-            QDirIterator it(path, QDirIterator::Subdirectories);
-
-            while(it.hasNext())
-            {
-                QDir d = QFileInfo(it.next()).dir();
-                dlist << d.path();
-            }
-
-            dlist.removeDuplicates();
-
-            foreach(const QString& str, dlist)
-            {
-                // TODO - replace by new share
-                //delegate()->share_dir(
-                //    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
-            }
-        }
-    }
-}
-
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
 
 void QED2KSession::searchFiles(const QString& strQuery,
@@ -683,17 +639,6 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::deleted_transfer_alert*>(a.get()))
         {
             QString hash = QString::fromStdString(p->m_hash.toString());
-
-/*            QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
-
-            if (itr != m_files.end())
-            {
-                FileNode* node = itr.value();
-                Q_ASSERT(node);
-                m_files.erase(itr);
-                node->process_delete_transfer();
-            }
-*/
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
         else if (libed2k::finished_transfer_alert* p =
@@ -703,22 +648,7 @@ void QED2KSession::readAlerts()
 
             if (p->m_had_picker)
                 emit finishedTransfer(t);
-
-            /*FileNode* n = NULL;
-
-            if (m_files.contains(t.hash()))
-            {
-                n = m_files.value(t.hash());
-            }
-            else
-            {
-                n = node(t.filepath_at(0));
-                Q_ASSERT(p);
-                m_files.insert(t.hash(), n);
-            }
-
-            n->process_add_transfer(t.hash());
-            */
+            emit registerNode(t);
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)

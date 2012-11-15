@@ -136,7 +136,10 @@ Session::Session() : m_root(NULL, QFileInfo(), NULL, true)
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)),
             this, SIGNAL(finishedTransfer(Transfer)));
-    connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
+    connect(&m_edSession, SIGNAL(registerNode(Transfer)),
+            this, SLOT(on_registerNode(Transfer)));
+    connect(&m_edSession, SIGNAL(deletedTransfer(QString)),
+            this, SLOT(on_deletedTransfer(QString)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
     connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
@@ -377,12 +380,23 @@ void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Tr
 void Session::on_finishedTorrent(const QTorrentHandle& h)
 {
     emit finishedTransfer(Transfer(h));
-    shareByED2K(h, false);
+    QDir save_path(h.save_path());
+    int num_files = h.num_files();
+    std::set<QString> roots;
+
+    for (int i = 0; i < num_files; ++i)
+        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+
+    foreach(const QString& str, roots)
+    {
+        share(save_path.filePath(str), true);
+    }
 }
+
 void Session::on_metadataReceived(const QTorrentHandle& h) { emit metadataReceived(Transfer(h)); }
 void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files)
 {
-    if (del_files) shareByED2K(h, true);
+    Q_UNUSED(del_files);
     emit transferAboutToBeRemoved(Transfer(h));
 }
 void Session::on_torrentFinishedChecking(const QTorrentHandle& h) {
@@ -411,9 +425,38 @@ void Session::saveFastResumeData()
     m_edSession.saveFastResumeData();
 }
 
-void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
+void Session::on_registerNode(Transfer t)
 {
-    m_edSession.shareByED2K(h, unshare);
+    FileNode* n = NULL;
+
+    if (m_files.contains(t.hash()))
+    {
+        n = m_files.value(t.hash());
+    }
+    else
+    {
+        n = node(t.filepath_at(0));
+        Q_ASSERT(n);
+        m_files.insert(t.hash(), n);
+    }
+
+    n->process_add_transfer(t.hash());
+}
+
+void Session::on_deletedTransfer(QString hash)
+{
+    QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
+
+    // erase node if exists
+    if (itr != m_files.end())
+    {
+        FileNode* node = itr.value();
+        Q_ASSERT(node);
+        m_files.erase(itr);
+        node->process_delete_transfer();
+    }
+
+    emit deletedTransfer(hash);
 }
 
 void Session::removeDirectory(DirNode* dir)
@@ -658,4 +701,10 @@ void Session::loadFileSystem()
         }
 
     }
+}
+
+void Session::share(const QString& filepath, bool recursive)
+{
+    FileNode* p = node(filepath);
+    if (p != &m_root) p->share(recursive);
 }

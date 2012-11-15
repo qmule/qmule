@@ -1666,9 +1666,6 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             else
             {
                 Session::instance()->start();
-                // it is temp and bad code - avoid reshare before transfers will completed
-                // wait 8 seconds
-                QTimer::singleShot(8000, files, SLOT(reshare()));
             }
 
             activateControls(true);
