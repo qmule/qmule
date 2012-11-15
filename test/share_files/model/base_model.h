@@ -75,6 +75,7 @@ protected:
      FileNode* node(const QModelIndex& index) const;
      virtual QModelIndex node2index(const FileNode*) const = 0;
      virtual int node2row(const FileNode*) const = 0;
+     virtual int colcount() const = 0;
 
      DirNode*   m_rootItem;
      bool       m_row_count_changed;

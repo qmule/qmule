@@ -40,7 +40,7 @@ QModelIndex BaseModel::parent(const QModelIndex &index) const
 
 int BaseModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return (parent.column() > 0) ? 0 : 6;
+    return colcount();
 }
 
 QModelIndex BaseModel::index(const FileNode* node)

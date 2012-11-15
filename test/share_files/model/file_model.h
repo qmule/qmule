@@ -19,7 +19,8 @@ public:
     bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 protected:
     virtual QModelIndex node2index(const FileNode*) const;
-    virtual int node2row(const FileNode*) const;
+    virtual int node2row(const FileNode*) const;    
+    virtual int colcount() const { return 6; };
 };
 
 #endif // __FILE_MODEL__H__
