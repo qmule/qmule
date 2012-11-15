@@ -77,6 +77,7 @@ public:
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
     virtual void autoRunExternalProgram(const Transfer &t);
+    virtual std::vector<QString> incompleteFiles() const;
 
 public slots:
     virtual void pauseTransfer(const QString& hash);

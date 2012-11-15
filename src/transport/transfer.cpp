@@ -144,6 +144,23 @@ bool Transfer::extremity_pieces_first() const { return m_delegate->extremity_pie
 
 void Transfer::file_progress(std::vector<TransferSize>& fp) const { m_delegate->file_progress(fp); }
 
+std::vector<QString> Transfer::incompleteFiles() const
+{
+    std::vector<QString> res;
+
+    if (!is_seed())
+    {
+        QStringList fpaths = absolute_files_path();
+        std::vector<TransferSize> fprog;
+        file_progress(fprog);
+        for (int fn = 0; fn < fprog.size(); ++fn)
+            if (fprog[fn] < filesize_at(fn))
+                res.push_back(fpaths.at(fn));
+    }
+
+    return res;
+}
+
 std::vector<int> Transfer::file_priorities() const { return m_delegate->file_priorities(); }
 
 QString Transfer::filepath_at(unsigned int index) const {return m_delegate->filepath_at(index); }

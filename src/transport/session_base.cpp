@@ -1,11 +1,13 @@
 #include <QDateTime>
 #include <QNetworkInterface>
+#include <QProcess>
+#include <QDebug>
+
+#include <libed2k/util.hpp>
 
 #include "session_base.h"
 #include "misc.h"
 #include "preferences.h"
-#include <QProcess>
-#include <QDebug>
 
 const qreal SessionBase::MAX_RATIO = 9999.;
 
@@ -164,4 +166,17 @@ float SessionBase::progress() const
     }
 
     return (min_progress);
+}
+
+std::vector<QString> SessionBase::incompleteFiles() const
+{
+    std::vector<Transfer> transfers = getTransfers();
+    std::vector<QString> res;
+
+    for (std::vector<Transfer>::const_iterator i = transfers.begin(); i != transfers.end(); ++i)
+    {
+        libed2k::appendAll(res, i->incompleteFiles());
+    }
+
+    return res;
 }

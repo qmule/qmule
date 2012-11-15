@@ -115,8 +115,9 @@ bool QED2KHandle::extremity_pieces_first() const {
 }
 void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {
     fp.clear();
-    // using piece progress granularity
-    fp.push_back(pieces().count() * libed2k::PIECE_SIZE);
+    float p = progress();
+    TransferSize s = filesize_at(0);
+    fp.push_back(p == 1. ? s : s * p);
 }
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
 
@@ -132,6 +133,7 @@ QString QED2KHandle::filename_at(unsigned int index) const
 
 TransferSize QED2KHandle::filesize_at(unsigned int index) const
 {
+    Q_ASSERT(index == 0);
     return m_delegate.size();
 }
 
