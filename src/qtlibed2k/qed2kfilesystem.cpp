@@ -142,6 +142,7 @@ FileNode::FileNode(DirNode* parent, const QFileInfo& info, aux::QED2KSession* se
 
 FileNode::~FileNode()
 {
+    delete m_atp;
 }
 
 void FileNode::share(bool recursive)
@@ -193,12 +194,6 @@ void FileNode::unshare(bool recursive)
 void FileNode::process_add_transfer(const QString& hash)
 {
     m_hash = hash;
-
-    if (!is_active())
-    {
-        m_session->deleteTransfer(hash, false);
-    }
-
     m_session->signal_changeNode(this);
 }
 
