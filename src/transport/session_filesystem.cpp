@@ -7,8 +7,8 @@
 #include <windows.h>
 #endif
 
-#include "qed2kfilesystem.h"
-#include "qed2ksession.h"
+#include "session_filesystem.h"
+#include "session.h"
 #include "preferences.h"
 
 #include <libed2k/file.hpp>
@@ -130,7 +130,7 @@ int naturalCompare(const QString &s1, const QString &s2,  Qt::CaseSensitivity cs
     return QString::compare(s1, s2, cs);
 }
 
-FileNode::FileNode(DirNode* parent, const QFileInfo& info, aux::QED2KSession* session) :
+FileNode::FileNode(DirNode* parent, const QFileInfo& info, Session* session) :
     m_parent(parent),
     m_active(false),
     m_session(session),
@@ -155,7 +155,7 @@ void FileNode::share(bool recursive)
     {
         try
         {
-            m_session->addTransfer(*m_atp);
+            m_session->get_ed2k_session()->addTransfer(*m_atp);
         }
         catch(...)
         {
@@ -164,7 +164,7 @@ void FileNode::share(bool recursive)
     }
     else
     {
-        m_session->makeTransferParametersAsync(filepath());
+        m_session->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 
     m_parent->drop_transfer_by_file();
@@ -180,11 +180,11 @@ void FileNode::unshare(bool recursive)
 
     if (has_transfer())
     {
-        m_session->deleteTransfer(m_hash, false);
+        m_session->get_ed2k_session()->deleteTransfer(m_hash, false);
     }
     else
     {
-        m_session->cancelTransferParameters(filepath());
+        m_session->get_ed2k_session()->cancelTransferParameters(filepath());
     }
 
     m_parent->drop_transfer_by_file();
@@ -201,9 +201,10 @@ void FileNode::process_delete_transfer()
 {
     m_hash.clear();
 
+    // TODO ?
     if (is_active())
     {
-        m_session->addTransfer(*m_atp);
+        m_session->get_ed2k_session()->addTransfer(*m_atp);
     }
 
     m_session->signal_changeNode(this);
@@ -222,7 +223,7 @@ void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
         {
             try
             {
-             m_session->addTransfer(atp);
+             m_session->get_ed2k_session()->addTransfer(atp);
             }
             catch(...)
             {
@@ -295,7 +296,7 @@ QString FileNode::string() const
     return (res);
 }
 
-DirNode::DirNode(DirNode* parent, const QFileInfo& info, aux::QED2KSession* session, bool root /*= false*/) :
+DirNode::DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root /*= false*/) :
     FileNode(parent, info, session),
     m_populated(false),
     m_root(root)
@@ -354,7 +355,7 @@ void DirNode::unshare(bool recursive)
 
         if (has_transfer())
         {
-            m_session->deleteTransfer(m_hash, true);
+            m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
         }
 
         foreach(FileNode* p, m_file_children.values())
@@ -449,7 +450,7 @@ void DirNode::update_state()
 {
     if (m_active && (has_transfer()))
     {
-        m_session->deleteTransfer(m_hash, true);
+        m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
     }
 
     foreach(DirNode* node, m_dir_children)
@@ -462,7 +463,7 @@ void DirNode::drop_transfer_by_file()
 {
     if (m_active && has_transfer())
     {
-        m_session->deleteTransfer(m_hash, true);
+        m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
     }
 
     m_session->signal_changeNode(this);
@@ -541,12 +542,12 @@ void DirNode::build_collection()
              data.close();
 
              // hash file and add node
-             std::pair<libed2k::add_transfer_params, libed2k::error_code> res_pair = m_session->makeTransferParameters(collection_filepath);
+             std::pair<libed2k::add_transfer_params, libed2k::error_code> res_pair = m_session->get_ed2k_session()->makeTransferParameters(collection_filepath);
 
              if (!res_pair.second)
              {
                 m_session->setDirectLink(md4toQString(res_pair.first.file_hash), this);   //!< direclty set link in dictionary
-                m_session->addTransfer(res_pair.first);
+                m_session->get_ed2k_session()->addTransfer(res_pair.first);
              }
         }
     }

@@ -1,5 +1,5 @@
-#ifndef __QED2K_FILESYSTEM__
-#define __QED2K_FILESYSTEM__
+#ifndef __SESSION_FILESYSTEM__
+#define __SESSION_FILESYSTEM__
 
 #include <QObject>
 #include <QString>
@@ -17,15 +17,15 @@
 #include <libed2k/add_transfer_params.hpp>
 #include <libed2k/error_code.hpp>
 
-#include "qed2ksession.h"
 
+class Session;
 class DirNode;
 
 class FileNode
 {
 public:
 
-    FileNode(DirNode* parent, const QFileInfo& info, aux::QED2KSession* session);
+    FileNode(DirNode* parent, const QFileInfo& info, Session* session);
     virtual ~FileNode();
 
     virtual void share(bool recursive);
@@ -56,7 +56,7 @@ public:
 
     DirNode*    m_parent;
     bool        m_active;
-    aux::QED2KSession* m_session;
+    Session* m_session;
     QFileInfo   m_info;
     libed2k::add_transfer_params* m_atp;
     libed2k::error_code  m_error;
@@ -69,7 +69,7 @@ public:
 class DirNode : public FileNode
 {
 public:
-    DirNode(DirNode* parent, const QFileInfo& info, aux::QED2KSession* session, bool root = false);
+    DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root = false);
     virtual ~DirNode();
 
     virtual bool is_dir() const { return true; }
@@ -124,4 +124,4 @@ public:
 };
 
 
-#endif //__QED2K_FILESYSTEM__
+#endif //__SESSION_FILESYSTEM__

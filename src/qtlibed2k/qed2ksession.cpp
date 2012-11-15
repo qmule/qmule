@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include "qed2ksession.h"
-#include "qed2kfilesystem.h"
 #include <libed2k/bencode.hpp>
 #include <libed2k/file.hpp>
 #include <libed2k/md4_hash.hpp>
@@ -17,8 +16,6 @@
 #include <QDirIterator>
 
 #include "preferences.h"
-#include "qed2kfilesystem.h"
-
 
 using namespace libed2k;
 
@@ -209,18 +206,11 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
     return false;
 }
 
-// simple compare operator for our pairs
-bool operator<(const QVector<QString>& v1, const QVector<QString>& v2)
-{
-    return v1.size() < v2.size();
-}
-
 namespace aux
 {
 
 QED2KSession::QED2KSession()
-{
-    m_root = new DirNode(NULL, QFileInfo(), NULL, true);
+{    
 }
 
 void QED2KSession::start()
@@ -271,8 +261,6 @@ QED2KSession::~QED2KSession()
     {
         stop();
     }
-
-    delete m_root;
 }
 
 
@@ -696,7 +684,7 @@ void QED2KSession::readAlerts()
         {
             QString hash = QString::fromStdString(p->m_hash.toString());
 
-            QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
+/*            QHash<QString, FileNode*>::iterator itr = m_files.find(hash);
 
             if (itr != m_files.end())
             {
@@ -705,7 +693,7 @@ void QED2KSession::readAlerts()
                 m_files.erase(itr);
                 node->process_delete_transfer();
             }
-
+*/
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
         else if (libed2k::finished_transfer_alert* p =
@@ -716,7 +704,7 @@ void QED2KSession::readAlerts()
             if (p->m_had_picker)
                 emit finishedTransfer(t);
 
-            FileNode* n = NULL;
+            /*FileNode* n = NULL;
 
             if (m_files.contains(t.hash()))
             {
@@ -730,6 +718,7 @@ void QED2KSession::readAlerts()
             }
 
             n->process_add_transfer(t.hash());
+            */
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
@@ -948,244 +937,5 @@ std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeT
     bool cancel = false;
     return libed2k::file2atp()(filepath.toUtf8().constData(), cancel);
 }
-
-void QED2KSession::removeDirectory(DirNode* dir)
-{
-    std::set<DirNode*>::iterator itr = m_dirs.find(dir);
-
-    if (itr != m_dirs.end()) m_dirs.erase(itr);
-
-    m_dirs.erase(std::find(m_dirs.begin(), m_dirs.end(), dir), m_dirs.end());
-}
-
-void QED2KSession::addDirectory(DirNode* dir)
-{
-    m_dirs.insert(dir);
-}
-
-void QED2KSession::setDirectLink(const QString& hash, DirNode* node)
-{
-    m_files.insert(hash, node);
-}
-
-FileNode* QED2KSession::node(const QString& filepath)
-{
-    qDebug() << "node: " << filepath;
-    if (filepath.isEmpty() || filepath == tr("My Computer") ||
-            filepath == tr("Computer") || filepath.startsWith(QLatin1Char(':')))
-        return (m_root);
-
-#ifdef Q_OS_WIN32
-    QString longPath = qt_GetLongPathName(filepath);
-#else
-    QString longPath = filepath;
-#endif
-
-    QFileInfo fi(longPath);
-
-    QString absolutePath = QDir(longPath).absolutePath();
-
-    // ### TODO can we use bool QAbstractFileEngine::caseSensitive() const?
-    QStringList pathElements = absolutePath.split(QLatin1Char('/'), QString::SkipEmptyParts);
-
-    if ((pathElements.isEmpty())
-#if (!defined(Q_OS_WIN) || defined(Q_OS_WINCE)) && !defined(Q_OS_SYMBIAN)
-        && QDir::fromNativeSeparators(longPath) != QLatin1String("/")
-#endif
-        )
-        return (m_root);
-
-#if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
-    {
-        if (!pathElements.at(0).contains(QLatin1String(":")))
-        {
-            // The reason we express it like this instead of with anonymous, temporary
-            // variables, is to workaround a compiler crash with Q_CC_NOKIAX86.
-            QString rootPath = QDir(longPath).rootPath();
-            pathElements.prepend(rootPath);
-        }
-
-        if (pathElements.at(0).endsWith(QLatin1Char('/')))
-            pathElements[0].chop(1);
-    }
-#else
-    // add the "/" item, since it is a valid path element on Unix
-    if (absolutePath[0] == QLatin1Char('/'))
-        pathElements.prepend(QLatin1String("/"));
-#endif
-
-    DirNode *parent = m_root;
-    qDebug() << pathElements;
-    QString last_filename = pathElements.back();
-    pathElements.pop_back();
-
-    for (int i = 0; i < pathElements.count(); ++i)
-    {
-        QString element = pathElements.at(i);
-        DirNode* node;
-#ifdef Q_OS_WIN
-        // On Windows, "filename......." and "filename" are equivalent Task #133928
-        while (element.endsWith(QLatin1Char('.')))
-            element.chop(1);
-#endif
-        bool alreadyExists = parent->m_dir_children.contains(element);
-
-        if (alreadyExists)
-        {
-            node = parent->m_dir_children.value(element);
-        }
-        else
-        {
-
-            // Someone might call ::index("file://cookie/monster/doesn't/like/veggies"),
-            // a path that doesn't exists, I.E. don't blindly create directories.
-            QFileInfo info(absolutePath);
-
-            if (!info.exists())
-            {
-                qDebug() << "absolute path " << absolutePath << " is not exists";
-                return (m_root);
-            }
-
-            // generate node with fake info and next request real info
-            node = new DirNode(parent, info, this);
-            node->m_filename = element;
-            qDebug() << "node request for: " << node->filepath();
-            QFileInfo node_info(node->filepath());
-            node->m_info = node_info;
-            parent->add_node(node);
-        }
-
-        Q_ASSERT(node);
-        parent = node;
-    }
-
-    if (parent->m_dir_children.contains(last_filename))
-    {
-        return parent->m_dir_children.value(last_filename);
-    }
-
-    if (parent->m_file_children.contains(last_filename))
-    {
-        return parent->m_file_children.value(last_filename);
-    }
-
-
-    FileNode* p = m_root;
-    QFileInfo info(absolutePath);
-
-    if (info.exists())
-    {
-        if (info.isFile())
-        {
-            p = new FileNode(parent, info, this);
-            parent->add_node(p);
-        }
-        else if (info.isDir())
-        {
-            p = new DirNode(parent, info, this);
-            ((DirNode*)p)->populate();
-            parent->add_node(p);
-        }
-    }
-
-    return (p);
-}
-
-void QED2KSession::saveFileSystem()
-{
-    Preferences pref;
-    pref.beginGroup("SharedDirectories");
-    pref.beginWriteArray("ShareDirs");
-
-    int dir_indx = 0;
-    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
-    {
-        const DirNode* p = *itr;
-        qDebug() << "save: " << p->filepath();
-
-        pref.setArrayIndex(dir_indx);
-        pref.setValue("Path", p->filepath());
-        QStringList efiles = p->exclude_files();
-
-        if (!efiles.isEmpty())
-        {
-            int file_indx = 0;
-            pref.beginWriteArray("ExcludeFiles", efiles.size());
-
-            foreach(const QString& efile, efiles)
-            {
-                pref.setArrayIndex(file_indx);
-                pref.setValue("FileName", efile);
-                ++file_indx;
-            }
-
-            pref.endArray();
-        }
-
-        ++dir_indx;
-    }
-
-    pref.endArray();
-    pref.endGroup();
-}
-
-void QED2KSession::loadFileSystem()
-{
-    Preferences pref;
-    typedef QPair<QString, QVector<QString> > SD;
-    QVector<SD> vf;
-
-    pref.beginGroup("SharedDirectories");
-    int dcount = pref.beginReadArray("ShareDirs");
-    vf.resize(dcount);
-
-    for (int i = 0; i < dcount; ++i)
-    {
-
-        pref.setArrayIndex(i);
-        vf[i].first = pref.value("Path").toString();
-
-        int fcount = pref.beginReadArray("ExcludeFiles");
-        vf[i].second.resize(fcount);
-
-        for (int j = 0; j < fcount; ++ j)
-        {
-            pref.setArrayIndex(j);
-            vf[i].second[j] = pref.value("FileName").toString();
-        }
-
-        pref.endArray();
-
-    }
-
-    pref.endArray();
-
-    // sort dirs ASC to avoid update states on sharing
-    std::sort(vf.begin(), vf.end());
-
-    foreach(const SD& item, vf)
-    {
-        FileNode* dir_node = node(item.first);
-
-        if (dir_node != m_root)
-        {
-            dir_node->share(false);
-            QDir filepath(item.first);
-
-            for(int i = 0; i < item.second.size(); ++i)
-            {
-                FileNode* file_node = node(filepath.absoluteFilePath(item.second[i]));
-
-                if (file_node != m_root)
-                {
-                    file_node->unshare(false);
-                }
-            }
-        }
-
-    }
-}
-
 
 }

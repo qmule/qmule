@@ -8,6 +8,7 @@
 #include "qtlibtorrent/qbtsession.h"
 #include "qtlibed2k/qed2ksession.h"
 #include "torrentspeedmonitor.h"
+#include "session_filesystem.h"
 
 /**
  * Generic data transfer session
@@ -67,6 +68,8 @@ public:
     bool playMedia(Transfer t, int fileIndex);
     void shareByED2K(const QTorrentHandle& h, bool unshare);
 
+    void saveFileSystem();
+    void loadFileSystem();
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -89,6 +92,12 @@ signals:
     void alternativeSpeedsModeChanged(bool alternative);
     void recursiveDownloadPossible(QTorrentHandle t);    
     void newBanMessage(QString msg);
+    // filesystem signals
+    void changeNode(const FileNode* node);
+    void beginRemoveNode(const FileNode* node);
+    void endRemoveNode();
+    void beginInsertNode(const FileNode* node, int pos);
+    void endInsertNode();
 
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
@@ -114,6 +123,18 @@ private:
         std::for_each(m_sessions.begin(), m_sessions.end(), f);
     }
 
+    void addDirectory(DirNode* dir);
+    void removeDirectory(DirNode* dir);
+    void setDirectLink(const QString& hash, DirNode* node);
+    FileNode* node(const QString& filepath);
+
+    // emitters
+    void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
+    void signal_endRemoveNode() { emit endRemoveNode();}
+    void signal_beginInsertNode(const FileNode* node, int pos) { emit beginInsertNode(node, pos);}
+    void signal_endInsertNode() { emit endInsertNode();}
+    void signal_changeNode(const FileNode* node) { emit changeNode(node);}
+
     static Session* m_instance;
 
     QBtSession m_btSession;
@@ -125,6 +146,13 @@ private:
     QScopedPointer<QTimer>  m_alerts_reading;
 
     std::set<QPair<QString, int> > m_pending_medias;
+
+    DirNode m_root;
+    QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
+    std::set<DirNode*>          m_dirs;     // shared directories
+
+    friend class DirNode;
+    friend class FileNode;
 };
 
 #endif
