@@ -8,6 +8,7 @@
 #include <QPalette>
 #endif
 
+#include <set>
 #include <QPixmap>
 #include <QPointer>
 #include <QTimer>
@@ -20,6 +21,11 @@
 #include "qed2khandle.h"
 #include "trackerinfos.h"
 #include "preferences.h"
+
+class FileNode;
+class DirNode;
+
+extern QString md4toQString(const libed2k::md4_hash& hash);
 
 struct QED2KSearchResultEntry
 {
@@ -97,6 +103,7 @@ public:
     void stopServerConnection();
     bool isServerConnected() const;
     void makeTransferParametersAsync(const QString& filepath);
+    void cancelTransferParameters(const QString& filepath);
     std::pair<libed2k::add_transfer_params, libed2k::error_code> makeTransferParameters(const QString& filepath) const;
 
     /**
@@ -107,10 +114,29 @@ public:
 
     libed2k::session* delegate() const;
 
+    void saveFileSystem();
+    void loadFileSystem();
+
+    // emitters
+    void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
+    void signal_endRemoveNode() { emit endRemoveNode();}
+    void signal_beginInsertNode(const FileNode* node, int pos) { emit beginInsertNode(node, pos);}
+    void signal_endInsertNode() { emit endInsertNode();}
+    void signal_changeNode(const FileNode* node) { emit changeNode(node);}
+
+    void addDirectory(DirNode* dir);
+    void removeDirectory(DirNode* dir);
+    void setDirectLink(const QString& hash, DirNode* node);
+    FileNode* node(const QString& filepath);
 private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
+    DirNode* m_root;
+
+    QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
+    std::set<DirNode*>          m_dirs;     // shared directories
+
 public slots:
 	void startUpTransfers();
 	void configureSession();
@@ -200,6 +226,16 @@ signals:
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
 
     void transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
+
+    // filesystem signals
+    void changeNode(const FileNode* node);
+    void beginRemoveNode(const FileNode* node);
+    void endRemoveNode();
+    void beginInsertNode(const FileNode* node, int pos);
+    void endInsertNode();
+
+    friend class FileNode;
+    friend class DirNode;
 };
 
 }
