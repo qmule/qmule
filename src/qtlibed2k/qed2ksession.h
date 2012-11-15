@@ -126,7 +126,6 @@ public slots:
     virtual Transfer addLink(QString strLink, bool resumed = false);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
-    virtual void shareByED2K(const QTorrentHandle& h, bool unshare);
 
 	/**
 	  * number parameters were ignored on zero value
@@ -159,6 +158,7 @@ public slots:
     libed2k::peer_connection_handle findPeer(const libed2k::net_identifier& np);
 
 signals:
+    void registerNode(Transfer);    // temporary signal for node registration
     void serverNameResolved(QString strName);
     void serverConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
     void serverConnectionClosed(QString strError);

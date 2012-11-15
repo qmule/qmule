@@ -67,7 +67,6 @@ public:
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0;   //!< ed2k session only
-    virtual void shareByED2K(const QTorrentHandle& h, bool unshare) = 0;        //!< ed2k session only
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -198,7 +197,6 @@ public:
     Transfer addLink(QString strLink, bool resumed = false) {
         DEFER_RETURN2(addLink, strLink, resumed, Transfer()); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
-    void shareByED2K(const QTorrentHandle& h, bool unshare) { DEFER2(shareByED2K, h, unshare); }
     QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
         DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
     qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }

@@ -949,11 +949,6 @@ QED2KHandle QBtSession::addTransfer(const libed2k::add_transfer_params&)
     return QED2KHandle();
 }
 
-void QBtSession::shareByED2K(const QTorrentHandle& h, bool unshare)
-{
-    // do nothing
-}
-
 // Add a torrent to the Bittorrent session
 QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString from_url, bool resumed) {
   QTorrentHandle h;
