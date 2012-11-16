@@ -155,7 +155,8 @@ void FileNode::share(bool recursive)
     {
         try
         {
-            Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
+            m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
+            Session::instance()->registerNode(this);
         }
         catch(...)
         {
@@ -196,24 +197,26 @@ void FileNode::process_add_transfer(const QString& hash)
 {
     m_active = true;
     m_hash = hash;
+    Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::process_delete_transfer()
 {
+    qDebug() << "process delete transfer " << m_hash;
     m_hash.clear();
 
     // TODO ?
-    if (is_active())
-    {
-        Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
-    }
+    //if (is_active())
+   // {
+    //    Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
+    //}
 
     Session::instance()->signal_changeNode(this);
 }
 
-void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
-{
+bool FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+{        
     if (!ec)
     {
         if (!m_atp) m_atp = new libed2k::add_transfer_params;
@@ -225,7 +228,8 @@ void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
         {
             try
             {
-             Session::instance()->get_ed2k_session()->addTransfer(atp);
+                m_hash = Session::instance()->get_ed2k_session()->addTransfer(atp).hash();
+                Session::instance()->registerNode(this);
             }
             catch(...)
             {
@@ -236,6 +240,8 @@ void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
 
     m_error = ec;
     Session::instance()->signal_changeNode(this);
+
+    return (!ec);
 }
 
 QString FileNode::filepath() const
@@ -441,10 +447,11 @@ void DirNode::process_delete_transfer()
     m_hash.clear();
 }
 
-void DirNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+bool DirNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {
     Q_UNUSED(atp);
     Q_UNUSED(ec);
+    return true;
     // do nothing
 }
 

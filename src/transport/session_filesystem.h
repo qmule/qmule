@@ -36,7 +36,7 @@ public:
     // signal handlers
     virtual void process_add_transfer(const QString& hash);
     virtual void process_delete_transfer();
-    virtual void process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
+    virtual bool process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
@@ -83,7 +83,7 @@ public:
 
     // signal handlers
     virtual void process_delete_transfer();
-    virtual void process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
+    virtual bool process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
     QString collection_name() const;
     FileNode* child(const QString& filename);

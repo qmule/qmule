@@ -18,9 +18,6 @@ files_widget::files_widget(QWidget *parent)
     treeView->setModel(m_dir_model);
     tableView->setModel(m_file_model);
 
-    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-
     connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_dir_model, SLOT(changeNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_file_model, SLOT(changeNode(const FileNode*)));
 

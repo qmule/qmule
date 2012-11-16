@@ -432,18 +432,20 @@ void Session::on_registerNode(Transfer t)
     qDebug() << "Session::on_registerNode";
     FileNode* n = NULL;
 
-    if (m_files.contains(t.hash()))
+    if (!m_files.contains(t.hash()))
     {
-        n = m_files.value(t.hash());
-    }
-    else
-    {
+        //n = m_files.value(t.hash());
+    //}
+    //else
+    //{
         n = node(t.filepath_at(0));
         Q_ASSERT(n);
-        m_files.insert(t.hash(), n);
+        //m_files.insert(t.hash(), n);
+        //
+
+        n->process_add_transfer(t.hash());
     }
 
-    n->process_add_transfer(t.hash());
 }
 
 void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
@@ -490,6 +492,11 @@ void Session::addDirectory(DirNode* dir)
 void Session::setDirectLink(const QString& hash, DirNode* node)
 {
     m_files.insert(hash, node);
+}
+
+void Session::registerNode(FileNode* node)
+{
+    m_files.insert(node->hash(), node);
 }
 
 FileNode* Session::node(const QString& filepath)

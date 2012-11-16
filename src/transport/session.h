@@ -131,6 +131,7 @@ private:
     void addDirectory(DirNode* dir);
     void removeDirectory(DirNode* dir);
     void setDirectLink(const QString& hash, DirNode* node);
+    void registerNode(FileNode*);
     FileNode* node(const QString& filepath);
 
     // emitters

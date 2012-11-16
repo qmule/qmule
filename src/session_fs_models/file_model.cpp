@@ -140,14 +140,38 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
     {
     case Qt::CheckStateRole:
         {
-            if (index.column() == DC_STATUS) return active(index);
+            if (index.column() == DC_STATUS)
+            {
+                if (active(index))
+                {
+                    if (!hash(index).isEmpty())
+                    {
+                        return Qt::Checked;
+                    }
+                    else
+                    {
+                        return Qt::PartiallyChecked;
+                    }
+                }
+                else
+                {
+                    if (!hash(index).isEmpty())
+                    {
+                        return Qt::PartiallyChecked;
+                    }
+                    else
+                    {
+                        return Qt::Unchecked;
+                    }
+                }
+            }
         }
     break;
     case Qt::EditRole:
     case Qt::DisplayRole:
         switch (index.column())
         {
-        case DC_STATUS: return QVariant();
+            case DC_STATUS: return QVariant();
             case DC_NAME:   return displayName(index);
             case DC_SIZE:   return size(index);
             case DC_TYPE:   return type(index);
