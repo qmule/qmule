@@ -81,7 +81,7 @@ Session::~Session()
 { 
 }
 
-Session::Session() : m_root(NULL, QFileInfo(), NULL, true)
+Session::Session() : m_root(NULL, QFileInfo(), true)
 {    
     // prepare sessions container
     m_sessions.push_back(&m_btSession);
@@ -572,7 +572,7 @@ FileNode* Session::node(const QString& filepath)
             }
 
             // generate node with fake info and next request real info
-            node = new DirNode(parent, info, this);
+            node = new DirNode(parent, info);
             node->m_filename = element;
             qDebug() << "node request for: " << node->filepath();
             QFileInfo node_info(node->filepath());
@@ -602,12 +602,12 @@ FileNode* Session::node(const QString& filepath)
     {
         if (info.isFile())
         {
-            p = new FileNode(parent, info, this);
+            p = new FileNode(parent, info);
             parent->add_node(p);
         }
         else if (info.isDir())
         {
-            p = new DirNode(parent, info, this);
+            p = new DirNode(parent, info);
             ((DirNode*)p)->populate();
             parent->add_node(p);
         }

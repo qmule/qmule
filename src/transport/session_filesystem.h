@@ -18,14 +18,13 @@
 #include <libed2k/error_code.hpp>
 
 
-class Session;
 class DirNode;
 
 class FileNode
 {
 public:
 
-    FileNode(DirNode* parent, const QFileInfo& info, Session* session);
+    FileNode(DirNode* parent, const QFileInfo& info);
     virtual ~FileNode();
 
     virtual void share(bool recursive);
@@ -56,7 +55,6 @@ public:
 
     DirNode*    m_parent;
     bool        m_active;
-    Session* m_session;
     QFileInfo   m_info;
     libed2k::add_transfer_params* m_atp;
     libed2k::error_code  m_error;
@@ -69,7 +67,7 @@ public:
 class DirNode : public FileNode
 {
 public:
-    DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root = false);
+    DirNode(DirNode* parent, const QFileInfo& info, bool root = false);
     virtual ~DirNode();
 
     virtual bool is_dir() const { return true; }

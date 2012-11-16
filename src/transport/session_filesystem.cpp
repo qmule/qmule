@@ -130,10 +130,9 @@ int naturalCompare(const QString &s1, const QString &s2,  Qt::CaseSensitivity cs
     return QString::compare(s1, s2, cs);
 }
 
-FileNode::FileNode(DirNode* parent, const QFileInfo& info, Session* session) :
+FileNode::FileNode(DirNode* parent, const QFileInfo& info) :
     m_parent(parent),
     m_active(false),
-    m_session(session),
     m_info(info),
     m_atp(NULL)
 {
@@ -309,8 +308,8 @@ QString FileNode::string() const
     return (res);
 }
 
-DirNode::DirNode(DirNode* parent, const QFileInfo& info, Session* session, bool root /*= false*/) :
-    FileNode(parent, info, session),
+DirNode::DirNode(DirNode* parent, const QFileInfo& info, bool root /*= false*/) :
+    FileNode(parent, info),
     m_populated(false),
     m_root(root)
 {
@@ -702,7 +701,7 @@ void DirNode::populate()
         {
             if (!m_dir_children.contains(translateDriveName(fi)))
             {
-                DirNode* p = new DirNode(this, fi, m_session);
+                DirNode* p = new DirNode(this, fi);
                 p->m_filename = translateDriveName(fi);
                 add_node(p);
             }
@@ -720,13 +719,13 @@ void DirNode::populate()
 
             if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
             {
-                add_node(new DirNode(this, fileInfo, m_session));
+                add_node(new DirNode(this, fileInfo));
                 continue;
             }
 
             if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
             {
-                add_node(new FileNode(this, fileInfo, m_session));
+                add_node(new FileNode(this, fileInfo));
                 continue;
             }
         }
