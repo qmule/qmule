@@ -7,4 +7,5 @@ HEADERS += $$PWD/session_base.h \
 
 SOURCES += $$PWD/session_base.cpp \
            $$PWD/session.cpp \
-           $$PWD/transfer.cpp
+           $$PWD/transfer.cpp \
+           $$PWD/transfer_base.cpp

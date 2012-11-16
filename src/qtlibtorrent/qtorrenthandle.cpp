@@ -128,29 +128,6 @@ qlonglong QTorrentHandle::next_announce_s() const {
 #endif
 }
 
-float QTorrentHandle::progress() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  torrent_status st = torrent_handle::status(query_accurate_download_counters);
-#else
-  torrent_status st = torrent_handle::status();
-#endif
-  if (!st.total_wanted)
-    return 0.;
-  if (st.total_wanted_done == st.total_wanted)
-    return 1.;
-  float progress = (float) st.total_wanted_done / (float) st.total_wanted;
-  Q_ASSERT(progress >= 0. && progress <= 1.);
-  return progress;
-}
-
-bitfield QTorrentHandle::pieces() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return bitfield2TBF(torrent_handle::status(0x0).pieces);
-#else
-  return bitfield2TBF(torrent_handle::status().pieces);
-#endif
-}
-
 QString QTorrentHandle::current_tracker() const {
 #if LIBTORRENT_VERSION_MINOR > 15
   return misc::toQString(torrent_handle::status(0x0).current_tracker);
@@ -211,70 +188,6 @@ bool QTorrentHandle::extremity_pieces_first() const {
   return false;
 }
 
-size_type QTorrentHandle::total_wanted_done() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(query_accurate_download_counters).total_wanted_done;
-#else
-  return torrent_handle::status().total_wanted_done;
-#endif
-}
-
-size_type QTorrentHandle::total_wanted() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_wanted;
-#else
-  return torrent_handle::status().total_wanted;
-#endif
-}
-
-qreal QTorrentHandle::download_payload_rate() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).download_payload_rate;
-#else
-  return torrent_handle::status().download_payload_rate;
-#endif
-}
-
-qreal QTorrentHandle::upload_payload_rate() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).upload_payload_rate;
-#else
-  return torrent_handle::status().upload_payload_rate;
-#endif
-}
-
-int QTorrentHandle::num_peers() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_peers;
-#else
-  return torrent_handle::status().num_peers;
-#endif
-}
-
-int QTorrentHandle::num_seeds() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_seeds;
-#else
-  return torrent_handle::status().num_seeds;
-#endif
-}
-
-int QTorrentHandle::num_complete() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_complete;
-#else
-  return torrent_handle::status().num_complete;
-#endif
-}
-
-int QTorrentHandle::num_incomplete() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_incomplete;
-#else
-  return torrent_handle::status().num_incomplete;
-#endif
-}
-
 QString QTorrentHandle::save_path() const {
 #if LIBTORRENT_VERSION_MINOR > 15
   return misc::toQStringU(torrent_handle::save_path()).replace("\\", "/");
@@ -296,15 +209,6 @@ QStringList QTorrentHandle::url_seeds() const {
     std::cout << "ERROR: Failed to convert the URL seed" << std::endl;
   }
   return res;
-}
-
-// get the size of the torrent without the filtered files
-size_type QTorrentHandle::actual_size() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(query_accurate_download_counters).total_wanted;
-#else
-  return torrent_handle::status().total_wanted;
-#endif
 }
 
 bool QTorrentHandle::has_filtered_pieces() const {
@@ -376,14 +280,6 @@ std::vector<int> QTorrentHandle::file_extremity_pieces_at(unsigned int index) co
   return result;
 }
 
-TransferState QTorrentHandle::state() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return libstate2tstate(torrent_handle::status(0x0));
-#else
-  return libstate2tstate(torrent_handle::status());
-#endif
-}
-
 TransferStatus QTorrentHandle::status() const
 {
 #if LIBTORRENT_VERSION_MINOR > 15
@@ -403,71 +299,6 @@ QString QTorrentHandle::creator() const {
 
 QString QTorrentHandle::comment() const {
   return misc::toQStringU(torrent_handle::get_torrent_info().comment());
-}
-
-size_type QTorrentHandle::total_failed_bytes() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_failed_bytes;
-#else
-  return torrent_handle::status().total_failed_bytes;
-#endif
-}
-
-size_type QTorrentHandle::total_redundant_bytes() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_redundant_bytes;
-#else
-  return torrent_handle::status().total_redundant_bytes;
-#endif
-}
-
-bool QTorrentHandle::is_checking() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  torrent_status st = torrent_handle::status(0x0);
-#else
-  torrent_status st = torrent_handle::status();
-#endif
-  return st.state == torrent_status::checking_files || st.state == torrent_status::checking_resume_data;
-}
-
-size_type QTorrentHandle::total_done() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_done;
-#else
-  return torrent_handle::status().total_done;
-#endif
-}
-
-size_type QTorrentHandle::all_time_download() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).all_time_download;
-#else
-  return torrent_handle::status().all_time_download;
-#endif
-}
-
-size_type QTorrentHandle::all_time_upload() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).all_time_upload;
-#else
-  return torrent_handle::status().all_time_upload;
-#endif
-}
-
-size_type QTorrentHandle::total_payload_download() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_payload_download;
-#else
-  return torrent_handle::status().total_payload_download;
-#endif
-}
-
-size_type QTorrentHandle::total_payload_upload() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_payload_upload;
-#else
-  return torrent_handle::status().total_payload_upload;
-#endif
 }
 
 // Return a list of absolute paths corresponding
@@ -604,38 +435,6 @@ bool QTorrentHandle::is_sequential_download() const {
   return status.sequential_download;
 #else
   return torrent_handle::is_sequential_download();
-#endif
-}
-
-qlonglong QTorrentHandle::active_time() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).active_time;
-#else
-  return torrent_handle::status().active_time;
-#endif
-}
-
-qlonglong QTorrentHandle::seeding_time() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).seeding_time;
-#else
-  return torrent_handle::status().seeding_time;
-#endif
-}
-
-int QTorrentHandle::num_connections() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_connections;
-#else
-  return torrent_handle::status().num_connections;
-#endif
-}
-
-int QTorrentHandle::connections_limit() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).connections_limit;
-#else
-  return torrent_handle::status().connections_limit;
 #endif
 }
 
