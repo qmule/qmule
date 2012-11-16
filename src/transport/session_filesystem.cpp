@@ -155,7 +155,7 @@ void FileNode::share(bool recursive)
     {
         try
         {
-            m_session->get_ed2k_session()->addTransfer(*m_atp);
+            Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
         }
         catch(...)
         {
@@ -164,11 +164,12 @@ void FileNode::share(bool recursive)
     }
     else
     {
-        m_session->get_ed2k_session()->makeTransferParametersAsync(filepath());
+        //Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
+        Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 
     m_parent->drop_transfer_by_file();
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::unshare(bool recursive)
@@ -180,21 +181,22 @@ void FileNode::unshare(bool recursive)
 
     if (has_transfer())
     {
-        m_session->get_ed2k_session()->deleteTransfer(m_hash, false);
+        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, false);
     }
     else
     {
-        m_session->get_ed2k_session()->cancelTransferParameters(filepath());
+        Session::instance()->get_ed2k_session()->cancelTransferParameters(filepath());
     }
 
     m_parent->drop_transfer_by_file();
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::process_add_transfer(const QString& hash)
 {
+    m_active = true;
     m_hash = hash;
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::process_delete_transfer()
@@ -204,10 +206,10 @@ void FileNode::process_delete_transfer()
     // TODO ?
     if (is_active())
     {
-        m_session->get_ed2k_session()->addTransfer(*m_atp);
+        Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
     }
 
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
@@ -223,7 +225,7 @@ void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
         {
             try
             {
-             m_session->get_ed2k_session()->addTransfer(atp);
+             Session::instance()->get_ed2k_session()->addTransfer(atp);
             }
             catch(...)
             {
@@ -233,7 +235,7 @@ void FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
     }
 
     m_error = ec;
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 QString FileNode::filepath() const
@@ -314,7 +316,7 @@ void DirNode::share(bool recursive)
     if (!m_active)
     {
         m_active = true;
-        m_session->addDirectory(this);
+        Session::instance()->addDirectory(this);
 
         // execute without check current state
         // we can re-share files were unshared after directory was shared
@@ -341,7 +343,7 @@ void DirNode::share(bool recursive)
         }
     }
 
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void DirNode::unshare(bool recursive)
@@ -351,11 +353,11 @@ void DirNode::unshare(bool recursive)
     if (m_active)
     {
         m_active = false;
-        m_session->removeDirectory(this);
+        Session::instance()->removeDirectory(this);
 
         if (has_transfer())
         {
-            m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
+            Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
         }
 
         foreach(FileNode* p, m_file_children.values())
@@ -381,7 +383,7 @@ void DirNode::unshare(bool recursive)
         }
     }
 
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 bool DirNode::contains_active_children() const
@@ -450,7 +452,7 @@ void DirNode::update_state()
 {
     if (m_active && (has_transfer()))
     {
-        m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
+        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
     }
 
     foreach(DirNode* node, m_dir_children)
@@ -463,10 +465,10 @@ void DirNode::drop_transfer_by_file()
 {
     if (m_active && has_transfer())
     {
-        m_session->get_ed2k_session()->deleteTransfer(m_hash, true);
+        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
     }
 
-    m_session->signal_changeNode(this);
+    Session::instance()->signal_changeNode(this);
 }
 
 void DirNode::build_collection()
@@ -542,12 +544,12 @@ void DirNode::build_collection()
              data.close();
 
              // hash file and add node
-             std::pair<libed2k::add_transfer_params, libed2k::error_code> res_pair = m_session->get_ed2k_session()->makeTransferParameters(collection_filepath);
+             std::pair<libed2k::add_transfer_params, libed2k::error_code> res_pair = Session::instance()->get_ed2k_session()->makeTransferParameters(collection_filepath);
 
              if (!res_pair.second)
              {
-                m_session->setDirectLink(md4toQString(res_pair.first.file_hash), this);   //!< direclty set link in dictionary
-                m_session->get_ed2k_session()->addTransfer(res_pair.first);
+                Session::instance()->setDirectLink(md4toQString(res_pair.first.file_hash), this);   //!< direclty set link in dictionary
+                Session::instance()->get_ed2k_session()->addTransfer(res_pair.first);
              }
         }
     }
@@ -599,12 +601,12 @@ void DirNode::add_node(FileNode* node)
         if (node->is_dir())
         {
             insd = std::lower_bound(m_dir_vector.begin(), m_dir_vector.end(), node, std::ptr_fun(&toAsc));
-            m_session->signal_beginInsertNode(node, insd - m_dir_vector.begin());
+            Session::instance()->signal_beginInsertNode(node, insd - m_dir_vector.begin());
         }
         else
         {
             insf = std::lower_bound(m_file_vector.begin(), m_file_vector.end(), node, std::ptr_fun(&toAsc));
-            m_session->signal_beginInsertNode(node, insf - m_file_vector.begin());
+            Session::instance()->signal_beginInsertNode(node, insf - m_file_vector.begin());
         }
     }
 
@@ -635,12 +637,12 @@ void DirNode::add_node(FileNode* node)
         }
     }
 
-    if (m_populated) m_session->signal_endInsertNode();
+    if (m_populated) Session::instance()->signal_endInsertNode();
 }
 
 void DirNode::delete_node(const FileNode* node)
 {
-    if (m_populated) m_session->signal_beginRemoveNode(node);
+    if (m_populated) Session::instance()->signal_beginRemoveNode(node);
 
     if (node->is_dir())
     {
@@ -655,7 +657,7 @@ void DirNode::delete_node(const FileNode* node)
 
     delete node;
 
-    if (m_populated) m_session->signal_endRemoveNode();
+    if (m_populated) Session::instance()->signal_endRemoveNode();
 }
 
 QStringList DirNode::exclude_files() const

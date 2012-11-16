@@ -70,6 +70,7 @@ public:
     void saveFileSystem();
     void loadFileSystem();
     void share(const QString& filepath, bool recursive);
+    DirNode* root() { return &m_root; }
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -114,6 +115,7 @@ private slots:
 
     void on_deletedTransfer(QString);
     void on_registerNode(Transfer);
+    void on_transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
 
 private:
     Session();

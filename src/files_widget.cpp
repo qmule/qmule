@@ -3,12 +3,37 @@
 #include <QPainter>
 #include <QClipboard>
 #include "files_widget.h"
-#include "preferences.h"
+#include "session_fs_models/file_model.h"
+#include "session_fs_models/dir_model.h"
+#include "transport/session.h"
 
 files_widget::files_widget(QWidget *parent)
     : QWidget(parent)
 {
     setupUi(this);
+
+    m_dir_model = new DirectoryModel(Session::instance()->root());
+    m_file_model = new FilesModel(Session::instance()->root());
+
+    treeView->setModel(m_dir_model);
+    tableView->setModel(m_file_model);
+
+    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+
+    connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_dir_model, SLOT(changeNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_file_model, SLOT(changeNode(const FileNode*)));
+
+    connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_dir_model, SLOT(beginRemoveNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(endRemoveNode()), m_dir_model, SLOT(endRemoveNode()));
+    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*, int)), m_dir_model, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(Session::instance(), SIGNAL(endInsertNode()), m_dir_model, SLOT(endInsertNode()));
+
+    connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_file_model, SLOT(beginRemoveNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(endRemoveNode()), m_file_model, SLOT(endRemoveNode()));
+    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*, int)), m_file_model, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(Session::instance(), SIGNAL(endInsertNode()), m_file_model, SLOT(endInsertNode()));
+
     /*
 
     emuleFolder = QIcon(QPixmap::fromImage(img));
@@ -87,4 +112,9 @@ void files_widget::putToClipboard()
         QClipboard *cb = QApplication::clipboard();
         cb->setText(text);
     }
+}
+
+void files_widget::on_treeView_clicked(const QModelIndex &index)
+{
+    m_file_model->setRootNode(index);
 }

@@ -140,6 +140,8 @@ Session::Session() : m_root(NULL, QFileInfo(), NULL, true)
             this, SLOT(on_registerNode(Transfer)));
     connect(&m_edSession, SIGNAL(deletedTransfer(QString)),
             this, SLOT(on_deletedTransfer(QString)));
+    connect(&m_edSession, SIGNAL(transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&)),
+            this, SLOT(on_transferParametersReady(libed2k::add_transfer_params,libed2k::error_code)));
     connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
             this, SIGNAL(transferAboutToBeRemoved(Transfer)));
     connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
@@ -427,6 +429,7 @@ void Session::saveFastResumeData()
 
 void Session::on_registerNode(Transfer t)
 {
+    qDebug() << "Session::on_registerNode";
     FileNode* n = NULL;
 
     if (m_files.contains(t.hash()))
@@ -442,6 +445,17 @@ void Session::on_registerNode(Transfer t)
 
     n->process_add_transfer(t.hash());
 }
+
+void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+{
+    FileNode* p = node(misc::toQStringU(atp.m_filepath));
+
+    if (p != &m_root)
+    {
+        p->process_add_metadata(atp, ec);
+    }
+}
+
 
 void Session::on_deletedTransfer(QString hash)
 {
