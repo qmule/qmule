@@ -26,7 +26,8 @@ public:
          DC_SIZE,
          DC_TYPE,
          DC_TIME,
-         DC_HASH
+         DC_HASH,
+         DC_ERROR
      };
 
      BaseModel(DirNode* root, QObject *parent = 0);
@@ -53,7 +54,8 @@ public:
      QString filepath(const QModelIndex& index) const;
      QString time(const QModelIndex& index) const;
      QFile::Permissions permissions(const QModelIndex &index) const;
-     QString size(qint64 bytes) const;
+     QString error(const QModelIndex& index) const;
+     QString size(qint64 bytes) const;     
 protected:
      int elements_count(const DirNode* node) const;
      QVariant displayName(const QModelIndex& index);

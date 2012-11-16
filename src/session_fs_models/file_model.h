@@ -20,7 +20,7 @@ public:
 protected:
     virtual QModelIndex node2index(const FileNode*) const;
     virtual int node2row(const FileNode*) const;    
-    virtual int colcount() const { return 6; };
+    virtual int colcount() const { return 7; };
 };
 
 

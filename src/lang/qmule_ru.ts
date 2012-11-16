@@ -6298,6 +6298,18 @@ However, those plugins were disabled.</source>
         <translation>Не обмениваться вместе с подпапками</translation>
     </message>
     <message>
+        <source>FileSystem browser</source>
+        <translation>Файловая система</translation>
+    </message>
+    <message>
+        <source>Summary browser</source>
+        <translation>Суммарная раздача</translation>
+    </message>
+    <message>
+        <source>duplicate transfer</source>
+        <translation>Файл с таким хешем уже раздается</translation>
+    </message>    
+    <message>
         <source>ED2K link</source>
         <translation>ED2K ссылка</translation>
     </message>
@@ -6316,6 +6328,48 @@ However, those plugins were disabled.</source>
     <message>
         <source>File ID</source>
         <translation>Хэш файла</translation>
+    </message>
+</context>
+<context>
+    <name>dir_model</name>
+    <message>
+        <source>Name</source>
+        <translation>Имя директории</translation>
+    </message>
+</context>
+<context>
+    <name>file_model</name>
+    <message>
+        <source>Name</source>
+        <translation>Имя директории</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation>С</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Размер</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Тип файла</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип файла</translation>
+    </message>
+    <message>
+        <source>Date Modified</source>
+        <translation>Дата изменения</translation>
+    </message>
+    <message>
+        <source>Transfer hash</source>
+        <translation>Хэш трансфера</translation>
+    </message>
+    <message>
+        <source>Transfer state</source>
+        <translation>Состояние раздачи</translation>
     </message>
 </context>
 <context>

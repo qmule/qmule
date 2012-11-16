@@ -151,7 +151,7 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const
                 // prepare mule head
                 QPixmap pixm = icon.pixmap(icon.availableSizes()[0]);
                 QPainter painter(&pixm);
-                painter.drawPixmap(0, 0, QPixmap("../../src/Icons/emule/files/SharedFolderOvl.png"));
+                painter.drawPixmap(0, 0, QPixmap(":emule/files/SharedFolderOvl.png"));
                 painter.end();
                 res = QIcon(pixm);
             }

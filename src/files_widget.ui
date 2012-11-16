@@ -16,52 +16,64 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
      <widget class="QWidget" name="tab_1">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <attribute name="title">
        <string>FileSystem browser</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QTreeView" name="treeView"/>
-         </item>
-         <item>
-          <widget class="QTableView" name="tableView">
-           <property name="selectionMode">
-            <enum>QAbstractItemView::SingleSelection</enum>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <property name="showGrid">
-            <bool>false</bool>
-           </property>
-           <property name="sortingEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="cornerButtonEnabled">
-            <bool>false</bool>
-           </property>
-           <attribute name="horizontalHeaderHighlightSections">
-            <bool>false</bool>
-           </attribute>
-           <attribute name="verticalHeaderVisible">
-            <bool>false</bool>
-           </attribute>
-           <attribute name="verticalHeaderHighlightSections">
-            <bool>false</bool>
-           </attribute>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QSplitter" name="splitter_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QTreeView" name="treeView">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+         </widget>
+         <widget class="QTableView" name="tableView">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="showGrid">
+           <bool>false</bool>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="cornerButtonEnabled">
+           <bool>false</bool>
+          </property>
+          <attribute name="horizontalHeaderHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderHighlightSections">
+           <bool>false</bool>
+          </attribute>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>Summary browser</string>
       </attribute>
@@ -77,8 +89,14 @@
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QGroupBox" name="groupBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="title">
           <string>ED2K link</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="margin">
@@ -87,20 +105,7 @@
           <property name="spacing">
            <number>3</number>
           </property>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkForum">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Make forum link</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <widget class="QCheckBox" name="checkSize">
             <property name="enabled">
              <bool>false</bool>
@@ -113,7 +118,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="4" column="1">
            <widget class="QPushButton" name="btnCopy">
             <property name="enabled">
              <bool>false</bool>
@@ -129,7 +134,20 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="2">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkForum">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Make forum link</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
            <widget class="QPlainTextEdit" name="editLink">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

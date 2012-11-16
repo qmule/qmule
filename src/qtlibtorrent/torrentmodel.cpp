@@ -101,11 +101,18 @@ TorrentModelItem::State TorrentModelItem::state() const
       m_fgColor = QColor("red");
       return STATE_INVALID;
     }
-  } catch(libtorrent::invalid_handle&) {
+  } catch(libtorrent::invalid_handle&)
+    {
     m_icon = QIcon(":/Icons/skin/error.png");
     m_fgColor = QColor("red");
     return STATE_INVALID;
   }
+  catch(libed2k::libed2k_exception&)
+    {
+        m_icon = QIcon(":/Icons/skin/error.png");
+        m_fgColor = QColor("red");
+        return STATE_INVALID;
+    }
 }
 
 bool TorrentModelItem::setData(int column, const QVariant &value, int role)
@@ -296,10 +303,13 @@ QVariant TorrentModel::headerData(int section, Qt::Orientation orientation,
 QVariant TorrentModel::data(const QModelIndex &index, int role) const
 {
   if (!index.isValid()) return QVariant();
-  try {
+  try
+  {
     if (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0 && index.column() < columnCount())
       return m_torrents[index.row()]->data(index.column(), role);
-  } catch(libtorrent::invalid_handle&) {}
+  }
+  catch(libtorrent::invalid_handle&) {}
+  catch(libed2k::libed2k_exception&) {}
   return QVariant();
 }
 
@@ -315,18 +325,21 @@ bool TorrentModel::setData(const QModelIndex &index, const QVariant &value, int 
         notifyTorrentChanged(index.row());
       return change;
     }
-  } catch(libtorrent::invalid_handle&) {}
+  }
+  catch(libtorrent::invalid_handle&) {}
+  catch(libed2k::libed2k_exception&) {}
   return false;
 }
 
 int TorrentModel::torrentRow(const QString &hash) const
 {
-  QList<TorrentModelItem*>::const_iterator it;
+  QList<TorrentModelItem*>::const_iterator it;  
   int row = 0;
-  for (it = m_torrents.constBegin(); it != m_torrents.constEnd(); it++) {
-    if ((*it)->hash() == hash) return row;
-    ++row;
-  }
+    for (it = m_torrents.constBegin(); it != m_torrents.constEnd(); it++)
+    {
+        if ((*it)->hash() == hash) return row;
+        ++row;
+    }
   return -1;
 }
 

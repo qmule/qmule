@@ -94,7 +94,7 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
     QString returnValue;
     switch (section)
     {
-    case DC_STATUS: returnValue = tr("Status");
+    case DC_STATUS: returnValue = tr("S");
             break;
     case DC_NAME:   returnValue = tr("Name");
             break;
@@ -115,6 +115,8 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
             break;
     case DC_HASH:   returnValue = tr("Transfer hash");
             break;
+    case DC_ERROR:  returnValue = tr("Transfer state");
+            break;
     default: return QVariant();
     }
 
@@ -126,7 +128,17 @@ Qt::ItemFlags FilesModel::flags(const QModelIndex &index) const
     if (!index.isValid())
             return 0;
 
-    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    Qt::ItemFlags flags = Qt::ItemIsSelectable;
+
+    if (!active(index) && !hash(index).isEmpty())
+    {
+        // disabled
+    }
+    else
+    {
+        flags |= Qt::ItemIsEnabled;
+    }
+
     if (index.column() == DC_STATUS) flags |=  Qt::ItemIsUserCheckable;
     return flags;
 }
@@ -177,6 +189,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
             case DC_TYPE:   return type(index);
             case DC_TIME:   return time(index);
             case DC_HASH:   return hash(index);
+            case DC_ERROR:  return error(index);
             default:
                 qWarning("data: invalid display value column %d", index.column());
             break;

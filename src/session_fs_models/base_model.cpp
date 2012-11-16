@@ -1,4 +1,5 @@
 #include "base_model.h"
+#include "misc.h"
 
 BaseModel::BaseModel(DirNode* root, QObject *parent/* = 0*/) :
     QAbstractItemModel(parent), m_rootItem(root), m_row_count_changed(false)
@@ -153,6 +154,24 @@ QFile::Permissions BaseModel::permissions(const QModelIndex &index) const
 {
     if (!index.isValid()) return QFile::Permissions();
     return node(index)->m_info.permissions();
+}
+
+QString BaseModel::error(const QModelIndex& index) const
+{
+    QString res;
+
+    if (index.isValid())
+    {
+        FileNode* p = node(index);
+        Q_ASSERT(p);
+
+        if (p->m_error)
+        {
+            res = misc::toQStringU(p->m_error.message());
+        }
+    }
+
+    return res;
 }
 
 QString BaseModel::size(qint64 bytes) const

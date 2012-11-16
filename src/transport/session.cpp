@@ -434,15 +434,8 @@ void Session::on_registerNode(Transfer t)
 
     if (!m_files.contains(t.hash()))
     {
-        //n = m_files.value(t.hash());
-    //}
-    //else
-    //{
         n = node(t.filepath_at(0));
         Q_ASSERT(n);
-        //m_files.insert(t.hash(), n);
-        //
-
         n->process_add_transfer(t.hash());
     }
 

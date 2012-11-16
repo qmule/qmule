@@ -155,17 +155,18 @@ void FileNode::share(bool recursive)
     {
         try
         {
+            m_atp->duplicate_is_error = true;
             m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
             Session::instance()->registerNode(this);
         }
-        catch(...)
+        catch(const libed2k::libed2k_exception& e)
         {
-            // catch dublicate errors
+            m_error = e.error();
+            m_active = false;
         }
     }
     else
-    {
-        //Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
+    {        
         Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 
@@ -197,6 +198,13 @@ void FileNode::process_add_transfer(const QString& hash)
 {
     m_active = true;
     m_hash = hash;
+
+    // TODO - we need extract add_transfer_parameters from transfer to node
+    //if (!m_atp)
+    //{
+    //    m_atp = new libed2k::add_transfer_parameters;
+    //}
+
     Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
 }
@@ -205,13 +213,6 @@ void FileNode::process_delete_transfer()
 {
     qDebug() << "process delete transfer " << m_hash;
     m_hash.clear();
-
-    // TODO ?
-    //if (is_active())
-   // {
-    //    Session::instance()->get_ed2k_session()->addTransfer(*m_atp);
-    //}
-
     Session::instance()->signal_changeNode(this);
 }
 
@@ -222,26 +223,30 @@ bool FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
         if (!m_atp) m_atp = new libed2k::add_transfer_params;
 
         *m_atp = atp;
-        m_atp->duplicate_is_error = true;
 
         if (is_active())
         {
             try
             {
-                m_hash = Session::instance()->get_ed2k_session()->addTransfer(atp).hash();
+                m_atp->duplicate_is_error = true;
+                m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
                 Session::instance()->registerNode(this);
             }
-            catch(...)
+            catch(const libed2k::libed2k_exception& e)
             {
-                // catch dublicate errors
+                m_error = e.error();
+                m_active = false;
             }
         }
     }
+    else
+    {
+        m_active = false;
+        m_error = ec;
+    }
 
-    m_error = ec;
     Session::instance()->signal_changeNode(this);
-
-    return (!ec);
+    return (!m_error);
 }
 
 QString FileNode::filepath() const
