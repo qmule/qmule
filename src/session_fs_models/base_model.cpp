@@ -150,6 +150,12 @@ QString BaseModel::time(const QModelIndex& index) const
 #endif
 }
 
+QDateTime BaseModel::dt(const QModelIndex& index) const
+{
+    if (!index.isValid()) return QDateTime();
+    return node(index)->m_info.lastModified();
+}
+
 QFile::Permissions BaseModel::permissions(const QModelIndex &index) const
 {
     if (!index.isValid()) return QFile::Permissions();
@@ -169,6 +175,20 @@ QString BaseModel::error(const QModelIndex& index) const
         {
             res = misc::toQStringU(p->m_error.message());
         }
+    }
+
+    return res;
+}
+
+int BaseModel::has_error(const QModelIndex& index) const
+{
+    int res = 0;
+
+    if (index.isValid())
+    {
+        FileNode* p = node(index);
+        Q_ASSERT(p);
+        if (p->m_error) res = 1;
     }
 
     return res;
@@ -194,6 +214,29 @@ QString BaseModel::size(qint64 bytes) const
     return tr("%1 bytes").arg(QLocale().toString(bytes));
 }
 
+Qt::CheckState BaseModel::state(const QModelIndex& index) const
+{
+    Qt::CheckState st = Qt::Unchecked;
+
+    if (active(index))
+    {
+        if (!hash(index).isEmpty())
+        {
+            st = Qt::Checked;
+        }
+        else
+        {
+            st = Qt::PartiallyChecked;
+        }
+    }
+    else if (!hash(index).isEmpty())
+    {
+        return Qt::PartiallyChecked;
+    }
+
+    return st;
+}
+
 FileNode* BaseModel::node(const QModelIndex& index) const
 {
     FileNode* p = static_cast<FileNode*>(index.internalPointer());
@@ -206,7 +249,11 @@ FileNode* BaseModel::node(const QModelIndex& index) const
 void BaseModel::changeNode(const FileNode* node)
 {
     QModelIndex indx = index(node);
-    if (indx.isValid()) emit dataChanged(indx, index(indx.row(), columnCount() - 1, parent(indx)));
+
+    if (indx.isValid())
+    {
+        emitChangeSignal(indx);
+    }
 }
 
 void BaseModel::beginRemoveNode(const FileNode* node)
@@ -232,7 +279,7 @@ void BaseModel::endRemoveNode()
     }
 }
 
-void BaseModel::beginInsertNode(const FileNode* node, int pos)
+void BaseModel::beginInsertNode(const FileNode* node)
 {
     QModelIndex indx = index(node);
     m_row_count_changed = false;
@@ -242,8 +289,18 @@ void BaseModel::beginInsertNode(const FileNode* node, int pos)
         int row = 0;
         FileNode* node = static_cast<FileNode*>(indx.internalPointer());
         DirNode* parent_node = node->m_parent;
-        qDebug() << "beginInsertNode row: " << pos;
-        beginInsertRows(index(parent_node), pos, pos);
+
+        if (node->is_dir())
+        {
+            row = parent_node->m_dir_vector.size();
+        }
+        else
+        {
+            row = parent_node->m_file_vector.size();
+        }
+
+        qDebug() << "beginInsertNode row: " << row;
+        beginInsertRows(index(parent_node), row, row);
         m_row_count_changed = true;
     }
 }

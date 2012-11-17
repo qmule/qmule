@@ -607,48 +607,17 @@ bool toAsc(const FileNode* n1, const FileNode* n2)
 
 void DirNode::add_node(FileNode* node)
 {
-    QList<DirNode*>::iterator insd;
-    QList<FileNode*>::iterator insf;
-
-    if (m_populated)
-    {
-        if (node->is_dir())
-        {
-            insd = std::lower_bound(m_dir_vector.begin(), m_dir_vector.end(), node, std::ptr_fun(&toAsc));
-            m_session->beginInsertNode(node, insd - m_dir_vector.begin());
-        }
-        else
-        {
-            insf = std::lower_bound(m_file_vector.begin(), m_file_vector.end(), node, std::ptr_fun(&toAsc));
-            m_session->beginInsertNode(node, insf - m_file_vector.begin());
-        }
-    }
+    if (m_populated) m_session->beginInsertNode(node);
 
     if (node->is_dir())
     {
         m_dir_children.insert(node->filename(), static_cast<DirNode*>(node));
-
-        if (m_populated)
-        {
-            m_dir_vector.insert(insd, static_cast<DirNode*>(node));
-        }
-        else
-        {
-            m_dir_vector.push_back(static_cast<DirNode*>(node));
-        }
+        m_dir_vector.push_back(static_cast<DirNode*>(node));
     }
     else
     {
         m_file_children.insert(node->filename(), node);
-
-        if (m_populated)
-        {
-            m_file_vector.insert(insf, node);
-        }
-        else
-        {
-            m_file_vector.push_back(node);
-        }
+        m_file_vector.push_back(node);
     }
 
     if (m_populated) m_session->endInsertNode();

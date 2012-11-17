@@ -5,12 +5,15 @@
 #include <QFileIconProvider>
 #include <QSplitter>
 #include <QItemSelection>
+#include <QSortFilterProxyModel>
 #include "ui_files_widget.h"
 #include "misc.h"
 
 
 class DirectoryModel;
 class FilesModel;
+class SessionFilesSort;
+class SessionDirectoriesSort;
 
 class files_widget : public QWidget, public Ui::files_widget
 {
@@ -29,6 +32,9 @@ private:
 
     DirectoryModel* m_dir_model;
     FilesModel*     m_file_model;
+    SessionFilesSort* m_sort_files_model;
+    SessionDirectoriesSort* m_sort_dirs_model;
+    QModelIndex sort2dir(const QModelIndex& index) const;
 protected:
     virtual void closeEvent ( QCloseEvent * event);
 public slots:
@@ -41,6 +47,8 @@ private slots:
     void unxchangeSubdir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
     void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void sortChanged(int, Qt::SortOrder);
+    void sortChangedDirectory(int, Qt::SortOrder);
 };
 
 #endif // FILES_WIDGET_H

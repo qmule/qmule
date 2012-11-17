@@ -213,7 +213,7 @@ void BaseModel::endRemoveNode()
     }
 }
 
-void BaseModel::beginInsertNode(const FileNode* node, int pos)
+void BaseModel::beginInsertNode(const FileNode* node)
 {
     QModelIndex indx = index(node);
     m_row_count_changed = false;
@@ -223,8 +223,16 @@ void BaseModel::beginInsertNode(const FileNode* node, int pos)
         int row = 0;
         FileNode* node = static_cast<FileNode*>(indx.internalPointer());
         DirNode* parent_node = node->m_parent;
-        qDebug() << "beginInsertNode row: " << pos;
-        beginInsertRows(index(parent_node), pos, pos);
+        if (node->is_dir())
+        {
+            row = parent_node->m_dir_vector.size();
+        }
+        else
+        {
+            row = parent_node->m_file_vector.size();
+        }
+
+        beginInsertRows(index(parent_node), row, row);
         m_row_count_changed = true;
     }
 }

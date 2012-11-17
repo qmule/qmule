@@ -21,6 +21,7 @@ protected:
     virtual QModelIndex node2index(const FileNode*) const;
     virtual int node2row(const FileNode*) const;
     virtual int colcount() const { return 1; }
+    virtual void emitChangeSignal(const QModelIndex& indx) { emit dataChanged(indx, indx);}
 };
 
 #endif // __DIR_MODEL__H__

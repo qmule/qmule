@@ -10,10 +10,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);    
     m_model = new DirectoryModel((DirNode*)&m_sf.m_root);
     m_fileModel = new FileModel((DirNode*)&m_sf.m_root);
+    m_sorter = new QSortFilterProxyModel(this);    
+    m_sorter->setSourceModel(m_fileModel);
+    m_sorter->setDynamicSortFilter(true);
+
+    m_dir_sorter = new QSortFilterProxyModel(this);
+    m_dir_sorter->setSourceModel(m_model);
+    m_dir_sorter->setDynamicSortFilter(true);
 
     m_sf.share("/home/apavlov", false);
-    ui->treeView->setModel(m_model);
-    ui->tableView->setModel(m_fileModel);
+    ui->treeView->setModel(m_dir_sorter);
+    ui->tableView->setModel(m_sorter);
 
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     shareDir = new QAction(this);
@@ -36,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     removeD->setObjectName(QString::fromUtf8("remove D"));
     removeD->setText(tr("Remove directory"));
 
+    addFile = new QAction(this);
+    addFile->setObjectName(QString::fromUtf8("add File"));
+    addFile->setText(tr("add file"));
+
     m_dir_menu = new QMenu(this);
     m_dir_menu->setObjectName(QString::fromUtf8("DirMenu"));
     m_dir_menu->setTitle(tr("Directory actions"));
@@ -44,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dir_menu->addAction(unshareDir);
     m_dir_menu->addAction(unshareDirR);
     m_dir_menu->addAction(removeD);
+    m_dir_menu->addAction(addFile);
 
 
     removeF = new QAction(this);
@@ -63,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(unshareDirR,  SIGNAL(triggered()), this, SLOT(unshareDirectoryR()));
     connect(removeF,  SIGNAL(triggered()), this, SLOT(removeFile()));
     connect(removeD,  SIGNAL(triggered()), this, SLOT(removeDir()));
+    connect(addFile,  SIGNAL(triggered()), this, SLOT(processaddFile()));
 
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_model, SLOT(changeNode(const FileNode*)));
     connect(&m_sf, SIGNAL(changeNode(const FileNode*)), m_fileModel, SLOT(changeNode(const FileNode*)));
@@ -70,15 +83,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&m_sf, SIGNAL(beginRemoveNode(const FileNode*)), m_model, SLOT(beginRemoveNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endRemoveNode()), m_model, SLOT(endRemoveNode()));
-    connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*, int)), m_model, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*)), m_model, SLOT(beginInsertNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endInsertNode()), m_model, SLOT(endInsertNode()));
 
     connect(&m_sf, SIGNAL(beginRemoveNode(const FileNode*)), m_fileModel, SLOT(beginRemoveNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endRemoveNode()), m_fileModel, SLOT(endRemoveNode()));
-    connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*, int)), m_fileModel, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(&m_sf, SIGNAL(beginInsertNode(const FileNode*)), m_fileModel, SLOT(beginInsertNode(const FileNode*)));
     connect(&m_sf, SIGNAL(endInsertNode()), m_fileModel, SLOT(endInsertNode()));    
 
     connect(m_model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(testOnDeleteSlot(QModelIndex,int,int)));
+
+    connect(ui->tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(sortChanged(int, Qt::SortOrder)));
+
+    connect(ui->treeView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(dir_sortChanged(int, Qt::SortOrder)));
+
+    ui->treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
+    ui->tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
 }
 
 MainWindow::~MainWindow()
@@ -90,12 +112,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_treeView_clicked(const QModelIndex &index)
 {
-    m_fileModel->setRootNode(index);
+    QModelIndex src_indx = m_dir_sorter->mapToSource(index);
+    m_fileModel->setRootNode(src_indx);
 }
 
 void MainWindow::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
-    QModelIndex indx = ui->treeView->indexAt(pos);
+    QModelIndex sindx = ui->treeView->indexAt(pos);
+    QModelIndex indx = m_dir_sorter->mapToSource(sindx);
 
     if (indx.isValid())
     {
@@ -167,13 +191,20 @@ void MainWindow::removeFile()
     if (indx.isValid())
     {
         qDebug() << "call removeFile";
-        FileNode* node = static_cast<FileNode*>(indx.internalPointer());
-        DirNode* parent = node->m_parent;
+        QModelIndex src_indx = m_sorter->mapToSource(indx);
 
-        if (parent)
+        if (src_indx.isValid())
         {
-            qDebug() << "delete node call";
-            parent->delete_node(node);
+            FileNode* node = static_cast<FileNode*>(src_indx.internalPointer());
+            DirNode* parent = node->m_parent;
+
+            qDebug() << "address: " << node;
+
+            if (parent)
+            {
+                qDebug() << "delete node call";
+                parent->delete_node(node);
+            }
         }
     }
 }
@@ -192,6 +223,49 @@ void MainWindow::removeDir()
         {
             qDebug() << "delete directory node call";
             parent->delete_node(node);
+        }
+    }
+}
+
+void MainWindow::processaddFile()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Delete tranfer dialog"),
+                                      tr("Delete file?"), QLineEdit::Normal,
+                                      QDir::home().dirName(), &ok);
+    if (ok && !text.isEmpty())
+    {
+        QModelIndex indx = ui->treeView->currentIndex();
+
+        QModelIndex dir_indx = m_dir_sorter->mapToSource(indx);
+
+        if (dir_indx.isValid())
+        {
+            DirNode* node = static_cast<DirNode*>(dir_indx.internalPointer());
+            qDebug() << "call add file " << text << " to " << node->filepath();
+            QDir dir(node->filepath());
+
+            QFile data(dir.filePath(text));
+            if (data.open(QFile::WriteOnly | QFile::Truncate))
+            {
+                 QTextStream out(&data);
+                 out << "Result: " << qSetFieldWidth(10) << left << 3.14 << 2.7;
+                 data.close();
+                 FileNode* fn = m_sf.node(dir.filePath(text));
+                 if (fn != &m_sf.m_root)
+                 {
+                    qDebug() << "node for " << dir.filePath(text) << " was created";
+                 }
+                 else
+                 {
+                     qDebug() << " file not found";
+                 }
+             }
+             else
+             {
+                 qDebug() << "unable to open file";
+             }
+
         }
     }
 }
@@ -295,4 +369,14 @@ void MainWindow::testOnDeleteSlot(const QModelIndex& indx, int start, int end)
     {
         m_fileModel->setRootNode(indx);
     }
+}
+
+void MainWindow::sortChanged(int column, Qt::SortOrder order)
+{
+    m_sorter->sort(column, order);
+}
+
+void MainWindow::dir_sortChanged(int column, Qt::SortOrder order)
+{
+    m_dir_sorter->sort(column, order);
 }

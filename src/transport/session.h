@@ -97,7 +97,7 @@ signals:
     void changeNode(const FileNode* node);
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
-    void beginInsertNode(const FileNode* node, int pos);
+    void beginInsertNode(const FileNode* node);
     void endInsertNode();
 
 private slots:
@@ -137,7 +137,7 @@ private:
     // emitters
     void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
     void signal_endRemoveNode() { emit endRemoveNode();}
-    void signal_beginInsertNode(const FileNode* node, int pos) { emit beginInsertNode(node, pos);}
+    void signal_beginInsertNode(const FileNode* node) { emit beginInsertNode(node);}
     void signal_endInsertNode() { emit endInsertNode();}
     void signal_changeNode(const FileNode* node) { emit changeNode(node);}
 

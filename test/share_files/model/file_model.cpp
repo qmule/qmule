@@ -248,3 +248,14 @@ int FileModel::node2row(const FileNode* node) const
 
     return row;
 }
+/*
+bool FileSorter::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    res = false;
+    switch(left.column())
+    {
+        case BaseModel::DC_STATUS:
+        res =
+    }
+}
+*/

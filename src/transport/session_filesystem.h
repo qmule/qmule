@@ -17,7 +17,6 @@
 #include <libed2k/add_transfer_params.hpp>
 #include <libed2k/error_code.hpp>
 
-
 class DirNode;
 
 class FileNode

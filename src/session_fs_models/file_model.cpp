@@ -150,32 +150,26 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
+    case BaseModel::SortRole:
+        switch(index.column())
+        {
+            case DC_STATUS: return state(index);
+            case DC_NAME:   return displayName(index);
+            case DC_SIZE:   return size(index);
+            case DC_TYPE:   return type(index);
+            case DC_TIME:   return dt(index);
+            case DC_HASH:   return hash(index);
+            case DC_ERROR:  return has_error(index);
+            default:
+                qWarning("data: invalid display value column %d", index.column());
+            break;
+        }
+        break;
     case Qt::CheckStateRole:
         {
             if (index.column() == DC_STATUS)
             {
-                if (active(index))
-                {
-                    if (!hash(index).isEmpty())
-                    {
-                        return Qt::Checked;
-                    }
-                    else
-                    {
-                        return Qt::PartiallyChecked;
-                    }
-                }
-                else
-                {
-                    if (!hash(index).isEmpty())
-                    {
-                        return Qt::PartiallyChecked;
-                    }
-                    else
-                    {
-                        return Qt::Unchecked;
-                    }
-                }
+                return state(index);
             }
         }
     break;
@@ -285,5 +279,12 @@ int FilesModel::node2row(const FileNode* node) const
     }
 
     return row;
+}
+
+void FilesModel::emitChangeSignal(const QModelIndex& indx)
+{
+    emit dataChanged(indx, indx);
+    emit dataChanged(index(indx.row(), columnCount() - 2, parent(indx)),
+                               index(indx.row(), columnCount() - 1, parent(indx)));
 }
 

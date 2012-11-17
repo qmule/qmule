@@ -23,4 +23,11 @@ protected:
     virtual int colcount() const { return 6; };
 };
 
+/*
+class FileSorter : public QSortFilterProxyModel
+{
+public:
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+};
+*/
 #endif // __FILE_MODEL__H__

@@ -16,7 +16,8 @@ public:
          FileIconRole = Qt::DecorationRole,
          FilePathRole = Qt::UserRole + 1,
          FileNameRole = Qt::UserRole + 2,
-         FilePermissions = Qt::UserRole + 3
+         FilePermissions = Qt::UserRole + 3,
+         SortRole = Qt::UserRole + 4
      };
 
      enum DisplayColumns
@@ -53,9 +54,12 @@ public:
      QString name(const QModelIndex& index) const;
      QString filepath(const QModelIndex& index) const;
      QString time(const QModelIndex& index) const;
+     QDateTime dt(const QModelIndex& index) const;
      QFile::Permissions permissions(const QModelIndex &index) const;
      QString error(const QModelIndex& index) const;
+     int has_error(const QModelIndex& index) const;
      QString size(qint64 bytes) const;     
+     Qt::CheckState state(const QModelIndex& index) const;
 protected:
      int elements_count(const DirNode* node) const;
      QVariant displayName(const QModelIndex& index);
@@ -63,6 +67,7 @@ protected:
      virtual QModelIndex node2index(const FileNode*) const = 0;
      virtual int node2row(const FileNode*) const = 0;
      virtual int colcount() const = 0;
+     virtual void emitChangeSignal(const QModelIndex& index) = 0;
 
      DirNode*   m_rootItem;
      bool       m_row_count_changed;
@@ -72,7 +77,7 @@ public slots:
     void changeNode(const FileNode* node);
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
-    void beginInsertNode(const FileNode* node, int pos);
+    void beginInsertNode(const FileNode* node);
     void endInsertNode();
 };
 

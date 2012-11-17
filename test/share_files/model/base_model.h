@@ -85,7 +85,7 @@ public slots:
     void changeNode(const FileNode* node);
     void beginRemoveNode(const FileNode* node);
     void endRemoveNode();
-    void beginInsertNode(const FileNode* node, int pos);
+    void beginInsertNode(const FileNode* node);
     void endInsertNode();
 };
 

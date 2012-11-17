@@ -5,6 +5,7 @@
 #include "files_widget.h"
 #include "session_fs_models/file_model.h"
 #include "session_fs_models/dir_model.h"
+#include "session_fs_models/sort_model.h"
 #include "transport/session.h"
 
 files_widget::files_widget(QWidget *parent)
@@ -28,9 +29,16 @@ files_widget::files_widget(QWidget *parent)
 
     m_dir_model = new DirectoryModel(Session::instance()->root());
     m_file_model = new FilesModel(Session::instance()->root());
+    m_sort_files_model = new SessionFilesSort(this);
+    m_sort_files_model->setSourceModel(m_file_model);
+    m_sort_files_model->setDynamicSortFilter(true);
 
-    treeView->setModel(m_dir_model);
-    tableView->setModel(m_file_model);
+    m_sort_dirs_model = new SessionDirectoriesSort(this);
+    m_sort_dirs_model->setSourceModel(m_dir_model);
+    //m_sort_dirs_model->setDynamicSortFilter(true);
+
+    treeView->setModel(m_sort_dirs_model);
+    tableView->setModel(m_sort_files_model);
 
     m_filesMenu = new QMenu(this);
     m_filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
@@ -65,7 +73,7 @@ files_widget::files_widget(QWidget *parent)
     connect(tableView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
         SLOT(on_tableViewSelChanged(const QItemSelection &, const QItemSelection &))
-    );
+    );   
 
     connect(m_filesExchDir,       SIGNAL(triggered()), this, SLOT(exchangeDir()));
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
@@ -77,14 +85,22 @@ files_widget::files_widget(QWidget *parent)
 
     connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_dir_model, SLOT(beginRemoveNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(endRemoveNode()), m_dir_model, SLOT(endRemoveNode()));
-    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*, int)), m_dir_model, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*)), m_dir_model, SLOT(beginInsertNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(endInsertNode()), m_dir_model, SLOT(endInsertNode()));
 
     connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_file_model, SLOT(beginRemoveNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(endRemoveNode()), m_file_model, SLOT(endRemoveNode()));
-    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*, int)), m_file_model, SLOT(beginInsertNode(const FileNode*, int)));
+    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*)), m_file_model, SLOT(beginInsertNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(endInsertNode()), m_file_model, SLOT(endInsertNode()));
 
+    connect(tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(sortChanged(int, Qt::SortOrder)));
+
+    connect(treeView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(sortChangedDirectory(int, Qt::SortOrder)));
+
+    treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
+    tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
 
 /*
     allFiles = new QTreeWidgetItem(treeFiles);
@@ -131,12 +147,13 @@ void files_widget::putToClipboard()
 
 void files_widget::on_treeView_clicked(const QModelIndex &index)
 {
-    m_file_model->setRootNode(index);
+    QModelIndex dindex = sort2dir(index);
+    if (dindex.isValid()) m_file_model->setRootNode(dindex);
 }
 
 void files_widget::exchangeDir()
 {
-    QModelIndex indx = treeView->selectionModel()->currentIndex();
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
 
     if (indx.isValid())
     {
@@ -147,7 +164,7 @@ void files_widget::exchangeDir()
 
 void files_widget::exchangeSubdir()
 {
-    QModelIndex indx = treeView->selectionModel()->currentIndex();
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
 
     if (indx.isValid())
     {
@@ -158,7 +175,7 @@ void files_widget::exchangeSubdir()
 
 void files_widget::unexchangeDir()
 {
-    QModelIndex indx = treeView->selectionModel()->currentIndex();
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
 
     if (indx.isValid())
     {
@@ -169,13 +186,25 @@ void files_widget::unexchangeDir()
 
 void files_widget::unxchangeSubdir()
 {
-    QModelIndex indx = treeView->selectionModel()->currentIndex();
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
 
     if (indx.isValid())
     {
        qDebug() << "call unshareDirectoryR";
        static_cast<FileNode*>(indx.internalPointer())->unshare(true);
     }
+}
+
+QModelIndex files_widget::sort2dir(const QModelIndex& index) const
+{
+    Q_ASSERT(index.model() == m_sort_dirs_model);
+
+    if (index.isValid())
+    {
+        return m_sort_dirs_model->mapToSource(index);
+    }
+
+    return QModelIndex();
 }
 
 void files_widget::closeEvent ( QCloseEvent * event )
@@ -185,7 +214,7 @@ void files_widget::closeEvent ( QCloseEvent * event )
 
 void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
-    QModelIndex indx = treeView->indexAt(pos);
+    QModelIndex indx = sort2dir(treeView->indexAt(pos));
 
     if (indx.isValid())
     {
@@ -207,21 +236,38 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
 }
 
 void files_widget::on_tableViewSelChanged(const QItemSelection &, const QItemSelection &)
-{
+{/*
     QModelIndex index = tableView->currentIndex();
+
     if (index.isValid())
     {
-        if (m_file_model->active(index))
+        QModelIndex src_indx = m_sort_files_model->mapToSource(index);
+
+        if (src_indx.isValid())
         {
-            groupBox->setEnabled(true);
-            editLink->setEnabled(true);
-            btnCopy->setEnabled(true);
-            checkForum->setEnabled(true);
-            checkSize->setEnabled(true);
-        }
-        else
-        {
-            groupBox->setEnabled(false);
+            if (m_file_model->active(src_indx))
+            {
+                groupBox->setEnabled(true);
+                editLink->setEnabled(true);
+                btnCopy->setEnabled(true);
+                checkForum->setEnabled(true);
+                checkSize->setEnabled(true);
+            }
+            else
+            {
+                groupBox->setEnabled(false);
+            }
         }
     }
+    */
+}
+
+void files_widget::sortChanged(int column, Qt::SortOrder order)
+{
+    m_sort_files_model->sort(column, order);
+}
+
+void files_widget::sortChangedDirectory(int column, Qt::SortOrder order)
+{
+    m_sort_dirs_model->sort(column, order);
 }
