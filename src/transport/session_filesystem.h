@@ -33,9 +33,9 @@ public:
     virtual bool has_transfer() const { return !m_hash.isEmpty(); }
 
     // signal handlers
-    virtual void process_add_transfer(const QString& hash);
-    virtual void process_delete_transfer();
-    virtual bool process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
+    virtual void on_transfer_finished(const QString& hash);
+    virtual void on_transfer_deleted();
+    virtual bool on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
     virtual QString collection_name() const { return QString(""); }
     virtual QString filepath() const;
@@ -80,8 +80,8 @@ public:
     virtual void unshare(bool recursive);
 
     // signal handlers
-    virtual void process_delete_transfer();
-    virtual bool process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
+    virtual void on_transfer_deleted();
+    virtual bool on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
     QString collection_name() const;
     FileNode* child(const QString& filename);

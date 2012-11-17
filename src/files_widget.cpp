@@ -21,7 +21,10 @@ files_widget::files_widget(QWidget *parent)
         splitter_2->setSizes(sz);
     }
 
-    tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray());
+    if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
+    {
+        tableView->horizontalHeader()->resizeSection(0, 20);
+    }
 
     m_dir_model = new DirectoryModel(Session::instance()->root());
     m_file_model = new FilesModel(Session::instance()->root());
@@ -35,18 +38,22 @@ files_widget::files_widget(QWidget *parent)
 
     m_filesExchDir = new QAction(this);
     m_filesExchDir->setObjectName(QString::fromUtf8("filesExchDir"));
+    m_filesExchDir->setIcon(QIcon(":/emule/common/folder_share.ico"));
     m_filesExchDir->setText(tr("Exchange dir"));
 
     m_filesExchSubdir = new QAction(this);
     m_filesExchSubdir->setObjectName(QString::fromUtf8("filesExchSubdir"));
+    m_filesExchSubdir->setIcon(QIcon(":/emule/common/folder_share.ico"));
     m_filesExchSubdir->setText(tr("Exchange with subdirs"));
 
     m_filesUnexchDir = new QAction(this);
     m_filesUnexchDir->setObjectName(QString::fromUtf8("filesUnexchDir"));
+    m_filesUnexchDir->setIcon(QIcon(":/emule/common/folder_unshare.ico"));
     m_filesUnexchDir->setText(tr("Don't exchange dir"));
 
     m_filesUnexchSubdir = new QAction(this);
     m_filesUnexchSubdir->setObjectName(QString::fromUtf8("filesUnexchSubdir"));
+    m_filesUnexchSubdir->setIcon(QIcon(":/emule/common/folder_unshare.ico"));
     m_filesUnexchSubdir->setText(tr("Don't exchange with subdirs"));
 
     m_filesMenu->addAction(m_filesExchDir);

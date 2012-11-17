@@ -94,7 +94,7 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
     QString returnValue;
     switch (section)
     {
-    case DC_STATUS: returnValue = tr("S");
+    case DC_STATUS:
             break;
     case DC_NAME:   returnValue = tr("Name");
             break;

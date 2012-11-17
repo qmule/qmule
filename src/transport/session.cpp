@@ -436,7 +436,7 @@ void Session::on_registerNode(Transfer t)
     {
         n = node(t.filepath_at(0));
         Q_ASSERT(n);
-        n->process_add_transfer(t.hash());
+        n->on_transfer_finished(t.hash());
     }
 
 }
@@ -447,7 +447,7 @@ void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp
 
     if (p != &m_root)
     {
-        p->process_add_metadata(atp, ec);
+        p->on_metadata_completed(atp, ec);
     }
 }
 
@@ -462,7 +462,7 @@ void Session::on_deletedTransfer(QString hash)
         FileNode* node = itr.value();
         Q_ASSERT(node);
         m_files.erase(itr);
-        node->process_delete_transfer();
+        node->on_transfer_deleted();
     }
 
     emit deletedTransfer(hash);

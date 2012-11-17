@@ -193,32 +193,29 @@ void FileNode::unshare(bool recursive)
     Session::instance()->signal_changeNode(this);
 }
 
-void FileNode::process_add_transfer(const QString& hash)
+void FileNode::on_transfer_finished(const QString& hash)
 {
     m_active = true;
     m_hash = hash;
 
-    // TODO - we need extract add_transfer_parameters from transfer to node
-    //if (!m_atp)
-    //{
-    //    m_atp = new libed2k::add_transfer_parameters;
-    //}
+    // TODO - we need extract add_transfer_parameters to node from transfer
+
 
     Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
 }
 
-void FileNode::process_delete_transfer()
+void FileNode::on_transfer_deleted()
 {
-    qDebug() << "process delete transfer " << m_hash;
     m_hash.clear();
     Session::instance()->signal_changeNode(this);
 }
 
-bool FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
-{        
+bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+{            
     if (!ec)
     {
+        // parameters ready
         if (!m_atp) m_atp = new libed2k::add_transfer_params;
 
         *m_atp = atp;
@@ -239,9 +236,17 @@ bool FileNode::process_add_metadata(const libed2k::add_transfer_params& atp, con
         }
     }
     else
-    {
+    {        
+        // parameters possibly ware cancelled or completed with errors
+        delete m_atp;
+        m_atp = NULL;
         m_active = false;
         m_error = ec;
+
+        if (has_transfer())
+        {
+            Session::instance()->deleteTransfer(m_hash, false);
+        }
     }
 
     Session::instance()->signal_changeNode(this);
@@ -446,12 +451,12 @@ bool DirNode::all_active_children() const
     return active;
 }
 
-void DirNode::process_delete_transfer()
+void DirNode::on_transfer_deleted()
 {
     m_hash.clear();
 }
 
-bool DirNode::process_add_metadata(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+bool DirNode::on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {
     Q_UNUSED(atp);
     Q_UNUSED(ec);

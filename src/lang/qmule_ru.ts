@@ -1785,10 +1785,10 @@ No further notices will be issued.</source>
         <source>&amp;Options...</source>
         <translation>&amp;Настройки...</translation>
     </message>
-	<message>
-	    <source>OpenDownloadPath</source>
-		<translation>Открыть папку загруженных файлов</translation>
-	</message>
+    <message>
+        <source>OpenDownloadPath</source>
+        <translation>Открыть папку загруженных файлов</translation>
+    </message>
     <message>
         <source>Add &amp;URL...</source>
         <translation type="obsolete">Добавить &amp;URL...</translation>
@@ -6308,7 +6308,7 @@ However, those plugins were disabled.</source>
     <message>
         <source>duplicate transfer</source>
         <translation>Файл с таким хешем уже раздается</translation>
-    </message>    
+    </message>
     <message>
         <source>ED2K link</source>
         <translation>ED2K ссылка</translation>
@@ -6340,12 +6340,9 @@ However, those plugins were disabled.</source>
 <context>
     <name>file_model</name>
     <message>
+        <location filename="../session_fs_models/file_model.cpp" line="99"/>
         <source>Name</source>
-        <translation>Имя директории</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>С</translation>
+        <translation type="unfinished">Имя файла</translation>
     </message>
     <message>
         <source>Size</source>
