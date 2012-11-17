@@ -4,7 +4,8 @@
 #include "base_model.h"
 
 class FilesModel : public BaseModel
-{
+{    
+    Q_OBJECT
 public:
     FilesModel(DirNode* root, QObject* parent = 0);
     QModelIndex index(int row, int column,

@@ -6331,18 +6331,17 @@ However, those plugins were disabled.</source>
     </message>
 </context>
 <context>
-    <name>dir_model</name>
+    <name>DirectoryModel</name>
     <message>
         <source>Name</source>
         <translation>Имя директории</translation>
     </message>
 </context>
 <context>
-    <name>file_model</name>
+    <name>FilesModel</name>
     <message>
-        <location filename="../session_fs_models/file_model.cpp" line="99"/>
         <source>Name</source>
-        <translation type="unfinished">Имя файла</translation>
+        <translation>Имя файла</translation>
     </message>
     <message>
         <source>Size</source>

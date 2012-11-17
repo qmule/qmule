@@ -96,26 +96,26 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
     {
     case DC_STATUS:
             break;
-    case DC_NAME:   returnValue = tr("Name");
+    case DC_NAME:   returnValue = FilesModel::tr("Name");
             break;
-    case DC_SIZE:   returnValue = tr("Size");
+    case DC_SIZE:   returnValue = FilesModel::tr("Size");
             break;
     case DC_TYPE:   returnValue =
 #ifdef Q_OS_MAC
-                   tr("Kind", "Match OS X Finder");
+                   FilesModel::tr("Kind", "Match OS X Finder");
 #else
-                   tr("Type", "All other platforms");
+                   FilesModel::tr("Type", "All other platforms");
 #endif
            break;
     // Windows   - Type
     // OS X      - Kind
     // Konqueror - File Type
     // Nautilus  - Type
-    case DC_TIME:   returnValue = tr("Date Modified");
+    case DC_TIME:   returnValue = FilesModel::tr("Date Modified");
             break;
-    case DC_HASH:   returnValue = tr("Transfer hash");
+    case DC_HASH:   returnValue = FilesModel::tr("Transfer hash");
             break;
-    case DC_ERROR:  returnValue = tr("Transfer state");
+    case DC_ERROR:  returnValue = FilesModel::tr("Transfer state");
             break;
     default: return QVariant();
     }

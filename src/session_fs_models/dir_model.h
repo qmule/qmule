@@ -5,6 +5,7 @@
 
 class DirectoryModel : public BaseModel
 {
+    Q_OBJECT
 public:
     DirectoryModel(DirNode* root, QObject* parent = 0);
     QModelIndex index(int row, int column,
