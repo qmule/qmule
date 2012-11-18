@@ -96,7 +96,7 @@ signals:
     void resumedTransfer(Transfer t);
     void finishedTransfer(Transfer t);
     void deletedTransfer(QString hash);
-    void transferAboutToBeRemoved(Transfer t);
+    void transferAboutToBeRemoved(Transfer t, bool del_files);
     void savePathChanged(Transfer t);
     void newConsoleMessage(const QString &msg);
     void fileError(Transfer t, QString msg);

@@ -62,6 +62,9 @@
           <attribute name="horizontalHeaderHighlightSections">
            <bool>false</bool>
           </attribute>
+          <attribute name="horizontalHeaderMinimumSectionSize">
+           <number>10</number>
+          </attribute>
           <attribute name="verticalHeaderVisible">
            <bool>false</bool>
           </attribute>
@@ -72,14 +75,6 @@
         </widget>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <attribute name="title">
-       <string>Summary browser</string>
-      </attribute>
      </widget>
     </widget>
    </item>
@@ -108,6 +103,31 @@
           <property name="spacing">
            <number>3</number>
           </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QPlainTextEdit" name="editLink">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0">
            <widget class="QCheckBox" name="checkSize">
             <property name="enabled">
@@ -137,7 +157,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="1" column="0">
            <widget class="QCheckBox" name="checkForum">
             <property name="enabled">
              <bool>false</bool>
@@ -146,31 +166,6 @@
              <string>Make forum link</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QPlainTextEdit" name="editLink">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="readOnly">
              <bool>true</bool>
             </property>
            </widget>

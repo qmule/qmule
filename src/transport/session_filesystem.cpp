@@ -78,6 +78,22 @@ FileNode::~FileNode()
     delete m_atp;
 }
 
+void FileNode::create_transfer()
+{
+    try
+    {
+        m_atp->duplicate_is_error = true;
+        m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
+        Session::instance()->registerNode(this);
+        m_parent->drop_transfer_by_file();
+    }
+    catch(const libed2k::libed2k_exception& e)
+    {
+        m_error = e.error();
+        m_active = false;
+    }
+}
+
 void FileNode::share(bool recursive)
 {
     Q_UNUSED(recursive);
@@ -86,24 +102,13 @@ void FileNode::share(bool recursive)
 
     if (has_metadata())
     {
-        try
-        {
-            m_atp->duplicate_is_error = true;
-            m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
-            Session::instance()->registerNode(this);
-        }
-        catch(const libed2k::libed2k_exception& e)
-        {
-            m_error = e.error();
-            m_active = false;
-        }
+        create_transfer();
     }
     else
     {        
         Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 
-    m_parent->drop_transfer_by_file();
     Session::instance()->signal_changeNode(this);
 }
 
@@ -131,17 +136,17 @@ void FileNode::on_transfer_finished(const QString& hash)
 {
     m_active = true;
     m_hash = hash;
-
+    m_parent->drop_transfer_by_file();
     // TODO - we need extract add_transfer_parameters to node from transfer
-
-
     Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
 }
 
 void FileNode::on_transfer_deleted()
 {
+    m_active = false;
     m_hash.clear();
+    m_parent->drop_transfer_by_file();
     Session::instance()->signal_changeNode(this);
 }
 
@@ -156,17 +161,7 @@ bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, co
 
         if (is_active())
         {
-            try
-            {
-                m_atp->duplicate_is_error = true;
-                m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
-                Session::instance()->registerNode(this);
-            }
-            catch(const libed2k::libed2k_exception& e)
-            {
-                m_error = e.error();
-                m_active = false;
-            }
+            create_transfer();
         }
     }
     else

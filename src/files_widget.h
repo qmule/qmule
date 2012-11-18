@@ -35,20 +35,27 @@ private:
     SessionFilesSort* m_sort_files_model;
     SessionDirectoriesSort* m_sort_dirs_model;
     QModelIndex sort2dir(const QModelIndex& index) const;
-protected:
-    virtual void closeEvent ( QCloseEvent * event);
+    QModelIndex sort2file(const QModelIndex& index) const;
+    QString createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize);
+    void switchLinkWidget(bool enable);
+    void fillLinkWidget();
 public slots:
     void putToClipboard();
 private slots:
-    void on_treeView_clicked(const QModelIndex &index);
     void exchangeDir();
     void exchangeSubdir();
     void unexchangeDir();
     void unxchangeSubdir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
     void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void on_treeViewSelChanged(const QItemSelection &, const QItemSelection &);
     void sortChanged(int, Qt::SortOrder);
     void sortChangedDirectory(int, Qt::SortOrder);
+    void on_editLink_textChanged();
+    void on_checkForum_toggled(bool checked);
+    void on_checkSize_toggled(bool checked);
+    void on_btnCopy_clicked();
+    void on_changeRow(const QModelIndex& left, const QModelIndex& right);
 };
 
 #endif // FILES_WIDGET_H

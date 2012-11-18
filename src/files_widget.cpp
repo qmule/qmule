@@ -2,11 +2,14 @@
 #include <QAction>
 #include <QPainter>
 #include <QClipboard>
+
 #include "files_widget.h"
 #include "session_fs_models/file_model.h"
 #include "session_fs_models/dir_model.h"
 #include "session_fs_models/sort_model.h"
 #include "transport/session.h"
+
+#include <libed2k/file.hpp>
 
 files_widget::files_widget(QWidget *parent)
     : QWidget(parent)
@@ -35,7 +38,6 @@ files_widget::files_widget(QWidget *parent)
 
     m_sort_dirs_model = new SessionDirectoriesSort(this);
     m_sort_dirs_model->setSourceModel(m_dir_model);
-    //m_sort_dirs_model->setDynamicSortFilter(true);
 
     treeView->setModel(m_sort_dirs_model);
     tableView->setModel(m_sort_files_model);
@@ -75,6 +77,11 @@ files_widget::files_widget(QWidget *parent)
         SLOT(on_tableViewSelChanged(const QItemSelection &, const QItemSelection &))
     );   
 
+    connect(treeView->selectionModel(),
+        SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+        SLOT(on_treeViewSelChanged(const QItemSelection &, const QItemSelection &))
+    );
+
     connect(m_filesExchDir,       SIGNAL(triggered()), this, SLOT(exchangeDir()));
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
@@ -82,6 +89,8 @@ files_widget::files_widget(QWidget *parent)
 
     connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_dir_model, SLOT(changeNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_file_model, SLOT(changeNode(const FileNode*)));
+
+    connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
 
     connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_dir_model, SLOT(beginRemoveNode(const FileNode*)));
     connect(Session::instance(), SIGNAL(endRemoveNode()), m_dir_model, SLOT(endRemoveNode()));
@@ -101,31 +110,6 @@ files_widget::files_widget(QWidget *parent)
 
     treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
     tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
-
-/*
-    allFiles = new QTreeWidgetItem(treeFiles);
-    allFiles->setText(0, tr("All exchange files"));
-    allFiles->setIcon(0, QIcon(":/emule/files/all.ico"));
-    allFiles->setExpanded(true);
-
-    sharedDirs = new QTreeWidgetItem(allFiles);
-    sharedDirs->setText(0, tr("Exchange folders"));
-    sharedDirs->setIcon(0, provider.icon(QFileIconProvider::Folder));
-    sharedDirs->setExpanded(true);
-*/
-
-/*
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(addedTransfer(Transfer)), this, SLOT(addedTransfer(Transfer)));
-    connect(Session::instance()->get_ed2k_session(), SIGNAL(deletedTransfer(QString)), this, SLOT(deletedTransfer(QString)));
-
-    connect(tableFiles->selectionModel(),
-            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(selectedFileChanged(const QItemSelection&, const QItemSelection&)));
-
-    connect(checkForum, SIGNAL(stateChanged(int)), this, SLOT(checkChanged(int)));
-    connect(checkSize, SIGNAL(stateChanged(int)), this, SLOT(checkChanged(int)));
-    connect(btnCopy, SIGNAL(clicked()), this, SLOT(putToClipboard()));
-    */
 }
 
 files_widget::~files_widget()
@@ -143,12 +127,6 @@ void files_widget::putToClipboard()
         QClipboard *cb = QApplication::clipboard();
         cb->setText(text);
     }
-}
-
-void files_widget::on_treeView_clicked(const QModelIndex &index)
-{
-    QModelIndex dindex = sort2dir(index);
-    if (dindex.isValid()) m_file_model->setRootNode(dindex);
 }
 
 void files_widget::exchangeDir()
@@ -197,19 +175,68 @@ void files_widget::unxchangeSubdir()
 
 QModelIndex files_widget::sort2dir(const QModelIndex& index) const
 {
-    Q_ASSERT(index.model() == m_sort_dirs_model);
-
     if (index.isValid())
     {
+        Q_ASSERT(index.model() == m_sort_dirs_model);
         return m_sort_dirs_model->mapToSource(index);
     }
 
     return QModelIndex();
 }
 
-void files_widget::closeEvent ( QCloseEvent * event )
+QModelIndex files_widget::sort2file(const QModelIndex& index) const
 {
+    if (index.isValid())
+    {
+        Q_ASSERT(index.model() == m_sort_files_model);
+        return m_sort_files_model->mapToSource(index);
+    }
+
+    return QModelIndex();
 }
+
+QString files_widget::createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize)
+{
+    QString link = misc::toQStringU(libed2k::emule_collection::toLink(fileName.toUtf8().constData(), fileSize,
+                                                         libed2k::md4_hash::fromString(fileHash.toStdString()), false));
+    if (addForum)
+    {
+        link = "[u][b][url=" + link + "]" + fileName + "[/url][/b][/u]";
+        if (addSize) link += " " + misc::friendlyUnit(fileSize);
+    }
+
+    return link;
+}
+
+void files_widget::switchLinkWidget(bool enable)
+{
+    if (enable)
+    {
+        groupBox->setEnabled(true);
+        editLink->setEnabled(true);
+        checkForum->setEnabled(true);
+        checkSize->setEnabled(checkForum->isChecked());
+        fillLinkWidget();
+    }
+    else
+    {
+        editLink->clear();
+        groupBox->setEnabled(false);
+    }
+}
+
+void files_widget::fillLinkWidget()
+{
+    QModelIndex index = sort2file(tableView->currentIndex());
+
+    if (index.isValid())
+    editLink->setPlainText(createLink(m_file_model->displayName(index),
+                                      m_file_model->size(index),
+                                      m_file_model->hash(index),
+                                      checkForum->isChecked(),
+                                      checkSize->isChecked()));
+}
+
 
 
 void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
@@ -236,30 +263,24 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
 }
 
 void files_widget::on_tableViewSelChanged(const QItemSelection &, const QItemSelection &)
-{/*
-    QModelIndex index = tableView->currentIndex();
+{
+    QModelIndex index = sort2file(tableView->currentIndex());
+
+    if (index.isValid())
+    {        
+        switchLinkWidget(m_file_model->active(index));
+    }    
+}
+
+void files_widget::on_treeViewSelChanged(const QItemSelection &, const QItemSelection &)
+{
+    QModelIndex index = sort2dir(treeView->currentIndex());
 
     if (index.isValid())
     {
-        QModelIndex src_indx = m_sort_files_model->mapToSource(index);
-
-        if (src_indx.isValid())
-        {
-            if (m_file_model->active(src_indx))
-            {
-                groupBox->setEnabled(true);
-                editLink->setEnabled(true);
-                btnCopy->setEnabled(true);
-                checkForum->setEnabled(true);
-                checkSize->setEnabled(true);
-            }
-            else
-            {
-                groupBox->setEnabled(false);
-            }
-        }
+        switchLinkWidget(false);
+        m_file_model->setRootNode(index);
     }
-    */
 }
 
 void files_widget::sortChanged(int column, Qt::SortOrder order)
@@ -270,4 +291,40 @@ void files_widget::sortChanged(int column, Qt::SortOrder order)
 void files_widget::sortChangedDirectory(int column, Qt::SortOrder order)
 {
     m_sort_dirs_model->sort(column, order);
+}
+
+void files_widget::on_editLink_textChanged()
+{
+    btnCopy->setDisabled(editLink->toPlainText().isEmpty());
+}
+
+void files_widget::on_checkForum_toggled(bool checked)
+{
+    checkSize->setEnabled(checked);
+    fillLinkWidget();
+}
+
+void files_widget::on_checkSize_toggled(bool checked)
+{
+    Q_UNUSED(checked);
+    fillLinkWidget();
+}
+
+void files_widget::on_btnCopy_clicked()
+{
+    putToClipboard();
+}
+
+void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& right)
+{
+    Q_UNUSED(right);
+    // process current selection row changed state
+    QModelIndex current = sort2file(tableView->currentIndex());
+
+    if (left.isValid() && current.isValid() &&
+        (left.column() == 0) &&         // process only first signal (FileModel emits second signal to refresh hash and errors)
+        (left.row() == current.row()))  // check we stay on same row what was changed
+    {
+        switchLinkWidget(m_file_model->active(left) && !m_file_model->hash(left).isEmpty());
+    }
 }

@@ -62,7 +62,6 @@ public:
      Qt::CheckState state(const QModelIndex& index) const;
 protected:
      int elements_count(const DirNode* node) const;
-     QVariant displayName(const QModelIndex& index);
      FileNode* node(const QModelIndex& index) const;
      virtual QModelIndex node2index(const FileNode*) const = 0;
      virtual int node2row(const FileNode*) const = 0;

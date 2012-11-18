@@ -70,6 +70,7 @@ public:
     void saveFileSystem();
     void loadFileSystem();
     void share(const QString& filepath, bool recursive);
+    void unshare(const QString& filepath, bool recursive);
     DirNode* root() { return &m_root; }
 public slots:
     void playPendingMedia();
@@ -106,6 +107,7 @@ private slots:
     void on_finishedTorrent(const QTorrentHandle& h);
     void on_metadataReceived(const QTorrentHandle& h);
     void on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files);
+    void on_transferAboutToBeRemoved(const Transfer& t, bool del_files);
     void on_torrentFinishedChecking(const QTorrentHandle& h);
     void on_trackerAuthenticationRequired(const QTorrentHandle& h);
     void on_savePathChanged(const QTorrentHandle& h);
@@ -113,7 +115,6 @@ private slots:
     void readAlerts();
     void saveFastResumeData();
 
-    void on_deletedTransfer(QString);
     void on_registerNode(Transfer);
     void on_transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
 

@@ -289,7 +289,7 @@ void QED2KSession::deleteTransfer(const QString& hash, bool delete_files)
 {
     const Transfer t = getTransfer(hash);
     if (!t.is_valid()) return;
-    emit transferAboutToBeRemoved(t);
+    emit transferAboutToBeRemoved(t, delete_files);
 
     m_session->remove_transfer(
         t.ed2kHandle().delegate(),
@@ -637,8 +637,9 @@ void QED2KSession::readAlerts()
         }
         else if (libed2k::deleted_transfer_alert* p =
                  dynamic_cast<libed2k::deleted_transfer_alert*>(a.get()))
-        {
+        {            
             QString hash = QString::fromStdString(p->m_hash.toString());
+            qDebug() << "delete transfer alert" << hash;
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
         else if (libed2k::finished_transfer_alert* p =

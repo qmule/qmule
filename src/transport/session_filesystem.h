@@ -50,6 +50,7 @@ public:
 
     QString string() const;
     QString filename() const { return m_filename; }
+    void create_transfer();
     virtual qint64 size_on_disk() const { return m_info.size(); }
 
     DirNode*    m_parent;
