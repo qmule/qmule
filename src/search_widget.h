@@ -132,6 +132,7 @@ private:
     void fillFileValues(int row, const QED2KSearchResultEntry& fileEntry, const QModelIndex& parent = QModelIndex());
     bool hasSelectedMedia();
     bool hasSelectedFiles();
+    void updateFileActions();
 
     void processSearchResult(
         const std::vector<QED2KSearchResultEntry>& vRes, boost::optional<bool> obMoreResult);
@@ -180,6 +181,9 @@ private slots:
     void ed2kSearchFinished(const libed2k::net_identifier& np,const QString& hash,
                             const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
     void torrentSearchFinished(bool ok);
+    void addedTransfer(Transfer t);
+    void deletedTransfer(const QString& hash);
+
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
     void addFriend(const QString& user_name, const libed2k::net_identifier& np);
@@ -190,6 +194,16 @@ class SWSortFilterProxyModel : public QSortFilterProxyModel
 public:
     SWSortFilterProxyModel(QObject* parent = 0): QSortFilterProxyModel(parent){}
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+};
+
+class SWItemModel : public QStandardItemModel
+{
+public:
+    SWItemModel(int rows, int columns, QObject * parent = 0):
+        QStandardItemModel(rows, columns, parent){}
+    virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+private:
+    QColor color(const QModelIndex& index) const;
 };
 
 #endif // SEARCH_WIDGET_H

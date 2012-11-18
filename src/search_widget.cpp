@@ -34,6 +34,11 @@ boost::optional<qulonglong> toULongLong(const QString& str)
     return bOk ? boost::optional<qulonglong>(res) : boost::optional<qulonglong>();
 }
 
+bool inSession(const QString& hash)
+{
+    return misc::isMD4Hash(hash) && Session::instance()->getTransfer(hash).is_valid();
+}
+
 UserDir::UserDir(Preferences& pref)
 {
     bExpanded = pref.value("Expanded", false).toBool();
@@ -265,7 +270,7 @@ search_widget::search_widget(QWidget *parent)
     tableCond->item(10, 0)->setFlags(Qt::NoItemFlags);
     tableCond->item(10, 1)->setFlags(Qt::NoItemFlags);
 
-    model.reset(new QStandardItemModel(0, SWDelegate::SW_COLUMNS_NUM));
+    model.reset(new SWItemModel(0, SWDelegate::SW_COLUMNS_NUM));
     model.data()->setHeaderData(SWDelegate::SW_NAME, Qt::Horizontal,           tr("File Name"));
     model.data()->setHeaderData(SWDelegate::SW_SIZE, Qt::Horizontal,           tr("File Size"));
     model.data()->setHeaderData(SWDelegate::SW_AVAILABILITY, Qt::Horizontal,   tr("Availability"));
@@ -310,6 +315,10 @@ search_widget::search_widget(QWidget *parent)
                                 const std::vector<QED2KSearchResultEntry>&, bool)),
     		this, SLOT(ed2kSearchFinished(const libed2k::net_identifier&, const QString&,
                                           const std::vector<QED2KSearchResultEntry>&, bool)));
+    connect(Session::instance(), SIGNAL(addedTransfer(Transfer)),
+            this, SLOT(addedTransfer(Transfer)));
+    connect(Session::instance(), SIGNAL(deletedTransfer(QString)),
+            this, SLOT(deletedTransfer(const QString&)));
     connect(tabSearch, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabSearch, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(closeAll, SIGNAL(triggered()),  this, SLOT(closeAllTabs()));
@@ -1340,8 +1349,7 @@ void search_widget::peerDisconnected(const libed2k::net_identifier& np, const QS
 
 void search_widget::resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel)
 {
-    fileDownload->setEnabled(hasSelectedFiles());
-    filePreview->setEnabled(hasSelectedMedia());
+    updateFileActions();
 }
 
 void search_widget::download()
@@ -1462,7 +1470,8 @@ bool search_widget::hasSelectedMedia()
     for (iter = selected.begin(); iter != selected.end(); ++iter)
     {
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, *iter).toString();
-        if (misc::isPreviewable(misc::file_extension(filename)))
+        QString hash = selected_data(treeResult, SWDelegate::SW_ID, *iter).toString();
+        if (misc::isPreviewable(misc::file_extension(filename)) && !inSession(hash))
         {
             return true;
         }
@@ -1506,11 +1515,18 @@ bool search_widget::hasSelectedFiles()
     foreach (const QModelIndex& index, selected)
     {
         QString filename = selected_data(treeResult, SWDelegate::SW_NAME, index).toString();
-        if (!misc::isTorrentLink(filename))
+        QString hash = selected_data(treeResult, SWDelegate::SW_ID, index).toString();
+        if (!misc::isTorrentLink(filename) && !inSession(hash))
             return true;
     }
 
     return false;
+}
+
+void search_widget::updateFileActions()
+{
+    fileDownload->setEnabled(hasSelectedFiles());
+    filePreview->setEnabled(hasSelectedMedia());
 }
 
 void search_widget::setUserPicture(const libed2k::net_identifier& np, QIcon& icon)
@@ -1907,19 +1923,14 @@ void search_widget::torrentSearchFinished(bool ok)
     processSearchResult(entries, boost::optional<bool>());
 }
 
-bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+void search_widget::addedTransfer(Transfer t)
 {
-    QString name1 = sourceModel()->data(
-        sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
-    QString name2 = sourceModel()->data(
-        sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
-    bool torr1 = misc::isTorrentLink(name1);
-    bool torr2 = misc::isTorrentLink(name2);
+    updateFileActions();
+}
 
-    if (torr1 && !torr2) return sortOrder() == Qt::DescendingOrder;
-    else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
-
-    return QSortFilterProxyModel::lessThan(left, right);
+void search_widget::deletedTransfer(const QString& hash)
+{
+    updateFileActions();
 }
 
 void search_widget::getUserDetails()
@@ -1949,3 +1960,35 @@ void search_widget::createED2KLink()
     dlg.exec();
 }
 
+bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    QString name1 = sourceModel()->data(
+        sourceModel()->index(left.row(), SWDelegate::SW_NAME)).toString();
+    QString name2 = sourceModel()->data(
+        sourceModel()->index(right.row(), SWDelegate::SW_NAME)).toString();
+    bool torr1 = misc::isTorrentLink(name1);
+    bool torr2 = misc::isTorrentLink(name2);
+
+    if (torr1 && !torr2) return sortOrder() == Qt::DescendingOrder;
+    else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
+
+    return QSortFilterProxyModel::lessThan(left, right);
+}
+
+QVariant SWItemModel::data(const QModelIndex& inx, int role) const
+{
+    QVariant res;
+
+    if (role == Qt::ForegroundRole && inx.column() == SWDelegate::SW_NAME)
+        res = QVariant(color(inx));
+    else
+        res = QStandardItemModel::data(inx, role);
+
+    return res;
+}
+
+QColor SWItemModel::color(const QModelIndex& inx) const
+{
+    QString hash = index(inx.row(), SWDelegate::SW_ID, inx.parent()).data().toString();
+    return inSession(hash) ? Qt::red : Qt::black;
+}
