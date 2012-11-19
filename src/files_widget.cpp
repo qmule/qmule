@@ -268,7 +268,7 @@ void files_widget::on_tableViewSelChanged(const QItemSelection &, const QItemSel
 
     if (index.isValid())
     {        
-        switchLinkWidget(m_file_model->active(index));
+        switchLinkWidget(m_file_model->active(index) && !m_file_model->hash(index).isEmpty());
     }    
 }
 

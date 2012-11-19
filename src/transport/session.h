@@ -117,6 +117,7 @@ private slots:
 
     void on_registerNode(Transfer);
     void on_transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
+    void on_ED2KResumeDataLoaded();
 
 private:
     Session();

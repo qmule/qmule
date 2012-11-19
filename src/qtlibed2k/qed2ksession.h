@@ -118,6 +118,7 @@ private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
+    int m_resume_items_loaded;  // fast resume data what was sent to load
 
 public slots:
 	void startUpTransfers();
@@ -208,6 +209,7 @@ signals:
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
 
     void transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
+    void fastResumeDataLoadCompleted();
 };
 
 }

@@ -211,6 +211,7 @@ namespace aux
 
 QED2KSession::QED2KSession()
 {    
+    m_resume_items_loaded = 0;
 }
 
 void QED2KSession::start()
@@ -624,6 +625,14 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
             emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
+            --m_resume_items_loaded;
+            qDebug() << "added transfer " << m_resume_items_loaded;
+            // all fast resume data was loaded
+            if (m_resume_items_loaded == 0)
+            {
+                emit fastResumeDataLoadCompleted();
+            }
+
         }
         else if (libed2k::paused_transfer_alert* p =
                  dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
@@ -822,6 +831,7 @@ void QED2KSession::loadFastResumeData()
                         if (qfi.exists() && qfi.isFile())
                         {
                             delegate()->add_transfer(params);
+                            ++m_resume_items_loaded;
                         }
                         else
                         {
@@ -835,6 +845,12 @@ void QED2KSession::loadFastResumeData()
         }
 
         QFile::remove(file_abspath);
+    }
+
+    if (m_resume_items_loaded == 0)
+    {
+        // no fast resume data found - session ready for share
+        emit fastResumeDataLoadCompleted();
     }
 }
 

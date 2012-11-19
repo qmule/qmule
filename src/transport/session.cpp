@@ -146,8 +146,8 @@ Session::Session() : m_root(NULL, QFileInfo(), true)
             this, SLOT(on_transferAboutToBeRemoved(Transfer, bool)));
     connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
             this, SIGNAL(fileError(Transfer, QString)));
-
     connect(&m_edSession, SIGNAL(savePathChanged(Transfer)), this, SIGNAL(savePathChanged(Transfer)));
+    connect(&m_edSession, SIGNAL(fastResumeDataLoadCompleted()), this, SLOT(on_ED2KResumeDataLoaded()));
 
     m_speedMonitor.reset(new TorrentSpeedMonitor(this));
     m_speedMonitor->start();
@@ -491,6 +491,11 @@ void Session::saveFastResumeData()
     saveFileSystem();
     m_btSession.saveFastResumeData();
     m_edSession.saveFastResumeData();
+}
+
+void Session::on_ED2KResumeDataLoaded()
+{
+    loadFileSystem();
 }
 
 void Session::on_registerNode(Transfer t)
