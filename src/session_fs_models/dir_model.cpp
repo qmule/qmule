@@ -178,3 +178,8 @@ QVariant DirectoryModel::data(const QModelIndex &index, int role) const
 
     return res;
 }
+
+void DirectoryModel::emitChangeSignal(const QModelIndex& indx)
+{
+    emit dataChanged(indx, indx);
+}

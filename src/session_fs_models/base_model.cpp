@@ -25,13 +25,9 @@ QModelIndex BaseModel::parent(const QModelIndex &index) const
 
     if (parentItem->m_parent)
     {
-        foreach(const DirNode* p, parentItem->m_dir_vector)
+        foreach(const DirNode* p, parentItem->m_parent->m_dir_vector) // search parent in grand parent!
         {
-            if (p == parentItem)
-            {
-                break;
-            }
-
+            if (p == parentItem)  break;
             ++row;
         }
     }

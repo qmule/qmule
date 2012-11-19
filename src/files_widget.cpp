@@ -328,3 +328,4 @@ void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& righ
         switchLinkWidget(m_file_model->active(left) && !m_file_model->hash(left).isEmpty());
     }
 }
+
