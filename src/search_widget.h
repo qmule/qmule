@@ -202,8 +202,6 @@ public:
     SWItemModel(int rows, int columns, QObject * parent = 0):
         QStandardItemModel(rows, columns, parent){}
     virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-private:
-    QColor color(const QModelIndex& index) const;
 };
 
 #endif // SEARCH_WIDGET_H

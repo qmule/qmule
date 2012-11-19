@@ -9,6 +9,8 @@
 
 #include "misc.h"
 
+extern QColor itemColor(const QModelIndex& inx);
+
 class SWDelegate: public QItemDelegate {
   Q_OBJECT
 
@@ -36,8 +38,11 @@ public:
 
     ~SWDelegate() {}
 
-    void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const 
+    void paint(QPainter * painter, const QStyleOptionViewItem & opt, const QModelIndex & index) const 
     {
+        QStyleOptionViewItem option(opt);
+        option.palette.setColor(QPalette::Text, itemColor(index));
+
         switch (index.column())
         {
             case SW_NAME:

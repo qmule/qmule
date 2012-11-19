@@ -39,6 +39,12 @@ bool inSession(const QString& hash)
     return misc::isMD4Hash(hash) && Session::instance()->getTransfer(hash).is_valid();
 }
 
+QColor itemColor(const QModelIndex& inx)
+{
+    QString hash = inx.model()->index(inx.row(), SWDelegate::SW_ID, inx.parent()).data().toString();
+    return inSession(hash) ? Qt::red : Qt::black;
+}
+
 UserDir::UserDir(Preferences& pref)
 {
     bExpanded = pref.value("Expanded", false).toBool();
@@ -1980,15 +1986,9 @@ QVariant SWItemModel::data(const QModelIndex& inx, int role) const
     QVariant res;
 
     if (role == Qt::ForegroundRole && inx.column() == SWDelegate::SW_NAME)
-        res = QVariant(color(inx));
+        res = QVariant(itemColor(inx));
     else
         res = QStandardItemModel::data(inx, role);
 
     return res;
-}
-
-QColor SWItemModel::color(const QModelIndex& inx) const
-{
-    QString hash = index(inx.row(), SWDelegate::SW_ID, inx.parent()).data().toString();
-    return inSession(hash) ? Qt::red : Qt::black;
 }
