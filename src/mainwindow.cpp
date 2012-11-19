@@ -428,6 +428,8 @@ MainWindow::~MainWindow() {
   IconProvider::drop();
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
+  qDebug() << "Saving session filesystem";
+  Session::instance()->saveFileSystem();
   qDebug("Deleting Session::instance()");
   Session::drop();    
   qDebug("Exiting GUI destructor...");

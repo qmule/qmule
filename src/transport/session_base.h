@@ -77,7 +77,6 @@ public:
     virtual bool isFilePreviewPossible(const QString& hash) const;
     virtual void autoRunExternalProgram(const Transfer &t);
     virtual std::vector<QString> incompleteFiles() const;
-
 public slots:
     virtual void pauseTransfer(const QString& hash);
     virtual void resumeTransfer(const QString& hash);
@@ -200,8 +199,7 @@ public:
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
     QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
         DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
-    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
-
+    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }    
 private:
     std::queue<boost::function<void()> > m_deferred;
 };

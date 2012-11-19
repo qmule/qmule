@@ -488,6 +488,7 @@ void Session::saveFastResumeData()
 {
     m_periodic_resume->stop();
     m_alerts_reading->stop();
+    saveFileSystem();
     m_btSession.saveFastResumeData();
     m_edSession.saveFastResumeData();
 }
@@ -672,6 +673,7 @@ bool operator<(const QVector<QString>& v1, const QVector<QString>& v2)
 
 void Session::saveFileSystem()
 {
+    qDebug() << "saveFileSystem: " << m_dirs.size();
     Preferences pref;
     pref.beginGroup("SharedDirectories");
     pref.beginWriteArray("ShareDirs");
@@ -680,7 +682,7 @@ void Session::saveFileSystem()
     for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
     {
         const DirNode* p = *itr;
-        qDebug() << "save: " << p->filepath();
+        qDebug() << "save shared directory: " << p->filepath();
 
         pref.setArrayIndex(dir_indx);
         pref.setValue("Path", p->filepath());
@@ -748,6 +750,7 @@ void Session::loadFileSystem()
 
         if (dir_node != &m_root)
         {
+            qDebug() << "load shared directory: " << dir_node->filepath();
             dir_node->share(false);
             QDir filepath(item.first);
 
