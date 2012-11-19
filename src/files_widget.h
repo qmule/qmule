@@ -55,7 +55,8 @@ private slots:
     void on_checkForum_toggled(bool checked);
     void on_checkSize_toggled(bool checked);
     void on_btnCopy_clicked();
-    void on_changeRow(const QModelIndex& left, const QModelIndex& right);    
+    void on_changeRow(const QModelIndex& left, const QModelIndex& right);
+    void displayHSMenu(const QPoint&);
 };
 
 #endif // FILES_WIDGET_H

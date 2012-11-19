@@ -1,5 +1,6 @@
 #include "file_model.h"
 #include <QFont>
+#include <QBrush>
 
 FilesModel::FilesModel(DirNode* root, QObject* parent /*= 0*/) : BaseModel(root, parent)
 {
@@ -95,6 +96,7 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
     switch (section)
     {
     case DC_STATUS:
+                    returnValue = "#";
             break;
     case DC_NAME:   returnValue = FilesModel::tr("Name");
             break;
@@ -222,6 +224,11 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
                 f.setBold(true);
                 return f;
             }
+        }
+    case Qt::BackgroundRole:
+        if (!error(index).isEmpty())
+        {
+            return QBrush(Qt::red);
         }
     case FilePermissions:
         int p = permissions(index);

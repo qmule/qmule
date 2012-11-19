@@ -108,8 +108,12 @@ files_widget::files_widget(QWidget *parent)
     connect(treeView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(sortChangedDirectory(int, Qt::SortOrder)));
 
+    tableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(tableView->horizontalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayHSMenu(const QPoint&)));
+
     treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
-    tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
+    tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);        
 }
 
 files_widget::~files_widget()
@@ -326,6 +330,35 @@ void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& righ
         (left.row() == current.row()))  // check we stay on same row what was changed
     {
         switchLinkWidget(m_file_model->active(left) && !m_file_model->hash(left).isEmpty());
+    }
+}
+
+void files_widget::displayHSMenu(const QPoint&)
+{
+    QMenu hideshowColumn(this);
+    hideshowColumn.setTitle(tr("Column visibility"));
+    QList<QAction*> actions;
+
+    for (int i=0; i < m_file_model->columnCount(); ++i)
+    {
+        QAction *myAct = hideshowColumn.addAction(
+            m_file_model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+        myAct->setCheckable(true);
+        myAct->setChecked(!tableView->isColumnHidden(i));
+        actions.append(myAct);
+    }
+
+    // Call menu
+    QAction *act = hideshowColumn.exec(QCursor::pos());
+
+    if (act)
+    {
+        int col = actions.indexOf(act);
+        Q_ASSERT(col >= 0);
+        qDebug("Toggling column %d visibility", col);
+        tableView->setColumnHidden(col, !tableView->isColumnHidden(col));
+        if (!tableView->isColumnHidden(col) && tableView->columnWidth(col) <= 5)
+            tableView->setColumnWidth(col, 100);
     }
 }
 
