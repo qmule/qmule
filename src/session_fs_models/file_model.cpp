@@ -98,7 +98,7 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
             break;
     case DC_NAME:   returnValue = FilesModel::tr("Name");
             break;
-    case DC_SIZE:   returnValue = FilesModel::tr("Size");
+    case DC_FSIZE:   returnValue = FilesModel::tr("Size");
             break;
     case DC_TYPE:   returnValue =
 #ifdef Q_OS_MAC
@@ -155,7 +155,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         {
             case DC_STATUS: return state(index);
             case DC_NAME:   return displayName(index);
-            case DC_SIZE:   return size(index);
+            case DC_FSIZE:   return size(index);
             case DC_TYPE:   return type(index);
             case DC_TIME:   return dt(index);
             case DC_HASH:   return hash(index);
@@ -179,7 +179,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         {
             case DC_STATUS: return QVariant();
             case DC_NAME:   return displayName(index);
-            case DC_SIZE:   return size(index);
+            case DC_FSIZE:   return size(index);
             case DC_TYPE:   return type(index);
             case DC_TIME:   return time(index);
             case DC_HASH:   return hash(index);
@@ -210,7 +210,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
 
         break;
     case Qt::TextAlignmentRole:
-        if (index.column() == DC_SIZE)
+        if (index.column() == DC_FSIZE)
             return Qt::AlignRight;
         break;
     case Qt::FontRole:

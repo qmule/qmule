@@ -2,10 +2,6 @@
 #include <QFileSystemModel>
 #include <QTextStream>
 #include <algorithm>
-#ifdef Q_WS_WIN32
-#include <QVarLengthArray>
-#include <windows.h>
-#endif
 
 #include "session_filesystem.h"
 #include "session.h"
@@ -13,42 +9,6 @@
 
 #include <libed2k/file.hpp>
 #include <libed2k/filesystem.hpp>
-
-
-#ifdef Q_OS_WIN32
-static QString qt_GetLongPathName(const QString &strShortPath)
-{
-    if (strShortPath.isEmpty()
-        || strShortPath == QLatin1String(".") || strShortPath == QLatin1String(".."))
-        return strShortPath;
-    if (strShortPath.length() == 2 && strShortPath.endsWith(QLatin1Char(':')))
-        return strShortPath.toUpper();
-    const QString absPath = QDir(strShortPath).absolutePath();
-    if (absPath.startsWith(QLatin1String("//"))
-        || absPath.startsWith(QLatin1String("\\\\"))) // unc
-        return QDir::fromNativeSeparators(absPath);
-    if (absPath.startsWith(QLatin1Char('/')))
-        return QString();
-    const QString inputString = QLatin1String("\\\\?\\") + QDir::toNativeSeparators(absPath);
-    QVarLengthArray<TCHAR, MAX_PATH> buffer(MAX_PATH);
-    DWORD result = ::GetLongPathName((wchar_t*)inputString.utf16(),
-                                     buffer.data(),
-                                     buffer.size());
-    if (result > DWORD(buffer.size())) {
-        buffer.resize(result);
-        result = ::GetLongPathName((wchar_t*)inputString.utf16(),
-                                   buffer.data(),
-                                   buffer.size());
-    }
-    if (result > 4) {
-        QString longPath = QString::fromWCharArray(buffer.data() + 4); // ignoring prefix
-        longPath[0] = longPath.at(0).toUpper(); // capital drive letters
-        return QDir::fromNativeSeparators(longPath);
-    } else {
-        return QDir::fromNativeSeparators(strShortPath);
-    }
-}
-#endif
 
 QString translateDriveName(const QFileInfo &drive)
 {

@@ -24,7 +24,7 @@ public:
      {
          DC_STATUS = 0,
          DC_NAME,
-         DC_SIZE,
+         DC_FSIZE,
          DC_TYPE,
          DC_TIME,
          DC_HASH,
