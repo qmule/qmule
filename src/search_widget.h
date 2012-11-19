@@ -61,6 +61,19 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 };
 
+class SWSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    SWSortFilterProxyModel(QObject* parent = 0);
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+    void filterOwn(bool f);
+protected:
+    virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
+
+private:
+    bool m_filterOwn;
+};
+
 class search_widget : public QWidget , private Ui::search_widget
 {
     Q_OBJECT
@@ -85,7 +98,7 @@ private:
     QIcon iconSearchResult;
     QIcon iconUserFiles;
     QScopedPointer<QStandardItemModel> model;
-    QScopedPointer<QSortFilterProxyModel> filterModel;
+    QScopedPointer<SWSortFilterProxyModel> filterModel;
     SWDelegate* itemDelegate;
     search_filter* searchFilter;
     QString        m_lastSearchFileType;
@@ -149,6 +162,7 @@ private slots:
     void continueSearch();
     void cancelSearch();
     void clearSearch();
+    void filterOwn(int state);
     void searchRelatedFiles();
     void closeTab(int index);
     void selectTab(int nTabNum);
@@ -187,13 +201,6 @@ private slots:
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);
     void addFriend(const QString& user_name, const libed2k::net_identifier& np);
-};
-
-class SWSortFilterProxyModel : public QSortFilterProxyModel
-{
-public:
-    SWSortFilterProxyModel(QObject* parent = 0): QSortFilterProxyModel(parent){}
-    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 };
 
 class SWItemModel : public QStandardItemModel

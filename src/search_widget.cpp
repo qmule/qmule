@@ -316,6 +316,7 @@ search_widget::search_widget(QWidget *parent)
     connect(btnMore, SIGNAL(clicked()), this, SLOT(continueSearch()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSearch()));
     connect(btnClear, SIGNAL(clicked()), this, SLOT(clearSearch()));
+    connect(checkOwn, SIGNAL(stateChanged(int)), this, SLOT(filterOwn(int)));
     connect(Session::instance()->get_ed2k_session(),
             SIGNAL(searchResult(const libed2k::net_identifier&, const QString&,
                                 const std::vector<QED2KSearchResultEntry>&, bool)),
@@ -771,6 +772,11 @@ void search_widget::clearSearch()
 
     for (int ii = 0; ii < 11; ii ++)
         tableCond->item(ii, 1)->setText("");
+}
+
+void search_widget::filterOwn(int state)
+{
+    filterModel->filterOwn(state == Qt::Checked);
 }
 
 void search_widget::searchRelatedFiles()
@@ -1966,6 +1972,11 @@ void search_widget::createED2KLink()
     dlg.exec();
 }
 
+SWSortFilterProxyModel::SWSortFilterProxyModel(QObject* parent):
+    QSortFilterProxyModel(parent), m_filterOwn(false)
+{
+}
+
 bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
     QString name1 = sourceModel()->data(
@@ -1979,6 +1990,23 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
     else if (!torr1 && torr2) return sortOrder() == Qt::AscendingOrder;
 
     return QSortFilterProxyModel::lessThan(left, right);
+}
+
+void SWSortFilterProxyModel::filterOwn(bool f)
+{
+    m_filterOwn = f;
+    invalidateFilter();
+}
+
+bool SWSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
+{
+    if (m_filterOwn)
+    {
+        QString hash = sourceModel()->index(
+            source_row, SWDelegate::SW_ID, source_parent).data().toString();
+        return inSession(hash);
+    }
+    return true;
 }
 
 QVariant SWItemModel::data(const QModelIndex& inx, int role) const
