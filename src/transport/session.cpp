@@ -805,6 +805,7 @@ void Session::loadFileSystem()
 
                 if (file_node != &m_root)
                 {
+                    qDebug() << "  exclude file: " << file_node->filename();
                     file_node->unshare(false);
                 }
             }

@@ -46,6 +46,7 @@ void FileNode::create_transfer()
         m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
         Session::instance()->registerNode(this);
         m_parent->drop_transfer_by_file();
+        m_error = libed2k::errors::no_error;
     }
     catch(const libed2k::libed2k_exception& e)
     {
@@ -96,6 +97,7 @@ void FileNode::on_transfer_finished(const QString& hash)
 {
     m_active = true;
     m_hash = hash;
+    m_error = libed2k::errors::no_error;
     m_parent->drop_transfer_by_file();
     // TODO - we need extract add_transfer_parameters to node from transfer
     Session::instance()->registerNode(this);
@@ -112,6 +114,8 @@ void FileNode::on_transfer_deleted()
 
 bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {            
+    m_error = ec;
+
     if (!ec)
     {
         // parameters ready
@@ -130,13 +134,16 @@ bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, co
         delete m_atp;
         m_atp = NULL;
         m_active = false;
-        m_error = ec;
 
         if (has_transfer())
         {
             Session::instance()->deleteTransfer(m_hash, false);
         }
     }
+
+    // ignore cancel - it is not error
+    if (ec == libed2k::errors::make_error_code(libed2k::errors::file_params_making_was_cancelled))
+        m_error = libed2k::errors::no_error;
 
     Session::instance()->signal_changeNode(this);
     return (!m_error);

@@ -169,7 +169,7 @@ QString BaseModel::error(const QModelIndex& index) const
 
         if (p->m_error)
         {
-            res = misc::toQStringU(p->m_error.message());
+            res = tr("%1").arg(misc::toQStringU(p->m_error.message()));
         }
     }
 
@@ -225,10 +225,10 @@ Qt::CheckState BaseModel::state(const QModelIndex& index) const
             st = Qt::PartiallyChecked;
         }
     }
-    else if (!hash(index).isEmpty())
-    {
-        return Qt::PartiallyChecked;
-    }
+    //else if (!hash(index).isEmpty())
+    //{
+    //    return Qt::PartiallyChecked;
+    //}
 
     return st;
 }

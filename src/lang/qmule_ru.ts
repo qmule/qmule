@@ -6367,6 +6367,10 @@ However, those plugins were disabled.</source>
         <source>Transfer state</source>
         <translation>Состояние раздачи</translation>
     </message>
+    <message>
+        <source>duplicate transfer</source>
+        <translation>Повторяющийся хеш</translation>
+    </message>
 </context>
 <context>
     <name>info_dlg</name>

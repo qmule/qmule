@@ -228,7 +228,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
     case Qt::BackgroundRole:
         if (!error(index).isEmpty())
         {
-            return QBrush(Qt::red);
+            return QBrush(Qt::yellow);
         }
     case FilePermissions:
         int p = permissions(index);

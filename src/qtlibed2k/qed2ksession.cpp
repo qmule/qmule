@@ -625,14 +625,6 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
             emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
-            --m_resume_items_loaded;
-            qDebug() << "added transfer " << m_resume_items_loaded;
-            // all fast resume data was loaded
-            if (m_resume_items_loaded == 0)
-            {
-                emit fastResumeDataLoadCompleted();
-            }
-
         }
         else if (libed2k::paused_transfer_alert* p =
                  dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
@@ -659,6 +651,15 @@ void QED2KSession::readAlerts()
             if (p->m_had_picker)
                 emit finishedTransfer(t);
             emit registerNode(t);
+
+            --m_resume_items_loaded;
+            qDebug() << "finished transfer " << m_resume_items_loaded;
+
+            // all fast resume data was loaded
+            if (m_resume_items_loaded == 0)
+            {
+                emit fastResumeDataLoadCompleted();
+            }
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
