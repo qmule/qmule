@@ -429,6 +429,7 @@ MainWindow::~MainWindow() {
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
   qDebug() << "Saving session filesystem";
+  Session::instance()->dropDirectoryTransfers();
   Session::instance()->saveFileSystem();
   qDebug("Deleting Session::instance()");
   Session::drop();    

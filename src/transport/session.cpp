@@ -86,8 +86,8 @@ Session::~Session()
 { 
 }
 
-Session::Session() : m_root(NULL, QFileInfo(), true)
-{    
+Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(5000)
+{
     // prepare sessions container
     m_sessions.push_back(&m_btSession);
     m_sessions.push_back(&m_edSession);
@@ -493,6 +493,11 @@ void Session::saveFastResumeData()
 {
     m_periodic_resume->stop();
     m_alerts_reading->stop();
+    m_delay.cancel();
+    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        const DirNode* p = *itr;
+    }
     saveFileSystem();
     m_btSession.saveFastResumeData();
     m_edSession.saveFastResumeData();
@@ -510,7 +515,7 @@ void Session::on_registerNode(Transfer t)
 
     if (!m_files.contains(t.hash()))
     {
-        n = node(t.filepath_at(0));
+        n = node(t.absolute_files_path().at(0));
         Q_ASSERT(n);
         n->on_transfer_finished(t.hash());
     }
@@ -529,21 +534,14 @@ void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp
 
 void Session::removeDirectory(DirNode* dir)
 {
-    std::set<DirNode*>::iterator itr = m_dirs.find(dir);
-
-    if (itr != m_dirs.end()) m_dirs.erase(itr);
-
-    m_dirs.erase(std::find(m_dirs.begin(), m_dirs.end(), dir), m_dirs.end());
+    m_dirs.erase(dir);
+    m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
 }
 
 void Session::addDirectory(DirNode* dir)
 {
     m_dirs.insert(dir);
-}
-
-void Session::setDirectLink(const QString& hash, DirNode* node)
-{
-    m_files.insert(hash, node);
+    m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
 }
 
 void Session::registerNode(FileNode* node)
@@ -710,6 +708,19 @@ FileNode* Session::node(const QString& filepath)
     return (p);
 }
 
+void Session::prepare_collections()
+{
+    for (std::set<DirNode*>::iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        DirNode* p = *itr;
+
+        if (p->is_active() && !p->has_transfer())
+        {
+            p->build_collection();
+        }
+    }
+}
+
 // simple compare operator for our pairs
 bool operator<(const QVector<QString>& v1, const QVector<QString>& v2)
 {
@@ -757,6 +768,17 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
+    // fail save - remove all collections
+    QDir bkp_dir(misc::ED2KCollectionLocation());
+    if (bkp_dir.exists())
+    {
+        foreach(QString filename, bkp_dir.entryList(QDir::Files))
+        {
+            qDebug() << "remove fail file: " << filename;
+            QFile::remove(bkp_dir.absoluteFilePath(filename));
+        }
+    }
+
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;
     QVector<SD> vf;
@@ -810,7 +832,22 @@ void Session::loadFileSystem()
                 }
             }
         }
+    }
+}
 
+void Session::dropDirectoryTransfers()
+{
+    m_delay.cancel();
+
+    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        const DirNode* p = *itr;
+        qDebug() << "remove transfer on collection: " << p->filepath();
+
+        if (p->has_transfer())
+        {
+            deleteTransfer(p->m_hash, true);
+        }
     }
 }
 

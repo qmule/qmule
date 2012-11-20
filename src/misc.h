@@ -31,6 +31,7 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <boost/function.hpp>
 #include <libtorrent/version.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/torrent_handle.hpp>
@@ -43,6 +44,7 @@
 #include <QPoint>
 #include <QFile>
 #include <QDir>
+#include <QTimer>
 #ifndef DISABLE_GUI
 #include <QIcon>
 #endif
@@ -216,6 +218,22 @@ public:
   static QStringList migrationSharedFiles();
   static void migrateTorrents();
 
+};
+
+class Delay : QObject
+{
+    Q_OBJECT
+public:
+    Delay(int mseconds);
+    ~Delay();
+    void execute(boost::function<void()>);
+    void cancel();
+private:
+    int m_mseconds;
+    QTimer m_timer;
+    boost::function<void()> m_delegate;
+private slots:
+    void on_timeout();
 };
 
 //  Trick to get a portable sleep() function

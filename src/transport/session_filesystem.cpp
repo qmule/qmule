@@ -7,6 +7,7 @@
 #include "session.h"
 #include "preferences.h"
 
+#include <libed2k/md4_hash.hpp>
 #include <libed2k/file.hpp>
 #include <libed2k/filesystem.hpp>
 
@@ -82,7 +83,8 @@ void FileNode::unshare(bool recursive)
 
     if (has_transfer())
     {
-        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, false);
+        QString hash = m_hash;
+        Session::instance()->get_ed2k_session()->deleteTransfer(hash, false);
     }
     else
     {
@@ -137,7 +139,8 @@ bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, co
 
         if (has_transfer())
         {
-            Session::instance()->deleteTransfer(m_hash, false);
+            QString hash = m_hash;
+            Session::instance()->deleteTransfer(hash, false);
         }
     }
 
@@ -205,6 +208,10 @@ QString FileNode::string() const
     {
         res = misc::toQStringU(libed2k::emule_collection::toLink(libed2k::filename(m_atp->m_filepath), m_atp->file_size, m_atp->file_hash));
     }
+    else if (has_transfer())  //TODO - must be removed
+    {
+        res = QString("# empty line ") + m_hash;
+    }
 
     return (res);
 }
@@ -266,10 +273,7 @@ void DirNode::unshare(bool recursive)
         m_active = false;
         Session::instance()->removeDirectory(this);
 
-        if (has_transfer())
-        {
-            Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
-        }
+        deleteTransfer();
 
         foreach(FileNode* p, m_file_children.values())
         {
@@ -295,6 +299,15 @@ void DirNode::unshare(bool recursive)
     }
 
     Session::instance()->signal_changeNode(this);
+}
+
+void DirNode::deleteTransfer()
+{
+    if (has_transfer())
+    {
+        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
+        m_hash.clear();
+    }
 }
 
 bool DirNode::contains_active_children() const
@@ -349,7 +362,7 @@ bool DirNode::all_active_children() const
 
 void DirNode::on_transfer_deleted()
 {
-    m_hash.clear();
+    // do nothing
 }
 
 bool DirNode::on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
@@ -362,10 +375,7 @@ bool DirNode::on_metadata_completed(const libed2k::add_transfer_params& atp, con
 
 void DirNode::update_state()
 {
-    if (m_active && (has_transfer()))
-    {
-        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
-    }
+    if (m_active) deleteTransfer();
 
     foreach(DirNode* node, m_dir_children)
     {
@@ -375,11 +385,7 @@ void DirNode::update_state()
 
 void DirNode::drop_transfer_by_file()
 {
-    if (m_active && has_transfer())
-    {
-        Session::instance()->get_ed2k_session()->deleteTransfer(m_hash, true);
-    }
-
+    if (m_active) deleteTransfer();
     Session::instance()->signal_changeNode(this);
 }
 
@@ -459,9 +465,18 @@ void DirNode::build_collection()
              std::pair<libed2k::add_transfer_params, libed2k::error_code> res_pair = Session::instance()->get_ed2k_session()->makeTransferParameters(collection_filepath);
 
              if (!res_pair.second)
-             {
-                Session::instance()->setDirectLink(md4toQString(res_pair.first.file_hash), this);   //!< direclty set link in dictionary
-                Session::instance()->get_ed2k_session()->addTransfer(res_pair.first);
+             {               
+                try
+                {
+                    res_pair.first.duplicate_is_error = true;
+                    m_hash = Session::instance()->get_ed2k_session()->addTransfer(res_pair.first).hash();
+                    m_error = libed2k::errors::no_error;
+                }
+                catch(const libed2k::libed2k_exception& e)
+                {
+                    m_error = e.error();
+                    m_active = false;
+                }
              }
         }
     }

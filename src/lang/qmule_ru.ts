@@ -6367,9 +6367,16 @@ However, those plugins were disabled.</source>
         <source>Transfer state</source>
         <translation>Состояние раздачи</translation>
     </message>
+</context>
+<context>
+    <name>BaseModel</name>
     <message>
         <source>duplicate transfer</source>
         <translation>Повторяющийся хеш</translation>
+    </message>
+    <message>
+        <source>file size is zero</source>
+        <translation>Файл пуст</translation>
     </message>
 </context>
 <context>

@@ -78,6 +78,7 @@ public:
 
     virtual void share(bool recursive);
     virtual void unshare(bool recursive);
+    void deleteTransfer();
 
     // signal handlers
     virtual void on_transfer_deleted();

@@ -169,7 +169,7 @@ QString BaseModel::error(const QModelIndex& index) const
 
         if (p->m_error)
         {
-            res = tr("%1").arg(misc::toQStringU(p->m_error.message()));
+            res = BaseModel::tr(p->m_error.message().c_str());
         }
     }
 

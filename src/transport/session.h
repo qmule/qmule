@@ -9,6 +9,7 @@
 #include "qtlibed2k/qed2ksession.h"
 #include "torrentspeedmonitor.h"
 #include "session_filesystem.h"
+#include "misc.h"
 
 /**
  * Generic data transfer session
@@ -69,6 +70,7 @@ public:
 
     void saveFileSystem();
     void loadFileSystem();
+    void dropDirectoryTransfers();
     void share(const QString& filepath, bool recursive);
     void unshare(const QString& filepath, bool recursive);
     DirNode* root() { return &m_root; }
@@ -142,6 +144,7 @@ private:
     void signal_beginInsertNode(const FileNode* node) { emit beginInsertNode(node);}
     void signal_endInsertNode() { emit endInsertNode();}
     void signal_changeNode(const FileNode* node) { emit changeNode(node);}
+    void prepare_collections();
 
     static Session* m_instance;
 
@@ -156,6 +159,7 @@ private:
     std::set<QPair<QString, int> > m_pending_medias;
 
     DirNode m_root;
+    Delay                       m_delay;
     QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
     std::set<DirNode*>          m_dirs;     // shared directories
 

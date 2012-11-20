@@ -296,9 +296,13 @@ void QED2KSession::deleteTransfer(const QString& hash, bool delete_files)
         t.ed2kHandle().delegate(),
         delete_files ? libed2k::session::delete_files : libed2k::session::none);
 
-    if (QFile::remove(QDir(misc::ED2KBackupLocation()).absoluteFilePath(hash +".fastresume")))
+    if (QFile::remove(QDir(misc::ED2KBackupLocation()).absoluteFilePath(hash + ".fastresume")))
     {
         qDebug() << "Also deleted temp fast resume data: " << hash;
+    }
+    else
+    {
+        qDebug() << "fast resume wasn't removed for " << hash;
     }
 
     emit deletedTransfer(hash);
