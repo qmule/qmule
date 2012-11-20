@@ -276,6 +276,8 @@ search_widget::search_widget(QWidget *parent)
     tableCond->item(10, 0)->setFlags(Qt::NoItemFlags);
     tableCond->item(10, 1)->setFlags(Qt::NoItemFlags);
 
+    checkOwn->setChecked(Qt::Checked);
+
     model.reset(new SWItemModel(0, SWDelegate::SW_COLUMNS_NUM));
     model.data()->setHeaderData(SWDelegate::SW_NAME, Qt::Horizontal,           tr("File Name"));
     model.data()->setHeaderData(SWDelegate::SW_SIZE, Qt::Horizontal,           tr("File Size"));
@@ -316,7 +318,7 @@ search_widget::search_widget(QWidget *parent)
     connect(btnMore, SIGNAL(clicked()), this, SLOT(continueSearch()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(cancelSearch()));
     connect(btnClear, SIGNAL(clicked()), this, SLOT(clearSearch()));
-    connect(checkOwn, SIGNAL(stateChanged(int)), this, SLOT(filterOwn(int)));
+    connect(checkOwn, SIGNAL(stateChanged(int)), this, SLOT(showOwn(int)));
     connect(Session::instance()->get_ed2k_session(),
             SIGNAL(searchResult(const libed2k::net_identifier&, const QString&,
                                 const std::vector<QED2KSearchResultEntry>&, bool)),
@@ -766,7 +768,7 @@ void search_widget::clearSearch()
     comboName->setEditText("");
     comboType->setCurrentIndex(0);
 
-    checkOwn->setChecked(Qt::Unchecked);
+    checkOwn->setChecked(Qt::Checked);
     checkPlus->setChecked(Qt::Unchecked);
     checkTorrents->setChecked(Qt::Unchecked);
 
@@ -774,9 +776,9 @@ void search_widget::clearSearch()
         tableCond->item(ii, 1)->setText("");
 }
 
-void search_widget::filterOwn(int state)
+void search_widget::showOwn(int state)
 {
-    filterModel->filterOwn(state == Qt::Checked);
+    filterModel->showOwn(state == Qt::Checked);
 }
 
 void search_widget::searchRelatedFiles()
@@ -1938,11 +1940,13 @@ void search_widget::torrentSearchFinished(bool ok)
 void search_widget::addedTransfer(Transfer t)
 {
     updateFileActions();
+    filterModel->showOwn(checkOwn->isChecked());
 }
 
 void search_widget::deletedTransfer(const QString& hash)
 {
     updateFileActions();
+    filterModel->showOwn(checkOwn->isChecked());
 }
 
 void search_widget::getUserDetails()
@@ -1973,7 +1977,7 @@ void search_widget::createED2KLink()
 }
 
 SWSortFilterProxyModel::SWSortFilterProxyModel(QObject* parent):
-    QSortFilterProxyModel(parent), m_filterOwn(false)
+    QSortFilterProxyModel(parent), m_showOwn(true)
 {
 }
 
@@ -1992,19 +1996,19 @@ bool SWSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex
     return QSortFilterProxyModel::lessThan(left, right);
 }
 
-void SWSortFilterProxyModel::filterOwn(bool f)
+void SWSortFilterProxyModel::showOwn(bool f)
 {
-    m_filterOwn = f;
+    m_showOwn = f;
     invalidateFilter();
 }
 
 bool SWSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
 {
-    if (m_filterOwn)
+    if (!m_showOwn)
     {
         QString hash = sourceModel()->index(
             source_row, SWDelegate::SW_ID, source_parent).data().toString();
-        return inSession(hash);
+        return !inSession(hash);
     }
     return true;
 }

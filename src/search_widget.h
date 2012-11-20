@@ -66,12 +66,12 @@ class SWSortFilterProxyModel : public QSortFilterProxyModel
 public:
     SWSortFilterProxyModel(QObject* parent = 0);
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
-    void filterOwn(bool f);
+    void showOwn(bool f);
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
 
 private:
-    bool m_filterOwn;
+    bool m_showOwn;
 };
 
 class search_widget : public QWidget , private Ui::search_widget
@@ -162,7 +162,7 @@ private slots:
     void continueSearch();
     void cancelSearch();
     void clearSearch();
-    void filterOwn(int state);
+    void showOwn(int state);
     void searchRelatedFiles();
     void closeTab(int index);
     void selectTab(int nTabNum);
