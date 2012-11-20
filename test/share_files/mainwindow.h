@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QSortFilterProxyModel>
+#include <QTimer>
 #include "share_files.h"
 #include "delegate.h"
 #include "dir_model.h"
@@ -44,6 +45,7 @@ private:
 
     QMenu*     m_file_menu;
     QAction*   removeF;
+    Delay      m_delay;
 private slots:
     void shareDirectory();
     void shareDirectoryR();
@@ -60,6 +62,7 @@ private slots:
     void testOnDeleteSlot(const QModelIndex&, int, int);
     void sortChanged(int, Qt::SortOrder);
     void dir_sortChanged(int, Qt::SortOrder);
+    void on_pushButton_2_clicked();
 };
 
 #endif // MAINWINDOW_H

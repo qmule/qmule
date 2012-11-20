@@ -2,12 +2,15 @@
 #include "ui_mainwindow.h"
 #include <QInputDialog>
 #include <QTextStream>
+#include <QMessageBox>
+#include <boost/bind.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow), m_delay(5000)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
+
     m_model = new DirectoryModel((DirNode*)&m_sf.m_root);
     m_fileModel = new FileModel((DirNode*)&m_sf.m_root);
     m_sorter = new QSortFilterProxyModel(this);    
@@ -380,3 +383,9 @@ void MainWindow::dir_sortChanged(int column, Qt::SortOrder order)
 {
     m_dir_sorter->sort(column, order);
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    m_delay.execute(boost::bind(&instance::res, instance::get()));
+}
+

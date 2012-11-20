@@ -1,4 +1,5 @@
 #include "base_model.h"
+#include <QMessageBox>
 
 BaseModel::BaseModel(DirNode* root, QObject *parent/* = 0*/) :
     QAbstractItemModel(parent), m_rootItem(root), m_row_count_changed(false)
@@ -244,4 +245,56 @@ void BaseModel::endInsertNode()
         endInsertRows();
         m_row_count_changed = false;
     }
+}
+
+instance* instance::m_inst = NULL;
+
+instance* instance::get()
+{
+    if (!m_inst)
+    {
+        m_inst = new instance();
+    }
+
+    return m_inst;
+}
+
+int instance::res() const
+{
+    return QMessageBox::warning(NULL, tr("My Application"),
+                                                     tr("The document has been modified.\n"
+                                                        "Do you want to save your changes?"),
+                                                     QMessageBox::Save | QMessageBox::Discard
+                                                     | QMessageBox::Cancel,
+                                                     QMessageBox::Save);
+}
+
+Delay::Delay(int mseconds) : m_mseconds(mseconds)
+{
+    m_timer.setSingleShot(true);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_timeout()));
+}
+
+Delay::~Delay()
+{
+
+}
+
+void Delay::execute(boost::function<void()> f)
+{
+    m_delegate = f;
+
+    if (m_timer.isActive())
+    {
+        m_timer.setInterval(m_mseconds);
+    }
+    else
+    {
+        m_timer.start(m_mseconds);
+    }
+}
+
+void Delay::on_timeout()
+{
+    m_delegate();
 }

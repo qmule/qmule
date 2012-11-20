@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
+#ifdef Q_WS_WIN
 bool MainWindow::winEvent(MSG * message, long * result)
 {
     if (message->message == m_IDTaskbarButtonCreated) {
@@ -41,6 +42,7 @@ bool MainWindow::winEvent(MSG * message, long * result)
 
     return false;
 }
+#endif
 
 void MainWindow::updateState(int state)
 {

@@ -4,7 +4,9 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
+#include <QTimer>
 #include "share_files.h"
+#include <boost/function.hpp>
 
 class BaseModel : public QAbstractItemModel
 {
@@ -87,6 +89,32 @@ public slots:
     void endRemoveNode();
     void beginInsertNode(const FileNode* node);
     void endInsertNode();
+};
+
+class instance : QObject
+{
+    Q_OBJECT
+private:
+    instance() {}
+    static instance* m_inst;
+public:
+    static instance* get();
+    int res() const;
+};
+
+class Delay : QObject
+{
+    Q_OBJECT
+public:
+    Delay(int mseconds);
+    ~Delay();
+    void execute(boost::function<void()>);
+private:
+    int m_mseconds;
+    QTimer m_timer;
+    boost::function<void()> m_delegate;
+private slots:
+    void on_timeout();
 };
 
 

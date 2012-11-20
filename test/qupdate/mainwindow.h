@@ -17,8 +17,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+#ifdef Q_WS_WIN
 protected:
     bool winEvent(MSG * message, long * result);
+#endif
 private:
     Ui::MainWindow *ui;
     QScopedPointer<silent_updater> m_upd;
