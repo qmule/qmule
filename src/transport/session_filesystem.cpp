@@ -591,6 +591,7 @@ void DirNode::populate()
     {
         QString itPath = QDir::fromNativeSeparators(path);
         QDirIterator dirIt(itPath, QDir::NoDotAndDotDot| QDir::AllEntries | QDir::System | QDir::Hidden);
+        QSet<QString> incompleteFiles = Session::instance()->incompleteFiles();
 
         while(dirIt.hasNext())
         {
@@ -603,7 +604,8 @@ void DirNode::populate()
                 continue;
             }
 
-            if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()))
+            if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()) &&
+                !incompleteFiles.contains(fileInfo.filePath()))
             {
                 add_node(new FileNode(this, fileInfo));
                 continue;

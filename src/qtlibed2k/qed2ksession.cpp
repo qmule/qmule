@@ -654,7 +654,9 @@ void QED2KSession::readAlerts()
 
             if (p->m_had_picker)
                 emit finishedTransfer(t);
-            emit registerNode(t);
+
+            if (t.is_seed())
+                emit registerNode(t);
 
             --m_resume_items_loaded;
             qDebug() << "finished transfer " << m_resume_items_loaded;

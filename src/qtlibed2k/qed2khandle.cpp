@@ -71,7 +71,6 @@ float QED2KHandle::progress() const {
         return 0.;
     if (st.total_wanted_done == st.total_wanted)
         return 1.;
-    std::cout << "libed2k progress done: " << st.total_wanted_done << " wanted: " << st.total_wanted << std::endl;
     float progress = (float) st.total_wanted_done / (float) st.total_wanted;
     Q_ASSERT(progress >= 0. && progress <= 1.);
     return progress;
