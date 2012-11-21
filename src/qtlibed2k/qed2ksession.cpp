@@ -245,6 +245,7 @@ void QED2KSession::start()
     }
 
     m_session->set_alert_mask(alert::all_categories);
+    m_session->set_alert_queue_size_limit(10000);
     // start listening on special interface and port and start server connection
     configureSession();
 }

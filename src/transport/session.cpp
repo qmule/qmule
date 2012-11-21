@@ -86,7 +86,7 @@ Session::~Session()
 { 
 }
 
-Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(5000)
+Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(10000)
 {
     // prepare sessions container
     m_sessions.push_back(&m_btSession);

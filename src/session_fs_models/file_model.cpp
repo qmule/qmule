@@ -130,17 +130,7 @@ Qt::ItemFlags FilesModel::flags(const QModelIndex &index) const
     if (!index.isValid())
             return 0;
 
-    Qt::ItemFlags flags = Qt::ItemIsSelectable;
-
-    if (!active(index) && !hash(index).isEmpty())
-    {
-        // disabled
-    }
-    else
-    {
-        flags |= Qt::ItemIsEnabled;
-    }
-
+    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     if (index.column() == DC_STATUS) flags |=  Qt::ItemIsUserCheckable;
     return flags;
 }
