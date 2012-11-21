@@ -46,7 +46,6 @@ QString QED2KHandle::firstFileSavePath() const { return save_path(); }
 QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
-TransferState QED2KHandle::state() const { return libstate2tstate(m_delegate.status()); }
 TransferStatus QED2KHandle::status() const { return transfer_status2TS(m_delegate.status()); }
 
 TransferInfo QED2KHandle::get_info() const
@@ -58,56 +57,20 @@ TransferInfo QED2KHandle::get_info() const
 	return TransferInfo(ret);
 }
 
-qreal QED2KHandle::download_payload_rate() const {
-    return m_delegate.status().download_payload_rate;
-}
-qreal QED2KHandle::upload_payload_rate() const {
-    return m_delegate.status().upload_payload_rate;
-}
 int QED2KHandle::queue_position() const { return 0; }
-float QED2KHandle::progress() const {
-    libed2k::transfer_status st = m_delegate.status();
-    if (!st.total_wanted)
-        return 0.;
-    if (st.total_wanted_done == st.total_wanted)
-        return 1.;
-    float progress = (float) st.total_wanted_done / (float) st.total_wanted;
-    Q_ASSERT(progress >= 0. && progress <= 1.);
-    return progress;
-}
 float QED2KHandle::distributed_copies() const { return 0; }
 int QED2KHandle::num_files() const { return 1; }
-int QED2KHandle::num_seeds() const { return m_delegate.num_seeds(); }
-int QED2KHandle::num_peers() const { return m_delegate.num_peers(); }
-int QED2KHandle::num_complete() const { return m_delegate.status().num_complete; }
-int QED2KHandle::num_incomplete() const { return m_delegate.status().num_incomplete; }
-int QED2KHandle::num_connections() const{ return m_delegate.status().num_connections; }
 int QED2KHandle::upload_limit() const { return m_delegate.upload_limit(); }
 int QED2KHandle::download_limit() const { return m_delegate.download_limit(); }
-int QED2KHandle::connections_limit() const { return m_delegate.status().connections_limit; }
 QString QED2KHandle::current_tracker() const {	return QString(); }
-TransferSize QED2KHandle::actual_size() const { return m_delegate.status().total_wanted; }
-TransferSize QED2KHandle::total_done() const { return m_delegate.status().total_done; }
-TransferSize QED2KHandle::total_wanted_done() const { return m_delegate.status().total_wanted_done; }
-TransferSize QED2KHandle::total_wanted() const { return m_delegate.status().total_wanted; }
-TransferSize QED2KHandle::total_failed_bytes() const {return 0;}
-TransferSize QED2KHandle::total_redundant_bytes() const {return 0;}
-TransferSize QED2KHandle::total_payload_upload() const {return 0;}
-TransferSize QED2KHandle::total_payload_download() const {return 0;}
-TransferSize QED2KHandle::all_time_upload() const { return m_delegate.status().all_time_upload; }
-TransferSize QED2KHandle::all_time_download() const { return m_delegate.status().all_time_download; }
-qlonglong QED2KHandle::active_time() const {return 0;}
-qlonglong QED2KHandle::seeding_time() const {return 0;}
 bool QED2KHandle::is_valid() const { return m_delegate.is_valid(); }
 bool QED2KHandle::is_seed() const { return m_delegate.is_seed(); }
 bool QED2KHandle::is_paused() const { return m_delegate.is_paused(); }
 bool QED2KHandle::is_queued() const { return false; }
-bool QED2KHandle::is_checking() const {return false;}
 bool QED2KHandle::has_metadata() const { return true; }
 bool QED2KHandle::priv() const {return false;}
 bool QED2KHandle::super_seeding() const {return false;}
 bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequential_download(); }
-TransferBitfield QED2KHandle::pieces() const { return bitfield2TBF(m_delegate.status().pieces); }
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
 std::vector<int> QED2KHandle::piece_priorities() const { return m_delegate.piece_priorities(); }
