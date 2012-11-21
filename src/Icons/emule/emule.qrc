@@ -72,5 +72,7 @@
         <file>search/SearchRelated.png</file>
         <file>transfer_list/FileInfo.png</file>
         <file>common/eD2kLink.png</file>
+        <file>common/folder_unshare.ico</file>
+        <file>common/folder_share.ico</file>
     </qresource>
 </RCC>
