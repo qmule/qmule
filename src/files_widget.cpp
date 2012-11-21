@@ -139,8 +139,10 @@ void files_widget::exchangeDir()
 
     if (indx.isValid())
     {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call shareDirectory";
        static_cast<FileNode*>(indx.internalPointer())->share(false);
+       QApplication::restoreOverrideCursor();
     }
 }
 
@@ -150,8 +152,10 @@ void files_widget::exchangeSubdir()
 
     if (indx.isValid())
     {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call shareDirectoryR";
        static_cast<FileNode*>(indx.internalPointer())->share(true);
+       QApplication::restoreOverrideCursor();
     }
 }
 
@@ -161,8 +165,10 @@ void files_widget::unexchangeDir()
 
     if (indx.isValid())
     {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call unshareDirectory";
        static_cast<FileNode*>(indx.internalPointer())->unshare(false);
+       QApplication::restoreOverrideCursor();
     }
 }
 
@@ -172,8 +178,10 @@ void files_widget::unxchangeSubdir()
 
     if (indx.isValid())
     {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call unshareDirectoryR";
        static_cast<FileNode*>(indx.internalPointer())->unshare(true);
+       QApplication::restoreOverrideCursor();
     }
 }
 
