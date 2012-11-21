@@ -4,6 +4,16 @@
 #include "torrentpersistentdata.h"
 #include "misc.h"
 
+#define CATCH(expr) \
+try \
+{\
+    expr \
+} \
+catch(libed2k::libed2k_exception& e) \
+{ \
+    qDebug() << "what: " << e.message(); \
+}
+
 QED2KHandle::QED2KHandle()
 {
 }

@@ -132,7 +132,7 @@ bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, co
     }
     else
     {        
-        // parameters possibly ware cancelled or completed with errors
+        // parameters possibly were cancelled or completed with errors
         delete m_atp;
         m_atp = NULL;
         m_active = false;

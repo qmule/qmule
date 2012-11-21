@@ -349,8 +349,16 @@ void Session::startUpTransfers()
 }
 
 void Session::configureSession()
-{
+{    
     for_each(std::mem_fun(&SessionBase::configureSession));
+    Preferences pref;
+
+    if (m_incoming != pref.getSavePath())
+    {
+        unshare(m_incoming, false);
+        m_incoming = pref.getSavePath();
+        share(m_incoming, false);
+    }
 }
 
 void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
@@ -768,20 +776,10 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
-    // fail save - remove all collections
-    QDir bkp_dir(misc::ED2KCollectionLocation());
-    if (bkp_dir.exists())
-    {
-        foreach(QString filename, bkp_dir.entryList(QDir::Files))
-        {
-            qDebug() << "remove fail file: " << filename;
-            QFile::remove(bkp_dir.absoluteFilePath(filename));
-        }
-    }
-
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;
     QVector<SD> vf;
+    m_incoming = pref.getSavePath();
 
     pref.beginGroup("SharedDirectories");
     int dcount = pref.beginReadArray("ShareDirs");
@@ -833,6 +831,8 @@ void Session::loadFileSystem()
             }
         }
     }
+
+    share(m_incoming, false);
 }
 
 void Session::dropDirectoryTransfers()

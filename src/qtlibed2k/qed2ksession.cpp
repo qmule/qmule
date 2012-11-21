@@ -791,6 +791,18 @@ void QED2KSession::saveFastResumeData()
 void QED2KSession::loadFastResumeData()
 {
     qDebug("load fast resume data");
+
+    // avoid load collections from previous fail
+    QDir bkp_dir(misc::ED2KCollectionLocation());
+    if (bkp_dir.exists())
+    {
+        foreach(QString filename, bkp_dir.entryList(QDir::Files))
+        {
+            qDebug() << "remove fail file: " << filename;
+            QFile::remove(bkp_dir.absoluteFilePath(filename));
+        }
+    }
+
     // we need files 32 length(MD4_HASH_SIZE*2) name and extension fastresume
     QStringList filter;
     filter << "????????????????????????????????.fastresume";

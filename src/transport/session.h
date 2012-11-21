@@ -162,6 +162,7 @@ private:
     Delay                       m_delay;
     QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
     std::set<DirNode*>          m_dirs;     // shared directories
+    QString                     m_incoming; // incoming filepath
 
     friend class DirNode;
     friend class FileNode;
