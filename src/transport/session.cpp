@@ -832,6 +832,18 @@ void Session::loadFileSystem()
     }
 
     share(m_incoming, false);
+
+    if (pref.isMigrationStage())
+    {
+        qDebug() << "in migration stage process shared files also";
+
+        foreach(QString filepath, misc::migrationSharedFiles())
+        {
+            qDebug() << "migrate file " << filepath;
+            share(filepath, false);
+        }
+    }
+
     QApplication::restoreOverrideCursor();
 }
 

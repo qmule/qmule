@@ -28,7 +28,7 @@ files_widget::files_widget(QWidget *parent)
 
     if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
     {
-        tableView->horizontalHeader()->resizeSection(0, 20);
+        tableView->resizeColumnsToContents();
     }
 
     m_dir_model = new DirectoryModel(Session::instance()->root());
@@ -229,7 +229,7 @@ QModelIndex files_widget::sort2file(const QModelIndex& index) const
 QString files_widget::createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize)
 {
     QString link = misc::toQStringU(libed2k::emule_collection::toLink(fileName.toUtf8().constData(), fileSize,
-                                                         libed2k::md4_hash::fromString(fileHash.toStdString()), false));
+                                                         libed2k::md4_hash::fromString(fileHash.toStdString()), true));
     if (addForum)
     {
         link = "[u][b][url=" + link + "]" + fileName + "[/url][/b][/u]";
