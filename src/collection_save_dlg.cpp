@@ -158,7 +158,7 @@ void collection_save_dlg::dowload()
             continue;
         libed2k::add_transfer_params atp;
         QString filepath = dir.filePath(file_data[row].file_name);
-        atp.m_filepath = filepath.toUtf8().constData();
+        atp.file_path = filepath.toUtf8().constData();
         atp.file_hash = file_data[row].file_hash;        
         atp.file_size = file_data[row].file_size;
         Session::instance()->addTransfer(atp);

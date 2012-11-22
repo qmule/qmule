@@ -525,14 +525,13 @@ void Session::on_registerNode(Transfer t)
     {
         n = node(t.absolute_files_path().at(0));
         Q_ASSERT(n);
-        n->on_transfer_finished(t.hash());
+        n->on_transfer_finished(t);
     }
-
 }
 
 void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {
-    FileNode* p = node(misc::toQStringU(atp.m_filepath));
+    FileNode* p = node(misc::toQStringU(atp.file_path));
 
     if (p != &m_root)
     {

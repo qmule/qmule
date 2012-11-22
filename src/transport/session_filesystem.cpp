@@ -95,13 +95,17 @@ void FileNode::unshare(bool recursive)
     Session::instance()->signal_changeNode(this);
 }
 
-void FileNode::on_transfer_finished(const QString& hash)
+void FileNode::on_transfer_finished(Transfer t)
 {
     m_active = true;
-    m_hash = hash;
+    m_hash = t.hash();
     m_error = libed2k::errors::no_error;
     m_parent->drop_transfer_by_file();
-    // TODO - we need extract add_transfer_parameters to node from transfer
+
+    // extract add_transfer_parameters to node from transfer
+    if (!m_atp && t.is_valid())
+        m_atp = new libed2k::add_transfer_params(t.ed2kHandle().delegate().params());
+
     Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
 }
@@ -206,7 +210,9 @@ QString FileNode::string() const
 
     if (m_atp)
     {
-        res = misc::toQStringU(libed2k::emule_collection::toLink(libed2k::filename(m_atp->m_filepath), m_atp->file_size, m_atp->file_hash));
+        res = misc::toQStringU(
+            libed2k::emule_collection::toLink(
+                libed2k::filename(m_atp->file_path), m_atp->file_size, m_atp->file_hash));
     }
     else if (has_transfer())  //TODO - must be removed
     {

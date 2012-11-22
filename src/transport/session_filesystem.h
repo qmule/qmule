@@ -18,6 +18,7 @@
 #include <libed2k/error_code.hpp>
 
 class DirNode;
+class Transfer;
 
 class FileNode
 {
@@ -32,7 +33,7 @@ public:
     virtual bool has_transfer() const { return !m_hash.isEmpty(); }
 
     // signal handlers
-    virtual void on_transfer_finished(const QString& hash);
+    virtual void on_transfer_finished(Transfer t);
     virtual void on_transfer_deleted();
     virtual bool on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
