@@ -211,7 +211,6 @@ namespace aux
 
 QED2KSession::QED2KSession()
 {    
-    m_resume_items_loaded = 0;
 }
 
 void QED2KSession::start()
@@ -659,14 +658,24 @@ void QED2KSession::readAlerts()
             if (t.is_seed())
                 emit registerNode(t);
 
-            --m_resume_items_loaded;
-            qDebug() << "finished transfer " << m_resume_items_loaded;
+            if (!m_fast_resume_seeders.empty())
+            {
+                m_fast_resume_seeders.remove(t.hash());
+                if (m_fast_resume_seeders.empty())
+                {
+                    emit fastResumeDataLoadCompleted();
+                }
+            }
+
+
+            //--m_resume_items_loaded;
+            //qDebug() << "finished transfer " << m_resume_items_loaded;
 
             // all fast resume data was loaded
-            if (m_resume_items_loaded == 0)
-            {
-                emit fastResumeDataLoadCompleted();
-            }
+            //if (m_resume_items_loaded == 0)
+            //{
+            //    emit fastResumeDataLoadCompleted();
+           // }
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
@@ -850,8 +859,12 @@ void QED2KSession::loadFastResumeData()
                         // add transfer only when file still exists
                         if (qfi.exists() && qfi.isFile())
                         {
-                            delegate()->add_transfer(params);
-                            ++m_resume_items_loaded;
+                            QED2KHandle h(delegate()->add_transfer(params));
+
+                            if (h.is_seed())
+                            {
+                                m_fast_resume_seeders.insert(h.hash());
+                            }
                         }
                         else
                         {
@@ -867,7 +880,7 @@ void QED2KSession::loadFastResumeData()
         QFile::remove(file_abspath);
     }
 
-    if (m_resume_items_loaded == 0)
+    if (m_fast_resume_seeders.empty())
     {
         // no fast resume data found - session ready for share
         emit fastResumeDataLoadCompleted();

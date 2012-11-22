@@ -23,8 +23,9 @@ public:
     files_widget(QWidget *parent = 0);
     ~files_widget();
 
-private:
+private:    
     QMenu*   m_filesMenu;
+    QAction* m_openFolder;
     QAction* m_filesExchDir;
     QAction* m_filesExchSubdir;
     QAction* m_filesUnexchDir;
@@ -42,6 +43,7 @@ private:
 public slots:
     void putToClipboard();
 private slots:
+    void openFolder();
     void exchangeDir();
     void exchangeSubdir();
     void unexchangeDir();
