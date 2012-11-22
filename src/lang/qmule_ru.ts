@@ -6329,6 +6329,10 @@ However, those plugins were disabled.</source>
         <source>File ID</source>
         <translation>Хэш файла</translation>
     </message>
+    <message>
+        <source>Open folder</source>
+        <translation>Открыть папку</translation>
+    </message>
 </context>
 <context>
     <name>DirectoryModel</name>

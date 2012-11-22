@@ -2,6 +2,7 @@
 #include <QAction>
 #include <QPainter>
 #include <QClipboard>
+#include <QDesktopServices>
 
 #include "files_widget.h"
 #include "session_fs_models/file_model.h"
@@ -46,6 +47,11 @@ files_widget::files_widget(QWidget *parent)
     m_filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
     m_filesMenu->setTitle(tr("Exchange files"));
 
+    m_openFolder = new QAction(this);
+    m_openFolder->setObjectName(QString::fromUtf8("openFolder"));
+    m_openFolder->setIcon(QIcon(":/emule/common/folder_open.ico"));
+    m_openFolder->setText(tr("Open folder"));
+
     m_filesExchDir = new QAction(this);
     m_filesExchDir->setObjectName(QString::fromUtf8("filesExchDir"));
     m_filesExchDir->setIcon(QIcon(":/emule/common/folder_share.ico"));
@@ -66,6 +72,8 @@ files_widget::files_widget(QWidget *parent)
     m_filesUnexchSubdir->setIcon(QIcon(":/emule/common/folder_unshare.ico"));
     m_filesUnexchSubdir->setText(tr("Don't exchange with subdirs"));
 
+    m_filesMenu->addAction(m_openFolder);
+    m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesExchDir);
     m_filesMenu->addAction(m_filesExchSubdir);
     m_filesMenu->addSeparator();
@@ -82,6 +90,7 @@ files_widget::files_widget(QWidget *parent)
         SLOT(on_treeViewSelChanged(const QItemSelection &, const QItemSelection &))
     );
 
+    connect(m_openFolder,         SIGNAL(triggered()), this, SLOT(openFolder()));
     connect(m_filesExchDir,       SIGNAL(triggered()), this, SLOT(exchangeDir()));
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
@@ -130,6 +139,16 @@ void files_widget::putToClipboard()
     {
         QClipboard *cb = QApplication::clipboard();
         cb->setText(text);
+    }
+}
+
+void files_widget::openFolder()
+{
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
+
+    if (indx.isValid())
+    {
+        QDesktopServices::openUrl(static_cast<FileNode*>(indx.internalPointer())->filepath());
     }
 }
 

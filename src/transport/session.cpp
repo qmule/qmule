@@ -776,6 +776,7 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;
     QVector<SD> vf;
@@ -833,6 +834,7 @@ void Session::loadFileSystem()
     }
 
     share(m_incoming, false);
+    QApplication::restoreOverrideCursor();
 }
 
 void Session::dropDirectoryTransfers()
