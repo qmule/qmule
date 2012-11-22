@@ -171,7 +171,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         {
             case DC_STATUS: return QVariant();
             case DC_NAME:   return displayName(index);
-            case DC_FSIZE:   return size(index);
+            case DC_FSIZE:  return size(size(index));
             case DC_TYPE:   return type(index);
             case DC_TIME:   return time(index);
             case DC_HASH:   return hash(index);

@@ -244,7 +244,7 @@ void QED2KSession::start()
     }
 
     m_session->set_alert_mask(alert::all_categories);
-    m_session->set_alert_queue_size_limit(10000);
+    m_session->set_alert_queue_size_limit(100000);
     // start listening on special interface and port and start server connection
     configureSession();
 }
@@ -629,6 +629,14 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
             emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
+            if (!m_fast_resume_transfers.empty())
+            {
+                remove_by_state();
+                if (m_fast_resume_transfers.empty())
+                {
+                    emit fastResumeDataLoadCompleted();
+                }
+            }
         }
         else if (libed2k::paused_transfer_alert* p =
                  dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
@@ -658,24 +666,16 @@ void QED2KSession::readAlerts()
             if (t.is_seed())
                 emit registerNode(t);
 
-            if (!m_fast_resume_seeders.empty())
+            if (!m_fast_resume_transfers.empty())
             {
-                m_fast_resume_seeders.remove(t.hash());
-                if (m_fast_resume_seeders.empty())
+                m_fast_resume_transfers.remove(t.hash());
+                remove_by_state();
+
+                if (m_fast_resume_transfers.empty())
                 {
                     emit fastResumeDataLoadCompleted();
-                }
+                }                
             }
-
-
-            //--m_resume_items_loaded;
-            //qDebug() << "finished transfer " << m_resume_items_loaded;
-
-            // all fast resume data was loaded
-            //if (m_resume_items_loaded == 0)
-            //{
-            //    emit fastResumeDataLoadCompleted();
-           // }
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
@@ -858,13 +858,9 @@ void QED2KSession::loadFastResumeData()
                         QFileInfo qfi(QString::fromUtf8(trd.m_filepath.m_collection.c_str()));
                         // add transfer only when file still exists
                         if (qfi.exists() && qfi.isFile())
-                        {
+                        {                            
                             QED2KHandle h(delegate()->add_transfer(params));
-
-                            if (h.is_seed())
-                            {
-                                m_fast_resume_seeders.insert(h.hash());
-                            }
+                            m_fast_resume_transfers.insert(h.hash(), h);
                         }
                         else
                         {
@@ -880,7 +876,7 @@ void QED2KSession::loadFastResumeData()
         QFile::remove(file_abspath);
     }
 
-    if (m_fast_resume_seeders.empty())
+    if (m_fast_resume_transfers.empty())
     {
         // no fast resume data found - session ready for share
         emit fastResumeDataLoadCompleted();
@@ -910,6 +906,26 @@ void QED2KSession::makeTransferParametersAsync(const QString& filepath)
 void QED2KSession::cancelTransferParameters(const QString& filepath)
 {
     delegate()->cancel_transfer_parameters(filepath.toUtf8().constData());
+}
+
+void QED2KSession::remove_by_state()
+{
+    // begin analize states
+    QHash<QString, Transfer>::iterator i = m_fast_resume_transfers.begin();
+
+    while (i != m_fast_resume_transfers.end())
+    {
+        if (!i.value().is_valid() ||
+                (i.value().state() == qt_downloading))
+        {
+            qDebug() << "remove state " << i.value().hash() << " is valid " << i.value().is_valid();
+            i = m_fast_resume_transfers.erase(i);
+        }
+        else
+        {
+            ++i;
+        }
+    }
 }
 
 std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeTransferParameters(const QString& filepath) const

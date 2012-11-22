@@ -200,14 +200,14 @@ QString BaseModel::size(qint64 bytes) const
     const qint64 tb = 1024 * gb;
 
     if (bytes >= tb)
-        return tr("%1 TB").arg(QLocale().toString(qreal(bytes) / tb, 'f', 3));
+        return misc::tr("%1 TB").arg(QLocale().toString(qreal(bytes) / tb, 'f', 3));
     if (bytes >= gb)
-        return tr("%1 GB").arg(QLocale().toString(qreal(bytes) / gb, 'f', 2));
+        return misc::tr("%1 GB").arg(QLocale().toString(qreal(bytes) / gb, 'f', 2));
     if (bytes >= mb)
-        return tr("%1 MB").arg(QLocale().toString(qreal(bytes) / mb, 'f', 1));
+        return misc::tr("%1 MB").arg(QLocale().toString(qreal(bytes) / mb, 'f', 1));
     if (bytes >= kb)
         return tr("%1 KB").arg(QLocale().toString(bytes / kb));
-    return tr("%1 bytes").arg(QLocale().toString(bytes));
+    return misc::tr("%1 bytes").arg(QLocale().toString(bytes));
 }
 
 Qt::CheckState BaseModel::state(const QModelIndex& index) const

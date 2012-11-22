@@ -14,7 +14,7 @@
 #include <QTimer>
 #include <QHash>
 #include <QStringList>
-#include <QSet>
+#include <QHash>
 
 #include <transport/session_base.h>
 #include <libed2k/session.hpp>
@@ -119,7 +119,8 @@ private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
-    QSet<QString>      m_fast_resume_seeders;   // contains seeders were loaded from fast resume data files
+    QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
+    void remove_by_state();
 public slots:
 	void startUpTransfers();
 	void configureSession();

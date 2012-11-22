@@ -133,7 +133,7 @@ Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(10000)
     connect(m_periodic_resume.data(), SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
 
     m_alerts_reading->start(1000);
-    m_periodic_resume->start(170000);   // 3 min
+    m_periodic_resume->start(270000);   // 3 min
 
     // libed2k signals
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
@@ -517,17 +517,15 @@ void Session::on_ED2KResumeDataLoaded()
 }
 
 void Session::on_registerNode(Transfer t)
-{
-    qDebug() << "Session::on_registerNode";
-    FileNode* n = NULL;
-
+{        
     if (!m_files.contains(t.hash()))
     {
+        FileNode* n = NULL;
+        qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
         n = node(t.absolute_files_path().at(0));
         Q_ASSERT(n);
         n->on_transfer_finished(t.hash());
     }
-
 }
 
 void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
@@ -673,8 +671,7 @@ FileNode* Session::node(const QString& filepath)
 
             // generate node with fake info and next request real info
             node = new DirNode(parent, info);
-            node->m_filename = element;
-            qDebug() << "node request for: " << node->filepath();
+            node->m_filename = element;            
             QFileInfo node_info(node->filepath());
             node->m_info = node_info;
             parent->add_node(node);
@@ -776,6 +773,7 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
+    qDebug() << "load file system";
     QApplication::setOverrideCursor(Qt::WaitCursor);
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;

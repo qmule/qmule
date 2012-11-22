@@ -6382,6 +6382,26 @@ However, those plugins were disabled.</source>
         <source>file size is zero</source>
         <translation>Файл пуст</translation>
     </message>
+    <message>
+        <source>%1 TB</source>
+        <translation>%1 Тб</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 Гб</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 Мб</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 Кб</translation>
+    </message>
+    <message>
+        <source>%1 bytes</source>
+        <translation>%1 байт</translation>
+    </message>
 </context>
 <context>
     <name>info_dlg</name>
