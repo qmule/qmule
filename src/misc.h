@@ -55,6 +55,7 @@
 const qlonglong MAX_ETA = 8640000;
 
 typedef QMap<QString, QList<QString> > shared_map;
+class QTorrentHandle;
 
 /*  Miscellaneaous functions that can be useful */
 class misc : public QObject{
@@ -193,6 +194,7 @@ public:
   static QList<bool> boolListfromStringList(const QStringList &l);
 
   static bool isValidTorrentFile(const QString &path);
+  static QSet<QString> torrentRoots(const QTorrentHandle& h);
 
   /**
     * eMule migration functions

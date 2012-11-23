@@ -395,16 +395,11 @@ void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Tr
 
 void Session::on_finishedTorrent(const QTorrentHandle& h)
 {    
-    QDir save_path(h.save_path());
-    int num_files = h.num_files();
-    std::set<QString> roots;
-
-    for (int i = 0; i < num_files; ++i)
-        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+    QSet<QString> roots = misc::torrentRoots(h);
 
     foreach(const QString& str, roots)
     {
-        share(save_path.filePath(str), true);
+        share(str, true);
     }
 
     emit finishedTransfer(Transfer(h));
@@ -420,19 +415,13 @@ void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files
     if (del_files)
     {
         // remove emule transfers
-        QDir save_path(h.save_path());
-        int num_files = h.num_files();
-        std::set<QString> roots;
-
-        for (int i = 0; i < num_files; ++i)
-            roots.insert(h.filepath_at(i).split(QDir::separator()).first());
+        QSet<QString> roots = misc::torrentRoots(h);
 
         foreach(const QString& str, roots)
         {
-            unshare(save_path.filePath(str), true);
+            unshare(str, true);
         }
 
-        /*
         foreach(const QString& str, roots)
         {
             FileNode* p = node(str);
@@ -440,11 +429,9 @@ void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files
             if (p != &m_root)
             {
                 DirNode* parent = p->m_parent;
-                parent->delete_node();
+                parent->delete_node(p);
             }
         }
-        */
-
     }
 
     emit transferAboutToBeRemoved(Transfer(h), del_files);

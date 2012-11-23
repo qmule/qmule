@@ -934,6 +934,25 @@ bool misc::isValidTorrentFile(const QString &torrent_path) {
   return true;
 }
 
+QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
+{
+    QSet<QString> roots;
+    QDir save_path(h.save_path());
+
+    if (save_path.dirName() == h.name())
+    {
+        roots << save_path.absolutePath();
+    }
+    else
+    {
+        int num_files = h.num_files();
+        for (int i = 0; i < num_files; ++i)
+            roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+    }
+
+    return roots;
+}
+
 /**
  * Returns a path constructed from all the elements of file_path except the last.
  * A typical use is to obtain the parent path for a path supplied by the user.
