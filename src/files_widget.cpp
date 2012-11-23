@@ -26,13 +26,18 @@ files_widget::files_widget(QWidget *parent)
         splitter_2->setSizes(sz);
     }
 
-    if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
-    {
-        tableView->resizeColumnsToContents();
-    }
+
 
     m_dir_model = new DirectoryModel(Session::instance()->root());
     m_file_model = new FilesModel(Session::instance()->root());
+
+    //tableView->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
+    //tableView->horizontalHeader()->resizeSection(0,20);
+
+    if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
+    {
+    }
+
     m_sort_files_model = new SessionFilesSort(this);
     m_sort_files_model->setSourceModel(m_file_model);
     m_sort_files_model->setDynamicSortFilter(true);

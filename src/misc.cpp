@@ -1089,6 +1089,7 @@ QString ShellGetFolderPath(int iCSIDL)
 
 QString misc::emuleConfig(const QString& filename)
 {
+    qDebug() << "emule config for " << filename;
     QString res;
     static QList<QDir> dl = QList<QDir>()
             << QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("eMule IS Mod\\config")

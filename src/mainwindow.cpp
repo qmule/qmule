@@ -493,6 +493,7 @@ void MainWindow::writeSettings() {
   settings.beginGroup(QString::fromUtf8("MainWindow"));
   settings.setValue("geometry", saveGeometry());
   settings.endGroup();
+  settings.setMigrationStage(false);
 }
 
 void MainWindow::readSettings() {

@@ -223,12 +223,14 @@ void QED2KSession::start()
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
-    m_settings.m_known_file = pref.knownFile().toUtf8().constData();
+    if (pref.isMigrationStage())
+        m_settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData();
     m_settings.client_name  = pref.nick().toUtf8().constData();
     m_settings.mod_name = misc::productName().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
+    qDebug() << "known " << misc::toQStringU(m_settings.m_known_file);
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else

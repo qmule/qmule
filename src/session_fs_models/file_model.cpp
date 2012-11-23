@@ -96,7 +96,7 @@ QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
     switch (section)
     {
     case DC_STATUS:
-                    returnValue = "#";
+                    returnValue = "";
             break;
     case DC_NAME:   returnValue = FilesModel::tr("Name");
             break;
@@ -203,7 +203,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         break;
     case Qt::TextAlignmentRole:
         if (index.column() == DC_FSIZE)
-            return Qt::AlignRight;
+            return Qt::AlignRight | Qt::AlignHCenter;
         break;
     case Qt::FontRole:
         if (index.column() == DC_NAME)
