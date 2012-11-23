@@ -31,12 +31,6 @@ files_widget::files_widget(QWidget *parent)
     m_dir_model = new DirectoryModel(Session::instance()->root());
     m_file_model = new FilesModel(Session::instance()->root());
 
-    //tableView->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
-    //tableView->horizontalHeader()->resizeSection(0,20);
-
-    if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
-    {
-    }
 
     m_sort_files_model = new SessionFilesSort(this);
     m_sort_files_model->setSourceModel(m_file_model);
@@ -46,7 +40,13 @@ files_widget::files_widget(QWidget *parent)
     m_sort_dirs_model->setSourceModel(m_dir_model);
 
     treeView->setModel(m_sort_dirs_model);
-    tableView->setModel(m_sort_files_model);
+    tableView->setModel(m_sort_files_model);    
+
+    if (!tableView->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesView").toByteArray()))
+    {
+        tableView->setColumnWidth(0, 20);
+        tableView->setColumnWidth(1, 400);
+    }
 
     m_filesMenu = new QMenu(this);
     m_filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
