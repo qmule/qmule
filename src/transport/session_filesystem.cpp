@@ -398,7 +398,6 @@ void DirNode::drop_transfer_by_file()
 void DirNode::build_collection()
 {
     // collection would hash, but hasn't transfer yet
-    qDebug() << "build collection " << filename();
     bool pending = false;
 
     int files_count = 0;

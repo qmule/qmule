@@ -233,12 +233,17 @@ QModelIndex files_widget::sort2file(const QModelIndex& index) const
 
 QString files_widget::createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize)
 {
-    QString link = misc::toQStringU(libed2k::emule_collection::toLink(fileName.toUtf8().constData(), fileSize,
-                                                         libed2k::md4_hash::fromString(fileHash.toStdString()), true));
-    if (addForum)
+    QString link;
+
+    if (!fileHash.isEmpty())
     {
-        link = "[u][b][url=" + link + "]" + fileName + "[/url][/b][/u]";
-        if (addSize) link += " " + misc::friendlyUnit(fileSize);
+        link = misc::toQStringU(libed2k::emule_collection::toLink(fileName.toUtf8().constData(), fileSize,
+                                                             libed2k::md4_hash::fromString(fileHash.toStdString()), true));
+        if (addForum)
+        {
+            link = "[u][b][url=" + link + "]" + fileName + "[/url][/b][/u]";
+            if (addSize) link += " " + misc::friendlyUnit(fileSize);
+        }
     }
 
     return link;
