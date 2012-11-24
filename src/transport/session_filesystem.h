@@ -95,7 +95,7 @@ public:
     /**
       * pupulate directory with items no_share status
      */
-    void populate();
+    void populate(bool force = false);
 
     bool is_populated() const { return m_populated; }
 

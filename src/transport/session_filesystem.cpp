@@ -243,8 +243,8 @@ void DirNode::share(bool recursive)
         Session::instance()->addDirectory(this);
 
         // execute without check current state
-        // we can re-share files were unshared after directory was shared
-        populate();
+        // we can re-share files were unshared after directory was shared        
+        populate(true);  // re-scan directory
 
         foreach(FileNode* p, m_file_children.values())
         {
@@ -574,9 +574,9 @@ QStringList DirNode::exclude_files() const
     return res;
 }
 
-void DirNode::populate()
+void DirNode::populate(bool force /* = false*/)
 {
-    if (m_populated) return;
+    if (m_populated && !force) return;
 
     QString path = filepath();
 
