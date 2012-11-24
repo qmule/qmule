@@ -349,6 +349,11 @@ void TorrentModel::addTorrent(const Transfer& h)
     // do not show finished ed2k transfers
     return;
   }
+  if (h.type() == Transfer::ED2K && h.state() == qt_checking_resume_data) {
+    // we don't know yet whether this transfer finished or not
+    m_pendingTransfers << h;
+    return;
+  }
 
   if (torrentRow(h.hash()) < 0) {
     beginInsertTorrent(m_torrents.size());
@@ -392,6 +397,24 @@ void TorrentModel::endRemoveTorrent()
   endRemoveRows();
 }
 
+void TorrentModel::processPendingTransfers()
+{
+    for(QList<Transfer>::iterator i = m_pendingTransfers.begin();
+        i != m_pendingTransfers.end();)
+    {
+        TransferState state = i->state();
+        if (state != qt_checking_resume_data)
+        {
+            // now we know whether transfer finished or not
+            // do not show finished transfers
+            if (state != qt_seeding) addTorrent(*i);
+            i = m_pendingTransfers.erase(i);
+        }
+        else
+            ++i;
+    }
+}
+
 void TorrentModel::handleTorrentUpdate(const Transfer& h)
 {
   const int row = torrentRow(h.hash());
@@ -416,6 +439,7 @@ void TorrentModel::setRefreshInterval(int refreshInterval)
 
 void TorrentModel::forceModelRefresh()
 {
+  processPendingTransfers();
   emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1));
 }
 
