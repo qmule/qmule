@@ -1669,7 +1669,9 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             }
             else
             {
+                QApplication::setOverrideCursor(Qt::WaitCursor);
                 Session::instance()->start();
+                QApplication::restoreOverrideCursor();
             }
 
             activateControls(true);
