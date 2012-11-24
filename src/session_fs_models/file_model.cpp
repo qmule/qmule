@@ -203,7 +203,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         break;
     case Qt::TextAlignmentRole:
         if (index.column() == DC_FSIZE)
-            return (Qt::AlignRight);
+            return (Qt::AlignRight | Qt::AlignVCenter);
         break;
     case Qt::FontRole:
         if (index.column() == DC_NAME)
