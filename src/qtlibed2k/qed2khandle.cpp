@@ -4,6 +4,16 @@
 #include "torrentpersistentdata.h"
 #include "misc.h"
 
+#define CATCH(expr) \
+try \
+{\
+    expr \
+} \
+catch(libed2k::libed2k_exception& e) \
+{ \
+    qDebug() << "what: " << e.message(); \
+}
+
 QED2KHandle::QED2KHandle()
 {
 }
@@ -25,11 +35,11 @@ bool QED2KHandle::operator<(const TransferBase& t) const
 }
 
 QString QED2KHandle::hash() const { return misc::toQString(m_delegate.hash()); }
-QString QED2KHandle::name() const { return misc::toQStringU(m_delegate.filepath().filename()); }
+QString QED2KHandle::name() const { return misc::toQStringU(m_delegate.name()); }
 
 QString QED2KHandle::save_path() const
 {
-    return misc::toQStringU(m_delegate.save_path().string()).replace("\\", "/");
+    return misc::toQStringU(m_delegate.save_path()).replace("\\", "/"); // why replace ?
 }
 
 QString QED2KHandle::firstFileSavePath() const { return save_path(); }
@@ -77,17 +87,28 @@ bool QED2KHandle::extremity_pieces_first() const {
 }
 void QED2KHandle::file_progress(std::vector<TransferSize>& fp) const {
     fp.clear();
-    // using piece progress granularity
-    fp.push_back(pieces().count() * libed2k::PIECE_SIZE);
+    float p = progress();
+    TransferSize s = filesize_at(0);
+    fp.push_back(p == 1. ? s : s * p);
 }
 std::vector<int> QED2KHandle::file_priorities() const { return std::vector<int>(); }
-QString QED2KHandle::filepath_at(unsigned int index) const {
-    return misc::toQStringU(m_delegate.filepath().string());
+
+QString QED2KHandle::filepath_at(unsigned int index) const
+{
+    return misc::toQStringU(libed2k::combine_path(m_delegate.save_path(), m_delegate.name()));
 }
-QString QED2KHandle::filename_at(unsigned int index) const {
-    return misc::toQStringU(m_delegate.filepath().filename());
+
+QString QED2KHandle::filename_at(unsigned int index) const
+{
+    return misc::toQStringU(m_delegate.name());
 }
-TransferSize QED2KHandle::filesize_at(unsigned int index) const { return m_delegate.filesize(); }
+
+TransferSize QED2KHandle::filesize_at(unsigned int index) const
+{
+    Q_ASSERT(index == 0);
+    return m_delegate.size();
+}
+
 std::vector<int> QED2KHandle::file_extremity_pieces_at(unsigned int index) const {
     Q_ASSERT(index == 0);
     int last_piece = m_delegate.num_pieces() - 1;
@@ -99,6 +120,7 @@ std::vector<int> QED2KHandle::file_extremity_pieces_at(unsigned int index) const
     res.push_back(last_piece);
     return res;
 }
+
 QStringList QED2KHandle::url_seeds() const { return QStringList(); }
 QStringList QED2KHandle::absolute_files_path() const {
     QStringList res;

@@ -934,6 +934,25 @@ bool misc::isValidTorrentFile(const QString &torrent_path) {
   return true;
 }
 
+QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
+{
+    QSet<QString> roots;
+    QDir save_path(h.save_path());
+
+    if (save_path.dirName() == h.name())
+    {
+        roots << save_path.absolutePath();
+    }
+    else
+    {
+        int num_files = h.num_files();
+        for (int i = 0; i < num_files; ++i)
+            roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+    }
+
+    return roots;
+}
+
 /**
  * Returns a path constructed from all the elements of file_path except the last.
  * A typical use is to obtain the parent path for a path supplied by the user.
@@ -1089,6 +1108,7 @@ QString ShellGetFolderPath(int iCSIDL)
 
 QString misc::emuleConfig(const QString& filename)
 {
+    qDebug() << "emule config for " << filename;
     QString res;
     static QList<QDir> dl = QList<QDir>()
             << QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("eMule IS Mod\\config")
@@ -1383,3 +1403,36 @@ shared_map misc::migrationShareds()
      return res;
  }
 
+ Delay::Delay(int mseconds) : m_mseconds(mseconds)
+ {
+     connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_timeout()));
+ }
+
+ Delay::~Delay()
+ {
+
+ }
+
+ void Delay::execute(boost::function<void()> f)
+ {
+     m_delegate = f;
+
+     if (m_timer.isActive())
+     {
+         m_timer.setInterval(m_mseconds);
+     }
+     else
+     {
+         m_timer.start(m_mseconds);
+     }
+ }
+
+ void Delay::cancel()
+ {
+     if (m_timer.isActive()) m_timer.stop();
+ }
+
+ void Delay::on_timeout()
+ {
+     m_delegate();
+ }

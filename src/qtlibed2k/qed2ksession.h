@@ -8,11 +8,13 @@
 #include <QPalette>
 #endif
 
+#include <set>
 #include <QPixmap>
 #include <QPointer>
 #include <QTimer>
 #include <QHash>
 #include <QStringList>
+#include <QHash>
 
 #include <transport/session_base.h>
 #include <libed2k/session.hpp>
@@ -20,6 +22,11 @@
 #include "qed2khandle.h"
 #include "trackerinfos.h"
 #include "preferences.h"
+
+class FileNode;
+class DirNode;
+
+extern QString md4toQString(const libed2k::md4_hash& hash);
 
 struct QED2KSearchResultEntry
 {
@@ -96,6 +103,9 @@ public:
     void startServerConnection();
     void stopServerConnection();
     bool isServerConnected() const;
+    void makeTransferParametersAsync(const QString& filepath);
+    void cancelTransferParameters(const QString& filepath);
+    std::pair<libed2k::add_transfer_params, libed2k::error_code> makeTransferParameters(const QString& filepath) const;
 
     /**
       * scan ed2k backup directory and load all files were matched name filter
@@ -109,6 +119,8 @@ private:
     QScopedPointer<libed2k::session> m_session;
     libed2k::session_settings m_settings;
     libed2k::fingerprint m_finger;
+    QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
+    void remove_by_state();
 public slots:
 	void startUpTransfers();
 	void configureSession();
@@ -116,7 +128,6 @@ public slots:
     virtual Transfer addLink(QString strLink, bool resumed = false);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
-    virtual void shareByED2K(const QTorrentHandle& h, bool unshare);
 
 	/**
 	  * number parameters were ignored on zero value
@@ -149,6 +160,7 @@ public slots:
     libed2k::peer_connection_handle findPeer(const libed2k::net_identifier& np);
 
 signals:
+    void registerNode(Transfer);    // temporary signal for node registration
     void serverNameResolved(QString strName);
     void serverConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
     void serverConnectionClosed(QString strError);
@@ -196,6 +208,9 @@ signals:
      */
     void peerSharedDirectoryFiles(const libed2k::net_identifier& np, const QString& hash,
                                   const QString& strDirectory, const std::vector<QED2KSearchResultEntry>& vRes);
+
+    void transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
+    void fastResumeDataLoadCompleted();
 };
 
 }

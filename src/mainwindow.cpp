@@ -428,6 +428,9 @@ MainWindow::~MainWindow() {
   IconProvider::drop();
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
+  qDebug() << "Saving session filesystem";
+  Session::instance()->dropDirectoryTransfers();
+  Session::instance()->saveFileSystem();
   qDebug("Deleting Session::instance()");
   Session::drop();    
   qDebug("Exiting GUI destructor...");
@@ -490,6 +493,7 @@ void MainWindow::writeSettings() {
   settings.beginGroup(QString::fromUtf8("MainWindow"));
   settings.setValue("geometry", saveGeometry());
   settings.endGroup();
+  settings.setMigrationStage(false);
 }
 
 void MainWindow::readSettings() {
@@ -1665,10 +1669,9 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             }
             else
             {
+                QApplication::setOverrideCursor(Qt::WaitCursor);
                 Session::instance()->start();
-                // it is temp and bad code - avoid reshare before transfers will completed
-                // wait 8 seconds
-                QTimer::singleShot(8000, files, SLOT(reshare()));
+                QApplication::restoreOverrideCursor();
             }
 
             activateControls(true);

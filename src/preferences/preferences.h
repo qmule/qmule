@@ -83,13 +83,11 @@ public:
           setISLogin(misc::migrationAuthLogin());
           setISPassword(misc::migrationAuthPassword());
           saveSharedDirs(misc::migrationShareds());
-          saveSharedFiles(misc::migrationSharedFiles());
           setListenPort(misc::migrationPort(4662));
           setNick(misc::migrationNick(misc::getUserName()));
           setSavePath(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
-          setKnownFile(misc::emuleConfig("known.met"));
-          setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), false);
           misc::migrateTorrents();
+          sync();
       }
   }
 
@@ -718,24 +716,9 @@ public:
       return value(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), true).toBool();
   }
 
-  void setKnownFile(const QString& filename)
+  void setMigrationStage(bool mgr)
   {
-      setValue(QString::fromUtf8("Preferences/eDonkey/KnownFile"), filename);
-  }
-
-  /**
-    * this method immediately erase option value from file - it will be used only one time
-   */
-  QString knownFile()
-  {
-      QString res = value(QString::fromUtf8("Preferences/eDonkey/KnownFile"), "").toString();
-
-      if (!res.isEmpty())
-      {
-          setKnownFile("");
-      }
-
-      return (res);
+      setValue(QString::fromUtf8("Preferences/eDonkey/eMuleMigration"), mgr);
   }
 
   bool isShowSharedFiles() const
@@ -761,19 +744,19 @@ public:
   void saveSharedDirs(const shared_map& se)
   {
       int index = 0;
-      beginGroup("MuleSharedDirectories");
-      beginWriteArray("SharedDirectories");
+      beginGroup("SharedDirectories");
+      beginWriteArray("ShareDirs");
 
       for (shared_map::const_iterator itr = se.begin(); itr != se.end(); ++itr)
       {
           setArrayIndex(index);
-          setValue("SharedDirectory", itr.key());
+          setValue("Path", itr.key());
           beginWriteArray("ExcludeFiles", itr.value().size());
 
           for (int n = 0; n < itr.value().size(); ++n)
           {
               setArrayIndex(n);
-              setValue("ExcludeFile", itr.value().at(n));
+              setValue("FileName", itr.value().at(n));
           }
 
           endArray();
@@ -782,74 +765,6 @@ public:
 
       endArray();
       endGroup();
-  }
-
-  shared_map loadSharedDirs()
-  {
-      beginGroup("MuleSharedDirectories");
-      shared_map se;      
-      int size = beginReadArray("SharedDirectories");
-
-      for (int i = 0; i < size; ++i)
-      {
-          setArrayIndex(i);
-          QString dirName = value("SharedDirectory").toString();
-
-          if (dirName.lastIndexOf("/") != (dirName.length() - 1))
-              dirName += "/";
-
-          shared_map::iterator itr = se.insert(dirName, QList<QString>());
-          int sub_size = beginReadArray(QString("ExcludeFiles"));
-
-          for (int j = 0; j < sub_size; ++j)
-          {
-              setArrayIndex(j);
-              itr.value().append(value("ExcludeFile").toString());
-          }
-
-          endArray();
-      }
-
-      endArray();
-      endGroup();
-      return se;
-  }
-
-  void saveSharedFiles(const QList<QString>& sl)
-  {
-      // TODO - test remove behaviour
-      beginGroup("MuleSharedFiles");
-      beginWriteArray("SharedFiles");
-
-      int index = 0;
-      for (QList<QString>::const_iterator itr = sl.begin(); itr != sl.end(); ++itr)
-      {
-          setArrayIndex(index);
-          setValue("SFile", *itr);
-          ++index;
-      }
-
-      endArray();
-      endGroup();
-  }
-
-  QList<QString> loadSharedFiles()
-  {
-      QList<QString> sl;
-
-      beginGroup("MuleSharedFiles");
-      int size = beginReadArray("SharedFiles");
-
-      for (int i = 0; i < size; ++i)
-      {
-          setArrayIndex(i);
-          sl.append(value("SFile").toString());
-      }
-
-      endArray();
-      endGroup();
-
-      return sl;
   }
 
   int listenPort() const

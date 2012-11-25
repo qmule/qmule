@@ -1,5 +1,6 @@
-#include <libtorrent/peer_id.hpp>
-#include <libtorrent/escape_string.hpp>
+
+#include <QSet>
+
 #include "transport/transfer.h"
 
 //-- Generic transfer handle
@@ -143,6 +144,23 @@ TransferSize Transfer::piece_length() const { return m_delegate->piece_length();
 bool Transfer::extremity_pieces_first() const { return m_delegate->extremity_pieces_first(); }
 
 void Transfer::file_progress(std::vector<TransferSize>& fp) const { m_delegate->file_progress(fp); }
+
+QSet<QString> Transfer::incompleteFiles() const
+{
+    QSet<QString> res;
+
+    if (!is_seed())
+    {
+        QStringList fpaths = absolute_files_path();
+        std::vector<TransferSize> fprog;
+        file_progress(fprog);
+        for (int fn = 0; fn < fprog.size(); ++fn)
+            if (fprog[fn] < filesize_at(fn))
+                res << fpaths.at(fn);
+    }
+
+    return res;
+}
 
 std::vector<int> Transfer::file_priorities() const { return m_delegate->file_priorities(); }
 

@@ -3,6 +3,11 @@
 #include <QDesktopServices>
 #include <QDirIterator>
 
+#ifdef Q_WS_WIN32
+#include <QVarLengthArray>
+#include <windows.h>
+#endif
+
 #include "transport/session.h"
 #include "torrentpersistentdata.h"
 
@@ -78,10 +83,10 @@ void Session::drop()
 }
 
 Session::~Session()
-{
+{ 
 }
 
-Session::Session()
+Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(10000)
 {
     // prepare sessions container
     m_sessions.push_back(&m_btSession);
@@ -128,7 +133,7 @@ Session::Session()
     connect(m_periodic_resume.data(), SIGNAL(timeout()), SLOT(saveTempFastResumeData()));
 
     m_alerts_reading->start(1000);
-    m_periodic_resume->start(170000);   // 3 min
+    m_periodic_resume->start(270000);   // 3 min
 
     // libed2k signals
     connect(&m_edSession, SIGNAL(addedTransfer(Transfer)), this, SIGNAL(addedTransfer(Transfer)));
@@ -136,11 +141,18 @@ Session::Session()
     connect(&m_edSession, SIGNAL(resumedTransfer(Transfer)), this, SIGNAL(resumedTransfer(Transfer)));
     connect(&m_edSession, SIGNAL(finishedTransfer(Transfer)),
             this, SIGNAL(finishedTransfer(Transfer)));
-    connect(&m_edSession, SIGNAL(deletedTransfer(QString)), this, SIGNAL(deletedTransfer(QString)));
-    connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer)),
-            this, SIGNAL(transferAboutToBeRemoved(Transfer)));
+    connect(&m_edSession, SIGNAL(registerNode(Transfer)),
+            this, SLOT(on_registerNode(Transfer)));
+    connect(&m_edSession, SIGNAL(deletedTransfer(QString)),
+            this, SIGNAL(deletedTransfer(QString)));
+    connect(&m_edSession, SIGNAL(transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&)),
+            this, SLOT(on_transferParametersReady(libed2k::add_transfer_params,libed2k::error_code)));
+    connect(&m_edSession, SIGNAL(transferAboutToBeRemoved(Transfer, bool)),
+            this, SLOT(on_transferAboutToBeRemoved(Transfer, bool)));
     connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
             this, SIGNAL(fileError(Transfer, QString)));
+    connect(&m_edSession, SIGNAL(savePathChanged(Transfer)), this, SIGNAL(savePathChanged(Transfer)));
+    connect(&m_edSession, SIGNAL(fastResumeDataLoadCompleted()), this, SLOT(on_ED2KResumeDataLoaded()));
 
     m_speedMonitor.reset(new TorrentSpeedMonitor(this));
     m_speedMonitor->start();
@@ -337,8 +349,16 @@ void Session::startUpTransfers()
 }
 
 void Session::configureSession()
-{
+{    
     for_each(std::mem_fun(&SessionBase::configureSession));
+    Preferences pref;
+
+    if (m_incoming != pref.getSavePath())
+    {
+        unshare(m_incoming, false);
+        m_incoming = pref.getSavePath();
+        share(m_incoming, false);
+    }
 }
 
 void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
@@ -372,17 +392,80 @@ void Session::addTransferFromFile(const QString& filename)
 
 void Session::on_addedTorrent(const QTorrentHandle& h) { emit addedTransfer(Transfer(h)); }
 void Session::on_pausedTorrent(const QTorrentHandle& h) { emit pausedTransfer(Transfer(h)); }
+
 void Session::on_finishedTorrent(const QTorrentHandle& h)
-{
+{    
+    QSet<QString> roots = misc::torrentRoots(h);
+
+    foreach(const QString& str, roots)
+    {
+        share(str, true);
+    }
+
     emit finishedTransfer(Transfer(h));
-    shareByED2K(h, false);
 }
+
 void Session::on_metadataReceived(const QTorrentHandle& h) { emit metadataReceived(Transfer(h)); }
+
 void Session::on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files)
 {
-    if (del_files) shareByED2K(h, true);
-    emit transferAboutToBeRemoved(Transfer(h));
+    qDebug() << "torrent about to be removed " << h.hash()
+              << " files " << (del_files?"delete":"stay");
+
+    if (del_files)
+    {
+        // remove emule transfers
+        QSet<QString> roots = misc::torrentRoots(h);
+
+        foreach(const QString& str, roots)
+        {
+            unshare(str, true);
+        }
+
+        foreach(const QString& str, roots)
+        {
+            FileNode* p = node(str);
+
+            if (p != &m_root)
+            {
+                DirNode* parent = p->m_parent;
+                parent->delete_node(p);
+            }
+        }
+    }
+
+    emit transferAboutToBeRemoved(Transfer(h), del_files);
 }
+
+void Session::on_transferAboutToBeRemoved(const Transfer& t, bool del_files)
+{
+    qDebug() << "transfer about to be removed " << t.hash()
+             << " files " << (del_files?"delete":"stay");
+
+    QHash<QString, FileNode*>::iterator itr = m_files.find(t.hash());
+    // erase node if exists
+    if (itr != m_files.end())
+    {
+        FileNode* node = itr.value();
+        Q_ASSERT(node);
+        m_files.erase(itr);
+
+        if (del_files)
+        {
+            DirNode* parent = node->m_parent;
+            Q_ASSERT(parent);
+            parent->delete_node(node);
+        }
+        else
+        {
+            node->on_transfer_deleted();
+        }
+    }
+
+    emit transferAboutToBeRemoved(t, del_files);
+
+}
+
 void Session::on_torrentFinishedChecking(const QTorrentHandle& h) {
     emit transferFinishedChecking(Transfer(h));
 }
@@ -405,11 +488,376 @@ void Session::saveFastResumeData()
 {
     m_periodic_resume->stop();
     m_alerts_reading->stop();
+    m_delay.cancel();
+    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        const DirNode* p = *itr;
+    }
+    saveFileSystem();
     m_btSession.saveFastResumeData();
     m_edSession.saveFastResumeData();
 }
 
-void Session::shareByED2K(const QTorrentHandle& h, bool unshare)
+void Session::on_ED2KResumeDataLoaded()
 {
-    m_edSession.shareByED2K(h, unshare);
+    loadFileSystem();
+}
+
+void Session::on_registerNode(Transfer t)
+{        
+    if (!m_files.contains(t.hash()))
+    {
+        FileNode* n = NULL;
+        qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
+        n = node(t.absolute_files_path().at(0));
+        Q_ASSERT(n);
+        n->on_transfer_finished(t);
+    }
+}
+
+void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
+{
+    FileNode* p = node(misc::toQStringU(atp.file_path));
+
+    if (p != &m_root)
+    {
+        p->on_metadata_completed(atp, ec);
+    }
+}
+
+void Session::removeDirectory(DirNode* dir)
+{
+    m_dirs.erase(dir);
+    m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
+}
+
+void Session::addDirectory(DirNode* dir)
+{
+    m_dirs.insert(dir);
+    m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
+}
+
+void Session::registerNode(FileNode* node)
+{
+    m_files.insert(node->hash(), node);
+}
+
+#ifdef Q_OS_WIN32
+static QString qt_GetLongPathName(const QString &strShortPath)
+{
+    if (strShortPath.isEmpty()
+        || strShortPath == QLatin1String(".") || strShortPath == QLatin1String(".."))
+        return strShortPath;
+    if (strShortPath.length() == 2 && strShortPath.endsWith(QLatin1Char(':')))
+        return strShortPath.toUpper();
+    const QString absPath = QDir(strShortPath).absolutePath();
+    if (absPath.startsWith(QLatin1String("//"))
+        || absPath.startsWith(QLatin1String("\\\\"))) // unc
+        return QDir::fromNativeSeparators(absPath);
+    if (absPath.startsWith(QLatin1Char('/')))
+        return QString();
+    const QString inputString = QLatin1String("\\\\?\\") + QDir::toNativeSeparators(absPath);
+    QVarLengthArray<TCHAR, MAX_PATH> buffer(MAX_PATH);
+    DWORD result = ::GetLongPathName((wchar_t*)inputString.utf16(),
+                                     buffer.data(),
+                                     buffer.size());
+    if (result > DWORD(buffer.size())) {
+        buffer.resize(result);
+        result = ::GetLongPathName((wchar_t*)inputString.utf16(),
+                                   buffer.data(),
+                                   buffer.size());
+    }
+    if (result > 4) {
+        QString longPath = QString::fromWCharArray(buffer.data() + 4); // ignoring prefix
+        longPath[0] = longPath.at(0).toUpper(); // capital drive letters
+        return QDir::fromNativeSeparators(longPath);
+    } else {
+        return QDir::fromNativeSeparators(strShortPath);
+    }
+}
+#endif
+
+FileNode* Session::node(const QString& filepath)
+{
+    qDebug() << "node: " << filepath;
+    if (filepath.isEmpty() || filepath == tr("My Computer") ||
+            filepath == tr("Computer") || filepath.startsWith(QLatin1Char(':')))
+        return (&m_root);
+
+#ifdef Q_OS_WIN32
+    QString longPath = qt_GetLongPathName(filepath);
+#else
+    QString longPath = filepath;
+#endif
+
+    QFileInfo fi(longPath);
+
+    QString absolutePath = QDir(longPath).absolutePath();
+
+    // ### TODO can we use bool QAbstractFileEngine::caseSensitive() const?
+    QStringList pathElements = absolutePath.split(QLatin1Char('/'), QString::SkipEmptyParts);
+
+    if ((pathElements.isEmpty())
+#if (!defined(Q_OS_WIN) || defined(Q_OS_WINCE)) && !defined(Q_OS_SYMBIAN)
+        && QDir::fromNativeSeparators(longPath) != QLatin1String("/")
+#endif
+        )
+        return (&m_root);
+
+#if (defined(Q_OS_WIN) && !defined(Q_OS_WINCE)) || defined(Q_OS_SYMBIAN)
+    {
+        if (!pathElements.at(0).contains(QLatin1String(":")))
+        {
+            // The reason we express it like this instead of with anonymous, temporary
+            // variables, is to workaround a compiler crash with Q_CC_NOKIAX86.
+            QString rootPath = QDir(longPath).rootPath();
+            pathElements.prepend(rootPath);
+        }
+
+        if (pathElements.at(0).endsWith(QLatin1Char('/')))
+            pathElements[0].chop(1);
+    }
+#else
+    // add the "/" item, since it is a valid path element on Unix
+    if (absolutePath[0] == QLatin1Char('/'))
+        pathElements.prepend(QLatin1String("/"));
+#endif
+
+    DirNode *parent = &m_root;
+    qDebug() << pathElements;
+    QString last_filename = pathElements.back();
+    pathElements.pop_back();
+
+    for (int i = 0; i < pathElements.count(); ++i)
+    {
+        QString element = pathElements.at(i);
+        DirNode* node;
+#ifdef Q_OS_WIN
+        // On Windows, "filename......." and "filename" are equivalent Task #133928
+        while (element.endsWith(QLatin1Char('.')))
+            element.chop(1);
+#endif
+        bool alreadyExists = parent->m_dir_children.contains(element);
+
+        if (alreadyExists)
+        {
+            node = parent->m_dir_children.value(element);
+        }
+        else
+        {
+
+            // Someone might call ::index("file://cookie/monster/doesn't/like/veggies"),
+            // a path that doesn't exists, I.E. don't blindly create directories.
+            QFileInfo info(absolutePath);
+
+            if (!info.exists())
+            {
+                qDebug() << "absolute path " << absolutePath << " is not exists";
+                return (&m_root);
+            }
+
+            // generate node with fake info and next request real info
+            node = new DirNode(parent, info);
+            node->m_filename = element;            
+            QFileInfo node_info(node->filepath());
+            node->m_info = node_info;
+            parent->add_node(node);
+        }
+
+        Q_ASSERT(node);
+        parent = node;
+    }
+
+    if (parent->m_dir_children.contains(last_filename))
+    {
+        return parent->m_dir_children.value(last_filename);
+    }
+
+    if (parent->m_file_children.contains(last_filename))
+    {
+        return parent->m_file_children.value(last_filename);
+    }
+
+
+    FileNode* p = &m_root;
+    QFileInfo info(absolutePath);
+
+    if (info.exists())
+    {
+        if (info.isFile())
+        {
+            p = new FileNode(parent, info);
+            parent->add_node(p);
+        }
+        else if (info.isDir())
+        {
+            p = new DirNode(parent, info);
+            ((DirNode*)p)->populate();
+            parent->add_node(p);
+        }
+    }
+
+    return (p);
+}
+
+void Session::prepare_collections()
+{
+    for (std::set<DirNode*>::iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        DirNode* p = *itr;
+
+        if (p->is_active() && !p->has_transfer())
+        {
+            p->build_collection();
+        }
+    }
+}
+
+// simple compare operator for our pairs
+bool operator<(const QVector<QString>& v1, const QVector<QString>& v2)
+{
+    return v1.size() < v2.size();
+}
+
+void Session::saveFileSystem()
+{
+    qDebug() << "saveFileSystem: " << m_dirs.size();
+    Preferences pref;
+    pref.beginGroup("SharedDirectories");
+    pref.beginWriteArray("ShareDirs");
+
+    int dir_indx = 0;
+    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        const DirNode* p = *itr;
+        qDebug() << "save shared directory: " << p->filepath();
+
+        pref.setArrayIndex(dir_indx);
+        pref.setValue("Path", p->filepath());
+        QStringList efiles = p->exclude_files();
+
+        if (!efiles.isEmpty())
+        {
+            int file_indx = 0;
+            pref.beginWriteArray("ExcludeFiles", efiles.size());
+
+            foreach(const QString& efile, efiles)
+            {
+                pref.setArrayIndex(file_indx);
+                pref.setValue("FileName", efile);
+                ++file_indx;
+            }
+
+            pref.endArray();
+        }
+
+        ++dir_indx;
+    }
+
+    pref.endArray();
+    pref.endGroup();
+}
+
+void Session::loadFileSystem()
+{
+    qDebug() << "load file system";
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    Preferences pref;
+    typedef QPair<QString, QVector<QString> > SD;
+    QVector<SD> vf;
+    m_incoming = pref.getSavePath();
+
+    pref.beginGroup("SharedDirectories");
+    int dcount = pref.beginReadArray("ShareDirs");
+    vf.resize(dcount);
+
+    for (int i = 0; i < dcount; ++i)
+    {
+
+        pref.setArrayIndex(i);
+        vf[i].first = pref.value("Path").toString();
+
+        int fcount = pref.beginReadArray("ExcludeFiles");
+        vf[i].second.resize(fcount);
+
+        for (int j = 0; j < fcount; ++ j)
+        {
+            pref.setArrayIndex(j);
+            vf[i].second[j] = pref.value("FileName").toString();
+        }
+
+        pref.endArray();
+
+    }
+
+    pref.endArray();
+
+    // sort dirs ASC to avoid update states on sharing
+    std::sort(vf.begin(), vf.end());
+
+    foreach(const SD& item, vf)
+    {
+        FileNode* dir_node = node(item.first);
+
+        if (dir_node != &m_root)
+        {
+            qDebug() << "load shared directory: " << dir_node->filepath();
+            dir_node->share(false);
+            QDir filepath(item.first);
+
+            for(int i = 0; i < item.second.size(); ++i)
+            {
+                FileNode* file_node = node(filepath.absoluteFilePath(item.second[i]));
+
+                if (file_node != &m_root)
+                {
+                    qDebug() << "  exclude file: " << file_node->filename();
+                    file_node->unshare(false);
+                }
+            }
+        }
+    }
+
+    share(m_incoming, false);
+
+    if (pref.isMigrationStage())
+    {
+        qDebug() << "in migration stage process shared files also";
+
+        foreach(QString filepath, misc::migrationSharedFiles())
+        {
+            qDebug() << "migrate file " << filepath;
+            share(filepath, false);
+        }
+    }
+
+    QApplication::restoreOverrideCursor();
+}
+
+void Session::dropDirectoryTransfers()
+{
+    m_delay.cancel();
+
+    for (std::set<DirNode*>::const_iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
+    {
+        const DirNode* p = *itr;
+        qDebug() << "remove transfer on collection: " << p->filepath();
+
+        if (p->has_transfer())
+        {
+            deleteTransfer(p->m_hash, true);
+        }
+    }
+}
+
+void Session::share(const QString& filepath, bool recursive)
+{
+    FileNode* p = node(filepath);
+    if (p != &m_root) p->share(recursive);
+}
+
+void Session::unshare(const QString& filepath, bool recursive)
+{
+    FileNode* p = node(filepath);
+    if (p != &m_root) p->unshare(recursive);
 }

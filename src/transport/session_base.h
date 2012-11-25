@@ -10,7 +10,7 @@
 #include <vector>
 #include <queue>
 #include <libtorrent/session_status.hpp>
-#include <libed2k/session.hpp>
+#include <libed2k/add_transfer_params.hpp>
 #include <libed2k/session_status.hpp>
 
 #include <transport/transfer.h>
@@ -67,7 +67,6 @@ public:
     virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0;   //!< ed2k session only
-    virtual void shareByED2K(const QTorrentHandle& h, bool unshare) = 0;        //!< ed2k session only
 
     // implemented methods
     virtual qreal getRealRatio(const QString& hash) const;
@@ -77,7 +76,7 @@ public:
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
     virtual void autoRunExternalProgram(const Transfer &t);
-
+    virtual QSet<QString> incompleteFiles() const;
 public slots:
     virtual void pauseTransfer(const QString& hash);
     virtual void resumeTransfer(const QString& hash);
@@ -96,7 +95,8 @@ signals:
     void resumedTransfer(Transfer t);
     void finishedTransfer(Transfer t);
     void deletedTransfer(QString hash);
-    void transferAboutToBeRemoved(Transfer t);
+    void transferAboutToBeRemoved(Transfer t, bool del_files);
+    void savePathChanged(Transfer t);
     void newConsoleMessage(const QString &msg);
     void fileError(Transfer t, QString msg);
 
@@ -197,11 +197,9 @@ public:
     Transfer addLink(QString strLink, bool resumed = false) {
         DEFER_RETURN2(addLink, strLink, resumed, Transfer()); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
-    void shareByED2K(const QTorrentHandle& h, bool unshare) { DEFER2(shareByED2K, h, unshare); }
     QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
         DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
-    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
-
+    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }    
 private:
     std::queue<boost::function<void()> > m_deferred;
 };
