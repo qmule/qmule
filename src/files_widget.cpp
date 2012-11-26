@@ -249,15 +249,15 @@ QString files_widget::createLink(const QString& fileName, qint64 fileSize, const
     return link;
 }
 
-void files_widget::switchLinkWidget(bool enable)
+void files_widget::switchLinkWidget(const QStringList& links)
 {
-    if (enable)
+    if (!links.isEmpty())
     {
         groupBox->setEnabled(true);
         editLink->setEnabled(true);
         checkForum->setEnabled(true);
         checkSize->setEnabled(checkForum->isChecked());
-        fillLinkWidget();
+        fillLinkWidget(links);
     }
     else
     {
@@ -266,16 +266,34 @@ void files_widget::switchLinkWidget(bool enable)
     }
 }
 
-void files_widget::fillLinkWidget()
-{
-    QModelIndex index = sort2file(tableView->currentIndex());
+void files_widget::fillLinkWidget(const QStringList& links)
+{       
+    editLink->clear();
 
-    if (index.isValid())
-    editLink->setPlainText(createLink(m_file_model->displayName(index),
-                                      m_file_model->size(index),
-                                      m_file_model->hash(index),
-                                      checkForum->isChecked(),
-                                      checkSize->isChecked()));
+    foreach(const QString& s, links)
+    {
+        editLink->appendPlainText(s);
+    }
+}
+
+QStringList files_widget::generateLinks()
+{
+    QStringList list;
+    foreach(const QModelIndex& i, tableView->selectionModel()->selectedRows())
+    {
+        QModelIndex index = sort2file(i);
+
+        if (index.isValid() && m_file_model->active(index) && !m_file_model->hash(index).isEmpty())
+        {
+            list << createLink(m_file_model->displayName(index),
+                                          m_file_model->size(index),
+                                          m_file_model->hash(index),
+                                          checkForum->isChecked(),
+                                          checkSize->isChecked());
+        }
+    }
+
+    return list;
 }
 
 
@@ -303,23 +321,18 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
     }
 }
 
-void files_widget::on_tableViewSelChanged(const QItemSelection &, const QItemSelection &)
-{
-    QModelIndex index = sort2file(tableView->currentIndex());
-
-    if (index.isValid())
-    {        
-        switchLinkWidget(m_file_model->active(index) && !m_file_model->hash(index).isEmpty());
-    }    
+void files_widget::on_tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
+{    
+    switchLinkWidget(generateLinks());
 }
 
-void files_widget::on_treeViewSelChanged(const QItemSelection &, const QItemSelection &)
-{
+void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelection&)
+{   
     QModelIndex index = sort2dir(treeView->currentIndex());
 
     if (index.isValid())
     {
-        switchLinkWidget(false);
+        switchLinkWidget(QStringList());
         m_file_model->setRootNode(index);
     }
 }
@@ -342,13 +355,13 @@ void files_widget::on_editLink_textChanged()
 void files_widget::on_checkForum_toggled(bool checked)
 {
     checkSize->setEnabled(checked);
-    fillLinkWidget();
+    fillLinkWidget(generateLinks());
 }
 
 void files_widget::on_checkSize_toggled(bool checked)
 {
     Q_UNUSED(checked);
-    fillLinkWidget();
+    fillLinkWidget(generateLinks());
 }
 
 void files_widget::on_btnCopy_clicked()
@@ -358,15 +371,12 @@ void files_widget::on_btnCopy_clicked()
 
 void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& right)
 {
-    Q_UNUSED(right);
-    // process current selection row changed state
-    QModelIndex current = sort2file(tableView->currentIndex());
+    Q_UNUSED(right);    
 
-    if (left.isValid() && current.isValid() &&
-        (left.column() == 0) &&         // process only first signal (FileModel emits second signal to refresh hash and errors)
-        (left.row() == current.row()))  // check we stay on same row what was changed
+    // process only first signal (FileModel emits second signal to refresh hash and errors)
+    if (left.isValid() && (left.column() == 0))
     {
-        switchLinkWidget(m_file_model->active(left) && !m_file_model->hash(left).isEmpty());
+        switchLinkWidget(generateLinks());
     }
 }
 

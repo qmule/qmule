@@ -38,8 +38,9 @@ private:
     QModelIndex sort2dir(const QModelIndex& index) const;
     QModelIndex sort2file(const QModelIndex& index) const;
     QString createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize);
-    void switchLinkWidget(bool enable);
-    void fillLinkWidget();
+    void switchLinkWidget(const QStringList&);
+    void fillLinkWidget(const QStringList&);
+    QStringList generateLinks();
 public slots:
     void putToClipboard();
 private slots:
