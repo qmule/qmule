@@ -60,6 +60,16 @@ void BaseModel::setRootNode(const QModelIndex& index)
     }
 }
 
+void BaseModel::setRootNode(DirNode* node)
+{
+    if (node)
+    {
+        qDebug() << "set index to " << node->filepath();
+        m_rootItem = node;
+        reset();
+    }
+}
+
 
 // helper functions
 QString BaseModel::hash(const QModelIndex& index) const
@@ -225,10 +235,6 @@ Qt::CheckState BaseModel::state(const QModelIndex& index) const
             st = Qt::PartiallyChecked;
         }
     }
-    //else if (!hash(index).isEmpty())
-    //{
-    //    return Qt::PartiallyChecked;
-    //}
 
     return st;
 }

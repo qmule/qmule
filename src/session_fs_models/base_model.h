@@ -41,6 +41,7 @@ public:
      QModelIndex index ( int row, int column, const QModelIndex & parent = QModelIndex()) const;
 
      void setRootNode(const QModelIndex& index);
+     void setRootNode(DirNode*);
 
      // interface function
      QString hash(const QModelIndex& index) const;

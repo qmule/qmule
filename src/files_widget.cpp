@@ -8,6 +8,8 @@
 #include "session_fs_models/file_model.h"
 #include "session_fs_models/dir_model.h"
 #include "session_fs_models/sort_model.h"
+#include "session_fs_models/path_model.h"
+#include "session_fs_models/shared_files_model.h"
 #include "transport/session.h"
 
 #include <libed2k/file.hpp>
@@ -25,8 +27,6 @@ files_widget::files_widget(QWidget *parent)
         sz << 100 << 500;
         splitter_2->setSizes(sz);
     }
-
-
 
     m_dir_model = new DirectoryModel(Session::instance()->root());
     m_file_model = new FilesModel(Session::instance()->root());
@@ -47,6 +47,8 @@ files_widget::files_widget(QWidget *parent)
         tableView->setColumnWidth(0, 20);
         tableView->setColumnWidth(1, 400);
     }
+
+    treeView->header()->restoreState(pref.value("FilesWidget/DirectoriesView").toByteArray());
 
     m_filesMenu = new QMenu(this);
     m_filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
@@ -128,13 +130,75 @@ files_widget::files_widget(QWidget *parent)
 
     treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
     tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);        
+
+    // ======== summary page ==============
+
+    if (!splitter_3->restoreState(pref.value("FilesWidget/SplitterSummary").toByteArray()))
+    {
+        QList<int> sz;
+        sz << 100 << 500;
+        splitter_3->setSizes(sz);
+    }
+
+    if (!tableView_files->horizontalHeader()->restoreState(pref.value("FilesWidget/FilesViewSummary").toByteArray()))
+    {
+        tableView_files->setColumnWidth(0, 20);
+        tableView_files->setColumnWidth(1, 400);
+    }
+
+    tableView_paths->horizontalHeader()->restoreState(pref.value("FilesWidget/DirectoriesViewSummary").toByteArray());
+
+    m_path_model = new PathModel(this);
+    m_path_sort = new PathsSort(this);
+    m_path_sort->setSourceModel(m_path_model);
+    m_path_sort->setDynamicSortFilter(true);
+
+    tableView_paths->setModel(m_path_sort);
+    connect(Session::instance(), SIGNAL(insertSharedDirectory(const DirNode*)), m_path_model, SLOT(on_insertSharedDirectory(const DirNode*)));
+    connect(Session::instance(), SIGNAL(removeSharedDirectory(const DirNode*)), m_path_model, SLOT(on_removeSharedDirectory(const DirNode*)));
+
+    m_sum_file_model = new SFModel(this);
+    m_sum_sort_files_model = new SessionFilesSort(this);
+    m_sum_sort_files_model->setSourceModel(m_sum_file_model);
+    m_sum_sort_files_model->setDynamicSortFilter(false); // for performance dynamic sort off
+
+    tableView_files->setModel(m_sum_sort_files_model);
+
+    connect(Session::instance(), SIGNAL(removeSharedFile(FileNode*)), m_sum_file_model, SLOT(on_removeSharedFile(FileNode*)));
+    connect(Session::instance(), SIGNAL(insertSharedFile(FileNode*)), m_sum_file_model, SLOT(on_insertSharedFile(FileNode*)));
+
+    connect(tableView_paths->selectionModel(),
+        SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+        SLOT(on_tableViewPathsSumSelChanged(QItemSelection,QItemSelection)));
+
+    connect(tableView_files->selectionModel(),
+        SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+        SLOT(on_tableViewFilesSumSelChanged(const QItemSelection &, const QItemSelection &)));
+
+    connect(tableView_paths->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(paths_sortChanged(int, Qt::SortOrder)));
+
+    connect(tableView_files->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+            this, SLOT(files_sortChanged(int, Qt::SortOrder)));
+
+    tableView_files->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(tableView_files->horizontalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayHSMenuSummary(const QPoint&)));
+
+    // pre-sort summary models
+    tableView_paths->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
+    tableView_files->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
 }
 
 files_widget::~files_widget()
 {    
     Preferences pref;
     pref.setValue("FilesWidget/Splitter", splitter_2->saveState());
+    pref.setValue("FilesWidget/SplitterSummary", splitter_3->saveState());
     pref.setValue("FilesWidget/FilesView", tableView->horizontalHeader()->saveState());
+    pref.setValue("FilesWidget/FilesViewSummary", tableView_files->horizontalHeader()->saveState());
+    pref.setValue("FilesWidget/DirectoriesView", treeView->header()->saveState());
+    pref.setValue("FilesWidget/DirectoriesViewSummary", tableView_paths->horizontalHeader()->saveState());
 }
 
 void files_widget::putToClipboard()
@@ -231,6 +295,28 @@ QModelIndex files_widget::sort2file(const QModelIndex& index) const
     return QModelIndex();
 }
 
+QModelIndex files_widget::sort2dir_sum(const QModelIndex& index) const
+{
+    if (index.isValid())
+    {
+        Q_ASSERT(index.model() == m_path_sort);
+        return m_path_sort->mapToSource(index);
+    }
+
+    return QModelIndex();
+}
+
+QModelIndex files_widget::sort2file_sum(const QModelIndex& index) const
+{
+    if (index.isValid())
+    {
+        Q_ASSERT(index.model() == m_sum_sort_files_model);
+        return m_sum_sort_files_model->mapToSource(index);
+    }
+
+    return QModelIndex();
+}
+
 QString files_widget::createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize)
 {
     QString link;
@@ -296,7 +382,44 @@ QStringList files_widget::generateLinks()
     return list;
 }
 
+QStringList files_widget::generateLinksSum()
+{
+    QStringList list;
+    foreach(const QModelIndex& i, tableView_files->selectionModel()->selectedRows())
+    {
+        QModelIndex index = sort2file_sum(i);
 
+        if (index.isValid() && m_sum_file_model->active(index) && !m_sum_file_model->hash(index).isEmpty())
+        {
+            list << createLink(m_sum_file_model->displayName(index),
+                                          m_sum_file_model->size(index),
+                                          m_sum_file_model->hash(index),
+                                          checkForum->isChecked(),
+                                          checkSize->isChecked());
+        }
+    }
+
+    return list;
+}
+
+QStringList files_widget::generateLinksByTab()
+{
+    QStringList res;
+
+    switch(tabWidget->currentIndex())
+    {
+    case 0:
+        res = generateLinks();
+        break;
+    case 1:
+        res = generateLinksSum();
+        break;
+    default:
+        Q_ASSERT(false);
+    }
+
+    return res;
+}
 
 void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
 {
@@ -337,6 +460,22 @@ void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelec
     }
 }
 
+void files_widget::on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&)
+{
+    QModelIndex index = sort2dir_sum(tableView_paths->currentIndex());
+
+    if (index.isValid())
+    {
+        switchLinkWidget(QStringList());
+        m_sum_file_model->setFilter(m_path_model->filepath(index));
+    }
+}
+
+void files_widget::on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
+{
+    switchLinkWidget(generateLinksSum());
+}
+
 void files_widget::sortChanged(int column, Qt::SortOrder order)
 {
     m_sort_files_model->sort(column, order);
@@ -347,6 +486,16 @@ void files_widget::sortChangedDirectory(int column, Qt::SortOrder order)
     m_sort_dirs_model->sort(column, order);
 }
 
+void files_widget::paths_sortChanged(int column, Qt::SortOrder order)
+{
+    m_path_sort->sort(column, order);
+}
+
+void files_widget::files_sortChanged(int column, Qt::SortOrder order)
+{
+    m_sum_sort_files_model->sort(column, order);
+}
+
 void files_widget::on_editLink_textChanged()
 {
     btnCopy->setDisabled(editLink->toPlainText().isEmpty());
@@ -355,13 +504,13 @@ void files_widget::on_editLink_textChanged()
 void files_widget::on_checkForum_toggled(bool checked)
 {
     checkSize->setEnabled(checked);
-    fillLinkWidget(generateLinks());
+    fillLinkWidget(generateLinksByTab());
 }
 
 void files_widget::on_checkSize_toggled(bool checked)
 {
     Q_UNUSED(checked);
-    fillLinkWidget(generateLinks());
+    fillLinkWidget(generateLinksByTab());
 }
 
 void files_widget::on_btnCopy_clicked()
@@ -402,10 +551,43 @@ void files_widget::displayHSMenu(const QPoint&)
     {
         int col = actions.indexOf(act);
         Q_ASSERT(col >= 0);
-        qDebug("Toggling column %d visibility", col);
         tableView->setColumnHidden(col, !tableView->isColumnHidden(col));
         if (!tableView->isColumnHidden(col) && tableView->columnWidth(col) <= 5)
             tableView->setColumnWidth(col, 100);
     }
 }
 
+void files_widget::displayHSMenuSummary(const QPoint&)
+{
+    QMenu hideshowColumn(this);
+    hideshowColumn.setTitle(tr("Column visibility"));
+    QList<QAction*> actions;
+
+    for (int i=0; i < m_sum_file_model->columnCount(); ++i)
+    {
+        QAction *myAct = hideshowColumn.addAction(
+            m_sum_file_model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString());
+        myAct->setCheckable(true);
+        myAct->setChecked(!tableView_files->isColumnHidden(i));
+        actions.append(myAct);
+    }
+
+    // Call menu
+    QAction *act = hideshowColumn.exec(QCursor::pos());
+
+    if (act)
+    {
+        int col = actions.indexOf(act);
+        Q_ASSERT(col >= 0);
+        tableView_files->setColumnHidden(col, !tableView_files->isColumnHidden(col));
+        if (!tableView_files->isColumnHidden(col) && tableView_files->columnWidth(col) <= 5)
+            tableView_files->setColumnWidth(col, 100);
+    }
+}
+
+
+void files_widget::on_tabWidget_currentChanged(int index)
+{
+    tableView->clearSelection();
+    tableView_files->clearSelection();
+}

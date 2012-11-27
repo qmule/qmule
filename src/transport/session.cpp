@@ -448,6 +448,7 @@ void Session::on_transferAboutToBeRemoved(const Transfer& t, bool del_files)
     {
         FileNode* node = itr.value();
         Q_ASSERT(node);
+        emit removeSharedFile(node);
         m_files.erase(itr);
 
         if (del_files)
@@ -527,19 +528,22 @@ void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp
 
 void Session::removeDirectory(DirNode* dir)
 {
-    m_dirs.erase(dir);
+    emit removeSharedDirectory(dir);
+    m_dirs.erase(dir);    
     m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
 }
 
 void Session::addDirectory(DirNode* dir)
 {
-    m_dirs.insert(dir);
+    m_dirs.insert(dir);    
+    emit insertSharedDirectory(dir);
     m_delay.execute(boost::bind(&Session::prepare_collections, Session::instance()));
 }
 
 void Session::registerNode(FileNode* node)
 {
     m_files.insert(node->hash(), node);
+    emit insertSharedFile(node);
 }
 
 #ifdef Q_OS_WIN32

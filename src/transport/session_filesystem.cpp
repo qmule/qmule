@@ -156,6 +156,21 @@ bool FileNode::on_metadata_completed(const libed2k::add_transfer_params& atp, co
     return (!m_error);
 }
 
+QString correct_path(QString fullPath)
+{
+#if !defined(Q_OS_WIN) || defined(Q_OS_WINCE)
+    if ((fullPath.length() > 2) && fullPath[0] == QLatin1Char('/') && fullPath[1] == QLatin1Char('/'))
+        fullPath = fullPath.mid(1);
+#endif
+
+#if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
+    if (fullPath.length() == 2 && fullPath.endsWith(QLatin1Char(':')))
+        fullPath.append(QLatin1Char('/'));
+#endif
+
+    return fullPath;
+}
+
 QString FileNode::filepath() const
 {
     QStringList path;
@@ -168,19 +183,21 @@ QString FileNode::filepath() const
         parent = parent->m_parent;
     }
 
-    QString fullPath = QDir::fromNativeSeparators(path.join(QDir::separator()));
+    return correct_path(QDir::fromNativeSeparators(path.join(QDir::separator())));
+}
 
-#if !defined(Q_OS_WIN) || defined(Q_OS_WINCE)
-    if ((fullPath.length() > 2) && fullPath[0] == QLatin1Char('/') && fullPath[1] == QLatin1Char('/'))
-        fullPath = fullPath.mid(1);
-#endif
+QString FileNode::parent_path() const
+{
+    QStringList path;
+    const DirNode* parent = m_parent;
 
-#if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
-    if (fullPath.length() == 2 && fullPath.endsWith(QLatin1Char(':')))
-        fullPath.append(QLatin1Char('/'));
-#endif
+    while(parent && !parent->is_root())
+    {
+        path.prepend(parent->filename());
+        parent = parent->m_parent;
+    }
 
-    return fullPath;
+    return correct_path(QDir::fromNativeSeparators(path.join(QDir::separator())));
 }
 
 int FileNode::level() const
@@ -543,6 +560,7 @@ void DirNode::delete_node(const FileNode* node)
     if (node->is_dir())
     {
         m_dir_vector.erase(std::remove(m_dir_vector.begin(), m_dir_vector.end(), node), m_dir_vector.end());
+        Session::instance()->removeDirectory((DirNode*)node);
         Q_ASSERT(m_dir_children.take(node->filename()));
     }
     else

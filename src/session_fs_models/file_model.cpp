@@ -18,7 +18,9 @@ QModelIndex FilesModel::index(int row, int column,
         parentNode = m_rootItem;
     else
         parentNode = static_cast<DirNode*>(parent.internalPointer());
-    Q_ASSERT(row < parentNode->m_file_children.size());
+
+    Q_ASSERT(row < rowCount(parent));
+
     FileNode *childNode = parentNode->m_file_vector.at(row);
     Q_ASSERT(childNode);
     return createIndex(row, column, childNode);
@@ -51,22 +53,7 @@ QModelIndex FilesModel::index(const FileNode* node)
     if (node == m_rootItem || !parentNode || node->is_dir())
         return QModelIndex();
 
-    // get the parent's row
-    Q_ASSERT(node);
-
-    int row = 0;
-    // search node
-    foreach(const FileNode* p, parentNode->m_file_vector)
-    {
-        if (p == node)
-        {
-            break;
-        }
-
-        ++row;
-    }
-
-    return createIndex(row, 0, const_cast<FileNode*>(node));
+    return createIndex(node2row(node), 0, const_cast<FileNode*>(node));
 }
 
 QVariant FilesModel::headerData(int section, Qt::Orientation orientation,
@@ -236,7 +223,6 @@ bool FilesModel::setData ( const QModelIndex & index, const QVariant & value, in
     {
         FileNode* node = static_cast<FileNode*>(index.internalPointer());
         Q_ASSERT(node);
-        qDebug() << "node filepath " << node->filepath();
 
         if (node->is_active())
         {
@@ -284,4 +270,3 @@ void FilesModel::emitChangeSignal(const QModelIndex& indx)
     emit dataChanged(index(indx.row(), columnCount() - 2, parent(indx)),
                                index(indx.row(), columnCount() - 1, parent(indx)));
 }
-

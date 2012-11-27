@@ -38,7 +38,8 @@ public:
     virtual bool on_metadata_completed(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec);
 
     virtual QString collection_name() const { return QString(""); }
-    virtual QString filepath() const;
+    QString filepath() const;
+    QString parent_path() const;
     virtual bool is_dir() const { return false; }
     virtual bool is_root() const { return false; }
     virtual int children() const { return 0; }  // for tests

@@ -20,4 +20,12 @@ public:
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 };
 
+class PathsSort : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    PathsSort(QObject* parent = 0) : QSortFilterProxyModel(parent) {}
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+};
+
 #endif //__SORT_MODEL__

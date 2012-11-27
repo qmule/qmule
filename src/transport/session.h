@@ -74,6 +74,8 @@ public:
     void share(const QString& filepath, bool recursive);
     void unshare(const QString& filepath, bool recursive);
     DirNode* root() { return &m_root; }
+    std::set<DirNode*>& directories() { return m_dirs; }
+    QHash<QString, FileNode*>& files() { return m_files; }
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -103,6 +105,11 @@ signals:
     void beginInsertNode(const FileNode* node);
     void endInsertNode();
 
+    void removeSharedDirectory(const DirNode*);
+    void insertSharedDirectory(const DirNode*);
+
+    void removeSharedFile(FileNode*);
+    void insertSharedFile(FileNode*);
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
     void on_pausedTorrent(const QTorrentHandle& h);

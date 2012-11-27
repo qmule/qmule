@@ -97,3 +97,26 @@ bool SessionDirectoriesSort::lessThan(const QModelIndex& left, const QModelIndex
 
     return (QSortFilterProxyModel::lessThan(left, right));
 }
+
+bool PathsSort::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    if (left.column() == 0)
+    {
+        if (left.row() == 0)
+        {
+            return (sortOrder() == Qt::AscendingOrder);
+        }
+        else if (right.row() == 0)
+        {
+            return (sortOrder() != Qt::AscendingOrder);
+        }
+        else
+        {
+            return (naturalCompare(sourceModel()->data(left, Qt::DisplayRole).toString(),
+                               sourceModel()->data(right, Qt::DisplayRole).toString(),
+                               Qt::CaseSensitive) < 0);
+        }
+    }
+
+    return (QSortFilterProxyModel::lessThan(left, right));
+}

@@ -6303,7 +6303,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Summary browser</source>
-        <translation>Суммарная раздача</translation>
+        <translation>Все раздачи</translation>
     </message>
     <message>
         <source>duplicate transfer</source>
@@ -6332,6 +6332,10 @@ However, those plugins were disabled.</source>
     <message>
         <source>Open folder</source>
         <translation>Открыть папку</translation>
+    </message>
+    <message>
+        <source>Filepath</source>
+        <translation>Файловые фильтры</translation>
     </message>
 </context>
 <context>
@@ -6401,6 +6405,13 @@ However, those plugins were disabled.</source>
     <message>
         <source>%1 bytes</source>
         <translation>%1 байт</translation>
+    </message>
+</context>
+<context>
+    <name>PathModel</name>
+    <message>
+        <source>All shared files</source>
+        <translation>Все раздаваемые файлы</translation>
     </message>
 </context>
 <context>
