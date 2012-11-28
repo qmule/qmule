@@ -103,8 +103,10 @@ void FileNode::on_transfer_finished(Transfer t)
     m_parent->drop_transfer_by_file();
 
     // extract add_transfer_parameters to node from transfer
-    if (!m_atp && t.is_valid())
+    if (!m_atp && t.is_valid()) {
         m_atp = new libed2k::add_transfer_params(t.ed2kHandle().delegate().params());
+        m_atp->seed_mode = true; // libed2k will not check file data
+    }
 
     Session::instance()->registerNode(this);
     Session::instance()->signal_changeNode(this);
