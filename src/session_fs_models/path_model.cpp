@@ -1,4 +1,5 @@
 #include "path_model.h"
+#include "session.h"
 
 PathModel::PathModel(QObject *parent /* = 0*/)
     : QAbstractListModel(parent),
@@ -9,6 +10,9 @@ PathModel::PathModel(QObject *parent /* = 0*/)
     {
         m_paths.append(node);
     }
+
+    connect(Session::instance(), SIGNAL(insertSharedDirectory(const DirNode*)), this, SLOT(on_insertSharedDirectory(const DirNode*)));
+    connect(Session::instance(), SIGNAL(removeSharedDirectory(const DirNode*)), this, SLOT(on_removeSharedDirectory(const DirNode*)));
 }
 
 int PathModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

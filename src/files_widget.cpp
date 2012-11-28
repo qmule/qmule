@@ -103,20 +103,7 @@ files_widget::files_widget(QWidget *parent)
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
     connect(m_filesUnexchSubdir,  SIGNAL(triggered()), this, SLOT(unxchangeSubdir()));
 
-    connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_dir_model, SLOT(changeNode(const FileNode*)));
-    connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), m_file_model, SLOT(changeNode(const FileNode*)));
-
     connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
-
-    connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_dir_model, SLOT(beginRemoveNode(const FileNode*)));
-    connect(Session::instance(), SIGNAL(endRemoveNode()), m_dir_model, SLOT(endRemoveNode()));
-    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*)), m_dir_model, SLOT(beginInsertNode(const FileNode*)));
-    connect(Session::instance(), SIGNAL(endInsertNode()), m_dir_model, SLOT(endInsertNode()));
-
-    connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), m_file_model, SLOT(beginRemoveNode(const FileNode*)));
-    connect(Session::instance(), SIGNAL(endRemoveNode()), m_file_model, SLOT(endRemoveNode()));
-    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*)), m_file_model, SLOT(beginInsertNode(const FileNode*)));
-    connect(Session::instance(), SIGNAL(endInsertNode()), m_file_model, SLOT(endInsertNode()));
 
     connect(tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(sortChanged(int, Qt::SortOrder)));
@@ -151,21 +138,16 @@ files_widget::files_widget(QWidget *parent)
     m_path_model = new PathModel(this);
     m_path_sort = new PathsSort(this);
     m_path_sort->setSourceModel(m_path_model);
-    m_path_sort->setDynamicSortFilter(true);
+    m_path_sort->setDynamicSortFilter(false);
 
-    tableView_paths->setModel(m_path_sort);
-    connect(Session::instance(), SIGNAL(insertSharedDirectory(const DirNode*)), m_path_model, SLOT(on_insertSharedDirectory(const DirNode*)));
-    connect(Session::instance(), SIGNAL(removeSharedDirectory(const DirNode*)), m_path_model, SLOT(on_removeSharedDirectory(const DirNode*)));
+    tableView_paths->setModel(m_path_sort);    
 
     m_sum_file_model = new SFModel(this);
     m_sum_sort_files_model = new SessionFilesSort(this);
     m_sum_sort_files_model->setSourceModel(m_sum_file_model);
-    m_sum_sort_files_model->setDynamicSortFilter(false); // for performance dynamic sort off
+    m_sum_sort_files_model->setDynamicSortFilter(true); // for performance dynamic sort off
 
     tableView_files->setModel(m_sum_sort_files_model);
-
-    connect(Session::instance(), SIGNAL(removeSharedFile(FileNode*)), m_sum_file_model, SLOT(on_removeSharedFile(FileNode*)));
-    connect(Session::instance(), SIGNAL(insertSharedFile(FileNode*)), m_sum_file_model, SLOT(on_insertSharedFile(FileNode*)));
 
     connect(tableView_paths->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),

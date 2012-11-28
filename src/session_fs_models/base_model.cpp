@@ -1,9 +1,16 @@
 #include "base_model.h"
 #include "misc.h"
+#include "session.h"
 
 BaseModel::BaseModel(DirNode* root, QObject *parent/* = 0*/) :
     QAbstractItemModel(parent), m_rootItem(root), m_row_count_changed(false)
 {
+    // integrate model into session
+    connect(Session::instance(), SIGNAL(changeNode(const FileNode*)), this, SLOT(changeNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(beginRemoveNode(const FileNode*)), this, SLOT(beginRemoveNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(endRemoveNode()), this, SLOT(endRemoveNode()));
+    connect(Session::instance(), SIGNAL(beginInsertNode(const FileNode*)), this, SLOT(beginInsertNode(const FileNode*)));
+    connect(Session::instance(), SIGNAL(endInsertNode()), this, SLOT(endInsertNode()));
 }
 
 BaseModel::~BaseModel()

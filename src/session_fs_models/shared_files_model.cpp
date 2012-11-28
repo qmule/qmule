@@ -3,6 +3,8 @@
 SFModel::SFModel(QObject *parent /*= 0*/) : FilesModel(Session::instance()->root(), parent)
 {
     sync();
+    connect(Session::instance(), SIGNAL(removeSharedFile(FileNode*)), this, SLOT(on_removeSharedFile(FileNode*)));
+    connect(Session::instance(), SIGNAL(insertSharedFile(FileNode*)), this, SLOT(on_insertSharedFile(FileNode*)));
 }
 
 int SFModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const

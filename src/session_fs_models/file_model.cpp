@@ -1,9 +1,10 @@
 #include "file_model.h"
+#include "session.h"
 #include <QFont>
 #include <QBrush>
 
 FilesModel::FilesModel(DirNode* root, QObject* parent /*= 0*/) : BaseModel(root, parent)
-{
+{    
 }
 
 QModelIndex FilesModel::index(int row, int column,
