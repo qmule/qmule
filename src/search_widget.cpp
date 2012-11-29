@@ -1368,16 +1368,16 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
 
 void search_widget::download()
 {
-    if (tabSearch->currentIndex() < 0 || selected_row(treeResult) < 0)
-    {
-        qDebug("download button should be disabled when result isn't selected");
-        return;
-    }
-
     // Possible only with double click.
     if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
     {
         initPeer();
+        return;
+    }
+
+    if (!hasSelectedFiles())
+    {
+        qDebug("some files should be selected for downloading");
         return;
     }
 
