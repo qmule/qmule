@@ -56,7 +56,7 @@ public:
                     {
                         // link isn't set yet
                         QString iconLink = "<img src=\":/emule/common/hyperlink.ico\">";
-                        QLabel* label = new QLabel(iconLink + "&nbsp;" + name, view);
+                        QLabel* label = new QLabel("<tr><td>" + iconLink + "</td><td>" + name + "</td></tr>", view);
                         label->setOpenExternalLinks(true);
                         label->setToolTip(name);
                         view->setIndexWidget(index, label);
