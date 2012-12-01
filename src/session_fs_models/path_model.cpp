@@ -57,7 +57,7 @@ QVariant PathModel::headerData(int section, Qt::Orientation orientation,
         return QVariant();
 
     if (orientation == Qt::Horizontal)
-        return QString("Filepath");
+        return tr("Filepath");
 
     return QVariant();
 }

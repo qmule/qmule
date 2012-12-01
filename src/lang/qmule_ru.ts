@@ -6333,10 +6333,6 @@ However, those plugins were disabled.</source>
         <source>Open folder</source>
         <translation>Открыть папку</translation>
     </message>
-    <message>
-        <source>Filepath</source>
-        <translation>Файловые фильтры</translation>
-    </message>
 </context>
 <context>
     <name>DirectoryModel</name>
@@ -6412,6 +6408,10 @@ However, those plugins were disabled.</source>
     <message>
         <source>All shared files</source>
         <translation>Все раздаваемые файлы</translation>
+    </message>
+    <message>
+        <source>Filepath</source>
+        <translation>Директории</translation>
     </message>
 </context>
 <context>
