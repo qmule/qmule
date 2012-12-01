@@ -1331,8 +1331,13 @@ void MainWindow::updateGUI() {
   m_tbar->setState(winId(), Session::instance()->hasActiveTransfers()?taskbar_iface::S_NORM:taskbar_iface::S_PAUSED);
 }
 
-void MainWindow::showNotificationBaloon(QString title, QString msg) const {
+void MainWindow::showNotificationBaloon(QString title, QString msg) const
+{
   if (!Preferences().useProgramNotification()) return;
+
+  // forward all notifications to the console
+  addConsoleMessage(msg);
+
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
   org::freedesktop::Notifications notifications("org.freedesktop.Notifications",
                                                 "/org/freedesktop/Notifications",
@@ -1349,9 +1354,6 @@ void MainWindow::showNotificationBaloon(QString title, QString msg) const {
 #endif
   if (systrayIcon && QSystemTrayIcon::supportsMessages())
     systrayIcon->showMessage(title, msg, QSystemTrayIcon::Information, TIME_TRAY_BALLOON);
-
-  // forward all notifications to the console
-  addConsoleMessage(msg);
 }
 
 /*****************************************************
