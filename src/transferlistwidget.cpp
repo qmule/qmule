@@ -411,7 +411,10 @@ void TransferListWidget::hidePriorityColumn(bool hide) {
 void TransferListWidget::addLinkDialog() {
   Transfer t;
   bool ok;
-  QString link;
+  QString clipboardText = QApplication::clipboard()->text();
+  QString link =
+      clipboardText.startsWith("ed2k://", Qt::CaseInsensitive) ||
+      clipboardText.startsWith("magnet:", Qt::CaseInsensitive) ? clipboardText : "";
 
   do {
     link = QInputDialog::getText(
