@@ -26,21 +26,37 @@ QModelIndex BaseModel::parent(const QModelIndex &index) const
     DirNode* parentItem = childItem->m_parent;
 
     if (parentItem == m_rootItem)
-            return QModelIndex();
+    {
+        return QModelIndex();
+    }
 
+    bool found = false;
     int row = 0;
 
     if (parentItem->m_parent)
     {
         foreach(const DirNode* p, parentItem->m_parent->m_dir_vector) // search parent in grand parent!
         {
-            if (p == parentItem)  break;
+            if (p == parentItem)
+            {
+                found = true;
+                break;
+            }
+
             ++row;
+        }
+
+        if (found)
+        {
+            return createIndex(row, 0, parentItem);
         }
     }
 
-    return createIndex(row, 0, parentItem);
+    return QModelIndex();
+
 }
+
+
 
 int BaseModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
@@ -257,7 +273,7 @@ FileNode* BaseModel::node(const QModelIndex& index) const
 // slots
 void BaseModel::changeNode(const FileNode* node)
 {
-    QModelIndex indx = index(node);
+    QModelIndex indx = index(node);        
 
     if (indx.isValid())
     {

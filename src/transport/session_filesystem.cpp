@@ -411,7 +411,14 @@ void DirNode::update_state()
 void DirNode::drop_transfer_by_file()
 {
     if (m_active) deleteTransfer();
-    Session::instance()->signal_changeNode(this);
+
+    const DirNode* parent = this;
+    while(parent && !parent->is_root())
+    {
+        Session::instance()->signal_changeNode(parent);
+        parent = parent->m_parent;
+    }
+
 }
 
 void DirNode::build_collection()
