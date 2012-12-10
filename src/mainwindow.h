@@ -35,8 +35,6 @@
 #include <QSystemTrayIcon>
 #include <QPointer>
 
-#include <libed2k/is_https_auth.hpp>
-
 #include "qtlibed2k/qed2ksession.h"
 #include "transport/transfer.h"
 #include "ui_mainwindow.h"
@@ -167,8 +165,6 @@ protected slots:
   void on_actionConnect_triggered();
   void on_actionMessages_triggerd();
   void on_actionFiles_triggerd();
-  void on_auth_result(const std::string& strRes, const boost::system::error_code& ec);
-
 protected:
   void closeEvent(QCloseEvent *);
   void showEvent(QShowEvent *);
@@ -224,13 +220,11 @@ private:
   // Power Management
   PowerManagement *m_pwr;
   QTimer *preventTimer;
-  QTimer *authTimer;
   QTimer *flickerTimer;
   QScopedPointer<is_info_dlg> m_info_dlg;
   QScopedPointer<silent_updater> m_updater;
   QScopedPointer<taskbar_iface>  m_tbar;
   unsigned int m_nTaskbarButtonCreated;
-  libed2k::auth_runner ar;
 
   QIcon icon_disconnected;
   QIcon icon_connected;
@@ -255,9 +249,6 @@ private slots:
     void on_actionAutoShutdown_system_toggled(bool );
     // Check for active torrents and set preventing from suspend state
     void checkForActiveTorrents();
-    void on_auth(const QString& strRes, const QString& strError);
-    void authRequest();
-    void startAuthByTimer();
     void startChat(const QString& user_name, const libed2k::net_identifier& np);
     void addFriend(const QString& user_name, const libed2k::net_identifier& np);
     void startMessageFlickering();
@@ -273,9 +264,6 @@ private slots:
     void ed2kConnectionClosed(QString strError);
 
     void on_actionOpenDownloadPath_triggered();
-
-signals:
-    void signalAuth(const QString& strRes, const QString& strError);
 };
 
 #endif

@@ -219,7 +219,7 @@ void QED2KSession::start()
     Preferences pref;
     // set zero to port for stop automatically listening
     m_settings.listen_port = pref.listenPort();
-    m_settings.server_reconnect_timeout = -1; // do not attempt to reconnect after connection failed because auth need before
+    m_settings.server_reconnect_timeout = 20;
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
@@ -230,7 +230,7 @@ void QED2KSession::start()
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(m_settings.m_known_file);
-#ifdef NOAUTH
+#ifdef AMD1
     m_settings.server_hostname = "che-s-amd1";
 #else
     m_settings.server_hostname = "emule.is74.ru";
@@ -523,7 +523,6 @@ void QED2KSession::readAlerts()
         if (libed2k::server_connection_initialized_alert* p =
             dynamic_cast<libed2k::server_connection_initialized_alert*>(a.get()))
         {
-            qDebug() << "server connection initialized";
             emit serverConnectionInitialized(p->m_nClientId, p->m_nTCPFlags, p->m_nAuxPort);
         }
         else if (libed2k::server_status_alert* p = dynamic_cast<libed2k::server_status_alert*>(a.get()))
@@ -542,7 +541,6 @@ void QED2KSession::readAlerts()
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
-            qDebug() << "qt server connection closed";
             emit serverConnectionClosed(QString::fromLocal8Bit(p->m_error.message().c_str()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))

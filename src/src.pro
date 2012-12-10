@@ -47,8 +47,8 @@ CONFIG(release, debug|release) {
 }
 
 # Disable authentication
-CONFIG(noauth) {
-   DEFINES += NOAUTH
+CONFIG(amd1) {
+   DEFINES += AMD1
 }
 
 # VERSION DEFINES
