@@ -17,7 +17,6 @@
 
 #include "preferences.h"
 
-
 using namespace libed2k;
 
 /* Converts a QString hash into a  libed2k md4_hash */
@@ -27,7 +26,7 @@ static libed2k::md4_hash QStringToMD4(const QString& s)
     return libed2k::md4_hash::fromString(s.toStdString());
 }
 
-static QString md4toQString(const libed2k::md4_hash& hash)
+QString md4toQString(const libed2k::md4_hash& hash)
 {
     return QString::fromAscii(hash.toString().c_str(), hash.toString().size());
 }
@@ -119,7 +118,14 @@ QED2KSearchResultEntry QED2KSearchResultEntry::fromSharedFileEntry(const libed2k
         {
             if (boost::shared_ptr<libed2k::base_tag> p = sf.m_list.getTagByName(libed2k::FT_ED2K_MEDIA_LENGTH))
             {
-                sre.m_nMediaLength = p->asInt();
+                if (p->getType() == libed2k::TAGTYPE_STRING)
+                {
+                    // TODO - possible need store string length
+                }
+                else
+                {
+                    sre.m_nMediaLength = p->asInt();
+                }
             }
         }
 
@@ -182,7 +188,7 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             std::vector<char> out;
             libed2k::bencode(back_inserter(out), *p->resume_data);
             const QString filepath = libed2kBackup.absoluteFilePath(h.hash() +".fastresume");
-            libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.filepath(), p->m_handle.filesize(), out);
+            libed2k::transfer_resume_data trd(p->m_handle.hash(), p->m_handle.save_path(), p->m_handle.name(), p->m_handle.size(), out);
 
             std::ofstream fs(filepath.toLocal8Bit(), std::ios_base::out | std::ios_base::binary);
 
@@ -204,7 +210,7 @@ namespace aux
 {
 
 QED2KSession::QED2KSession()
-{
+{    
 }
 
 void QED2KSession::start()
@@ -217,12 +223,13 @@ void QED2KSession::start()
     m_settings.server_keep_alive_timeout = -1;
     m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
     m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
-    m_settings.m_known_file = pref.knownFile().toUtf8().constData();
+    m_settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
     m_settings.client_name  = pref.nick().toUtf8().constData();
     m_settings.mod_name = misc::productName().toUtf8().constData();
     m_settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
+    qDebug() << "known " << misc::toQStringU(m_settings.m_known_file);
 #ifdef NOAUTH
     m_settings.server_hostname = "che-s-amd1";
 #else
@@ -238,6 +245,7 @@ void QED2KSession::start()
     }
 
     m_session->set_alert_mask(alert::all_categories);
+    m_session->set_alert_queue_size_limit(100000);
     // start listening on special interface and port and start server connection
     configureSession();
 }
@@ -283,15 +291,19 @@ void QED2KSession::deleteTransfer(const QString& hash, bool delete_files)
 {
     const Transfer t = getTransfer(hash);
     if (!t.is_valid()) return;
-    emit transferAboutToBeRemoved(t);
+    emit transferAboutToBeRemoved(t, delete_files);
 
     m_session->remove_transfer(
         t.ed2kHandle().delegate(),
         delete_files ? libed2k::session::delete_files : libed2k::session::none);
 
-    if (QFile::remove(QDir(misc::ED2KBackupLocation()).absoluteFilePath(hash +".fastresume")))
+    if (QFile::remove(QDir(misc::ED2KBackupLocation()).absoluteFilePath(hash + ".fastresume")))
     {
         qDebug() << "Also deleted temp fast resume data: " << hash;
+    }
+    else
+    {
+        qDebug() << "fast resume wasn't removed for " << hash;
     }
 
     emit deletedTransfer(hash);
@@ -396,7 +408,7 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
         QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
-        atp.file_path = filepath.toUtf8();
+        atp.file_path = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
         return QED2KHandle(delegate()->add_transfer(atp));
     }
@@ -416,7 +428,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
             qDebug() << "add transfer " << filepath;
             libed2k::add_transfer_params atp;
             atp.file_hash = ece.m_filehash;
-            atp.file_path = filepath.toUtf8();
+            atp.file_path = filepath.toUtf8().constData();
             atp.file_size = ece.m_filesize;
             addTransfer(atp);
         }
@@ -425,50 +437,8 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
-    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.filename().c_str());
+    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
     return QED2KHandle(delegate()->add_transfer(atp));
-}
-
-void QED2KSession::shareByED2K(const QTorrentHandle& h, bool unshare)
-{
-    QDir save_path(h.save_path());
-    int num_files = h.num_files();
-    std::set<QString> roots;
-    std::deque<std::string> excludes;
-
-    for (int i = 0; i < num_files; ++i)
-        roots.insert(h.filepath_at(i).split(QDir::separator()).first());
-
-    for (std::set<QString>::const_iterator i = roots.begin(); i != roots.end(); ++i)
-    {
-        QString path = save_path.filePath(*i);  // never contains last separator
-        QFileInfo info(path);
-
-        if (info.isFile())
-        {
-            delegate()->share_file(path.toUtf8().constData(), unshare);
-        }
-        else if (info.isDir())
-        {
-            QStringList dlist;
-            dlist << path;
-            QDirIterator it(path, QDirIterator::Subdirectories);
-
-            while(it.hasNext())
-            {
-                QDir d = QFileInfo(it.next()).dir();
-                dlist << d.path();
-            }
-
-            dlist.removeDuplicates();
-
-            foreach(const QString& str, dlist)
-            {
-                delegate()->share_dir(
-                    save_path.path().toUtf8().constData(), str.toUtf8().constData(), excludes, unshare);
-            }
-        }
-    }
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
@@ -612,6 +582,7 @@ void QED2KSession::readAlerts()
         else if (libed2k::mule_listen_failed_alert* p =
                  dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
         {
+            Q_UNUSED(p)
             // TODO - process signal - it means we have different client on same port
         }
         else if (libed2k::peer_connected_alert* p = dynamic_cast<libed2k::peer_connected_alert*>(a.get()))
@@ -659,6 +630,14 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
             emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
+            if (!m_fast_resume_transfers.empty())
+            {
+                remove_by_state();
+                if (m_fast_resume_transfers.empty())
+                {
+                    emit fastResumeDataLoadCompleted();
+                }
+            }
         }
         else if (libed2k::paused_transfer_alert* p =
                  dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
@@ -672,22 +651,52 @@ void QED2KSession::readAlerts()
         }
         else if (libed2k::deleted_transfer_alert* p =
                  dynamic_cast<libed2k::deleted_transfer_alert*>(a.get()))
-        {
+        {            
+            QString hash = QString::fromStdString(p->m_hash.toString());
+            qDebug() << "delete transfer alert" << hash;
             emit deletedTransfer(QString::fromStdString(p->m_hash.toString()));
         }
         else if (libed2k::finished_transfer_alert* p =
                  dynamic_cast<libed2k::finished_transfer_alert*>(a.get()))
         {
+            Transfer t(QED2KHandle(p->m_handle));
+
             if (p->m_had_picker)
-                emit finishedTransfer(Transfer(QED2KHandle(p->m_handle)));
+                emit finishedTransfer(t);
+
+            if (t.is_seed())
+                emit registerNode(t);
+
+            if (!m_fast_resume_transfers.empty())
+            {
+                m_fast_resume_transfers.remove(t.hash());
+                remove_by_state();
+
+                if (m_fast_resume_transfers.empty())
+                {
+                    emit fastResumeDataLoadCompleted();
+                }                
+            }
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
-                autoRunExternalProgram(Transfer(QED2KHandle(p->m_handle)));
+                autoRunExternalProgram(t);
         }
         else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
         {
             writeResumeData(p);
+        }
+        else if (libed2k::transfer_params_alert* p = dynamic_cast<libed2k::transfer_params_alert*>(a.get()))
+        {
+            emit transferParametersReady(p->m_atp, p->m_ec);
+        }
+        else if (libed2k::file_renamed_alert* p = dynamic_cast<libed2k::file_renamed_alert*>(a.get()))
+        {
+            emit savePathChanged(Transfer(QED2KHandle(p->m_handle)));
+        }
+        else if (libed2k::storage_moved_alert* p = dynamic_cast<libed2k::storage_moved_alert*>(a.get()))
+        {
+            emit savePathChanged(Transfer(QED2KHandle(p->m_handle)));
         }
         else if (libed2k::file_error_alert* p = dynamic_cast<libed2k::file_error_alert*>(a.get()))
         {
@@ -695,7 +704,8 @@ void QED2KSession::readAlerts()
 
             if (h.is_valid())
             {
-                emit fileError(Transfer(h), QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
+                emit fileError(Transfer(h),
+                               QString::fromLocal8Bit(p->error.message().c_str(), p->error.message().size()));
                 h.pause();
             }
         }
@@ -794,6 +804,18 @@ void QED2KSession::saveFastResumeData()
 void QED2KSession::loadFastResumeData()
 {
     qDebug("load fast resume data");
+
+    // avoid load collections from previous fail
+    QDir bkp_dir(misc::ED2KCollectionLocation());
+    if (bkp_dir.exists())
+    {
+        foreach(QString filename, bkp_dir.entryList(QDir::Files))
+        {
+            qDebug() << "remove fail file: " << filename;
+            QFile::remove(bkp_dir.absoluteFilePath(filename));
+        }
+    }
+
     // we need files 32 length(MD4_HASH_SIZE*2) name and extension fastresume
     QStringList filter;
     filter << "????????????????????????????????.fastresume";
@@ -837,8 +859,9 @@ void QED2KSession::loadFastResumeData()
                         QFileInfo qfi(QString::fromUtf8(trd.m_filepath.m_collection.c_str()));
                         // add transfer only when file still exists
                         if (qfi.exists() && qfi.isFile())
-                        {
-                            delegate()->add_transfer(params);
+                        {                            
+                            QED2KHandle h(delegate()->add_transfer(params));
+                            m_fast_resume_transfers.insert(h.hash(), h);
                         }
                         else
                         {
@@ -852,6 +875,12 @@ void QED2KSession::loadFastResumeData()
         }
 
         QFile::remove(file_abspath);
+    }
+
+    if (m_fast_resume_transfers.empty())
+    {
+        // no fast resume data found - session ready for share
+        emit fastResumeDataLoadCompleted();
     }
 }
 
@@ -868,6 +897,42 @@ void QED2KSession::stopServerConnection()
 bool QED2KSession::isServerConnected() const
 {
     return (delegate()->server_conn_online());
+}
+
+void QED2KSession::makeTransferParametersAsync(const QString& filepath)
+{
+    delegate()->make_transfer_parameters(filepath.toUtf8().constData());
+}
+
+void QED2KSession::cancelTransferParameters(const QString& filepath)
+{
+    delegate()->cancel_transfer_parameters(filepath.toUtf8().constData());
+}
+
+void QED2KSession::remove_by_state()
+{
+    // begin analize states
+    QHash<QString, Transfer>::iterator i = m_fast_resume_transfers.begin();
+
+    while (i != m_fast_resume_transfers.end())
+    {
+        if (!i.value().is_valid() ||
+                (i.value().state() == qt_downloading))
+        {
+            qDebug() << "remove state " << i.value().hash() << " is valid " << i.value().is_valid();
+            i = m_fast_resume_transfers.erase(i);
+        }
+        else
+        {
+            ++i;
+        }
+    }
+}
+
+std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeTransferParameters(const QString& filepath) const
+{
+    bool cancel = false;
+    return libed2k::file2atp()(filepath.toUtf8().constData(), cancel);
 }
 
 }

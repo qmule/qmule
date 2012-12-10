@@ -8,6 +8,8 @@
 #include "qtlibtorrent/qbtsession.h"
 #include "qtlibed2k/qed2ksession.h"
 #include "torrentspeedmonitor.h"
+#include "session_filesystem.h"
+#include "misc.h"
 
 /**
  * Generic data transfer session
@@ -63,10 +65,17 @@ public:
     bool isQueueingEnabled() const;
     bool isListening() const;
 
-    void deferPlayMedia(Transfer t);
-    bool playMedia(Transfer t);
-    void shareByED2K(const QTorrentHandle& h, bool unshare);
+    void deferPlayMedia(Transfer t, int fileIndex);
+    bool playMedia(Transfer t, int fileIndex);
 
+    void saveFileSystem();
+    void loadFileSystem();
+    void dropDirectoryTransfers();
+    void share(const QString& filepath, bool recursive);
+    void unshare(const QString& filepath, bool recursive);
+    DirNode* root() { return &m_root; }
+    std::set<DirNode*>& directories() { return m_dirs; }
+    QHash<QString, FileNode*>& files() { return m_files; }
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -87,22 +96,37 @@ signals:
     void newDownloadedTransfer(QString path, QString url);
     void downloadFromUrlFailure(QString url, QString reason);
     void alternativeSpeedsModeChanged(bool alternative);
-    void recursiveDownloadPossible(QTorrentHandle t);
-    void savePathChanged(Transfer t);
+    void recursiveDownloadPossible(QTorrentHandle t);    
     void newBanMessage(QString msg);
+    // filesystem signals
+    void changeNode(const FileNode* node);
+    void beginRemoveNode(const FileNode* node);
+    void endRemoveNode();
+    void beginInsertNode(const FileNode* node);
+    void endInsertNode();
 
+    void removeSharedDirectory(const DirNode*);
+    void insertSharedDirectory(const DirNode*);
+
+    void removeSharedFile(FileNode*);
+    void insertSharedFile(FileNode*);
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
     void on_pausedTorrent(const QTorrentHandle& h);
     void on_finishedTorrent(const QTorrentHandle& h);
     void on_metadataReceived(const QTorrentHandle& h);
     void on_torrentAboutToBeRemoved(const QTorrentHandle& h, bool del_files);
+    void on_transferAboutToBeRemoved(const Transfer& t, bool del_files);
     void on_torrentFinishedChecking(const QTorrentHandle& h);
     void on_trackerAuthenticationRequired(const QTorrentHandle& h);
     void on_savePathChanged(const QTorrentHandle& h);
     void saveTempFastResumeData();
     void readAlerts();
     void saveFastResumeData();
+
+    void on_registerNode(Transfer);
+    void on_transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
+    void on_ED2KResumeDataLoaded();
 
 private:
     Session();
@@ -115,6 +139,20 @@ private:
         std::for_each(m_sessions.begin(), m_sessions.end(), f);
     }
 
+    void addDirectory(DirNode* dir);
+    void removeDirectory(DirNode* dir);
+    void setDirectLink(const QString& hash, DirNode* node);
+    void registerNode(FileNode*);
+    FileNode* node(const QString& filepath);
+
+    // emitters
+    void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
+    void signal_endRemoveNode() { emit endRemoveNode();}
+    void signal_beginInsertNode(const FileNode* node) { emit beginInsertNode(node);}
+    void signal_endInsertNode() { emit endInsertNode();}
+    void signal_changeNode(const FileNode* node) { emit changeNode(node);}
+    void prepare_collections();
+
     static Session* m_instance;
 
     QBtSession m_btSession;
@@ -125,7 +163,16 @@ private:
     QScopedPointer<QTimer>  m_periodic_resume;
     QScopedPointer<QTimer>  m_alerts_reading;
 
-    std::vector<QString> m_pending_medias;
+    std::set<QPair<QString, int> > m_pending_medias;
+
+    DirNode m_root;
+    Delay                       m_delay;
+    QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
+    std::set<DirNode*>          m_dirs;     // shared directories
+    QString                     m_incoming; // incoming filepath
+
+    friend class DirNode;
+    friend class FileNode;
 };
 
 #endif

@@ -200,6 +200,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   menuStatus->addAction(actionMessages);
   menuStatus->addAction(actionOptions);
   menuStatus->addSeparator();
+  menuStatus->addAction(actionOpenDownloadPath);
 
   actionTools->setMenu(menuStatus);
   if(QToolButton * btn = qobject_cast<QToolButton *>(toolBar->widgetForAction(actionTools)))
@@ -236,7 +237,7 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionSearch, SIGNAL(triggered()), this, SLOT(on_actionSearch_triggerd()));
   connect(actionCatalog, SIGNAL(triggered()), this, SLOT(on_actionCatalog_triggerd()));
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
-  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));
+  connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));  
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
   connect(search, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
   connect(transfer_List, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
@@ -427,6 +428,9 @@ MainWindow::~MainWindow() {
   IconProvider::drop();
   // Delete Session::instance() object
   m_pwr->setActivityState(false);
+  qDebug() << "Saving session filesystem";
+  Session::instance()->dropDirectoryTransfers();
+  Session::instance()->saveFileSystem();
   qDebug("Deleting Session::instance()");
   Session::drop();    
   qDebug("Exiting GUI destructor...");
@@ -489,6 +493,7 @@ void MainWindow::writeSettings() {
   settings.beginGroup(QString::fromUtf8("MainWindow"));
   settings.setValue("geometry", saveGeometry());
   settings.endGroup();
+  settings.setMigrationStage(false);
 }
 
 void MainWindow::readSettings() {
@@ -1326,8 +1331,13 @@ void MainWindow::updateGUI() {
   m_tbar->setState(winId(), Session::instance()->hasActiveTransfers()?taskbar_iface::S_NORM:taskbar_iface::S_PAUSED);
 }
 
-void MainWindow::showNotificationBaloon(QString title, QString msg) const {
+void MainWindow::showNotificationBaloon(QString title, QString msg) const
+{
   if (!Preferences().useProgramNotification()) return;
+
+  // forward all notifications to the console
+  addConsoleMessage(msg);
+
 #if defined(Q_WS_X11) && defined(QT_DBUS_LIB)
   org::freedesktop::Notifications notifications("org.freedesktop.Notifications",
                                                 "/org/freedesktop/Notifications",
@@ -1344,9 +1354,6 @@ void MainWindow::showNotificationBaloon(QString title, QString msg) const {
 #endif
   if (systrayIcon && QSystemTrayIcon::supportsMessages())
     systrayIcon->showMessage(title, msg, QSystemTrayIcon::Information, TIME_TRAY_BALLOON);
-
-  // forward all notifications to the console
-  addConsoleMessage(msg);
 }
 
 /*****************************************************
@@ -1664,10 +1671,9 @@ void MainWindow::on_auth(const QString& strRes, const QString& strError)
             }
             else
             {
+                QApplication::setOverrideCursor(Qt::WaitCursor);
                 Session::instance()->start();
-                // it is temp and bad code - avoid reshare before transfers will completed
-                // wait 8 seconds
-                QTimer::singleShot(8000, files, SLOT(reshare()));
+                QApplication::restoreOverrideCursor();
             }
 
             activateControls(true);
@@ -1890,4 +1896,10 @@ void MainWindow::setDisconnectedStatus()
     if (systrayIcon) {
         systrayIcon->setIcon(getSystrayIcon());
     }
+}
+
+void MainWindow::on_actionOpenDownloadPath_triggered()
+{
+    Preferences pref;
+    QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
 }

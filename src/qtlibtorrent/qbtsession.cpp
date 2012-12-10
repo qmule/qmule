@@ -949,11 +949,6 @@ QED2KHandle QBtSession::addTransfer(const libed2k::add_transfer_params&)
     return QED2KHandle();
 }
 
-void QBtSession::shareByED2K(const QTorrentHandle& h, bool unshare)
-{
-    // do nothing
-}
-
 // Add a torrent to the Bittorrent session
 QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString from_url, bool resumed) {
   QTorrentHandle h;
@@ -1268,7 +1263,7 @@ void QBtSession::loadTorrentTempData(QTorrentHandle &h, QString savePath, bool m
 #endif
 
       // Prioritize first/last piece
-      h.prioritize_first_last_piece(TorrentTempData::isSequential(hash));
+      h.prioritize_extremity_pieces(TorrentTempData::isSequential(hash));
 
       // Update file names
       const QStringList files_path = TorrentTempData::getFilesPath(hash);

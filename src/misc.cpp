@@ -38,7 +38,8 @@
 #include <QDebug>
 #include <QProcess>
 #include <QSettings>
- #include <QNetworkInterface>
+#include <QNetworkInterface>
+#include <QTextCodec>
 
 #ifdef DISABLE_GUI
 #include <QCoreApplication>
@@ -933,6 +934,25 @@ bool misc::isValidTorrentFile(const QString &torrent_path) {
   return true;
 }
 
+QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
+{
+    QSet<QString> roots;
+    QDir save_path(h.save_path());
+
+    if (save_path.dirName() == h.name())
+    {
+        roots << save_path.absolutePath();
+    }
+    else
+    {
+        int num_files = h.num_files();
+        for (int i = 0; i < num_files; ++i)
+            roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+    }
+
+    return roots;
+}
+
 /**
  * Returns a path constructed from all the elements of file_path except the last.
  * A typical use is to obtain the parent path for a path supplied by the user.
@@ -1049,7 +1069,7 @@ QString misc::ifaceFromHumanName(const QString& strHumanIface)
     return strRes;
 }
 
-QStringList misc::getFileLines(const QString& filename)
+QStringList misc::getFileLines(const QString& filename, const char* codec /*= NULL*/)
 {
     QStringList slist;
     QFile textFile(filename);
@@ -1059,9 +1079,8 @@ QStringList misc::getFileLines(const QString& filename)
         return slist;
     }
 
-
     QTextStream textStream(&textFile);
-    textStream.setCodec("UTF-8");
+    if (codec) textStream.setCodec(codec);
     textStream.setAutoDetectUnicode(true);
 
     while (true)
@@ -1089,6 +1108,7 @@ QString ShellGetFolderPath(int iCSIDL)
 
 QString misc::emuleConfig(const QString& filename)
 {
+    qDebug() << "emule config for " << filename;
     QString res;
     static QList<QDir> dl = QList<QDir>()
             << QDir(ShellGetFolderPath(CSIDL_LOCAL_APPDATA)).filePath("eMule IS Mod\\config")
@@ -1113,12 +1133,12 @@ QString misc::emuleConfigFilename()
 
 QStringList misc::emuleSharedFiles()
 {
-    return getFileLines(emuleConfig("sharedfiles.dat"));
+    return getFileLines(emuleConfig("sharedfiles.dat"),  "UTF-16");
 }
 
 QStringList misc::emuleSharedDirs()
 {
-    return getFileLines(emuleConfig("shareddir.dat"));
+    return getFileLines(emuleConfig("shareddir.dat"), "UTF-16");
 }
 
 QString misc::emuleKeyFile()
@@ -1152,7 +1172,9 @@ shared_map misc::migrationShareds()
             emuleSharedFiles().filter(QRegExp("^-")).replaceInStrings(QRegExp("^-"), "");
     QDir dir;
 
-    foreach(dir, emuleSharedDirs())
+    QStringList dirs = emuleSharedDirs();
+    qDebug() << dirs;
+    foreach(dir, dirs)
     {
         shared_map::iterator itr = se.insert(dir.path(), QList<QString>());
         QFileInfo fi;
@@ -1364,9 +1386,9 @@ shared_map misc::migrationShareds()
  }
 
  QString misc::migrationNick(const QString& nick)
- {
+ {     
      QString res = nick;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^Nick"));
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp("^Nick"));
 
      if (!sl.empty())
      {
@@ -1381,3 +1403,36 @@ shared_map misc::migrationShareds()
      return res;
  }
 
+ Delay::Delay(int mseconds) : m_mseconds(mseconds)
+ {
+     connect(&m_timer, SIGNAL(timeout()), this, SLOT(on_timeout()));
+ }
+
+ Delay::~Delay()
+ {
+
+ }
+
+ void Delay::execute(boost::function<void()> f)
+ {
+     m_delegate = f;
+
+     if (m_timer.isActive())
+     {
+         m_timer.setInterval(m_mseconds);
+     }
+     else
+     {
+         m_timer.start(m_mseconds);
+     }
+ }
+
+ void Delay::cancel()
+ {
+     if (m_timer.isActive()) m_timer.stop();
+ }
+
+ void Delay::on_timeout()
+ {
+     m_delegate();
+ }

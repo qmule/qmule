@@ -75,7 +75,7 @@ PreviewSelect::PreviewSelect(QWidget* parent, Transfer h): QDialog(parent), h(h)
     QMessageBox::critical(0, tr("Preview impossible"), tr("Sorry, we can't preview this file"));
     close();
   }
-  connect(this, SIGNAL(readyToPreviewFile(QString)), parent, SLOT(previewFile(QString)));
+  connect(this, SIGNAL(readyToPreviewFile(Transfer, int)), parent, SLOT(previewFile(Transfer, int)));
   if (previewListModel->rowCount() == 1) {
     qDebug("Torrent file only contains one file, no need to display selection dialog before preview");
     // Only one file : no choice
@@ -101,13 +101,7 @@ void PreviewSelect::on_previewButton_clicked() {
 
   QString path;
   foreach (index, selectedIndexes) {
-    path = h.absolute_files_path().at(indexes.at(index.row()));
-    // File
-    if (QFile::exists(path)) {
-      emit readyToPreviewFile(path);
-    } else {
-      QMessageBox::critical(0, tr("Preview impossible"), tr("Sorry, we can't preview this file"));
-    }
+    emit readyToPreviewFile(h, indexes.at(index.row()));
     close();
     return;
   }

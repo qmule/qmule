@@ -1,102 +1,84 @@
 #ifndef FILES_WIDGET_H
 #define FILES_WIDGET_H
 
-#include <libed2k/file.hpp>
-#include <transport/transfer.h>
 #include <QWidget>
 #include <QFileIconProvider>
+#include <QSplitter>
+#include <QItemSelection>
+#include <QSortFilterProxyModel>
 #include "ui_files_widget.h"
 #include "misc.h"
 
-QT_BEGIN_NAMESPACE
-class QStandardItemModel;
-class QSortFilterProxyModel;
-class QStandardItem;
-QT_END_NAMESPACE
 
-
-enum FW_Columns
-{
-    FW_NAME,
-    FW_SIZE,
-    FW_ID,
-    FW_COLUMNS_NUM
-};
+class DirectoryModel;
+class FilesModel;
+class PathModel;
+class SFModel;
+class SessionFilesSort;
+class SessionDirectoriesSort;
+class PathsSort;
 
 class files_widget : public QWidget, public Ui::files_widget
 {
     Q_OBJECT
-    QTreeWidgetItem* allFiles;
-    QTreeWidgetItem* allDirs;
-    QTreeWidgetItem* sharedDirs;
-    QScopedPointer<QStandardItemModel> model;
-    QScopedPointer<QSortFilterProxyModel> filterModel;
-    QFileIconProvider provider;
-
-    shared_map dirRules;
-    QList<QString> fileRules;
-    QMap<QString, QString> transferPath;
-
-    QString saveDirPath;
-
-    QMenu*   filesMenu;
-    QAction* filesExchDir;
-    QAction* filesExchSubdir;
-    QAction* filesUnexchDir;
-    QAction* filesUnexchSubdir;
-
-    QFont usualFont;
-    QFont boldFont;
-    QIcon emuleFolder;
-
-    bool bProcessFiles;
 
 public:
     files_widget(QWidget *parent = 0);
     ~files_widget();
 
-private:
-    bool    isDirTreeItem(QTreeWidgetItem* item);
-    bool    isSharedDirTreeItem(QTreeWidgetItem* item);
-    bool    isExchangeDir(QTreeWidgetItem* item);
-    QString getDirPath(QTreeWidgetItem* item);
-    void    generateSharedTree();
-    void    exchangeSubdir(QFileInfoList& fileList);
-    bool    partOfSharedPath(QString path);
-    void    setExchangeStatus(QTreeWidgetItem* item, bool status);
-    void    setChildExchangeStatus(QTreeWidgetItem* item, bool status);
-    void    checkExchangeParentStatus(QTreeWidgetItem* curItem);
-    void    shareDir(QString dirPath, bool bShare);
-    void    checkBaseAdd(QString dirPath);
-    void    checkBaseRemove(QString dirPath);
-    void    removeLastSlash(QString& dirPath);
-    void    addLastSlash(QString& dirPath);
-    void    applyUnexchangeStatus(QString strPath, bool recursive);
-    bool    findTreeItem(QTreeWidgetItem*& item, QString strPath);
-    void    removeTransferPath(QString filePath);
-    void    createED2KLink();
-    QString getHashByPath(QString filePath);
+private:    
+    QMenu*   m_filesMenu;
+    QAction* m_openFolder;
+    QAction* m_filesExchDir;
+    QAction* m_filesExchSubdir;
+    QAction* m_filesUnexchDir;
+    QAction* m_filesUnexchSubdir;
 
+    DirectoryModel* m_dir_model;
+    FilesModel*     m_file_model;
+    PathModel*      m_path_model;
+    PathsSort*      m_path_sort;
+    SFModel*        m_sum_file_model;
+    SessionFilesSort* m_sum_sort_files_model;
+
+    SessionFilesSort* m_sort_files_model;
+    SessionDirectoriesSort* m_sort_dirs_model;
+    QModelIndex sort2dir(const QModelIndex& index) const;
+    QModelIndex sort2file(const QModelIndex& index) const;
+    QModelIndex sort2dir_sum(const QModelIndex& index) const;
+    QModelIndex sort2file_sum(const QModelIndex& index) const;
+    QString createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize);
+    void switchLinkWidget(const QStringList&);
+    void fillLinkWidget(const QStringList&);
+    QStringList generateLinks();        // files browser
+    QStringList generateLinksSum();     // summary browser
+    QStringList generateLinksByTab();   // for 0 files, for 1 summary
 public slots:
-    void optionsChanged();
-    void reshare();
-
+    void putToClipboard();
 private slots:
-    void itemExpanded(QTreeWidgetItem* item);
-    void itemCollapsed(QTreeWidgetItem* item);
-    void currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* olditem);
-    void tableItemChanged(QStandardItem* item);
-    void displayTreeMenu(const QPoint&);
+    void openFolder();
     void exchangeDir();
     void exchangeSubdir();
     void unexchangeDir();
     void unxchangeSubdir();
-    void applyChanges();
-    void addedTransfer(Transfer transfer);
-    void deletedTransfer(QString hash);
-    void selectedFileChanged(const QItemSelection& sel, const QItemSelection& unsel);
-    void checkChanged(int state);
-    void putToClipboard();
+    void on_treeView_customContextMenuRequested(const QPoint &pos);
+    void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void on_treeViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void sortChanged(int, Qt::SortOrder);
+    void sortChangedDirectory(int, Qt::SortOrder);
+
+    void paths_sortChanged(int, Qt::SortOrder);
+    void files_sortChanged(int, Qt::SortOrder);
+    void on_editLink_textChanged();
+    void on_checkForum_toggled(bool checked);
+    void on_checkSize_toggled(bool checked);
+    void on_btnCopy_clicked();
+    void on_changeRow(const QModelIndex& left, const QModelIndex& right);
+    void displayHSMenu(const QPoint&);
+    void displayHSMenuSummary(const QPoint&);
+    void on_tabWidget_currentChanged(int index);
 };
 
 #endif // FILES_WIDGET_H

@@ -69,25 +69,6 @@ static QString boostTimeToQString(const boost::posix_time::ptime &boostDate) {
 }
 #endif
 
-static QPair<int, int> get_file_extremity_pieces(const torrent_info& t, int file_index)
-{
-  const int num_pieces = t.num_pieces();
-  const int piece_size = t.piece_length();
-  const file_entry& file = t.file_at(file_index);
-
-  // Determine the first and last piece of the file
-  int first_piece = floor((file.offset + 1) / (float) piece_size);
-  Q_ASSERT(first_piece >= 0 && first_piece < num_pieces);
-  qDebug("First piece of the file is %d/%d", first_piece, num_pieces - 1);
-
-  int num_pieces_in_file = ceil(file.size / (float) piece_size);
-  int last_piece = first_piece + num_pieces_in_file - 1;
-  Q_ASSERT(last_piece >= 0 && last_piece < num_pieces);
-  qDebug("last piece of the file is %d/%d", last_piece, num_pieces - 1);
-
-  return qMakePair(first_piece, last_piece);
-}
-
 QTorrentHandle::QTorrentHandle(const torrent_handle& h): torrent_handle(h) {}
 
 bool QTorrentHandle::operator==(const TransferBase& t) const {
@@ -147,29 +128,6 @@ qlonglong QTorrentHandle::next_announce_s() const {
 #endif
 }
 
-float QTorrentHandle::progress() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  torrent_status st = torrent_handle::status(query_accurate_download_counters);
-#else
-  torrent_status st = torrent_handle::status();
-#endif
-  if (!st.total_wanted)
-    return 0.;
-  if (st.total_wanted_done == st.total_wanted)
-    return 1.;
-  float progress = (float) st.total_wanted_done / (float) st.total_wanted;
-  Q_ASSERT(progress >= 0. && progress <= 1.);
-  return progress;
-}
-
-bitfield QTorrentHandle::pieces() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return bitfield2TBF(torrent_handle::status(0x0).pieces);
-#else
-  return bitfield2TBF(torrent_handle::status().pieces);
-#endif
-}
-
 QString QTorrentHandle::current_tracker() const {
 #if LIBTORRENT_VERSION_MINOR > 15
   return misc::toQString(torrent_handle::status(0x0).current_tracker);
@@ -208,94 +166,26 @@ int QTorrentHandle::num_pieces() const {
   return torrent_handle::get_torrent_info().num_pieces();
 }
 
-bool QTorrentHandle::first_last_piece_first() const {
+bool QTorrentHandle::extremity_pieces_first() const {
   const torrent_info& t = get_torrent_info();
+  std::vector<int> piece_priorities = torrent_handle::piece_priorities();
 
-  // Get int first media file
-  int index = 0;
-  for (index = 0; index < t.num_files(); ++index) {
+  for (int index = 0; index < t.num_files(); ++index) {
 #if LIBTORRENT_VERSION_MINOR > 15
     QString path = misc::toQStringU(t.file_at(index).path);
 #else
     QString path = misc::toQStringU(t.file_at(index).path.string());
 #endif
     const QString ext = misc::file_extension(path);
-    if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0)
-      break;
+    if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0) {
+      const std::vector<int> extremities = file_extremity_pieces_at(index);
+      int sum_prio = 0;
+      foreach (int e, extremities) sum_prio += piece_priorities[e];
+      if (sum_prio == 7 * extremities.size()) return true;
+    }
   }
 
-  if (index >= t.num_files()) // No media file
-    return false;
-
-
-  QPair<int, int> extremities = get_file_extremity_pieces (t, index);
-
-  return (torrent_handle::piece_priority(extremities.first) == 7)
-      && (torrent_handle::piece_priority(extremities.second) == 7);
-}
-
-size_type QTorrentHandle::total_wanted_done() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(query_accurate_download_counters).total_wanted_done;
-#else
-  return torrent_handle::status().total_wanted_done;
-#endif
-}
-
-size_type QTorrentHandle::total_wanted() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_wanted;
-#else
-  return torrent_handle::status().total_wanted;
-#endif
-}
-
-qreal QTorrentHandle::download_payload_rate() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).download_payload_rate;
-#else
-  return torrent_handle::status().download_payload_rate;
-#endif
-}
-
-qreal QTorrentHandle::upload_payload_rate() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).upload_payload_rate;
-#else
-  return torrent_handle::status().upload_payload_rate;
-#endif
-}
-
-int QTorrentHandle::num_peers() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_peers;
-#else
-  return torrent_handle::status().num_peers;
-#endif
-}
-
-int QTorrentHandle::num_seeds() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_seeds;
-#else
-  return torrent_handle::status().num_seeds;
-#endif
-}
-
-int QTorrentHandle::num_complete() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_complete;
-#else
-  return torrent_handle::status().num_complete;
-#endif
-}
-
-int QTorrentHandle::num_incomplete() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_incomplete;
-#else
-  return torrent_handle::status().num_incomplete;
-#endif
+  return false;
 }
 
 QString QTorrentHandle::save_path() const {
@@ -319,15 +209,6 @@ QStringList QTorrentHandle::url_seeds() const {
     std::cout << "ERROR: Failed to convert the URL seed" << std::endl;
   }
   return res;
-}
-
-// get the size of the torrent without the filtered files
-size_type QTorrentHandle::actual_size() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(query_accurate_download_counters).total_wanted;
-#else
-  return torrent_handle::status().total_wanted;
-#endif
 }
 
 bool QTorrentHandle::has_filtered_pieces() const {
@@ -373,12 +254,30 @@ QString QTorrentHandle::orig_filepath_at(unsigned int index) const {
 #endif
 }
 
-TransferState QTorrentHandle::state() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return libstate2tstate(torrent_handle::status(0x0));
-#else
-  return libstate2tstate(torrent_handle::status());
-#endif
+std::vector<int> QTorrentHandle::file_extremity_pieces_at(unsigned int index) const {
+  const torrent_info& t = get_torrent_info();
+  const int num_pieces = t.num_pieces();
+  const int piece_size = t.piece_length();
+  const file_entry& file = t.file_at(index);
+
+  // Determine the first and last piece of the file
+  int first_piece = floor((file.offset + 1) / (float)piece_size);
+  Q_ASSERT(first_piece >= 0 && first_piece < num_pieces);
+
+  int num_pieces_in_file = ceil(file.size / (float)piece_size);
+  int last_piece = first_piece + num_pieces_in_file - 1;
+  Q_ASSERT(last_piece >= 0 && last_piece < num_pieces);
+
+  const int preview_size = 10 * 1024 * 1024; // 10M
+  const int preview_pieces = std::min<int>(ceil(preview_size / (float)piece_size), num_pieces_in_file);
+  Q_ASSERT(preview_pieces > 0 && preview_pieces <= num_pieces_in_file);
+
+  std::vector<int> result;
+  for (int p = 0; p < preview_pieces; ++p) {
+    result.push_back(first_piece + p);
+    result.push_back(last_piece - p);
+  }
+  return result;
 }
 
 TransferStatus QTorrentHandle::status() const
@@ -400,71 +299,6 @@ QString QTorrentHandle::creator() const {
 
 QString QTorrentHandle::comment() const {
   return misc::toQStringU(torrent_handle::get_torrent_info().comment());
-}
-
-size_type QTorrentHandle::total_failed_bytes() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_failed_bytes;
-#else
-  return torrent_handle::status().total_failed_bytes;
-#endif
-}
-
-size_type QTorrentHandle::total_redundant_bytes() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_redundant_bytes;
-#else
-  return torrent_handle::status().total_redundant_bytes;
-#endif
-}
-
-bool QTorrentHandle::is_checking() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  torrent_status st = torrent_handle::status(0x0);
-#else
-  torrent_status st = torrent_handle::status();
-#endif
-  return st.state == torrent_status::checking_files || st.state == torrent_status::checking_resume_data;
-}
-
-size_type QTorrentHandle::total_done() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_done;
-#else
-  return torrent_handle::status().total_done;
-#endif
-}
-
-size_type QTorrentHandle::all_time_download() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).all_time_download;
-#else
-  return torrent_handle::status().all_time_download;
-#endif
-}
-
-size_type QTorrentHandle::all_time_upload() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).all_time_upload;
-#else
-  return torrent_handle::status().all_time_upload;
-#endif
-}
-
-size_type QTorrentHandle::total_payload_download() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_payload_download;
-#else
-  return torrent_handle::status().total_payload_download;
-#endif
-}
-
-size_type QTorrentHandle::total_payload_upload() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).total_payload_upload;
-#else
-  return torrent_handle::status().total_payload_upload;
-#endif
 }
 
 // Return a list of absolute paths corresponding
@@ -604,38 +438,6 @@ bool QTorrentHandle::is_sequential_download() const {
 #endif
 }
 
-qlonglong QTorrentHandle::active_time() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).active_time;
-#else
-  return torrent_handle::status().active_time;
-#endif
-}
-
-qlonglong QTorrentHandle::seeding_time() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).seeding_time;
-#else
-  return torrent_handle::status().seeding_time;
-#endif
-}
-
-int QTorrentHandle::num_connections() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).num_connections;
-#else
-  return torrent_handle::status().num_connections;
-#endif
-}
-
-int QTorrentHandle::connections_limit() const {
-#if LIBTORRENT_VERSION_MINOR > 15
-  return torrent_handle::status(0x0).connections_limit;
-#else
-  return torrent_handle::status().connections_limit;
-#endif
-}
-
 int QTorrentHandle::upload_limit() const {
     return torrent_handle::upload_limit();
 }
@@ -695,6 +497,10 @@ void QTorrentHandle::downloading_pieces(bitfield &bf) const {
 
 void QTorrentHandle::piece_availability(std::vector<int>& avail) const {
     torrent_handle::piece_availability(avail);
+}
+
+std::vector<int> QTorrentHandle::piece_priorities() const {
+    return torrent_handle::piece_priorities();
 }
 
 bool QTorrentHandle::has_metadata() const {
@@ -891,16 +697,16 @@ void QTorrentHandle::prioritize_files(const vector<int> &files) const {
   }
 }
 
-void QTorrentHandle::prioritize_first_last_piece(int file_index, bool b) const {
+void QTorrentHandle::prioritize_extremity_pieces(bool b, unsigned int file_index) const {
   // Determine the priority to set
   int prio = b ? 7 : torrent_handle::file_priority(file_index);
 
-  QPair<int, int> extremities = get_file_extremity_pieces (get_torrent_info(), file_index);
-  piece_priority(extremities.first, prio);
-  piece_priority(extremities.second, prio);
+  const std::vector<int> extremities = file_extremity_pieces_at(file_index);
+  foreach (int e, extremities)
+    piece_priority(e, prio);
 }
 
-void QTorrentHandle::prioritize_first_last_piece(bool b) const {
+void QTorrentHandle::prioritize_extremity_pieces(bool b) const {
   if (!has_metadata()) return;
   // Download first and last pieces first for all media files in the torrent
   const uint nbfiles = num_files();
@@ -908,8 +714,7 @@ void QTorrentHandle::prioritize_first_last_piece(bool b) const {
     const QString path = filepath_at(index);
     const QString ext = misc::file_extension(path);
     if (misc::isPreviewable(ext) && torrent_handle::file_priority(index) > 0) {
-      qDebug() << "File" << path << "is previewable, toggle downloading of first/last pieces first";
-      prioritize_first_last_piece(index, b);
+        prioritize_extremity_pieces(b, index);
     }
   }
 }

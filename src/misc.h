@@ -31,6 +31,7 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <boost/function.hpp>
 #include <libtorrent/version.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/torrent_handle.hpp>
@@ -43,6 +44,7 @@
 #include <QPoint>
 #include <QFile>
 #include <QDir>
+#include <QTimer>
 #ifndef DISABLE_GUI
 #include <QIcon>
 #endif
@@ -53,6 +55,7 @@
 const qlonglong MAX_ETA = 8640000;
 
 typedef QMap<QString, QList<QString> > shared_map;
+class QTorrentHandle;
 
 /*  Miscellaneaous functions that can be useful */
 class misc : public QObject{
@@ -104,7 +107,7 @@ public:
 
   static inline bool isMD4Hash(const QString& s)
   {
-      return (s.length() == libed2k::md4_hash::hash_size);
+      return (s.length() == 32);
   }
 
   static inline bool isSHA1Hash(const QString& s)
@@ -191,13 +194,14 @@ public:
   static QList<bool> boolListfromStringList(const QStringList &l);
 
   static bool isValidTorrentFile(const QString &path);
+  static QSet<QString> torrentRoots(const QTorrentHandle& h);
 
   /**
     * eMule migration functions
     * helpers for quiet migration
     * migration functions must return empty values or 0!
    */
-  static QStringList getFileLines(const QString& filename);
+  static QStringList getFileLines(const QString& filename, const char* codec = NULL);
   static QString emuleConfig(const QString& filename);
   static QString emuleConfigFilename();
 
@@ -216,6 +220,22 @@ public:
   static QStringList migrationSharedFiles();
   static void migrateTorrents();
 
+};
+
+class Delay : QObject
+{
+    Q_OBJECT
+public:
+    Delay(int mseconds);
+    ~Delay();
+    void execute(boost::function<void()>);
+    void cancel();
+private:
+    int m_mseconds;
+    QTimer m_timer;
+    boost::function<void()> m_delegate;
+private slots:
+    void on_timeout();
 };
 
 //  Trick to get a portable sleep() function

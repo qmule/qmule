@@ -272,6 +272,8 @@ private slots:
     void ed2kIdentity(QString strName, QString strDescription);
     void ed2kConnectionClosed(QString strError);
 
+    void on_actionOpenDownloadPath_triggered();
+
 signals:
     void signalAuth(const QString& strRes, const QString& strError);
 };

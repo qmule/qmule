@@ -1786,6 +1786,10 @@ No further notices will be issued.</source>
         <translation>&amp;Настройки...</translation>
     </message>
     <message>
+        <source>OpenDownloadPath</source>
+        <translation>Открыть папку загруженных файлов</translation>
+    </message>
+    <message>
         <source>Add &amp;URL...</source>
         <translation type="obsolete">Добавить &amp;URL...</translation>
     </message>
@@ -5073,6 +5077,18 @@ Do you want to install it now?</source>
         <translation>ED2K ссылка</translation>
     </message>
     <message>
+        <source>Add link...</source>
+        <translation>Добавить ссылку...</translation>
+    </message>
+    <message>
+        <source>ED2K/magnet link:</source>
+        <translation>ED2K/magnet ссылка:</translation>
+    </message>
+    <message>
+        <source>Incorrect link</source>
+        <translation>Некорректная ссылка</translation>
+    </message>
+    <message>
         <source>View file...</source>
         <translation>Просмотр файла...</translation>
     </message>
@@ -6282,6 +6298,18 @@ However, those plugins were disabled.</source>
         <translation>Не обмениваться вместе с подпапками</translation>
     </message>
     <message>
+        <source>FileSystem browser</source>
+        <translation>Файловая система</translation>
+    </message>
+    <message>
+        <source>Summary browser</source>
+        <translation>Все раздачи</translation>
+    </message>
+    <message>
+        <source>duplicate transfer</source>
+        <translation>Файл с таким хешем уже раздается</translation>
+    </message>
+    <message>
         <source>ED2K link</source>
         <translation>ED2K ссылка</translation>
     </message>
@@ -6300,6 +6328,90 @@ However, those plugins were disabled.</source>
     <message>
         <source>File ID</source>
         <translation>Хэш файла</translation>
+    </message>
+    <message>
+        <source>Open folder</source>
+        <translation>Открыть папку</translation>
+    </message>
+</context>
+<context>
+    <name>DirectoryModel</name>
+    <message>
+        <source>Name</source>
+        <translation>Имя директории</translation>
+    </message>
+</context>
+<context>
+    <name>FilesModel</name>
+    <message>
+        <source>Name</source>
+        <translation>Имя файла</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Размер</translation>
+    </message>
+    <message>
+        <source>Kind</source>
+        <translation>Тип файла</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип файла</translation>
+    </message>
+    <message>
+        <source>Date Modified</source>
+        <translation>Дата изменения</translation>
+    </message>
+    <message>
+        <source>Transfer hash</source>
+        <translation>Хэш трансфера</translation>
+    </message>
+    <message>
+        <source>Transfer state</source>
+        <translation>Состояние раздачи</translation>
+    </message>
+</context>
+<context>
+    <name>BaseModel</name>
+    <message>
+        <source>duplicate transfer</source>
+        <translation>Повторяющийся хеш</translation>
+    </message>
+    <message>
+        <source>file size is zero</source>
+        <translation>Файл пуст</translation>
+    </message>
+    <message>
+        <source>%1 TB</source>
+        <translation>%1 Тб</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 Гб</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 Мб</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 Кб</translation>
+    </message>
+    <message>
+        <source>%1 bytes</source>
+        <translation>%1 байт</translation>
+    </message>
+</context>
+<context>
+    <name>PathModel</name>
+    <message>
+        <source>All shared files</source>
+        <translation>Все раздаваемые файлы</translation>
+    </message>
+    <message>
+        <source>Filepath</source>
+        <translation>Директории</translation>
     </message>
 </context>
 <context>
@@ -6838,7 +6950,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Search results</source>
-        <translation>Результаты поиска</translation>
+        <translation>Результаты поиска   </translation>
     </message>
     <message>
         <source>Download</source>
