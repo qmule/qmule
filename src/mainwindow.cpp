@@ -46,9 +46,6 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QDockWidget>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
 
 #include <libed2k/log.hpp>
 

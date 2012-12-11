@@ -219,8 +219,6 @@ options_imp::options_imp(QWidget *parent):
   connect(spinMaxActiveTorrents, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(checkIgnoreSlowTorrentsForQueueing, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
 
-  connect(editLogin, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
-  connect(editPassword, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));
   connect(editUserName, SIGNAL(textChanged(QString)), SLOT(enableApplyButton()));  
 
   //eMule tab
@@ -452,8 +450,6 @@ void options_imp::saveOptions() {
   // End Queueing system preferences
 
   // Emule
-  pref.setISLogin(editLogin->text());
-  pref.setISPassword(editPassword->text());
   pref.setNick(editUserName->text());
 
   // temporary hack - emule port can't be equal torrent port
@@ -715,8 +711,6 @@ void options_imp::loadOptions() {
   // End Queueing system preferences
 
   //Emule
-  editLogin->setText(pref.getISLogin());
-  editPassword->setText(pref.getISPassword());
   editUserName->setText(pref.nick());
   emuleSpinPort->setValue(pref.listenPort());
   checkEmuleSD->setChecked(pref.isShowSharedDirectories() && pref.isShowSharedFiles());

@@ -80,8 +80,6 @@ public:
   {
       if (isMigrationStage())
       {
-          setISLogin(misc::migrationAuthLogin());
-          setISPassword(misc::migrationAuthPassword());
           saveSharedDirs(misc::migrationShareds());
           setListenPort(misc::migrationPort(4662));
           setNick(misc::migrationNick(misc::getUserName()));
@@ -200,29 +198,6 @@ public:
   void setPreventFromSuspend(bool b) {
     setValue("Preferences/General/PreventFromSuspend", b);
   }
-
-  // ED2K settings
-
-  QString getISLogin() const
-  {
-      return value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
-  }
-
-  void setISLogin(const QString& strISLogin)
-  {
-      setValue("Preferences/General/ISLogin", strISLogin);
-  }
-
-  QString getISPassword() const
-  {
-      return QString::fromStdString(is_crypto::DecryptPasswd(value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString().toStdString(), misc::ED2KKeyFile().toStdString()));
-  }
-
-  void setISPassword(const QString& strISPassword)
-  {      
-      setValue("Preferences/General/ISPassword",  QString::fromStdString(is_crypto::EncryptPasswd(strISPassword.toStdString(), misc::ED2KKeyFile().toStdString())));
-  }
-
 
   // Downloads
   QString getSavePath() const {

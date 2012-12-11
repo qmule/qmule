@@ -27,11 +27,11 @@ nox {
   TARGET = qmule-nox
   DEFINES += DISABLE_GUI
 } else {
-  QT += xml
   TARGET = qmule 
 }
 QT += network
 QT += webkit
+QT += xml
 
 # Vars
 LANG_PATH = lang
@@ -145,18 +145,18 @@ nox {
               updownratiodlg.h \
               loglistwidget.h \
               transfer_list.h \
-	          status_widget.h  \
-	          search_widget.h \
+              status_widget.h  \
+              search_widget.h \
               login_dlg.h \
               search_widget_delegate.h \
               search_filter.h \
-	          messages_widget.h \
+              messages_widget.h \
               add_friend.h \
               files_widget.h \
               status_bar.h \
               clicked_label.h \
               collection_save_dlg.h \ 
-			  infodlg.h \
+              infodlg.h \
               silent_updater.h\
               taskbar_iface.h \
               user_properties.h \
@@ -179,7 +179,7 @@ nox {
              loglistwidget.cpp \
              transfer_list.cpp \
      	     status_widget.cpp  \
-	         search_widget.cpp \
+             search_widget.cpp \
              login_dlg.cpp \
              search_filter.cpp \
              messages_widget.cpp \
@@ -187,7 +187,7 @@ nox {
              files_widget.cpp \
              status_bar.cpp \
              collection_save_dlg.cpp \ 
-			 infodlg.cpp \
+             infodlg.cpp \
              silent_updater.cpp\
              taskbar_iface.cpp \
              user_properties.cpp \
@@ -209,15 +209,15 @@ nox {
            confirmdeletiondlg.ui \
            torrentimportdlg.ui \
            executionlog.ui \
-	       status_widget.ui \
-	       search_widget.ui \
+           status_widget.ui \
+           search_widget.ui \
            login_dlg.ui \
            messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
            status_bar.ui \
-	       collection_save_dlg.ui \
-		   infodlg.ui \
+           collection_save_dlg.ui \
+           infodlg.ui \
            user_properties.ui \
            torrent_properties.ui \
            ed2k_link_maker.ui
