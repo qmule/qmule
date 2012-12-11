@@ -452,6 +452,28 @@ public:
 
   // ED2K options
 
+  int getED2KlDownloadLimit() const
+  {
+    return value("Preferences/Connection/ED2KDLLimit", -1).toInt();
+  }
+
+  void setED2KDownloadLimit(int limit)
+  {
+    if (limit <= 0) limit = -1;
+    setValue("Preferences/Connection/ED2KDLLimit", limit);
+  }
+
+  int getED2KUploadLimit() const
+  {
+    return value("Preferences/Connection/ED2KUPLimit", 300).toInt();
+  }
+
+  void setED2KUploadLimit(int limit)
+  {
+    if (limit <= 0) limit = -1;
+    setValue("Preferences/Connection/ED2KUPLimit", limit);
+  }
+
   int serverPort()
   {            
       return value(QString::fromUtf8("Preferences/Connection/ServerPort"), 4661).toInt();

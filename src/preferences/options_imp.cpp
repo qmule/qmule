@@ -172,10 +172,14 @@ options_imp::options_imp(QWidget *parent):
   connect(checkUPnP, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkUploadLimit, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkDownloadLimit, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(ed2k_checkUploadLimit, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(ed2k_checkDownloadLimit, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(spinUploadLimit, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(spinDownloadLimit, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(spinUploadLimitAlt, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(spinDownloadLimitAlt, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
+  connect(ed2k_spinUploadLimit, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
+  connect(ed2k_spinDownloadLimit, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(check_schedule, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(schedule_from, SIGNAL(timeChanged(QTime)), this, SLOT(enableApplyButton()));
   connect(schedule_to, SIGNAL(timeChanged(QTime)), this, SLOT(enableApplyButton()));
@@ -401,6 +405,9 @@ void options_imp::saveOptions() {
   pref.includeOverheadInLimits(checkLimitTransportOverhead->isChecked());
   pref.setAltGlobalDownloadLimit(spinDownloadLimitAlt->value());
   pref.setAltGlobalUploadLimit(spinUploadLimitAlt->value());
+  const QPair<int, int> ed2k_ud_limit = getED2KLimits();
+  pref.setED2KDownloadLimit(ed2k_ud_limit.first);
+  pref.setED2KUploadLimit(ed2k_ud_limit.second);
   pref.setAltBandwidthEnabled(check_schedule->isChecked());
   pref.setSchedulerEnabled(check_schedule->isChecked());
   pref.setSchedulerStartTime(schedule_from->time());
@@ -589,16 +596,49 @@ void options_imp::loadOptions() {
     spinDownloadLimit->setEnabled(false);
   }
   intValue = pref.getGlobalUploadLimit();
-  if (intValue != -1) {
+
+  if (intValue != -1)
+  {
     // Enabled
     checkUploadLimit->setChecked(true);
     spinUploadLimit->setEnabled(true);
     spinUploadLimit->setValue(intValue);
-  } else {
-    // Disabled
+  }
+  else
+  {
     checkUploadLimit->setChecked(false);
     spinUploadLimit->setEnabled(false);
   }
+
+  intValue = pref.getED2KlDownloadLimit();
+
+  if (intValue != -1)
+  {
+      ed2k_checkDownloadLimit->setChecked(true);
+      ed2k_spinDownloadLimit->setEnabled(true);
+      ed2k_spinDownloadLimit->setValue(intValue);
+  }
+  else
+  {
+      ed2k_checkDownloadLimit->setChecked(false);
+      ed2k_spinDownloadLimit->setEnabled(false);
+  }
+
+  intValue = pref.getED2KUploadLimit();
+
+  if (intValue != -1)
+  {
+      ed2k_checkUploadLimit->setChecked(true);
+      ed2k_spinUploadLimit->setEnabled(true);
+      ed2k_spinUploadLimit->setValue(intValue);
+  }
+  else
+  {
+      ed2k_checkUploadLimit->setChecked(false);
+      ed2k_spinUploadLimit->setEnabled(false);
+  }
+
+
   spinUploadLimitAlt->setValue(pref.getAltGlobalUploadLimit());
   spinDownloadLimitAlt->setValue(pref.getAltGlobalDownloadLimit());
   // Options
@@ -807,6 +847,12 @@ QPair<int,int> options_imp::getGlobalBandwidthLimits() const {
     UP = spinUploadLimit->value();
   }
   return qMakePair(DL, UP);
+}
+
+QPair<int,int> options_imp::getED2KLimits() const
+{
+    return qMakePair(ed2k_spinDownloadLimit->isEnabled()?ed2k_spinDownloadLimit->value():-1,
+                     ed2k_spinUploadLimit->isEnabled()?ed2k_spinUploadLimit->value():-1);
 }
 
 bool options_imp::startMinimized() const {

@@ -3155,6 +3155,10 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation>Ограничения скорости торрент закачек</translation>
     </message>
     <message>
+        <source>Mule Rate Limits</source>
+        <translation>Ограничения скорости осло закачек</translation>
+    </message>
+    <message>
         <source>Alternative Torrent Rate Limits</source>
         <translation>Альтернативные ограничения скорости торрент закачек</translation>
     </message>
