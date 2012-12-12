@@ -74,7 +74,6 @@ const int UNLEN = 256;
 #include <winbase.h>
 #endif
 
-#include <libed2k/is_crypto.hpp>
 #include "libtorrent/bencode.hpp"
 #include "transport/session.h"
 #include "torrentpersistentdata.h"
@@ -1157,12 +1156,6 @@ QString misc::migrationAuthLogin()
 {
     QSettings qs(QString("HKEY_CURRENT_USER\\Software\\eMule IS Mod"), QSettings::NativeFormat);
     return qs.value("AuthLogin", QString("")).toString();
-}
-
-QString misc::migrationAuthPassword()
-{
-    QSettings qs(QString("HKEY_CURRENT_USER\\Software\\eMule IS Mod"), QSettings::NativeFormat);
-    return QString::fromStdString(is_crypto::DecryptPasswd(qs.value("AuthPassword", QString("")).toString().toStdString(), emuleKeyFile().toStdString()));
 }
 
 shared_map misc::migrationShareds()

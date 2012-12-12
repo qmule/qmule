@@ -38,7 +38,6 @@
 #include <QList>
 #include <QDebug>
 #include <libtorrent/version.hpp>
-#include <libed2k/is_crypto.hpp>
 
 #ifndef DISABLE_GUI
 #include <QApplication>

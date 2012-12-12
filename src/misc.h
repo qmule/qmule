@@ -215,7 +215,6 @@ public:
   static int     migrationPort(int port);
   static QString migrationNick(const QString& nick);
   static QString migrationAuthLogin();
-  static QString migrationAuthPassword();
   static shared_map migrationShareds();
   static QStringList migrationSharedFiles();
   static void migrateTorrents();
