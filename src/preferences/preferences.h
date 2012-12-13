@@ -79,6 +79,7 @@ public:
   {
       if (isMigrationStage())
       {
+          qDebug() << "migrate options";
           saveSharedDirs(misc::migrationShareds());
           setListenPort(misc::migrationPort(4662));
           setNick(misc::migrationNick(misc::getUserName()));

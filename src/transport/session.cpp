@@ -795,6 +795,7 @@ void Session::loadFileSystem()
     }
 
     pref.endArray();
+    pref.endGroup();
 
     // sort dirs ASC to avoid update states on sharing
     std::sort(vf.begin(), vf.end());
@@ -826,7 +827,7 @@ void Session::loadFileSystem()
 
     if (pref.isMigrationStage())
     {
-        qDebug() << "in migration stage process shared files also";
+        qDebug() << "on migration stage process shared files also";
 
         foreach(QString filepath, misc::migrationSharedFiles())
         {
