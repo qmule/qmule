@@ -284,31 +284,56 @@ void TransferListWidget::pauseVisibleTorrents() {
   }
 }
 
-void TransferListWidget::deleteSelectedTorrents() {
-//  if (main_window->getCurrentTabWidget() != this) return;
+void TransferListWidget::deleteSelectedTorrents()
+{
+    //  if (main_window->getCurrentTabWidget() != this) return;
   const QStringList& hashes = getSelectedTorrentsHashes();
   if (hashes.empty()) return;
   bool delete_local_files = false;
-  if (Preferences().confirmTorrentDeletion() &&
-      !DeletionConfirmationDlg::askForDeletionConfirmation(&delete_local_files))
-    return;
-  foreach (const QString &hash, hashes) {
-    Transfer t = BTSession->getTransfer(hash);
+  bool file_control_active = false;
 
-    if (t.type() == Transfer::ED2K && t.is_seed() && !delete_local_files) {
-      // delete view only
-      listModel->removeTorrent(hash);
-    }
-    else
-      BTSession->deleteTransfer(hash, delete_local_files);
+  // search torrent or completed ed2k transfer and active file control
+  foreach (const QString &hash, hashes)
+  {
+        Transfer t = BTSession->getTransfer(hash);
+        if (t.type() == Transfer::ED2K &&  !t.is_seed())
+            continue;
+
+        file_control_active = true;
+        break;
   }
+
+  if (Preferences().confirmTorrentDeletion() &&
+      !DeletionConfirmationDlg::askForDeletionConfirmation(file_control_active, &delete_local_files))
+    return;
+
+    foreach (const QString &hash, hashes)
+    {
+        Transfer t = BTSession->getTransfer(hash);
+
+        try
+        {
+            if (t.type() == Transfer::ED2K && t.is_seed() && !delete_local_files)
+            {
+                // delete view only
+                listModel->removeTorrent(hash);
+            } // delete bt files by flag, delete ed2k files by flag or ed2k + always on not seed
+            else
+                BTSession->deleteTransfer(hash, delete_local_files || (!t.is_seed() && (t.type() == Transfer::ED2K)));
+
+        }
+        catch(const libtorrent::libtorrent_exception& )
+        {
+        }
+    }
 }
 
-void TransferListWidget::deleteVisibleTorrents() {
+void TransferListWidget::deleteVisibleTorrents()
+{
   if (nameFilterModel->rowCount() <= 0) return;
   bool delete_local_files = false;
   if (Preferences().confirmTorrentDeletion() &&
-      !DeletionConfirmationDlg::askForDeletionConfirmation(&delete_local_files))
+      !DeletionConfirmationDlg::askForDeletionConfirmation(true, &delete_local_files)) // TODO - delete it?
     return;
   QStringList hashes;
   for (int i=0; i<nameFilterModel->rowCount(); ++i) {

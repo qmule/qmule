@@ -25,6 +25,7 @@ CONFIG(debug, debug|release) {
  }
 
 DEFINES += "BUILDDATE='\"$$system(date -R)\"'"
+DEFINES += BOOST_EXCEPTION_DISABLE
 
 
 # Man page
