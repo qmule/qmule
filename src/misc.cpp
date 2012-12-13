@@ -1332,11 +1332,6 @@ QString misc::migrationAuthLogin()
     return QString();
 }
 
-QString misc::migrationAuthPassword()
-{
-    return QString();
-}
-
 shared_map misc::migrationShareds()
 {
     return shared_map();
