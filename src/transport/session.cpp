@@ -740,21 +740,20 @@ void Session::saveFileSystem()
         pref.setValue("Path", p->filepath());
         QStringList efiles = p->exclude_files();
 
+        pref.beginWriteArray("ExcludeFiles", efiles.size());
         if (!efiles.isEmpty())
         {
-            int file_indx = 0;
-            pref.beginWriteArray("ExcludeFiles", efiles.size());
+            int file_indx = 0;            
 
             foreach(const QString& efile, efiles)
             {
                 pref.setArrayIndex(file_indx);
                 pref.setValue("FileName", efile);
                 ++file_indx;
-            }
-
-            pref.endArray();
+            }            
         }
 
+        pref.endArray();
         ++dir_indx;
     }
 
