@@ -109,7 +109,7 @@ private slots:
   void notifyTorrentChanged(int row);
   void forceModelRefresh();
   void handleTorrentLabelChange(QString previous, QString current);
-  void handleTorrentAboutToBeRemoved(const Transfer& h);
+  void handleTorrentAboutToBeRemoved(const Transfer& h, bool);
 
 private:
   void beginInsertTorrent(int row);

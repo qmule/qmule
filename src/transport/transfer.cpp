@@ -145,9 +145,9 @@ bool Transfer::extremity_pieces_first() const { return m_delegate->extremity_pie
 
 void Transfer::file_progress(std::vector<TransferSize>& fp) const { m_delegate->file_progress(fp); }
 
-QSet<QString> Transfer::incompleteFiles() const
+QList<QDir> Transfer::incompleteFiles() const
 {
-    QSet<QString> res;
+    QList<QDir> res;
 
     if (!is_seed())
     {

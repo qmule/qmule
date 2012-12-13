@@ -823,6 +823,8 @@ void Session::loadFileSystem()
         }
     }
 
+    // this call do nothing when incoming dir in share list
+    // because call executes on shared node in non-recursive manner does nothing
     share(m_incoming, false);
 
     if (pref.isMigrationStage())

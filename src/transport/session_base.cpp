@@ -166,10 +166,10 @@ float SessionBase::progress() const
     return (min_progress);
 }
 
-QSet<QString> SessionBase::incompleteFiles() const
+QList<QDir> SessionBase::incompleteFiles() const
 {
     std::vector<Transfer> transfers = getTransfers();
-    QSet<QString> res;
+    QList<QDir> res;
 
     for (std::vector<Transfer>::const_iterator i = transfers.begin(); i != transfers.end(); ++i)
     {

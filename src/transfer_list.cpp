@@ -113,9 +113,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
 
     vboxLayout2->addLayout(hboxLayout2);  
     vboxLayout2->addWidget(peersList);  
-
-    connect(transferList->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
-    connect(transferList->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
     transferList->getSourceModel()->populate();
 
     connect(btnSwitch, SIGNAL(clicked()), this, SLOT(btnSwitchClick()));

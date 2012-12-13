@@ -277,10 +277,11 @@ void DirNode::share(bool recursive)
         }
     }
 
-    // share all what are not shared
-    foreach(DirNode* p, m_dir_children.values())
+    if (recursive)
     {
-        if (recursive)
+        // share all sub directories what are not shared
+        // it must works also on already shared directory for recursive sharing
+        foreach(DirNode* p, m_dir_children.values())
         {
             p->share(recursive);
         }
@@ -623,7 +624,7 @@ void DirNode::populate(bool force /* = false*/)
     {
         QString itPath = QDir::fromNativeSeparators(path);
         QDirIterator dirIt(itPath, QDir::NoDotAndDotDot| QDir::AllEntries | QDir::System | QDir::Hidden);
-        QSet<QString> incompleteFiles = Session::instance()->incompleteFiles();
+        QList<QDir> incompleteFiles = Session::instance()->incompleteFiles();
 
         while(dirIt.hasNext())
         {

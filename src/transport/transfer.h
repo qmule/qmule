@@ -81,7 +81,7 @@ public:
     TransferSize piece_length() const;
     bool extremity_pieces_first() const;
     void file_progress(std::vector<TransferSize>& fp) const;
-    QSet<QString> incompleteFiles() const;
+    QList<QDir> incompleteFiles() const;
     std::vector<int> file_priorities() const;
     QString filepath_at(unsigned int index) const;
     QString filename_at(unsigned int index) const;
