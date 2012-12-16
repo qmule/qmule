@@ -1,6 +1,6 @@
-#include "status_widget.h"
-
+#include <libed2k/util.hpp>
 #include <QDateTime>
+#include "status_widget.h"
 
 status_widget::status_widget(QWidget *parent)
     : QWidget(parent)
@@ -60,7 +60,7 @@ void status_widget::updateConnectedInfo()
     QString num;
     num.setNum(m_nClientId);
     editInfo->appendPlainText("ID:\t" + num);
-    editInfo->appendPlainText("\tHigh ID");
+    editInfo->appendPlainText(libed2k::isLowId(m_nClientId)?"\tLow ID":"\tHigh ID");
 
     editInfo->setCurrentCharFormat(charFormatBold);
     editInfo->appendPlainText("\n" + tr("eD2K Server"));
