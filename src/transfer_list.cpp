@@ -139,6 +139,7 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     mainToolBar->setIconSize(QSize(24, 24));
     mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     mainToolBar->setFloatable(false);
+    setContextMenuPolicy(Qt::NoContextMenu);
 
     actionOpen = new QAction(this);
     actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
