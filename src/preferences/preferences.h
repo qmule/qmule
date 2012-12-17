@@ -82,8 +82,14 @@ public:
           qDebug() << "migrate options";
           saveSharedDirs(misc::migrationShareds());
           setListenPort(misc::migrationPort(4662));
-          setNick(misc::migrationNick(misc::getUserName()));
-          setSavePath(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
+          setNick(misc::migrateValue("Nick", misc::getUserName()));
+          setSavePath(misc::migrateValue("IncomingDir", misc::QDesktopServicesDownloadLocation()));
+          QString maxDownload = misc::migrateValue("MaxDownload", QString::number(ed2k_max_download));
+          QString maxUpload = misc::migrateValue("MaxUpload", QString::number(ed2k_max_upload));
+
+          // zero will interpret as default limit
+          setED2KDownloadLimit((maxDownload.toLong()==0)?ed2k_max_download:maxDownload.toLong());
+          setED2KUploadLimit((maxUpload.toLong()==0)?ed2k_max_upload:maxUpload.toLong());
           misc::migrateTorrents();
           sync();
       }
@@ -454,7 +460,7 @@ public:
 
   int getED2KlDownloadLimit() const
   {
-    return value("Preferences/Connection/ED2KDLLimit", -1).toInt();
+    return value("Preferences/Connection/ED2KDLLimit", ed2k_max_download).toInt();
   }
 
   void setED2KDownloadLimit(int limit)
@@ -465,7 +471,7 @@ public:
 
   int getED2KUploadLimit() const
   {
-    return value("Preferences/Connection/ED2KUPLimit", 300).toInt();
+    return value("Preferences/Connection/ED2KUPLimit", ed2k_max_upload).toInt();
   }
 
   void setED2KUploadLimit(int limit)

@@ -1349,42 +1349,25 @@ shared_map misc::migrationShareds()
 
 #endif
 
- QString misc::migrationIncomingDir(const QString& dir)
- {
-     QString res = dir;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^IncomingDir"));
-
-     if (!sl.empty())
-     {
-         QStringList sres = sl.at(0).split(QRegExp("="));
-
-         if (sres.size() > 1)
-         {
-             res = sres[1];
-         }
-     }
-
-     return res;
- }
-
  int misc::migrationPort(int port)
  {
      QSettings qs(emuleConfig(emuleConfigFilename()), QSettings::IniFormat);
      return qs.value("eMule/Port", port).toInt();
  }
 
- QString misc::migrationNick(const QString& nick)
- {     
-     QString res = nick;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp("^Nick"));
+ QString misc::migrateValue(const QString& value, const QString& def)
+ {
+     QString res = def;
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp(QString("^") + value + "="));
 
-     if (!sl.empty())
+     foreach(const QString& s, sl)
      {
-         QStringList sres = sl.at(0).split(QRegExp("="));
+         QStringList sres = s.split(QRegExp("="));
 
          if (sres.size() > 1)
          {
              res = sres[1];
+             break;
          }
      }
 

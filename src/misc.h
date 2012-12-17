@@ -54,6 +54,9 @@
 
 const qlonglong MAX_ETA = 8640000;
 
+const int ed2k_max_download = 10000;
+const int ed2k_max_upload   = 8000;
+
 typedef QMap<QString, QList<QString> > shared_map;
 class QTorrentHandle;
 
@@ -211,9 +214,8 @@ public:
   static QString emuleKeyFile();
 #endif
 
-  static QString migrationIncomingDir(const QString& dir);
   static int     migrationPort(int port);
-  static QString migrationNick(const QString& nick);
+  static QString migrateValue(const QString& value, const QString& def);
   static QString migrationAuthLogin();
   static shared_map migrationShareds();
   static QStringList migrationSharedFiles();
