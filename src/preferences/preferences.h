@@ -82,10 +82,10 @@ public:
           qDebug() << "migrate options";
           saveSharedDirs(misc::migrationShareds());
           setListenPort(misc::migrationPort(4662));
-          setNick(misc::migrateValue("Nick", misc::getUserName()));
+          setNick(misc::migrateValue("Nick", misc::getUserName(), "UTF-8"));
           setSavePath(misc::migrateValue("IncomingDir", misc::QDesktopServicesDownloadLocation()));
-          QString maxDownload = misc::migrateValue("MaxDownload", QString::number(ed2k_max_download));
-          QString maxUpload = misc::migrateValue("MaxUpload", QString::number(ed2k_max_upload));
+          QString maxDownload = misc::migrateValue("MaxDownload", QString::number(ed2k_max_download), "UTF-8");
+          QString maxUpload = misc::migrateValue("MaxUpload", QString::number(ed2k_max_upload), "UTF-8");
 
           // zero will interpret as default limit
           setED2KDownloadLimit((maxDownload.toLong()==0)?ed2k_max_download:maxDownload.toLong());

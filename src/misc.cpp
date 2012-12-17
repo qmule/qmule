@@ -1355,10 +1355,10 @@ shared_map misc::migrationShareds()
      return qs.value("eMule/Port", port).toInt();
  }
 
- QString misc::migrateValue(const QString& value, const QString& def)
+ QString misc::migrateValue(const QString& value, const QString& def, const char* codepage /* = NULL*/)
  {
      QString res = def;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp(QString("^") + value + "="));
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), codepage).filter(QRegExp(QString("^") + value + "="));
 
      foreach(const QString& s, sl)
      {
