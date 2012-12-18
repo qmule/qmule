@@ -301,17 +301,17 @@ search_widget::search_widget(QWidget *parent)
     itemDelegate = new SWDelegate(treeResult);
     treeResult->setItemDelegate(itemDelegate);
 
-    searchFilter = new search_filter(this);
-    searchFilter->setMinimumSize(QSize(180, 20));
-    searchFilter->setMaximumSize(QSize(180, 16777215));
+    //searchFilter = new search_filter(this);
+    //searchFilter->setMinimumSize(QSize(180, 20));
+    //searchFilter->setMaximumSize(QSize(180, 16777215));
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(searchFilter->sizePolicy().hasHeightForWidth());
-    searchFilter->setSizePolicy(sizePolicy);
+    //sizePolicy.setHeightForWidth(searchFilter->sizePolicy().hasHeightForWidth());
+    //searchFilter->setSizePolicy(sizePolicy);
 
-    searchFilter->hide();
-    horizontalLayoutTabs->addWidget(searchFilter);
+    //searchFilter->hide();
+    //horizontalLayoutTabs->addWidget(searchFilter);
 
     connect(tableCond, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(itemCondClicked(QTableWidgetItem*)));
     connect(btnStart, SIGNAL(clicked()), this, SLOT(startSearch()));
@@ -336,8 +336,8 @@ search_widget::search_widget(QWidget *parent)
     connect(defMegas,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(comboName,  SIGNAL(editTextChanged(const QString)), this, SLOT(searchTextChanged(const QString)));
     connect(comboName->lineEdit(), SIGNAL(returnPressed()), this, SLOT(startSearch()));
-    connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
-    connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));   
+    //connect(searchFilter, SIGNAL(textChanged(QString)), this, SLOT(applyFilter(QString)));
+    //connect(searchFilter, SIGNAL(filterSelected(SWDelegate::Column)), this, SLOT(setFilterType(SWDelegate::Column)));
     connect(Session::instance()->get_ed2k_session(), SIGNAL(peerSharedDirectories(const libed2k::net_identifier&, const QString&, const QStringList&)),
             this, SLOT(processUserDirs(const libed2k::net_identifier&, const QString&, const QStringList&)));
     connect(Session::instance()->get_ed2k_session(),
@@ -492,7 +492,7 @@ void search_widget::load()
     {
         tabSearch->setCurrentIndex(nCurTabSearch);
         tabSearch->show();
-        searchFilter->show();
+        //searchFilter->show();
         closeAll->setEnabled(true);
     }
 
@@ -952,7 +952,7 @@ void search_widget::prepareNewSearch(
     if (!tabSearch->count())
     {
         tabSearch->show();
-        searchFilter->show();
+        //searchFilter->show();
     }
 
     nCurTabSearch = tabSearch->addTab(icon, reqType + reqText);
@@ -989,7 +989,7 @@ void search_widget::closeTab(int index)
     if (!tabSearch->count())
     {
         clearSearchTable();
-        searchFilter->hide();
+        //searchFilter->hide();
         btnCloseAll->setDisabled(true);
     }
     else
@@ -1262,8 +1262,8 @@ void search_widget::searchTextChanged(const QString text)
 
 void search_widget::applyFilter(QString filter)
 {
-    if (searchFilter->isFilterSet())
-        filterModel->setFilterRegExp(QRegExp(filter, Qt::CaseInsensitive));
+    //if (searchFilter->isFilterSet())
+    //    filterModel->setFilterRegExp(QRegExp(filter, Qt::CaseInsensitive));
 }
 
 void search_widget::setFilterType(SWDelegate::Column column)
@@ -1610,7 +1610,7 @@ void search_widget::processUserDirs(
     if (!tabSearch->count())
     {
         tabSearch->show();
-        searchFilter->show();
+        //searchFilter->show();
     }
 
     std::vector<QED2KSearchResultEntry> vec;
