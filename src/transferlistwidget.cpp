@@ -762,7 +762,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   bool super_seeding_mode = false;
   bool all_same_sequential_download_mode = true, all_same_prio_firstlast = true;
   bool sequential_download_mode = false, prioritize_first_last = false;
-  bool one_has_metadata = false, one_not_seed = false, one_is_bittorrent = false;
+  bool one_has_metadata = false, one_seed = false, one_not_seed = false, one_is_bittorrent = false;
   bool first = true;
   bool has_view = true;
   Transfer h;
@@ -794,6 +794,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
       }
     }
     else {
+      one_seed = true;
       if (!one_not_seed && all_same_super_seeding && h.has_metadata()) {
         if (first) {
           super_seeding_mode = h.super_seeding();
@@ -827,9 +828,10 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     listMenu.addSeparator();
     listMenu.addAction(&actionDelete);
     listMenu.addSeparator();
-    listMenu.addAction(&actionSetTorrentPath);
+    if (!one_seed)
+      listMenu.addAction(&actionSetTorrentPath);
   }
-  if (selectedIndexes.size() == 1)
+  if (selectedIndexes.size() == 1 && one_not_seed)
     listMenu.addAction(&actionRename);
   // Label Menu
   QStringList customLabels = getCustomLabels();
