@@ -1,3 +1,4 @@
+#include <iterator>
 #include <libed2k/util.hpp>
 #include <QDateTime>
 #include "status_widget.h"
