@@ -905,7 +905,7 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
 
   // Adding torrent to Bittorrent session
   try {
-    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toStdString(), p));
+    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toUtf8().constData(), p));
   }catch(std::exception e) {
     qDebug("Error: %s", e.what());
   }

@@ -215,7 +215,7 @@ public:
 #endif
 
   static int     migrationPort(int port);
-  static QString migrateValue(const QString& value, const QString& def);
+  static QString migrateValue(const QString& value, const QString& def, const char* codepage = NULL);
   static QString migrationAuthLogin();
   static shared_map migrationShareds();
   static QStringList migrationSharedFiles();
