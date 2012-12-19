@@ -1,6 +1,5 @@
-#include <iterator>
-#include <libed2k/util.hpp>
 #include <QDateTime>
+#include <libed2k/util.hpp>
 #include "status_widget.h"
 
 status_widget::status_widget(QWidget *parent)
