@@ -314,6 +314,7 @@ public:
     virtual QString comment() const = 0;
     virtual QString next_announce() const = 0;
     virtual TransferStatus status() const = 0;
+    virtual TransferState state() const = 0;
     virtual TransferInfo get_info() const = 0;
     virtual int queue_position() const = 0;
     virtual float distributed_copies() const = 0;
@@ -371,8 +372,7 @@ public:
     virtual void set_sequential_download(bool sd) const = 0;
     virtual void set_upload_mode(bool b) const = 0;
 
-    // implemented methods
-    virtual TransferState state() const;
+    // implemented methods    
     virtual qreal download_payload_rate() const;
     virtual qreal upload_payload_rate() const;
     virtual float progress() const;

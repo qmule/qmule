@@ -24,6 +24,7 @@ public:
     QString comment() const;
     QString next_announce() const;
     TransferStatus status() const;
+    TransferState state() const;
     TransferInfo get_info() const;
     int queue_position() const;
     float distributed_copies() const;

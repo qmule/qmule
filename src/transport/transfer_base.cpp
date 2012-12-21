@@ -1,10 +1,11 @@
 
 #include "transfer_base.h"
 
-TransferState TransferBase::state() const { return status().state; }
 qreal TransferBase::download_payload_rate() const { return status().download_payload_rate; }
 qreal TransferBase::upload_payload_rate() const { return status().upload_payload_rate; }
-float TransferBase::progress() const {
+
+float TransferBase::progress() const
+{
     // libtorrent 0.16: torrent_handle::status(query_accurate_download_counters)
     TransferStatus st = status();
     if (!st.total_wanted)
@@ -15,6 +16,7 @@ float TransferBase::progress() const {
     Q_ASSERT(progress >= 0. && progress <= 1.);
     return progress;
 }
+
 int TransferBase::num_seeds() const { return status().num_seeds; }
 int TransferBase::num_peers() const { return status().num_peers; }
 int TransferBase::num_complete() const { return status().num_complete; }
