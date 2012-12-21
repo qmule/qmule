@@ -2279,18 +2279,23 @@ void QBtSession::readAlerts() {
           h.pause();
       }
     }
-    else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get())) {
+    else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get()))
+    {
       QTorrentHandle h(p->handle);
-      qDebug("A file completed download in torrent %s", qPrintable(h.name()));
-      if (appendqBExtension) {
-        qDebug("appendqBTExtension is true");
-        QString name = h.filepath_at(p->index);
-        if (name.endsWith(".!qB")) {
-          const QString old_name = name;
-          name.chop(4);
-          qDebug("Renaming %s to %s", qPrintable(old_name), qPrintable(name));
-          h.rename_file(p->index, name);
-        }
+
+      if (h.is_valid())
+      {
+          qDebug("A file completed download in torrent %s", qPrintable(h.name()));
+          if (appendqBExtension) {
+            qDebug("appendqBTExtension is true");
+            QString name = h.filepath_at(p->index);
+            if (name.endsWith(".!qB")) {
+              const QString old_name = name;
+              name.chop(4);
+              qDebug("Renaming %s to %s", qPrintable(old_name), qPrintable(name));
+              h.rename_file(p->index, name);
+            }
+          }
       }
     }
     else if (torrent_paused_alert* p = dynamic_cast<torrent_paused_alert*>(a.get())) {
