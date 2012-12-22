@@ -501,7 +501,9 @@ void Session::saveFastResumeData()
 
 void Session::on_ED2KResumeDataLoaded()
 {
+    emit beginLoadSharedFileSystem();
     loadFileSystem();
+    emit endLoadSharedFileSystem();
 }
 
 void Session::on_registerNode(Transfer t)
@@ -706,6 +708,7 @@ FileNode* Session::node(const QString& filepath)
 
 void Session::prepare_collections()
 {
+    int i = 10; // limit collections sharing at moment to avoid gui hang up
     for (std::set<DirNode*>::iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
     {
         DirNode* p = *itr;
@@ -713,7 +716,11 @@ void Session::prepare_collections()
         if (p->is_active() && !p->has_transfer())
         {
             p->build_collection();
+            --i;
         }
+
+        if (i == 0)
+            break;
     }
 }
 
@@ -763,8 +770,7 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
-    qDebug() << "load file system";
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    qDebug() << "load file system";    
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;
     QVector<SD> vf;
@@ -836,8 +842,6 @@ void Session::loadFileSystem()
             share(filepath, false);
         }
     }
-
-    QApplication::restoreOverrideCursor();
 }
 
 void Session::dropDirectoryTransfers()

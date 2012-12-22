@@ -34,6 +34,7 @@
 #include <QProcess>
 #include <QSystemTrayIcon>
 #include <QPointer>
+#include <QSplashScreen>
 
 #include "qtlibed2k/qed2ksession.h"
 #include "transport/transfer.h"
@@ -97,7 +98,7 @@ public:
   };
 
   // Construct / Destruct
-  MainWindow(QWidget *parent=0, QStringList torrentCmdLine=QStringList());
+  MainWindow(QSplashScreen* sscrn, QWidget *parent=0, QStringList torrentCmdLine=QStringList());
   ~MainWindow();
   TransferListWidget* getTransferList() const { return transfer_List->getTransferList(); }
   QMenu* getTrayIconMenu();
@@ -224,6 +225,7 @@ private:
   QScopedPointer<is_info_dlg> m_info_dlg;
   QScopedPointer<silent_updater> m_updater;
   QScopedPointer<taskbar_iface>  m_tbar;
+  QScopedPointer<QSplashScreen>  m_sscrn;
   unsigned int m_nTaskbarButtonCreated;
 
   QIcon icon_disconnected;
@@ -264,6 +266,9 @@ private slots:
     void ed2kConnectionClosed(QString strError);
 
     void on_actionOpenDownloadPath_triggered();
+    void on_beginLoadSharedFileSystem();
+    void on_endLoadSharedFileSystem();
+    void deleteSplash();
 };
 
 #endif

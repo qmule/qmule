@@ -241,14 +241,15 @@ int main(int argc, char *argv[]) {
   no_splash = !al.filter(QRegExp("^-+no-splash$")).isEmpty();
 #endif
 
+  QSplashScreen *splash = 0;
 #ifndef DISABLE_GUI
   if (pref.isSlashScreenDisabled())
   {
     no_splash = true;
   }
 
-  QSplashScreen *splash = 0;
-  if (!no_splash) {
+  if (!no_splash)
+  {
     QPixmap splash_img(":/Icons/skin/Logo.png");
     QPainter painter(&splash_img);
     QString prog_name = "eMule - qMule";
@@ -258,8 +259,7 @@ int main(int argc, char *argv[]) {
     painter.drawText(175 - painter.fontMetrics().width(prog_name) / 2, 220, prog_name);
     painter.drawText(175 - painter.fontMetrics().width(version) / 2, 220 + painter.fontMetrics().height(), version);
     
-    splash = new QSplashScreen(splash_img, Qt::WindowStaysOnTopHint);
-    QTimer::singleShot(1500, splash, SLOT(deleteLater()));
+    splash = new QSplashScreen(splash_img, Qt::WindowStaysOnTopHint);    
     splash->show();
     app.processEvents();
   }
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifndef DISABLE_GUI
-  MainWindow window(0, dataList);
+  MainWindow window(splash, 0, dataList);
   QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
                    &window, SLOT(processParams(const QString&)));  
   app.setActivationWindow(&window);

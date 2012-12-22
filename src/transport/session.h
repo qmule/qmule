@@ -110,6 +110,9 @@ signals:
 
     void removeSharedFile(FileNode*);
     void insertSharedFile(FileNode*);
+
+    void beginLoadSharedFileSystem();
+    void endLoadSharedFileSystem();
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
     void on_pausedTorrent(const QTorrentHandle& h);

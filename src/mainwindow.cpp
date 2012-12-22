@@ -97,9 +97,11 @@ using namespace libtorrent;
  *****************************************************/
 
 // Constructor
-MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
+MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false)
+{
   setupUi(this);
-
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  m_sscrn.reset(sscrn);
   m_bDisconnectBtnPressed = false;
   m_last_file_error = QDateTime::currentDateTime().addSecs(-1); // imagine last file error event was 1 seconds in past
   m_tbar.reset(new taskbar_iface(this, 99));
@@ -167,6 +169,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   QAction *defineUiLockPasswdAct = lockMenu->addAction(tr("Set the password..."));
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
   actionLock_qMule->setMenu(lockMenu);
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Create sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   // Creating Bittorrent session
   connect(Session::instance(), SIGNAL(fileError(Transfer, QString)),
           this, SLOT(fileError(Transfer, QString)));
@@ -314,6 +318,11 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(executable_watcher, SIGNAL(fileChanged(QString)), this, SLOT(notifyOfUpdate(QString)));
   executable_watcher->addPath(qApp->applicationFilePath());
 
+  connect(Session::instance(), SIGNAL(beginLoadSharedFileSystem()), this, SLOT(on_beginLoadSharedFileSystem()));
+  connect(Session::instance(), SIGNAL(endLoadSharedFileSystem()), this, SLOT(on_endLoadSharedFileSystem()));
+
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Startup transfers..."), Qt::AlignLeft | Qt::AlignBottom);
   // Resume unfinished torrents
   Session::instance()->startUpTransfers();
   // Add torrent given on command line
@@ -368,7 +377,9 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   //Tray actions.
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
   connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
-  connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));  
+  connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   Session::instance()->start();
 }
 
@@ -1672,4 +1683,26 @@ void MainWindow::on_actionOpenDownloadPath_triggered()
 {
     Preferences pref;
     QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
+}
+
+void MainWindow::on_beginLoadSharedFileSystem()
+{
+    if (!m_sscrn.isNull())
+        m_sscrn->showMessage(tr("Begin load shared filesystem..."), Qt::AlignLeft | Qt::AlignBottom);
+}
+
+void MainWindow::on_endLoadSharedFileSystem()
+{
+    if (!m_sscrn.isNull())
+    {
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);
+        QTimer::singleShot(1000, this, SLOT(deleteSplash()));
+    }
+
+    QApplication::restoreOverrideCursor();
+}
+
+void MainWindow::deleteSplash()
+{
+    m_sscrn.reset();
 }
