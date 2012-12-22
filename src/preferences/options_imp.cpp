@@ -610,7 +610,7 @@ void options_imp::loadOptions() {
     spinUploadLimit->setEnabled(false);
   }
 
-  intValue = pref.getED2KlDownloadLimit();
+  intValue = pref.getED2KDownloadLimit();
 
   if (intValue != -1)
   {
