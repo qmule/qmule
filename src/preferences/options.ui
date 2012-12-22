@@ -1393,7 +1393,7 @@
                     <number>1000000</number>
                    </property>
                    <property name="value">
-                    <number>300</number>
+                    <number>8000</number>
                    </property>
                   </widget>
                  </item>
@@ -1426,7 +1426,7 @@
                     <number>1000000</number>
                    </property>
                    <property name="value">
-                    <number>100</number>
+                    <number>10000</number>
                    </property>
                   </widget>
                  </item>
@@ -1862,8 +1862,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
-             <height>412</height>
+             <width>451</width>
+             <height>190</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -2392,8 +2392,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>60</width>
-             <height>18</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>
