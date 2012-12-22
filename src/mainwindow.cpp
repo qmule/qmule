@@ -69,7 +69,6 @@
 #include "iconprovider.h"
 #include "status_widget.h"
 #include "search_widget.h"
-#include "login_dlg.h"
 #include "messages_widget.h"
 #include "files_widget.h"
 #include "status_bar.h"

@@ -147,7 +147,6 @@ nox {
               transfer_list.h \
               status_widget.h  \
               search_widget.h \
-              login_dlg.h \
               search_widget_delegate.h \
               search_filter.h \
               messages_widget.h \
@@ -180,7 +179,6 @@ nox {
              transfer_list.cpp \
      	     status_widget.cpp  \
              search_widget.cpp \
-             login_dlg.cpp \
              search_filter.cpp \
              messages_widget.cpp \
              add_friend.cpp \
@@ -211,7 +209,6 @@ nox {
            executionlog.ui \
            status_widget.ui \
            search_widget.ui \
-           login_dlg.ui \
            messages_widget.ui \
            add_friend.ui \
            files_widget.ui \
