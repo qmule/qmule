@@ -268,7 +268,6 @@ private slots:
     void on_actionOpenDownloadPath_triggered();
     void on_beginLoadSharedFileSystem();
     void on_endLoadSharedFileSystem();
-    void deleteSplash();
 };
 
 #endif

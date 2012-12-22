@@ -328,24 +328,6 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   processParams(torrentCmdLine);
 
   qDebug("GUI Built");
-#ifdef Q_WS_WIN
-  if (!pref.neverCheckFileAssoc() &&
-          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
-  {
-    if (QMessageBox::question(0, tr("Torrent file association"),
-                             tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
-                             QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
-      Preferences::setTorrentFileAssoc(true);
-      Preferences::setMagnetLinkAssoc(true);
-      Preferences::setEmuleFileAssoc(true);
-      Preferences::setCommonAssocSection(true); // enable common section
-    }
-    else
-    {
-      pref.setNeverCheckFileAssoc();
-    }
-  }
-#endif
 #ifdef Q_WS_MAC
   qt_mac_set_dock_menu(getTrayIconMenu());
 #endif
@@ -1694,14 +1676,29 @@ void MainWindow::on_endLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
     {
-        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);
-        QTimer::singleShot(1000, this, SLOT(deleteSplash()));
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);        
+        m_sscrn.reset();
     }
 
     QApplication::restoreOverrideCursor();
-}
-
-void MainWindow::deleteSplash()
-{
-    m_sscrn.reset();
+#ifdef Q_WS_WIN
+    Preferences pref;
+    if (!pref.neverCheckFileAssoc() &&
+          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
+    {
+        if (QMessageBox::question(0, tr("Torrent file association"),
+                                 tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
+                                 QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+        {
+            Preferences::setTorrentFileAssoc(true);
+            Preferences::setMagnetLinkAssoc(true);
+            Preferences::setEmuleFileAssoc(true);
+            Preferences::setCommonAssocSection(true); // enable common section
+        }
+        else
+        {
+            pref.setNeverCheckFileAssoc();
+        }
+    }
+#endif
 }
