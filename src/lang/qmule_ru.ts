@@ -2265,6 +2265,26 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <source>Server connection</source>
         <translation>Соединение с сервером</translation>
     </message>
+    <message>
+        <source>Create sessions...</source>
+        <translation>Создание сессий...</translation>
+    </message>
+    <message>
+        <source>Startup transfers...</source>
+        <translation>Загрузка раздач...</translation>
+    </message>
+    <message>
+        <source>Startup sessions...</source>
+        <translation>Запуск сессий...</translation>
+    </message>
+    <message>
+        <source>Begin load shared filesystem...</source>
+        <translation>Загрузка расшаренных директорий...</translation>
+    </message>
+    <message>
+        <source>Shared filesystem loading was completed...</source>
+        <translation>Загрузка расшаренных директорий завершена</translation>
+    </message>
 </context>
 <context>
     <name>PeerAdditionDlg</name>

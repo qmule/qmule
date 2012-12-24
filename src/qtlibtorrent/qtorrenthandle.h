@@ -82,6 +82,7 @@ public:
   QString orig_filepath_at(unsigned int index) const;
   std::vector<int> file_extremity_pieces_at(unsigned int index) const;
   TransferStatus status() const;
+  TransferState state() const;
   libtorrent::torrent_info get_info() const;
   QString creator() const;
   QString comment() const;
