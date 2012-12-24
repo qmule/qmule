@@ -1555,6 +1555,7 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
     log_msg += id;
     status->addLogMessage(log_msg);
     status->clientID(client_id);
+    statusBar->setStatusMsg(log_msg);
 }
 
 void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
