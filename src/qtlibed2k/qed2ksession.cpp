@@ -217,31 +217,34 @@ void QED2KSession::start()
 {
     qDebug() <<  Q_FUNC_INFO;
     Preferences pref;
+    libed2k::session_settings settings;
+    libed2k::fingerprint finger;
+
     // set zero to port for stop automatically listening
-    m_settings.listen_port = pref.listenPort();
-    m_settings.server_reconnect_timeout = 20;
-    m_settings.server_keep_alive_timeout = -1;
-    m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
-    m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
-    m_settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
-    m_settings.client_name  = pref.nick().toUtf8().constData();
-    m_settings.mod_name = misc::productName().toUtf8().constData();
-    m_settings.m_announce_timeout = 10; // announcing every 10 seconds
+    settings.listen_port = pref.listenPort();
+    settings.server_reconnect_timeout = 20;
+    settings.server_keep_alive_timeout = -1;
+    settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
+    settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
+    settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
+    settings.client_name  = pref.nick().toUtf8().constData();
+    settings.mod_name = misc::productName().toUtf8().constData();
+    settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
-    qDebug() << "known " << misc::toQStringU(m_settings.m_known_file);
+    qDebug() << "known " << misc::toQStringU(settings.m_known_file);
 #ifdef AMD1
-    m_settings.server_hostname = "che-s-amd1";
+    settings.server_hostname = "che-s-amd1";
 #else
-    m_settings.server_hostname = "emule.is74.ru";
+    settings.server_hostname = "emule.is74.ru";
 #endif    
     if (iface_name.isEmpty())
     {
-        m_session.reset(new libed2k::session(m_finger, NULL, m_settings));
+        m_session.reset(new libed2k::session(finger, NULL, settings));
     }
     else
     {
-        m_session.reset(new libed2k::session(m_finger, iface_name.toAscii().constData(), m_settings));
+        m_session.reset(new libed2k::session(finger, iface_name.toAscii().constData(), settings));
     }
 
     m_session->set_alert_mask(alert::all_categories);
@@ -317,8 +320,16 @@ void QED2KSession::banIP(QString ip) {}
 QHash<QString, TrackerInfos> QED2KSession::getTrackersInfo(const QString &hash) const{ 
     return QHash<QString, TrackerInfos>();
 }
-void QED2KSession::setDownloadRateLimit(long rate) {}
-void QED2KSession::setUploadRateLimit(long rate) {}
+void QED2KSession::setDownloadRateLimit(long rate) {
+    session_settings settings = m_session->settings();
+    settings.download_rate_limit = rate;
+    m_session->set_settings(settings);
+}
+void QED2KSession::setUploadRateLimit(long rate) {
+    session_settings settings = m_session->settings();
+    settings.upload_rate_limit = rate;
+    m_session->set_settings(settings);
+}
 void QED2KSession::startUpTransfers()
 {
     loadFastResumeData();
@@ -330,12 +341,16 @@ void QED2KSession::configureSession()
     Preferences pref;
     const unsigned short old_listenPort = m_session->settings().listen_port;
     const unsigned short new_listenPort = pref.listenPort();
+    const int down_limit = pref.getED2KDownloadLimit();
+    const int up_limit = pref.getED2KUploadLimit();
 
     // set common settings before for announce correct nick on server
     libed2k::session_settings s = m_session->settings();
     s.client_name = pref.nick().toUtf8().constData();
-    s.m_show_shared_catalogs    = pref.isShowSharedDirectories();
-    s.m_show_shared_files       = pref.isShowSharedFiles();
+    s.m_show_shared_catalogs = pref.isShowSharedDirectories();
+    s.m_show_shared_files = pref.isShowSharedFiles();
+    s.download_rate_limit = down_limit <= 0 ? -1 : down_limit*1024;
+    s.upload_rate_limit = up_limit <= 0 ? -1 : up_limit*1024;
     m_session->set_settings(s);
 
     if (new_listenPort != old_listenPort)

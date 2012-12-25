@@ -117,8 +117,6 @@ public:
 
 private:
     QScopedPointer<libed2k::session> m_session;
-    libed2k::session_settings m_settings;
-    libed2k::fingerprint m_finger;
     QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
     void remove_by_state();
 public slots:
