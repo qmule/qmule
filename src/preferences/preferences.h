@@ -458,7 +458,7 @@ public:
 
   // ED2K options
 
-  int getED2KlDownloadLimit() const
+  int getED2KDownloadLimit() const
   {
     return value("Preferences/Connection/ED2KDLLimit", ed2k_max_download).toInt();
   }

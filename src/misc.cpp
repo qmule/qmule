@@ -936,17 +936,20 @@ bool misc::isValidTorrentFile(const QString &torrent_path) {
 QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
 {
     QSet<QString> roots;
-    QDir save_path(h.save_path());
 
-    if (save_path.dirName() == h.name())
+    if (h.has_metadata())
     {
-        roots << save_path.absolutePath();
-    }
-    else
-    {
-        int num_files = h.num_files();
-        for (int i = 0; i < num_files; ++i)
-            roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+        QDir save_path(h.save_path());
+        if (save_path.dirName() == h.name())
+        {
+            roots << save_path.absolutePath();
+        }
+        else
+        {
+            int num_files = h.num_files();
+            for (int i = 0; i < num_files; ++i)
+                roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+        }
     }
 
     return roots;
