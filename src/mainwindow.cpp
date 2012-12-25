@@ -784,25 +784,10 @@ bool MainWindow::event(QEvent * e) {
                 qDebug("minimisation");
                 if (systrayIcon && Preferences().minimizeToTray()) 
                 {
-                    qDebug("Has active window: %d", (int)(qApp->activeWindow() != 0));
-                    // Check if there is a modal window
-                    bool has_modal_window = false;
-                    foreach (QWidget *widget, QApplication::allWidgets()) 
-                    {
-                        if (widget->isModal()) 
-                        {
-                            has_modal_window = true;
-                            break;
-                        }
-                    }
-                    // Iconify if there is no modal window
-                    if (!has_modal_window) 
-                    {
-                        qDebug("Minimize to Tray enabled, hiding!");
-                        e->accept();
-                        QTimer::singleShot(0, this, SLOT(hide()));
-                        return true;
-                    }
+                    qDebug("Minimize to Tray enabled, hiding!");
+                    e->accept();
+                    QTimer::singleShot(0, this, SLOT(hide()));
+                    return true;
                 }
             }
             break;
