@@ -1377,6 +1377,7 @@ QMenu* MainWindow::getTrayIconMenu() {
   myTrayIconMenu->addAction(actionToggleVisibility);
   myTrayIconMenu->addSeparator();
   myTrayIconMenu->addAction(actionOpen);
+  /* disable useless actions
   myTrayIconMenu->addSeparator();
   const bool isAltBWEnabled = Preferences().isAltBandwidthEnabled();
   updateAltSpeedsBtn(isAltBWEnabled);
@@ -1388,6 +1389,7 @@ QMenu* MainWindow::getTrayIconMenu() {
   myTrayIconMenu->addAction(actionStart_All);
   myTrayIconMenu->addAction(actionPause_All);
   myTrayIconMenu->addSeparator();
+  */
   myTrayIconMenu->addAction(actionExit);
   if (ui_locked)
     myTrayIconMenu->setEnabled(false);
