@@ -2164,24 +2164,7 @@ void QBtSession::readAlerts() {
     else if (file_renamed_alert* p = dynamic_cast<file_renamed_alert*>(a.get())) {
       QTorrentHandle h(p->handle);
       if (h.is_valid()) {
-        if (h.num_files() > 1) {
-          // Check if folders were renamed
-          QStringList old_path_parts = h.orig_filepath_at(p->index).split("/");
-          old_path_parts.removeLast();
-          QString old_path = old_path_parts.join("/");
-          QStringList new_path_parts = misc::toQStringU(p->name).split("/");
-          new_path_parts.removeLast();
-          if (!new_path_parts.isEmpty() && old_path != new_path_parts.join("/")) {
-            qDebug("Old_path(%s) != new_path(%s)", qPrintable(old_path), qPrintable(new_path_parts.join("/")));
-            old_path = h.save_path()+"/"+old_path;
-            qDebug("Detected folder renaming, attempt to delete old folder: %s", qPrintable(old_path));
-            QDir().rmpath(old_path);
-          }
-        } else {
-          // Single-file torrent
-          // Renaming a file corresponds to changing the save path
-          emit savePathChanged(h);
-        }
+        emit savePathChanged(h);
       }
     }
     else if (torrent_deleted_alert* p = dynamic_cast<torrent_deleted_alert*>(a.get())) {
