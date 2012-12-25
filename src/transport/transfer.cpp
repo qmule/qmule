@@ -149,7 +149,7 @@ QList<QDir> Transfer::incompleteFiles() const
 {
     QList<QDir> res;
 
-    if (!is_seed())
+    if (!is_seed() && has_metadata())
     {
         QStringList fpaths = absolute_files_path();
         std::vector<TransferSize> fprog;
