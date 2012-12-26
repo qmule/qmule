@@ -9,12 +9,38 @@
 
 #include <vector>
 #include <queue>
+
 #include <libtorrent/session_status.hpp>
 #include <libed2k/add_transfer_params.hpp>
 #include <libed2k/session_status.hpp>
 
-#include <transport/transfer.h>
-#include <qtlibtorrent/trackerinfos.h>
+#include "transport/transfer.h"
+#include "qtlibtorrent/trackerinfos.h"
+
+struct ErrorCode
+{
+    typedef boost::system::error_code LibCode;
+    typedef std::string UICode;
+
+    ErrorCode& operator=(const LibCode& ec) {
+        m_libCode = ec;
+        m_uiCode = "";
+        return *this;
+    }
+    ErrorCode& operator=(const UICode& ec) {
+        m_uiCode = ec;
+        m_libCode = LibCode();
+        return *this;
+    }
+
+    operator bool() const { return m_libCode || !m_uiCode.empty(); }
+    operator LibCode&() { return m_libCode; }
+
+    std::string message() const { return m_libCode ? m_libCode.message() : m_uiCode; }
+
+    LibCode m_libCode;
+    std::string m_uiCode;
+};
 
 struct SessionStatus
 {
@@ -64,7 +90,7 @@ public:
     virtual void readAlerts() = 0;
     virtual void saveTempFastResumeData() = 0;
     virtual void saveFastResumeData() = 0;
-    virtual Transfer addLink(QString strLink, bool resumed = false) = 0;
+    virtual Transfer addLink(QString strLink, bool resumed, ErrorCode& ec) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0;   //!< ed2k session only
 
@@ -77,6 +103,7 @@ public:
     virtual bool isFilePreviewPossible(const QString& hash) const;
     virtual void autoRunExternalProgram(const Transfer &t);
     virtual QList<QDir> incompleteFiles() const;
+
 public slots:
     virtual void pauseTransfer(const QString& hash);
     virtual void resumeTransfer(const QString& hash);
@@ -194,12 +221,16 @@ public:
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
     void saveFastResumeData() { DEFER0(saveFastResumeData); }
-    Transfer addLink(QString strLink, bool resumed = false) {
-        DEFER_RETURN2(addLink, strLink, resumed, Transfer()); }
+    Transfer addLink(QString strLink, bool resumed, ErrorCode& ec)
+    {
+        // TODO: add link deferring is not supported
+        Q_ASSERT(S::started());
+        return S::addLink(strLink, resumed, ec);
+    }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
     QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
         DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
-    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }    
+    qreal getRealRatio(const QString& hash) const { FORWARD_RETURN(getRealRatio(hash), 0); }
 private:
     std::queue<boost::function<void()> > m_deferred;
 };

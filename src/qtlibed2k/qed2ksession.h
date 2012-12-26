@@ -123,7 +123,7 @@ public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);	
-    virtual Transfer addLink(QString strLink, bool resumed = false);
+    virtual Transfer addLink(QString strLink, bool resumed, ErrorCode& ec);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
 

@@ -366,16 +366,22 @@ void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
     for_each(boost::bind(&SessionBase::enableIPFilter, _1, filter_path, force));
 }
 
-Transfer Session::addLink(QString strLink, bool resumed)
+Transfer Session::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
     qDebug() << "add ED2K/magnet link: " << strLink;
 
     if (strLink.startsWith("ed2k://"))
     {
-        return m_edSession.addLink(strLink, resumed);
+        return m_edSession.addLink(strLink, resumed, ec);
     }
 
-    return m_btSession.addLink(strLink, resumed);
+    return m_btSession.addLink(strLink, resumed, ec);
+}
+
+Transfer Session::addLink(QString strLink, bool resumed /* = false */)
+{
+    ErrorCode ec;
+    return addLink(strLink, resumed, ec);
 }
 
 void Session::addTransferFromFile(const QString& filename)

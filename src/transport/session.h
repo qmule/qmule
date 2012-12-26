@@ -76,6 +76,7 @@ public:
     DirNode* root() { return &m_root; }
     std::set<DirNode*>& directories() { return m_dirs; }
     QHash<QString, FileNode*>& files() { return m_files; }
+
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -84,10 +85,11 @@ public slots:
     void playLink(const QString& strLink);
 
     /**
-      * select appropriate session and run command on it
+     * select appropriate session and run command on it
      */
-    virtual Transfer addLink(QString strLink, bool resumed = false);
-    virtual void addTransferFromFile(const QString& filename);
+    Transfer addLink(QString strLink, bool resumed, ErrorCode& ec);
+    Transfer addLink(QString strLink, bool resumed = false);
+    void addTransferFromFile(const QString& filename);
 
 signals:
     void metadataReceived(Transfer t);

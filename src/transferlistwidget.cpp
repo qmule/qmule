@@ -436,6 +436,7 @@ void TransferListWidget::hidePriorityColumn(bool hide) {
 void TransferListWidget::addLinkDialog() {
   Transfer t;
   bool ok;
+  ErrorCode ec;
   QString clipboardText = QApplication::clipboard()->text();
   QString link =
       clipboardText.startsWith("ed2k://", Qt::CaseInsensitive) ||
@@ -446,9 +447,9 @@ void TransferListWidget::addLinkDialog() {
       this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
     if (ok && !link.isEmpty()) {
       t = BTSession->addLink(
-        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed(), false);
+        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed(), false, ec);
       if (!t.is_valid())
-        QMessageBox::critical(this, tr("Incorrect link"), tr("Incorrect link"));
+        QMessageBox::critical(this, tr("Error"), tr(ec ? ec.message().c_str() : "Incorrect link"));
     }
   } while(ok && !t.is_valid());
 }

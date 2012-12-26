@@ -857,12 +857,13 @@ void QBtSession::loadTorrentSettings(QTorrentHandle& h) {
 #endif
 }
 
-Transfer QBtSession::addLink(QString strLink, bool resumed)
+Transfer QBtSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
   QTorrentHandle h;
   const QString hash(misc::magnetUriToHash(strLink));
-  if (hash.isEmpty()) {
+  if (!strLink.startsWith("magnet:", Qt::CaseInsensitive) || hash.isEmpty()) {
     addConsoleMessage(tr("'%1' is not a valid magnet URI.").arg(strLink));
+    ec = "Incorrect link";
     return h;
   }
   const QDir torrentBackup(misc::BTBackupLocation());
@@ -872,13 +873,13 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
     if (QFile::exists(torrent_path))
       return addTorrent(torrent_path, false, QString::null, true);
   }
-  qDebug("Adding a magnet URI: %s", qPrintable(hash));
-  Q_ASSERT(strLink.startsWith("magnet:", Qt::CaseInsensitive));
 
+  qDebug("Adding a magnet URI: %s", qPrintable(hash));
   // Check for duplicate torrent
   if (s->find_torrent(QStringToSha1(hash)).is_valid()) {
     qDebug("/!\\ Torrent is already in download list");
     addConsoleMessage(tr("'%1' is already in download list.", "e.g: 'xxx.avi' is already in download list.").arg(strLink));
+    ec = libtorrent::errors::duplicate_torrent;
     return h;
   }
 
@@ -906,8 +907,9 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
   // Adding torrent to Bittorrent session
   try {
     h =  QTorrentHandle(add_magnet_uri(*s, strLink.toUtf8().constData(), p));
-  }catch(std::exception e) {
+  }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
+    ec = e.error();
   }
   // Check if it worked
   if (!h.is_valid()) {
@@ -2518,7 +2520,8 @@ void QBtSession::downloadFromURLList(const QStringList& urls) {
 }
 
 void QBtSession::addMagnetSkipAddDlg(QString uri) {
-  addLink(uri, false);
+  ErrorCode ec;
+  addLink(uri, false, ec);
 }
 
 void QBtSession::downloadUrlAndSkipDialog(QString url, QString save_path, QString label) {
@@ -2608,6 +2611,7 @@ void QBtSession::startUpTransfers() {
   // End of safety measure
 
   qDebug("Starting up torrents");
+  ErrorCode ec;
   if (isQueueingEnabled()) {
     priority_queue<QPair<int, QString>, vector<QPair<int, QString> >, std::greater<QPair<int, QString> > > torrent_queue;
     foreach (const QString &hash, known_torrents) {
@@ -2627,7 +2631,7 @@ void QBtSession::startUpTransfers() {
       torrent_queue.pop();
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash)) {
-        addLink(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true, ec);
       } else {
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
       }
@@ -2637,7 +2641,7 @@ void QBtSession::startUpTransfers() {
     foreach (const QString &hash, known_torrents) {
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash))
-        addLink(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true, ec);
       else
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
     }

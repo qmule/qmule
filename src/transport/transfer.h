@@ -4,6 +4,7 @@
 
 #include <QSharedPointer>
 #include <QtCore/QStringList>
+
 #include "qtlibtorrent/qtorrenthandle.h"
 #include "qtlibed2k/qed2khandle.h"
 

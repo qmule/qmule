@@ -411,11 +411,12 @@ void QED2KSession::configureSession()
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
-Transfer QED2KSession::addLink(QString strLink, bool resumed)
+Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
     libed2k::emule_collection_entry ece = libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+    QED2KHandle h;
 
     if (ece.defined())
     {
@@ -425,10 +426,18 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
-        return QED2KHandle(delegate()->add_transfer(atp));
+        atp.duplicate_is_error = true;
+        try {
+            h = QED2KHandle(delegate()->add_transfer(atp));
+        }
+        catch(libed2k::libed2k_exception e){
+            ec = e.error();
+        }
     }
+    else
+        ec = "Incorrect link";
 
-    return QED2KHandle();
+    return h;
 }
 
 void QED2KSession::addTransferFromFile(const QString& filename)

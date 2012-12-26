@@ -5109,8 +5109,20 @@ Do you want to install it now?</source>
         <translation>ED2K/magnet ссылка:</translation>
     </message>
     <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
         <source>Incorrect link</source>
         <translation>Некорректная ссылка</translation>
+    </message>
+    <message>
+        <source>transfer already exists in session</source>
+        <translation>Файл существует</translation>
+    </message>
+    <message>
+        <source>torrent already exists in session</source>
+        <translation>Торрент уже присутствует в списке закачек</translation>
     </message>
     <message>
         <source>View file...</source>
