@@ -55,8 +55,8 @@ class DeletionConfirmationDlg : public QDialog, private Ui::confirmDeletionDlg {
     }
     else
     {
-        checkPermDelete->setEnabled(false);
-        checkPermDelete->setEnabled(false);
+        checkPermDelete->setChecked(true);
+        checkPermDelete->setEnabled(false);        
     }
 
     buttonBox->setFocus();
