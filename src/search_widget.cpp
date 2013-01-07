@@ -820,7 +820,7 @@ void search_widget::processSearchResult(
     btnCancel->setEnabled(nSearchesInProgress != 0);
 
     if (obMoreResult)
-        btnMore->setEnabled(obMoreResult);
+        btnMore->setEnabled(*obMoreResult);
 
     searchItems[nCurTabSearch].vecResults.insert(searchItems[nCurTabSearch].vecResults.end(), vRes.begin(), vRes.end());
 
