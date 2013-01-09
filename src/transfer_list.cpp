@@ -151,6 +151,7 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionDelete->setObjectName(QString::fromUtf8("actionDelete"));
     actionDelete->setToolTip(tr("Delete"));
     actionDelete->setIcon(IconProvider::instance()->getIcon("list-remove"));
+    actionDelete->setShortcut(QKeySequence(QString::fromUtf8("Del")));
 
     actionStart = new QAction(this);
     actionStart->setObjectName(QString::fromUtf8("actionStart"));
