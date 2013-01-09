@@ -345,6 +345,13 @@ void TransferListWidget::deleteVisibleTorrents()
   }
 }
 
+void TransferListWidget::launchSelectedTorrents()
+{
+    const QModelIndexList selectedIndexes = selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        torrentDoubleClicked(selectedIndexes.first());
+}
+
 void TransferListWidget::increasePrioSelectedTorrents() {
   qDebug() << Q_FUNC_INFO;
 //  if (main_window->getCurrentTabWidget() != this) return;

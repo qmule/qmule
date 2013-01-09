@@ -59,6 +59,7 @@ private:
     QAction* actionDelete;
     QAction* actionStart;
     QAction* actionPause;
+    QAction* actionLaunch;
 
     QToolBar* mainToolBar;
 
