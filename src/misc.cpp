@@ -189,17 +189,21 @@ QString misc::QDesktopServicesDownloadLocation() {
       // Resolve $HOME environment variables
       xdg_download_dir.replace("$HOME", QDir::homePath());
       save_path = xdg_download_dir;
+      save_path += QDir::separator() + "mule";
       qDebug() << Q_FUNC_INFO << "SUCCESS: Using XDG path for downloads: " << save_path;
     }
   }
 
   // Fallback
-  if (!save_path.isEmpty() && !QFile::exists(save_path)) {
-    QDir().mkpath(save_path);
+  if (!save_path.isEmpty() && !QFile::exists(save_path))
+  {
+      QDir().mkpath(save_path);
   }
 
-  if (save_path.isEmpty() || !QFile::exists(save_path)) {
+  if (save_path.isEmpty() || !QFile::exists(save_path))
+  {
     save_path = QDir::home().absoluteFilePath(tr("Downloads"));
+    save_path += QDir::separator() + "mule";
     qDebug() << Q_FUNC_INFO << "using" << save_path << "as fallback since the XDG detection did not work";
   }
 
@@ -211,6 +215,7 @@ QString misc::QDesktopServicesDownloadLocation() {
 #endif
 
   // Fallback
+  qDebug() << Q_FUNC_INFO << " use downloads";
   return QDir::home().absoluteFilePath(tr("Downloads"));
 }
 
