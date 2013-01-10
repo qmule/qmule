@@ -213,6 +213,7 @@ private:
   LineEdit *search_filter;
   // Keyboard shortcuts
   QShortcut *switchTransferShortcut;
+  QShortcut *hideShortcut;
   // Widgets
   QAction *prioSeparator;
   QAction *prioSeparatorMenu;

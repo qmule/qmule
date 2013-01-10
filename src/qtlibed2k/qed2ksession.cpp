@@ -176,6 +176,7 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 
 bool writeResumeData(const libed2k::save_resume_data_alert* p)
 {
+    qDebug() << Q_FUNC_INFO;
     try
     {
         QED2KHandle h(p->m_handle);
@@ -200,8 +201,10 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             }
         }
     }
-    catch(const libed2k::libed2k_exception&)
-    {}
+    catch(const libed2k::libed2k_exception& e)
+    {
+        qDebug() << "error on write resume data " << misc::toQStringU(e.what());
+    }
 
     return false;
 }
@@ -771,16 +774,28 @@ void QED2KSession::saveFastResumeData()
     for (std::vector<transfer_handle>::iterator th_itr = transfers.begin(); th_itr != transfers.end(); th_itr++)
     {
         QED2KHandle h = QED2KHandle(*th_itr);
-        if (!h.is_valid() || !h.has_metadata()) continue;
+        if (!h.is_valid() || !h.has_metadata())
+        {
+            qDebug() << "transfer invalid or hasn't metadata";
+            continue;
+        }
+
         try
         {
 
-            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking) continue;
+            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking)
+            {
+                qDebug() << "transfer " << h.hash() << " in checking files or queued for checking";
+                continue;
+            }
+
             h.save_resume_data();
             ++num_resume_data;
         }
-        catch(libed2k::libed2k_exception&)
-        {}
+        catch(libed2k::libed2k_exception& e)
+        {
+            qDebug() << "exception on request saving " << misc::toQStringU(e.what());
+        }
     }
 
     while (num_resume_data > 0)
@@ -795,6 +810,7 @@ void QED2KSession::saveFastResumeData()
 
         if (libed2k::save_resume_data_failed_alert const* rda = dynamic_cast<libed2k::save_resume_data_failed_alert const*>(a))
         {
+            qDebug() << "save resume data failed alert " << misc::toQStringU(rda->message().c_str());
             --num_resume_data;
 
             try
@@ -803,8 +819,10 @@ void QED2KSession::saveFastResumeData()
                 if (rda->m_handle.is_valid())
                     delegate()->remove_transfer(rda->m_handle);
             }
-            catch(const libed2k::libed2k_exception&)
-            {}
+            catch(const libed2k::libed2k_exception& e)
+            {
+                qDebug() << "exception on remove transfer after save " << misc::toQStringU(e.what());
+            }
         }
         else if (libed2k::save_resume_data_alert const* rd = dynamic_cast<libed2k::save_resume_data_alert const*>(a))
         {
@@ -815,8 +833,10 @@ void QED2KSession::saveFastResumeData()
             {
                 delegate()->remove_transfer(rd->m_handle);
             }
-            catch(const libed2k::libed2k_exception& )
-            {}
+            catch(const libed2k::libed2k_exception& e)
+            {
+                qDebug() << "exception on remove transfer after save " << misc::toQStringU(e.what());
+            }
         }
 
         delegate()->pop_alert();
