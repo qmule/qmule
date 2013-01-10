@@ -407,6 +407,7 @@ MainWindow::~MainWindow()
 
   // Keyboard shortcuts
   delete switchTransferShortcut;
+  delete hideShortcut;
 
   IconProvider::drop();
   // Delete Session::instance() object
@@ -539,6 +540,8 @@ void MainWindow::createKeyboardShortcuts() {
   actionExit->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Q")));
   switchTransferShortcut = new QShortcut(QKeySequence(tr("Alt+1", "shortcut to switch to first tab")), this);
   connect(switchTransferShortcut, SIGNAL(activated()), this, SLOT(displayTransferTab()));
+  hideShortcut = new QShortcut(QKeySequence(QString::fromUtf8("Esc")), this);
+  connect(hideShortcut, SIGNAL(activated()), this, SLOT(hide()));
   actionDocumentation->setShortcut(QKeySequence("F1"));
 
 #ifdef Q_WS_MAC
