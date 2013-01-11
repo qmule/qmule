@@ -258,6 +258,7 @@ void QED2KSession::start()
 
 void QED2KSession::stop()
 {
+    m_session->pause();
     saveFastResumeData();
 }
 
