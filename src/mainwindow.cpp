@@ -46,9 +46,6 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QDockWidget>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
 
 #include <libed2k/log.hpp>
 
@@ -72,7 +69,6 @@
 #include "iconprovider.h"
 #include "status_widget.h"
 #include "search_widget.h"
-#include "login_dlg.h"
 #include "messages_widget.h"
 #include "files_widget.h"
 #include "status_bar.h"
@@ -100,9 +96,11 @@ using namespace libtorrent;
  *****************************************************/
 
 // Constructor
-MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false) {
+MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torrentCmdLine) : QMainWindow(parent), m_posInitialized(false), force_exit(false)
+{
   setupUi(this);
-
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  m_sscrn.reset(sscrn);
   m_bDisconnectBtnPressed = false;
   m_last_file_error = QDateTime::currentDateTime().addSecs(-1); // imagine last file error event was 1 seconds in past
   m_tbar.reset(new taskbar_iface(this, 99));
@@ -170,6 +168,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   QAction *defineUiLockPasswdAct = lockMenu->addAction(tr("Set the password..."));
   connect(defineUiLockPasswdAct, SIGNAL(triggered()), this, SLOT(defineUILockPassword()));
   actionLock_qMule->setMenu(lockMenu);
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Create sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   // Creating Bittorrent session
   connect(Session::instance(), SIGNAL(fileError(Transfer, QString)),
           this, SLOT(fileError(Transfer, QString)));
@@ -252,11 +252,8 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(statusBar, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
   flickerTimer = new QTimer(this);
   connect(flickerTimer, SIGNAL(timeout()), SLOT(on_flickerTimer()));
-
   on_actionCatalog_triggerd();
-#ifndef NOAUTH
-    activateControls(false);
-#endif
+
 
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
@@ -320,30 +317,17 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(executable_watcher, SIGNAL(fileChanged(QString)), this, SLOT(notifyOfUpdate(QString)));
   executable_watcher->addPath(qApp->applicationFilePath());
 
+  connect(Session::instance(), SIGNAL(beginLoadSharedFileSystem()), this, SLOT(on_beginLoadSharedFileSystem()));
+  connect(Session::instance(), SIGNAL(endLoadSharedFileSystem()), this, SLOT(on_endLoadSharedFileSystem()));
+
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Startup transfers..."), Qt::AlignLeft | Qt::AlignBottom);
   // Resume unfinished torrents
   Session::instance()->startUpTransfers();
   // Add torrent given on command line
   processParams(torrentCmdLine);
 
   qDebug("GUI Built");
-#ifdef Q_WS_WIN
-  if (!pref.neverCheckFileAssoc() &&
-          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
-  {
-    if (QMessageBox::question(0, tr("Torrent file association"),
-                             tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
-                             QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
-      Preferences::setTorrentFileAssoc(true);
-      Preferences::setMagnetLinkAssoc(true);
-      Preferences::setEmuleFileAssoc(true);
-      Preferences::setCommonAssocSection(true); // enable common section
-    }
-    else
-    {
-      pref.setNeverCheckFileAssoc();
-    }
-  }
-#endif
 #ifdef Q_WS_MAC
   qt_mac_set_dock_menu(getTrayIconMenu());
 #endif
@@ -361,9 +345,6 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connectioh_state = csDisconnected;
   m_info_dlg.reset(new is_info_dlg(this));
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
-  authTimer = new QTimer(this);
-  connect(authTimer, SIGNAL(timeout()), this, SLOT(startAuthByTimer()));
-  connect(this, SIGNAL(signalAuth(const QString&, const QString&)), SLOT(on_auth(const QString&, const QString&)), Qt::BlockingQueuedConnection);
 
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(quint32, quint32, quint32)));
@@ -378,7 +359,9 @@ MainWindow::MainWindow(QWidget *parent, QStringList torrentCmdLine) : QMainWindo
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
   connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
   connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
-  authRequest();
+  if (!m_sscrn.isNull())
+      m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
+  Session::instance()->start();
 }
 
 void MainWindow::deleteSession()
@@ -393,9 +376,9 @@ void MainWindow::deleteSession()
 }
 
 // Destructor
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
   qDebug("GUI destruction");
-  ar.stop();
   hide();
 #ifdef Q_WS_MAC
   // Workaround to avoid bug http://bugreports.qt.nokia.com/browse/QTBUG-7305
@@ -424,6 +407,7 @@ MainWindow::~MainWindow() {
 
   // Keyboard shortcuts
   delete switchTransferShortcut;
+  delete hideShortcut;
 
   IconProvider::drop();
   // Delete Session::instance() object
@@ -556,6 +540,8 @@ void MainWindow::createKeyboardShortcuts() {
   actionExit->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Q")));
   switchTransferShortcut = new QShortcut(QKeySequence(tr("Alt+1", "shortcut to switch to first tab")), this);
   connect(switchTransferShortcut, SIGNAL(activated()), this, SLOT(displayTransferTab()));
+  hideShortcut = new QShortcut(QKeySequence(QString::fromUtf8("Esc")), this);
+  connect(hideShortcut, SIGNAL(activated()), this, SLOT(hide()));
   actionDocumentation->setShortcut(QKeySequence("F1"));
 
 #ifdef Q_WS_MAC
@@ -801,25 +787,10 @@ bool MainWindow::event(QEvent * e) {
                 qDebug("minimisation");
                 if (systrayIcon && Preferences().minimizeToTray()) 
                 {
-                    qDebug("Has active window: %d", (int)(qApp->activeWindow() != 0));
-                    // Check if there is a modal window
-                    bool has_modal_window = false;
-                    foreach (QWidget *widget, QApplication::allWidgets()) 
-                    {
-                        if (widget->isModal()) 
-                        {
-                            has_modal_window = true;
-                            break;
-                        }
-                    }
-                    // Iconify if there is no modal window
-                    if (!has_modal_window) 
-                    {
-                        qDebug("Minimize to Tray enabled, hiding!");
-                        e->accept();
-                        QTimer::singleShot(0, this, SLOT(hide()));
-                        return true;
-                    }
+                    qDebug("Minimize to Tray enabled, hiding!");
+                    e->accept();
+                    QTimer::singleShot(0, this, SLOT(hide()));
+                    return true;
                 }
             }
             break;
@@ -983,22 +954,6 @@ void MainWindow::on_actionFiles_triggerd()
     selectWidget(wFiles);
 }
 
-void MainWindow::on_auth_result(const std::string& strRes, const boost::system::error_code& ec)
-{
-    qDebug("MainWindow::on_auth_result: %s", strRes.c_str());
-    QString strError;
-
-    // do not emit signal on aborted operation
-    if (ec == boost::asio::error::operation_aborted) return;
-
-    if (ec)
-    {
-        strError = QString::fromLocal8Bit(ec.message().c_str());
-    }
-
-    emit signalAuth(QString::fromUtf8(strRes.c_str(), strRes.size()), strError);
-}
-
 void MainWindow::selectWidget(Widgets wNum)
 {
     actionCatalog->setChecked(false);
@@ -1074,7 +1029,7 @@ void MainWindow::on_actionConnect_triggered()
     {
         case csDisconnected:
         {
-            authRequest();
+            Session::instance()->get_ed2k_session()->startServerConnection();
             break;
         }
         case csConnecting:
@@ -1425,6 +1380,7 @@ QMenu* MainWindow::getTrayIconMenu() {
   myTrayIconMenu->addAction(actionToggleVisibility);
   myTrayIconMenu->addSeparator();
   myTrayIconMenu->addAction(actionOpen);
+  /* disable useless actions
   myTrayIconMenu->addSeparator();
   const bool isAltBWEnabled = Preferences().isAltBandwidthEnabled();
   updateAltSpeedsBtn(isAltBWEnabled);
@@ -1436,6 +1392,7 @@ QMenu* MainWindow::getTrayIconMenu() {
   myTrayIconMenu->addAction(actionStart_All);
   myTrayIconMenu->addAction(actionPause_All);
   myTrayIconMenu->addSeparator();
+  */
   myTrayIconMenu->addAction(actionExit);
   if (ui_locked)
     myTrayIconMenu->setEnabled(false);
@@ -1553,206 +1510,9 @@ QIcon MainWindow::getSystrayIcon() const
   return icon_CurTray;
 }
 
-void MainWindow::on_auth(const QString& strRes, const QString& strError)
-{
-    qDebug("MainWindow::on_auth");
-
-    if (!strError.isEmpty())
-    {
-        QString msg = tr("Authentication Error: ") + strError;
-        QString msg2 = tr("New authentication attempt in 30 seconds.");
-        addConsoleMessage(msg);
-        addConsoleMessage(msg2);
-        authTimer->start(30000);
-
-        statusBar->setStatusMsg(msg + " " + msg2);
-        return;
-    }
-
-    QString str(strError);
-    QString result = strRes;
-
-    // add quotes
-    QString sample("Message type=");
-    int nPos = result.indexOf(sample);
-
-    if (nPos >= 0)
-    {
-        nPos += sample.length();
-        result = result.left(nPos) + "\"" + result.mid(nPos , 1) + "\"" + result.right(result.size() - nPos - 1);
-    }
-
-    // remove all data previous xml header
-    int pos = result.indexOf("<?xml", 0, Qt::CaseInsensitive);
-
-    if (pos != -1)
-    {
-        result.remove(0, pos);
-    }
-
-    // remove all data after xml document end
-    pos = result.lastIndexOf("</DATA>", -1, Qt::CaseInsensitive);
-
-    if (pos != -1)
-    {
-        result.remove(pos + 7, result.length() - pos - 7);
-    }
-
-    //QString result("<?xml version=\"1.0\"?><DATA><AuthResult>0</AuthResult><Message type=\"1\"><![CDATA[]]></Message><filter><![CDATA[]]></filter><server>emule.is74.ru</server></DATA>");    
-    QDomDocument doc;
-    QString errorStr;
-    int errorLine;
-    int errorColumn;
-
-    if (!doc.setContent(result, true, &errorStr, &errorLine, &errorColumn))
-    {
-        QMessageBox msgBox;
-        msgBox.setText(QString("Authentication error, incorrect answer: " ) + result);
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
-        return;
-    }
-
-    QDomElement root = doc.documentElement();
-    QDomNode node = root.firstChild();
-    int authResult      = -1;
-    int authMessageType = -1;
-
-    QString authMessage;
-    QString authFilter;
-    QString authServer;
-
-    while (!node.isNull())
-    {
-        if (node.toElement().tagName() == "AuthResult")
-            authResult = node.toElement().text().toInt();
-        if (node.toElement().tagName() == "Message")
-        {
-            authMessageType = node.toElement().attribute("type").toInt();
-            QDomNode cdata = node.firstChild();
-            if ( cdata.isCDATASection() )
-	            authMessage = cdata.toCDATASection().data();
-        }
-        if (node.toElement().tagName() == "filter")
-            if ( node.isCDATASection() )
-	            authFilter = node.toCDATASection().data();
-        if (node.toElement().tagName() == "server")
-            authServer = node.toElement().text();
-        if (node.toElement().tagName() == "Timeout")
-            authResult = node.toElement().text().toInt();
-        node = node.nextSibling();
-    }
-
-    if (authMessage.length())
-    {
-        addConsoleMessage(tr("Message from authentication server: ") + authMessage);
-
-        if (authMessageType)
-        {
-            QMessageBox msgBox;
-            msgBox.setText(authMessage);
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-        }
-    }
-
-    switch (authResult)
-    {
-        case 0:
-        {
-            QString msg = tr("Authentication comleted");
-            addConsoleMessage(msg);
-            statusBar->setStatusMsg(msg);      
-
-            if (Session::instance()->started())
-            {
-                // when session started - we have to run only server connection
-                Session::instance()->get_ed2k_session()->startServerConnection();
-            }
-            else
-            {
-                QApplication::setOverrideCursor(Qt::WaitCursor);
-                Session::instance()->start();
-                QApplication::restoreOverrideCursor();
-            }
-
-            activateControls(true);
-
-            break;
-        }
-        case 1:
-        {
-            actionConnect->setIcon(icon_disconnected);
-            actionConnect->setText(tr("Connecting"));
-            connectioh_state = csDisconnected;
-            authTimer->start(1000);
-            Preferences pref;
-            pref.setISPassword("");
-            break;
-        }
-        case 2:
-        {
-            break;
-        }
-    }
-
-
-}
-
-void MainWindow::authRequest()
-{
-    Preferences pref;
-
-    QString msg = tr("Sending authentication request.");
-    authTimer->stop();
-
-    if (pref.getISLogin().length() && pref.getISPassword().length())
-    {
-        ar.start("el.is74.ru", "auth.php",
-                pref.getISLogin().toUtf8().constData(),
-                pref.getISPassword().toUtf8().constData(),
-                "0.5.6.7",
-                boost::bind(&MainWindow::on_auth_result, this, _1, _2));
-
-        addConsoleMessage(msg);
-        statusBar->setStatusMsg(msg);
-        return;
-    }
-
-    login_dlg dlg(this, pref.getISLogin(), pref.getISPassword());
-
-    if (dlg.exec() == QDialog::Accepted)
-    {
-        pref.setISLogin(dlg.getLogin());
-        pref.setISPassword(dlg.getPasswd());
-        actionConnect->setIcon(icon_connecting);
-        actionConnect->setText(tr("Cancel"));
-        connectioh_state = csConnecting;
-        ar.start("el.is74.ru", "auth.php",
-                pref.getISLogin().toUtf8().constData(),
-                pref.getISPassword().toUtf8().constData(),
-                "0.5.6.7",
-                boost::bind(&MainWindow::on_auth_result, this, _1, _2));
-
-        addConsoleMessage(msg);
-        statusBar->setStatusMsg(msg);
-    }
-#ifdef NOAUTH
-    else
-    {
-        Session::instance()->start();
-    }
-#endif
-}
-
 void MainWindow::addConsoleMessage(const QString& msg, QColor color /*=QApplication::palette().color(QPalette::WindowText)*/) const
 {
     status->addHtmlLogMessage("<font color='grey'>"+ QDateTime::currentDateTime().toString(QString::fromUtf8("dd/MM/yyyy hh:mm:ss")) + "</font> - <font color='" + color.name() + "'><i>" + msg + "</i></font>");
-}
-
-void MainWindow::startAuthByTimer()
-{
-    authRequest();
 }
 
 void MainWindow::ed2kServerNameResolved(QString strServer)
@@ -1785,6 +1545,7 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
     log_msg += id;
     status->addLogMessage(log_msg);
     status->clientID(client_id);
+    statusBar->setStatusMsg(log_msg);
 }
 
 void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
@@ -1819,16 +1580,8 @@ void MainWindow::ed2kIdentity(QString strName, QString strDescription)
 void MainWindow::ed2kConnectionClosed(QString strError)
 {
     status->addLogMessage(strError);
-
     setDisconnectedStatus();
-
     statusBar->setStatusMsg(strError);
-
-    if (!m_bDisconnectBtnPressed)
-    {
-        // start new connection iteration
-        on_actionConnect_triggered();
-    }
 }
 
 
@@ -1902,4 +1655,41 @@ void MainWindow::on_actionOpenDownloadPath_triggered()
 {
     Preferences pref;
     QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
+}
+
+void MainWindow::on_beginLoadSharedFileSystem()
+{
+    if (!m_sscrn.isNull())
+        m_sscrn->showMessage(tr("Begin load shared filesystem..."), Qt::AlignLeft | Qt::AlignBottom);
+}
+
+void MainWindow::on_endLoadSharedFileSystem()
+{
+    if (!m_sscrn.isNull())
+    {
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);        
+        m_sscrn.reset();
+    }
+
+    QApplication::restoreOverrideCursor();
+#ifdef Q_WS_WIN
+    Preferences pref;
+    if (!pref.neverCheckFileAssoc() &&
+          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
+    {
+        if (QMessageBox::question(0, tr("Torrent file association"),
+                                 tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
+                                 QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+        {
+            Preferences::setTorrentFileAssoc(true);
+            Preferences::setMagnetLinkAssoc(true);
+            Preferences::setEmuleFileAssoc(true);
+            Preferences::setCommonAssocSection(true); // enable common section
+        }
+        else
+        {
+            pref.setNeverCheckFileAssoc();
+        }
+    }
+#endif
 }

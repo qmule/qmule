@@ -100,7 +100,7 @@ private:
     QScopedPointer<QStandardItemModel> model;
     QScopedPointer<SWSortFilterProxyModel> filterModel;
     SWDelegate* itemDelegate;
-    search_filter* searchFilter;
+    //search_filter* searchFilter;
     QString        m_lastSearchFileType;
 
     QMenu* userMenu;

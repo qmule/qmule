@@ -74,7 +74,6 @@ const int UNLEN = 256;
 #include <winbase.h>
 #endif
 
-#include <libed2k/is_crypto.hpp>
 #include "libtorrent/bencode.hpp"
 #include "transport/session.h"
 #include "torrentpersistentdata.h"
@@ -190,17 +189,21 @@ QString misc::QDesktopServicesDownloadLocation() {
       // Resolve $HOME environment variables
       xdg_download_dir.replace("$HOME", QDir::homePath());
       save_path = xdg_download_dir;
+      save_path += QDir::separator() + "mule";
       qDebug() << Q_FUNC_INFO << "SUCCESS: Using XDG path for downloads: " << save_path;
     }
   }
 
   // Fallback
-  if (!save_path.isEmpty() && !QFile::exists(save_path)) {
-    QDir().mkpath(save_path);
+  if (!save_path.isEmpty() && !QFile::exists(save_path))
+  {
+      QDir().mkpath(save_path);
   }
 
-  if (save_path.isEmpty() || !QFile::exists(save_path)) {
+  if (save_path.isEmpty() || !QFile::exists(save_path))
+  {
     save_path = QDir::home().absoluteFilePath(tr("Downloads"));
+    save_path += QDir::separator() + "mule";
     qDebug() << Q_FUNC_INFO << "using" << save_path << "as fallback since the XDG detection did not work";
   }
 
@@ -212,6 +215,7 @@ QString misc::QDesktopServicesDownloadLocation() {
 #endif
 
   // Fallback
+  qDebug() << Q_FUNC_INFO << " use downloads";
   return QDir::home().absoluteFilePath(tr("Downloads"));
 }
 
@@ -937,17 +941,20 @@ bool misc::isValidTorrentFile(const QString &torrent_path) {
 QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
 {
     QSet<QString> roots;
-    QDir save_path(h.save_path());
 
-    if (save_path.dirName() == h.name())
+    if (h.has_metadata())
     {
-        roots << save_path.absolutePath();
-    }
-    else
-    {
-        int num_files = h.num_files();
-        for (int i = 0; i < num_files; ++i)
-            roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+        QDir save_path(h.save_path());
+        if (save_path.dirName() == h.name())
+        {
+            roots << save_path.absolutePath();
+        }
+        else
+        {
+            int num_files = h.num_files();
+            for (int i = 0; i < num_files; ++i)
+                roots << save_path.filePath(h.filepath_at(i).split(QDir::separator()).first());
+        }
     }
 
     return roots;
@@ -1159,12 +1166,6 @@ QString misc::migrationAuthLogin()
     return qs.value("AuthLogin", QString("")).toString();
 }
 
-QString misc::migrationAuthPassword()
-{
-    QSettings qs(QString("HKEY_CURRENT_USER\\Software\\eMule IS Mod"), QSettings::NativeFormat);
-    return QString::fromStdString(is_crypto::DecryptPasswd(qs.value("AuthPassword", QString("")).toString().toStdString(), emuleKeyFile().toStdString()));
-}
-
 shared_map misc::migrationShareds()
 {
     shared_map se;
@@ -1339,11 +1340,6 @@ QString misc::migrationAuthLogin()
     return QString();
 }
 
-QString misc::migrationAuthPassword()
-{
-    return QString();
-}
-
 shared_map misc::migrationShareds()
 {
     return shared_map();
@@ -1361,42 +1357,25 @@ shared_map misc::migrationShareds()
 
 #endif
 
- QString misc::migrationIncomingDir(const QString& dir)
- {
-     QString res = dir;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename())).filter(QRegExp("^IncomingDir"));
-
-     if (!sl.empty())
-     {
-         QStringList sres = sl.at(0).split(QRegExp("="));
-
-         if (sres.size() > 1)
-         {
-             res = sres[1];
-         }
-     }
-
-     return res;
- }
-
  int misc::migrationPort(int port)
  {
      QSettings qs(emuleConfig(emuleConfigFilename()), QSettings::IniFormat);
      return qs.value("eMule/Port", port).toInt();
  }
 
- QString misc::migrationNick(const QString& nick)
- {     
-     QString res = nick;
-     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), "UTF-8").filter(QRegExp("^Nick"));
+ QString misc::migrateValue(const QString& value, const QString& def, const char* codepage /* = NULL*/)
+ {
+     QString res = def;
+     QStringList sl = getFileLines(emuleConfig(emuleConfigFilename()), codepage).filter(QRegExp(QString("^") + value + "="));
 
-     if (!sl.empty())
+     foreach(const QString& s, sl)
      {
-         QStringList sres = sl.at(0).split(QRegExp("="));
+         QStringList sres = s.split(QRegExp("="));
 
          if (sres.size() > 1)
          {
              res = sres[1];
+             break;
          }
      }
 

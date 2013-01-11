@@ -289,6 +289,11 @@ TransferStatus QTorrentHandle::status() const
 #endif
 }
 
+TransferState QTorrentHandle::state() const
+{
+    return status().state;
+}
+
 libtorrent::torrent_info QTorrentHandle::get_info() const {
     return torrent_handle::get_torrent_info();
 }

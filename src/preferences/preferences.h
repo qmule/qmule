@@ -38,7 +38,6 @@
 #include <QList>
 #include <QDebug>
 #include <libtorrent/version.hpp>
-#include <libed2k/is_crypto.hpp>
 
 #ifndef DISABLE_GUI
 #include <QApplication>
@@ -80,12 +79,17 @@ public:
   {
       if (isMigrationStage())
       {
-          setISLogin(misc::migrationAuthLogin());
-          setISPassword(misc::migrationAuthPassword());
+          qDebug() << "migrate options";
           saveSharedDirs(misc::migrationShareds());
           setListenPort(misc::migrationPort(4662));
-          setNick(misc::migrationNick(misc::getUserName()));
-          setSavePath(misc::migrationIncomingDir(misc::QDesktopServicesDownloadLocation()));
+          setNick(misc::migrateValue("Nick", misc::getUserName(), "UTF-8"));
+          setSavePath(misc::migrateValue("IncomingDir", misc::QDesktopServicesDownloadLocation()));
+          QString maxDownload = misc::migrateValue("MaxDownload", QString::number(ed2k_max_download), "UTF-8");
+          QString maxUpload = misc::migrateValue("MaxUpload", QString::number(ed2k_max_upload), "UTF-8");
+
+          // zero will interpret as default limit
+          setED2KDownloadLimit((maxDownload.toLong()==0)?ed2k_max_download:maxDownload.toLong());
+          setED2KUploadLimit((maxUpload.toLong()==0)?ed2k_max_upload:maxUpload.toLong());
           misc::migrateTorrents();
           sync();
       }
@@ -200,29 +204,6 @@ public:
   void setPreventFromSuspend(bool b) {
     setValue("Preferences/General/PreventFromSuspend", b);
   }
-
-  // ED2K settings
-
-  QString getISLogin() const
-  {
-      return value(QString::fromUtf8("Preferences/General/ISLogin"), "").toString();
-  }
-
-  void setISLogin(const QString& strISLogin)
-  {
-      setValue("Preferences/General/ISLogin", strISLogin);
-  }
-
-  QString getISPassword() const
-  {
-      return QString::fromStdString(is_crypto::DecryptPasswd(value(QString::fromUtf8("Preferences/General/ISPassword"), "").toString().toStdString(), misc::ED2KKeyFile().toStdString()));
-  }
-
-  void setISPassword(const QString& strISPassword)
-  {      
-      setValue("Preferences/General/ISPassword",  QString::fromStdString(is_crypto::EncryptPasswd(strISPassword.toStdString(), misc::ED2KKeyFile().toStdString())));
-  }
-
 
   // Downloads
   QString getSavePath() const {
@@ -476,6 +457,28 @@ public:
   }
 
   // ED2K options
+
+  int getED2KDownloadLimit() const
+  {
+    return value("Preferences/Connection/ED2KDLLimit", ed2k_max_download).toInt();
+  }
+
+  void setED2KDownloadLimit(int limit)
+  {
+    if (limit <= 0) limit = -1;
+    setValue("Preferences/Connection/ED2KDLLimit", limit);
+  }
+
+  int getED2KUploadLimit() const
+  {
+    return value("Preferences/Connection/ED2KUPLimit", ed2k_max_upload).toInt();
+  }
+
+  void setED2KUploadLimit(int limit)
+  {
+    if (limit <= 0) limit = -1;
+    setValue("Preferences/Connection/ED2KUPLimit", limit);
+  }
 
   int serverPort()
   {            

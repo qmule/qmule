@@ -176,6 +176,7 @@ QED2KPeerOptions::QED2KPeerOptions(const libed2k::misc_options& mo, const libed2
 
 bool writeResumeData(const libed2k::save_resume_data_alert* p)
 {
+    qDebug() << Q_FUNC_INFO;
     try
     {
         QED2KHandle h(p->m_handle);
@@ -200,8 +201,10 @@ bool writeResumeData(const libed2k::save_resume_data_alert* p)
             }
         }
     }
-    catch(const libed2k::libed2k_exception&)
-    {}
+    catch(const libed2k::libed2k_exception& e)
+    {
+        qDebug() << "error on write resume data " << misc::toQStringU(e.what());
+    }
 
     return false;
 }
@@ -217,31 +220,34 @@ void QED2KSession::start()
 {
     qDebug() <<  Q_FUNC_INFO;
     Preferences pref;
+    libed2k::session_settings settings;
+    libed2k::fingerprint finger;
+
     // set zero to port for stop automatically listening
-    m_settings.listen_port = pref.listenPort();
-    m_settings.server_reconnect_timeout = -1; // do not attempt to reconnect after connection failed because auth need before
-    m_settings.server_keep_alive_timeout = -1;
-    m_settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
-    m_settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
-    m_settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
-    m_settings.client_name  = pref.nick().toUtf8().constData();
-    m_settings.mod_name = misc::productName().toUtf8().constData();
-    m_settings.m_announce_timeout = 10; // announcing every 10 seconds
+    settings.listen_port = pref.listenPort();
+    settings.server_reconnect_timeout = 20;
+    settings.server_keep_alive_timeout = -1;
+    settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
+    settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
+    settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
+    settings.client_name  = pref.nick().toUtf8().constData();
+    settings.mod_name = misc::productName().toUtf8().constData();
+    settings.m_announce_timeout = 10; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
-    qDebug() << "known " << misc::toQStringU(m_settings.m_known_file);
-#ifdef NOAUTH
-    m_settings.server_hostname = "che-s-amd1";
+    qDebug() << "known " << misc::toQStringU(settings.m_known_file);
+#ifdef AMD1
+    settings.server_hostname = "che-s-amd1";
 #else
-    m_settings.server_hostname = "emule.is74.ru";
+    settings.server_hostname = "emule.is74.ru";
 #endif    
     if (iface_name.isEmpty())
     {
-        m_session.reset(new libed2k::session(m_finger, NULL, m_settings));
+        m_session.reset(new libed2k::session(finger, NULL, settings));
     }
     else
     {
-        m_session.reset(new libed2k::session(m_finger, iface_name.toAscii().constData(), m_settings));
+        m_session.reset(new libed2k::session(finger, iface_name.toAscii().constData(), settings));
     }
 
     m_session->set_alert_mask(alert::all_categories);
@@ -252,6 +258,7 @@ void QED2KSession::start()
 
 void QED2KSession::stop()
 {
+    m_session->pause();
     saveFastResumeData();
 }
 
@@ -317,8 +324,16 @@ void QED2KSession::banIP(QString ip) {}
 QHash<QString, TrackerInfos> QED2KSession::getTrackersInfo(const QString &hash) const{ 
     return QHash<QString, TrackerInfos>();
 }
-void QED2KSession::setDownloadRateLimit(long rate) {}
-void QED2KSession::setUploadRateLimit(long rate) {}
+void QED2KSession::setDownloadRateLimit(long rate) {
+    session_settings settings = m_session->settings();
+    settings.download_rate_limit = rate;
+    m_session->set_settings(settings);
+}
+void QED2KSession::setUploadRateLimit(long rate) {
+    session_settings settings = m_session->settings();
+    settings.upload_rate_limit = rate;
+    m_session->set_settings(settings);
+}
 void QED2KSession::startUpTransfers()
 {
     loadFastResumeData();
@@ -330,12 +345,16 @@ void QED2KSession::configureSession()
     Preferences pref;
     const unsigned short old_listenPort = m_session->settings().listen_port;
     const unsigned short new_listenPort = pref.listenPort();
+    const int down_limit = pref.getED2KDownloadLimit();
+    const int up_limit = pref.getED2KUploadLimit();
 
     // set common settings before for announce correct nick on server
     libed2k::session_settings s = m_session->settings();
     s.client_name = pref.nick().toUtf8().constData();
-    s.m_show_shared_catalogs    = pref.isShowSharedDirectories();
-    s.m_show_shared_files       = pref.isShowSharedFiles();
+    s.m_show_shared_catalogs = pref.isShowSharedDirectories();
+    s.m_show_shared_files = pref.isShowSharedFiles();
+    s.download_rate_limit = down_limit <= 0 ? -1 : down_limit*1024;
+    s.upload_rate_limit = up_limit <= 0 ? -1 : up_limit*1024;
     m_session->set_settings(s);
 
     if (new_listenPort != old_listenPort)
@@ -396,11 +415,12 @@ void QED2KSession::configureSession()
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
-Transfer QED2KSession::addLink(QString strLink, bool resumed)
+Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
     libed2k::emule_collection_entry ece = libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+    QED2KHandle h;
 
     if (ece.defined())
     {
@@ -410,10 +430,21 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed)
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
-        return QED2KHandle(delegate()->add_transfer(atp));
-    }
+        atp.duplicate_is_error = true;
 
-    return QED2KHandle();
+        try
+        {
+            h = addTransfer(atp);
+        }
+        catch(libed2k::libed2k_exception e)
+        {
+            ec = e.error();
+        }
+    }
+    else
+        ec = "Incorrect link";
+
+    return h;
 }
 
 void QED2KSession::addTransferFromFile(const QString& filename)
@@ -438,6 +469,20 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
+
+    {
+        // do not create file on windows with last point because of Qt truncate it point!
+        bool touch = true;
+#ifdef Q_WS_WIN
+        touch = (!atp.file_path.empty() && (atp.file_path.at(atp.file_path.size() - 1) != '.'));
+#endif
+        QFile f(misc::toQStringU(atp.file_path));
+        if (!f.exists() && touch)
+        {                  
+            f.open(QIODevice::WriteOnly);
+        }
+    }
+
     return QED2KHandle(delegate()->add_transfer(atp));
 }
 
@@ -523,7 +568,6 @@ void QED2KSession::readAlerts()
         if (libed2k::server_connection_initialized_alert* p =
             dynamic_cast<libed2k::server_connection_initialized_alert*>(a.get()))
         {
-            qDebug() << "server connection initialized";
             emit serverConnectionInitialized(p->m_nClientId, p->m_nTCPFlags, p->m_nAuxPort);
         }
         else if (libed2k::server_status_alert* p = dynamic_cast<libed2k::server_status_alert*>(a.get()))
@@ -542,7 +586,6 @@ void QED2KSession::readAlerts()
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
-            qDebug() << "qt server connection closed";
             emit serverConnectionClosed(QString::fromLocal8Bit(p->m_error.message().c_str()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))
@@ -749,16 +792,28 @@ void QED2KSession::saveFastResumeData()
     for (std::vector<transfer_handle>::iterator th_itr = transfers.begin(); th_itr != transfers.end(); th_itr++)
     {
         QED2KHandle h = QED2KHandle(*th_itr);
-        if (!h.is_valid() || !h.has_metadata()) continue;
+        if (!h.is_valid() || !h.has_metadata())
+        {
+            qDebug() << "transfer invalid or hasn't metadata";
+            continue;
+        }
+
         try
         {
 
-            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking) continue;
+            if (h.state() == qt_checking_files || h.state() == qt_queued_for_checking)
+            {
+                qDebug() << "transfer " << h.hash() << " in checking files or queued for checking";
+                continue;
+            }
+
             h.save_resume_data();
             ++num_resume_data;
         }
-        catch(libed2k::libed2k_exception&)
-        {}
+        catch(libed2k::libed2k_exception& e)
+        {
+            qDebug() << "exception on request saving " << misc::toQStringU(e.what());
+        }
     }
 
     while (num_resume_data > 0)
@@ -773,6 +828,7 @@ void QED2KSession::saveFastResumeData()
 
         if (libed2k::save_resume_data_failed_alert const* rda = dynamic_cast<libed2k::save_resume_data_failed_alert const*>(a))
         {
+            qDebug() << "save resume data failed alert " << misc::toQStringU(rda->message().c_str());
             --num_resume_data;
 
             try
@@ -781,8 +837,10 @@ void QED2KSession::saveFastResumeData()
                 if (rda->m_handle.is_valid())
                     delegate()->remove_transfer(rda->m_handle);
             }
-            catch(const libed2k::libed2k_exception&)
-            {}
+            catch(const libed2k::libed2k_exception& e)
+            {
+                qDebug() << "exception on remove transfer after save " << misc::toQStringU(e.what());
+            }
         }
         else if (libed2k::save_resume_data_alert const* rd = dynamic_cast<libed2k::save_resume_data_alert const*>(a))
         {
@@ -793,8 +851,10 @@ void QED2KSession::saveFastResumeData()
             {
                 delegate()->remove_transfer(rd->m_handle);
             }
-            catch(const libed2k::libed2k_exception& )
-            {}
+            catch(const libed2k::libed2k_exception& e)
+            {
+                qDebug() << "exception on remove transfer after save " << misc::toQStringU(e.what());
+            }
         }
 
         delegate()->pop_alert();

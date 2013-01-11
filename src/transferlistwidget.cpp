@@ -284,31 +284,56 @@ void TransferListWidget::pauseVisibleTorrents() {
   }
 }
 
-void TransferListWidget::deleteSelectedTorrents() {
-//  if (main_window->getCurrentTabWidget() != this) return;
+void TransferListWidget::deleteSelectedTorrents()
+{
+    //  if (main_window->getCurrentTabWidget() != this) return;
   const QStringList& hashes = getSelectedTorrentsHashes();
   if (hashes.empty()) return;
   bool delete_local_files = false;
-  if (Preferences().confirmTorrentDeletion() &&
-      !DeletionConfirmationDlg::askForDeletionConfirmation(&delete_local_files))
-    return;
-  foreach (const QString &hash, hashes) {
-    Transfer t = BTSession->getTransfer(hash);
+  bool file_control_active = false;
 
-    if (t.type() == Transfer::ED2K && t.is_seed() && !delete_local_files) {
-      // delete view only
-      listModel->removeTorrent(hash);
-    }
-    else
-      BTSession->deleteTransfer(hash, delete_local_files);
+  // search torrent or completed ed2k transfer and active file control
+  foreach (const QString &hash, hashes)
+  {
+        Transfer t = BTSession->getTransfer(hash);
+        if (t.type() == Transfer::ED2K &&  !t.is_seed())
+            continue;
+
+        file_control_active = true;
+        break;
   }
+
+  if (Preferences().confirmTorrentDeletion() &&
+      !DeletionConfirmationDlg::askForDeletionConfirmation(file_control_active, &delete_local_files))
+    return;
+
+    foreach (const QString &hash, hashes)
+    {
+        Transfer t = BTSession->getTransfer(hash);
+
+        try
+        {
+            if (t.type() == Transfer::ED2K && t.is_seed() && !delete_local_files)
+            {
+                // delete view only
+                listModel->removeTorrent(hash);
+            } // delete bt files by flag, delete ed2k files by flag or ed2k + always on not seed
+            else
+                BTSession->deleteTransfer(hash, delete_local_files || (!t.is_seed() && (t.type() == Transfer::ED2K)));
+
+        }
+        catch(const libtorrent::libtorrent_exception& )
+        {
+        }
+    }
 }
 
-void TransferListWidget::deleteVisibleTorrents() {
+void TransferListWidget::deleteVisibleTorrents()
+{
   if (nameFilterModel->rowCount() <= 0) return;
   bool delete_local_files = false;
   if (Preferences().confirmTorrentDeletion() &&
-      !DeletionConfirmationDlg::askForDeletionConfirmation(&delete_local_files))
+      !DeletionConfirmationDlg::askForDeletionConfirmation(true, &delete_local_files)) // TODO - delete it?
     return;
   QStringList hashes;
   for (int i=0; i<nameFilterModel->rowCount(); ++i) {
@@ -318,6 +343,13 @@ void TransferListWidget::deleteVisibleTorrents() {
   foreach (const QString &hash, hashes) {
     BTSession->deleteTransfer(hash, delete_local_files);
   }
+}
+
+void TransferListWidget::launchSelectedTorrents()
+{
+    const QModelIndexList selectedIndexes = selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        torrentDoubleClicked(selectedIndexes.first());
 }
 
 void TransferListWidget::increasePrioSelectedTorrents() {
@@ -411,6 +443,7 @@ void TransferListWidget::hidePriorityColumn(bool hide) {
 void TransferListWidget::addLinkDialog() {
   Transfer t;
   bool ok;
+  ErrorCode ec;
   QString clipboardText = QApplication::clipboard()->text();
   QString link =
       clipboardText.startsWith("ed2k://", Qt::CaseInsensitive) ||
@@ -421,9 +454,9 @@ void TransferListWidget::addLinkDialog() {
       this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
     if (ok && !link.isEmpty()) {
       t = BTSession->addLink(
-        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed(), false);
+        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed(), false, ec);
       if (!t.is_valid())
-        QMessageBox::critical(this, tr("Incorrect link"), tr("Incorrect link"));
+        QMessageBox::critical(this, tr("Error"), tr(ec ? ec.message().c_str() : "Incorrect link"));
     }
   } while(ok && !t.is_valid());
 }
@@ -737,7 +770,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   bool super_seeding_mode = false;
   bool all_same_sequential_download_mode = true, all_same_prio_firstlast = true;
   bool sequential_download_mode = false, prioritize_first_last = false;
-  bool one_has_metadata = false, one_not_seed = false, one_is_bittorrent = false;
+  bool one_has_metadata = false, one_seed = false, one_not_seed = false, one_is_bittorrent = false;
   bool first = true;
   bool has_view = true;
   Transfer h;
@@ -769,6 +802,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
       }
     }
     else {
+      one_seed = true;
       if (!one_not_seed && all_same_super_seeding && h.has_metadata()) {
         if (first) {
           super_seeding_mode = h.super_seeding();
@@ -802,9 +836,10 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     listMenu.addSeparator();
     listMenu.addAction(&actionDelete);
     listMenu.addSeparator();
-    listMenu.addAction(&actionSetTorrentPath);
+    if (!one_seed)
+      listMenu.addAction(&actionSetTorrentPath);
   }
-  if (selectedIndexes.size() == 1)
+  if (selectedIndexes.size() == 1 && one_not_seed)
     listMenu.addAction(&actionRename);
   // Label Menu
   QStringList customLabels = getCustomLabels();

@@ -857,12 +857,13 @@ void QBtSession::loadTorrentSettings(QTorrentHandle& h) {
 #endif
 }
 
-Transfer QBtSession::addLink(QString strLink, bool resumed)
+Transfer QBtSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
   QTorrentHandle h;
   const QString hash(misc::magnetUriToHash(strLink));
-  if (hash.isEmpty()) {
+  if (!strLink.startsWith("magnet:", Qt::CaseInsensitive) || hash.isEmpty()) {
     addConsoleMessage(tr("'%1' is not a valid magnet URI.").arg(strLink));
+    ec = "Incorrect link";
     return h;
   }
   const QDir torrentBackup(misc::BTBackupLocation());
@@ -872,13 +873,13 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
     if (QFile::exists(torrent_path))
       return addTorrent(torrent_path, false, QString::null, true);
   }
-  qDebug("Adding a magnet URI: %s", qPrintable(hash));
-  Q_ASSERT(strLink.startsWith("magnet:", Qt::CaseInsensitive));
 
+  qDebug("Adding a magnet URI: %s", qPrintable(hash));
   // Check for duplicate torrent
   if (s->find_torrent(QStringToSha1(hash)).is_valid()) {
     qDebug("/!\\ Torrent is already in download list");
     addConsoleMessage(tr("'%1' is already in download list.", "e.g: 'xxx.avi' is already in download list.").arg(strLink));
+    ec = libtorrent::errors::duplicate_torrent;
     return h;
   }
 
@@ -905,9 +906,10 @@ Transfer QBtSession::addLink(QString strLink, bool resumed)
 
   // Adding torrent to Bittorrent session
   try {
-    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toStdString(), p));
-  }catch(std::exception e) {
+    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toUtf8().constData(), p));
+  }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
+    ec = e.error();
   }
   // Check if it worked
   if (!h.is_valid()) {
@@ -2164,24 +2166,7 @@ void QBtSession::readAlerts() {
     else if (file_renamed_alert* p = dynamic_cast<file_renamed_alert*>(a.get())) {
       QTorrentHandle h(p->handle);
       if (h.is_valid()) {
-        if (h.num_files() > 1) {
-          // Check if folders were renamed
-          QStringList old_path_parts = h.orig_filepath_at(p->index).split("/");
-          old_path_parts.removeLast();
-          QString old_path = old_path_parts.join("/");
-          QStringList new_path_parts = misc::toQStringU(p->name).split("/");
-          new_path_parts.removeLast();
-          if (!new_path_parts.isEmpty() && old_path != new_path_parts.join("/")) {
-            qDebug("Old_path(%s) != new_path(%s)", qPrintable(old_path), qPrintable(new_path_parts.join("/")));
-            old_path = h.save_path()+"/"+old_path;
-            qDebug("Detected folder renaming, attempt to delete old folder: %s", qPrintable(old_path));
-            QDir().rmpath(old_path);
-          }
-        } else {
-          // Single-file torrent
-          // Renaming a file corresponds to changing the save path
-          emit savePathChanged(h);
-        }
+        emit savePathChanged(h);
       }
     }
     else if (torrent_deleted_alert* p = dynamic_cast<torrent_deleted_alert*>(a.get())) {
@@ -2279,18 +2264,23 @@ void QBtSession::readAlerts() {
           h.pause();
       }
     }
-    else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get())) {
+    else if (file_completed_alert* p = dynamic_cast<file_completed_alert*>(a.get()))
+    {
       QTorrentHandle h(p->handle);
-      qDebug("A file completed download in torrent %s", qPrintable(h.name()));
-      if (appendqBExtension) {
-        qDebug("appendqBTExtension is true");
-        QString name = h.filepath_at(p->index);
-        if (name.endsWith(".!qB")) {
-          const QString old_name = name;
-          name.chop(4);
-          qDebug("Renaming %s to %s", qPrintable(old_name), qPrintable(name));
-          h.rename_file(p->index, name);
-        }
+
+      if (h.is_valid())
+      {
+          qDebug("A file completed download in torrent %s", qPrintable(h.name()));
+          if (appendqBExtension) {
+            qDebug("appendqBTExtension is true");
+            QString name = h.filepath_at(p->index);
+            if (name.endsWith(".!qB")) {
+              const QString old_name = name;
+              name.chop(4);
+              qDebug("Renaming %s to %s", qPrintable(old_name), qPrintable(name));
+              h.rename_file(p->index, name);
+            }
+          }
       }
     }
     else if (torrent_paused_alert* p = dynamic_cast<torrent_paused_alert*>(a.get())) {
@@ -2530,7 +2520,8 @@ void QBtSession::downloadFromURLList(const QStringList& urls) {
 }
 
 void QBtSession::addMagnetSkipAddDlg(QString uri) {
-  addLink(uri, false);
+  ErrorCode ec;
+  addLink(uri, false, ec);
 }
 
 void QBtSession::downloadUrlAndSkipDialog(QString url, QString save_path, QString label) {
@@ -2620,6 +2611,7 @@ void QBtSession::startUpTransfers() {
   // End of safety measure
 
   qDebug("Starting up torrents");
+  ErrorCode ec;
   if (isQueueingEnabled()) {
     priority_queue<QPair<int, QString>, vector<QPair<int, QString> >, std::greater<QPair<int, QString> > > torrent_queue;
     foreach (const QString &hash, known_torrents) {
@@ -2639,7 +2631,7 @@ void QBtSession::startUpTransfers() {
       torrent_queue.pop();
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash)) {
-        addLink(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true, ec);
       } else {
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
       }
@@ -2649,7 +2641,7 @@ void QBtSession::startUpTransfers() {
     foreach (const QString &hash, known_torrents) {
       qDebug("Starting up torrent %s", qPrintable(hash));
       if (TorrentPersistentData::isMagnet(hash))
-        addLink(TorrentPersistentData::getMagnetUri(hash), true);
+        addLink(TorrentPersistentData::getMagnetUri(hash), true, ec);
       else
         addTorrent(torrentBackup.path()+QDir::separator()+hash+".torrent", false, QString(), true);
     }

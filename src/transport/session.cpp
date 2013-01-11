@@ -366,16 +366,22 @@ void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
     for_each(boost::bind(&SessionBase::enableIPFilter, _1, filter_path, force));
 }
 
-Transfer Session::addLink(QString strLink, bool resumed)
+Transfer Session::addLink(QString strLink, bool resumed, ErrorCode& ec)
 {
     qDebug() << "add ED2K/magnet link: " << strLink;
 
     if (strLink.startsWith("ed2k://"))
     {
-        return m_edSession.addLink(strLink, resumed);
+        return m_edSession.addLink(strLink, resumed, ec);
     }
 
-    return m_btSession.addLink(strLink, resumed);
+    return m_btSession.addLink(strLink, resumed, ec);
+}
+
+Transfer Session::addLink(QString strLink, bool resumed /* = false */)
+{
+    ErrorCode ec;
+    return addLink(strLink, resumed, ec);
 }
 
 void Session::addTransferFromFile(const QString& filename)
@@ -501,7 +507,9 @@ void Session::saveFastResumeData()
 
 void Session::on_ED2KResumeDataLoaded()
 {
+    emit beginLoadSharedFileSystem();
     loadFileSystem();
+    emit endLoadSharedFileSystem();
 }
 
 void Session::on_registerNode(Transfer t)
@@ -511,8 +519,9 @@ void Session::on_registerNode(Transfer t)
         FileNode* n = NULL;
         qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
         n = node(t.absolute_files_path().at(0));
-        Q_ASSERT(n);
-        n->on_transfer_finished(t);
+        Q_ASSERT(n != &m_root);
+        if (n != &m_root)
+            n->on_transfer_finished(t);
     }
 }
 
@@ -706,6 +715,7 @@ FileNode* Session::node(const QString& filepath)
 
 void Session::prepare_collections()
 {
+    int i = 10; // limit collections sharing at moment to avoid gui hang up
     for (std::set<DirNode*>::iterator itr = m_dirs.begin(); itr != m_dirs.end(); ++itr)
     {
         DirNode* p = *itr;
@@ -713,7 +723,11 @@ void Session::prepare_collections()
         if (p->is_active() && !p->has_transfer())
         {
             p->build_collection();
+            --i;
         }
+
+        if (i == 0)
+            break;
     }
 }
 
@@ -740,21 +754,20 @@ void Session::saveFileSystem()
         pref.setValue("Path", p->filepath());
         QStringList efiles = p->exclude_files();
 
+        pref.beginWriteArray("ExcludeFiles", efiles.size());
         if (!efiles.isEmpty())
         {
-            int file_indx = 0;
-            pref.beginWriteArray("ExcludeFiles", efiles.size());
+            int file_indx = 0;            
 
             foreach(const QString& efile, efiles)
             {
                 pref.setArrayIndex(file_indx);
                 pref.setValue("FileName", efile);
                 ++file_indx;
-            }
-
-            pref.endArray();
+            }            
         }
 
+        pref.endArray();
         ++dir_indx;
     }
 
@@ -764,8 +777,7 @@ void Session::saveFileSystem()
 
 void Session::loadFileSystem()
 {
-    qDebug() << "load file system";
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    qDebug() << "load file system";    
     Preferences pref;
     typedef QPair<QString, QVector<QString> > SD;
     QVector<SD> vf;
@@ -795,6 +807,7 @@ void Session::loadFileSystem()
     }
 
     pref.endArray();
+    pref.endGroup();
 
     // sort dirs ASC to avoid update states on sharing
     std::sort(vf.begin(), vf.end());
@@ -822,11 +835,13 @@ void Session::loadFileSystem()
         }
     }
 
+    // this call do nothing when incoming dir in share list
+    // because call executes on shared node in non-recursive manner does nothing
     share(m_incoming, false);
 
     if (pref.isMigrationStage())
     {
-        qDebug() << "in migration stage process shared files also";
+        qDebug() << "on migration stage process shared files also";
 
         foreach(QString filepath, misc::migrationSharedFiles())
         {
@@ -834,8 +849,6 @@ void Session::loadFileSystem()
             share(filepath, false);
         }
     }
-
-    QApplication::restoreOverrideCursor();
 }
 
 void Session::dropDirectoryTransfers()

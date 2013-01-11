@@ -2265,6 +2265,26 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <source>Server connection</source>
         <translation>Соединение с сервером</translation>
     </message>
+    <message>
+        <source>Create sessions...</source>
+        <translation>Создание сессий...</translation>
+    </message>
+    <message>
+        <source>Startup transfers...</source>
+        <translation>Загрузка раздач...</translation>
+    </message>
+    <message>
+        <source>Startup sessions...</source>
+        <translation>Запуск сессий...</translation>
+    </message>
+    <message>
+        <source>Begin load shared filesystem...</source>
+        <translation>Загрузка расшаренных директорий...</translation>
+    </message>
+    <message>
+        <source>Shared filesystem loading was completed...</source>
+        <translation>Загрузка расшаренных директорий завершена</translation>
+    </message>
 </context>
 <context>
     <name>PeerAdditionDlg</name>
@@ -3153,6 +3173,10 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>Torrent Rate Limits</source>
         <translation>Ограничения скорости торрент закачек</translation>
+    </message>
+    <message>
+        <source>Mule Rate Limits</source>
+        <translation>Ограничения скорости осло закачек</translation>
     </message>
     <message>
         <source>Alternative Torrent Rate Limits</source>
@@ -5085,8 +5109,20 @@ Do you want to install it now?</source>
         <translation>ED2K/magnet ссылка:</translation>
     </message>
     <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
         <source>Incorrect link</source>
         <translation>Некорректная ссылка</translation>
+    </message>
+    <message>
+        <source>transfer already exists in session</source>
+        <translation>Файл существует</translation>
+    </message>
+    <message>
+        <source>torrent already exists in session</source>
+        <translation>Торрент уже присутствует в списке закачек</translation>
     </message>
     <message>
         <source>View file...</source>

@@ -40,7 +40,7 @@ class DeletionConfirmationDlg : public QDialog, private Ui::confirmDeletionDlg {
   Q_OBJECT
 
   public:
-  DeletionConfirmationDlg(QWidget *parent=0): QDialog(parent) {
+  DeletionConfirmationDlg(bool file_control_active, QWidget *parent=0): QDialog(parent) {
     setupUi(this);
     // Icons
     lbl_warn->setPixmap(IconProvider::instance()->getIcon("dialog-warning").pixmap(lbl_warn->height()));
@@ -48,22 +48,35 @@ class DeletionConfirmationDlg : public QDialog, private Ui::confirmDeletionDlg {
     rememberBtn->setIcon(IconProvider::instance()->getIcon("object-locked"));
 
     move(misc::screenCenter(this));
-    checkPermDelete->setChecked(Preferences().deleteTorrentFilesAsDefault());
-    connect(checkPermDelete, SIGNAL(clicked()), this, SLOT(updateRememberButtonState()));
+    if (file_control_active)
+    {
+        checkPermDelete->setChecked(Preferences().deleteTorrentFilesAsDefault());
+        connect(checkPermDelete, SIGNAL(clicked()), this, SLOT(updateRememberButtonState()));
+    }
+    else
+    {
+        checkPermDelete->setChecked(true);
+        checkPermDelete->setEnabled(false);        
+    }
+
     buttonBox->setFocus();
+
   }
 
   bool shouldDeleteLocalFiles() const {
     return checkPermDelete->isChecked();
   }
 
-  static bool askForDeletionConfirmation(bool *delete_local_files) {
-    DeletionConfirmationDlg dlg;
-    if (dlg.exec() == QDialog::Accepted) {
-      *delete_local_files = dlg.shouldDeleteLocalFiles();
-      return true;
-    }
-    return false;
+  static bool askForDeletionConfirmation(bool file_control_active, bool *delete_local_files)
+  {
+      DeletionConfirmationDlg dlg(file_control_active);
+      if (dlg.exec() == QDialog::Accepted)
+      {
+        *delete_local_files = dlg.shouldDeleteLocalFiles();
+        return true;
+      }
+
+      return false;
   }
 
 private slots:

@@ -113,9 +113,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
 
     vboxLayout2->addLayout(hboxLayout2);  
     vboxLayout2->addWidget(peersList);  
-
-    connect(transferList->getSourceModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
-    connect(transferList->getSourceModel(), SIGNAL(rowsRemoved(QModelIndex, int, int)), mainWindow, SLOT(updateNbTorrents()));
     transferList->getSourceModel()->populate();
 
     connect(btnSwitch, SIGNAL(clicked()), this, SLOT(btnSwitchClick()));
@@ -142,6 +139,7 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     mainToolBar->setIconSize(QSize(24, 24));
     mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     mainToolBar->setFloatable(false);
+    setContextMenuPolicy(Qt::NoContextMenu);
 
     actionOpen = new QAction(this);
     actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
@@ -153,6 +151,7 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionDelete->setObjectName(QString::fromUtf8("actionDelete"));
     actionDelete->setToolTip(tr("Delete"));
     actionDelete->setIcon(IconProvider::instance()->getIcon("list-remove"));
+    actionDelete->setShortcut(QKeySequence(QString::fromUtf8("Del")));
 
     actionStart = new QAction(this);
     actionStart->setObjectName(QString::fromUtf8("actionStart"));
@@ -164,18 +163,25 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionPause->setToolTip(tr("Pause"));
     actionPause->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
 
+    actionLaunch = new QAction(this);
+    actionLaunch->setObjectName(QString::fromUtf8("actionLaunch"));
+    actionLaunch->setToolTip(tr("Launch"));
+    actionLaunch->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+    actionLaunch->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
+    addAction(actionLaunch);
+
     mainToolBar->addAction(actionOpen);
     mainToolBar->addAction(actionDelete);
     mainToolBar->addSeparator();
     mainToolBar->addAction(actionStart);
     mainToolBar->addAction(actionPause);
-
     addToolBar(Qt::LeftToolBarArea, mainToolBar);
 
     connect(actionOpen, SIGNAL(triggered()), mainWindow, SLOT(on_actionOpen_triggered()));
     connect(actionDelete, SIGNAL(triggered()), transferList, SLOT(deleteSelectedTorrents()));
     connect(actionStart, SIGNAL(triggered()), transferList, SLOT(startSelectedTorrents()));
     connect(actionPause, SIGNAL(triggered()), transferList, SLOT(pauseSelectedTorrents()));
+    connect(actionLaunch, SIGNAL(triggered()), transferList, SLOT(launchSelectedTorrents()));
       
     connect(peersList, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(sendMessageToPeer(const QString&, const libed2k::net_identifier&)));
     connect(peersList, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addPeerToFriends(const QString&, const libed2k::net_identifier&)));

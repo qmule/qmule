@@ -107,25 +107,20 @@ public:
     void cancelTransferParameters(const QString& filepath);
     std::pair<libed2k::add_transfer_params, libed2k::error_code> makeTransferParameters(const QString& filepath) const;
 
-    /**
-      * scan ed2k backup directory and load all files were matched name filter
-      *
-    */
+    /** scan ed2k backup directory and load all files were matched name filter */
     void loadFastResumeData();
 
     libed2k::session* delegate() const;
 
 private:
     QScopedPointer<libed2k::session> m_session;
-    libed2k::session_settings m_settings;
-    libed2k::fingerprint m_finger;
     QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
     void remove_by_state();
 public slots:
 	void startUpTransfers();
 	void configureSession();
 	void enableIPFilter(const QString &filter_path, bool force=false);	
-    virtual Transfer addLink(QString strLink, bool resumed = false);
+    virtual Transfer addLink(QString strLink, bool resumed, ErrorCode& ec);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
 

@@ -222,8 +222,8 @@ void TorrentModel::populate() {
   // Listen for torrent changes
   connect(Session::instance(), SIGNAL(addedTransfer(Transfer)),
           SLOT(addTorrent(Transfer)));
-  connect(Session::instance(), SIGNAL(transferAboutToBeRemoved(Transfer)),
-          SLOT(handleTorrentAboutToBeRemoved(Transfer)));
+  connect(Session::instance(), SIGNAL(transferAboutToBeRemoved(Transfer, bool)),
+          SLOT(handleTorrentAboutToBeRemoved(Transfer, bool)));
   connect(Session::instance(), SIGNAL(deletedTransfer(QString)),
           SLOT(removeTorrent(QString)));
   connect(Session::instance(), SIGNAL(finishedTransfer(Transfer)),
@@ -502,7 +502,7 @@ QString TorrentModel::torrentHash(int row) const
   return QString();
 }
 
-void TorrentModel::handleTorrentAboutToBeRemoved(const Transfer &h)
+void TorrentModel::handleTorrentAboutToBeRemoved(const Transfer &h, bool)
 {
   const int row = torrentRow(h.hash());
   if (row >= 0) {

@@ -47,6 +47,42 @@ QString QED2KHandle::creation_date() const { return QString(); }
 QString QED2KHandle::comment() const { return QString(); }
 QString QED2KHandle::next_announce() const { return QString(); }
 TransferStatus QED2KHandle::status() const { return transfer_status2TS(m_delegate.status()); }
+TransferState QED2KHandle::state() const
+{
+    TransferState ts;
+
+    switch (m_delegate.state())
+    {
+        case libed2k::transfer_status::queued_for_checking:
+            ts = qt_queued_for_checking;
+            break;
+        case libed2k::transfer_status::checking_files:
+            ts = qt_checking_files;
+            break;
+        case libed2k::transfer_status::downloading_metadata:
+            ts = qt_downloading_metadata;
+            break;
+        case libed2k::transfer_status::downloading:
+            ts = qt_downloading;
+            break;
+        case libed2k::transfer_status::finished:
+            ts = qt_seeding;
+            break;
+        case libed2k::transfer_status::seeding:
+            ts = qt_seeding;
+            break;
+        case libed2k::transfer_status::allocating:
+            ts = qt_allocating;
+            break;
+        case libed2k::transfer_status::checking_resume_data:
+            ts = qt_checking_resume_data;
+            break;
+        default:
+            ts = qt_unhandled_state;
+    }
+
+    return (ts);
+}
 
 TransferInfo QED2KHandle::get_info() const
 {
