@@ -258,6 +258,7 @@ void QED2KSession::start()
 
 void QED2KSession::stop()
 {
+    m_session->pause();
     saveFastResumeData();
 }
 
@@ -430,10 +431,13 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
         atp.file_path = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
         atp.duplicate_is_error = true;
-        try {
-            h = QED2KHandle(delegate()->add_transfer(atp));
+
+        try
+        {
+            h = addTransfer(atp);
         }
-        catch(libed2k::libed2k_exception e){
+        catch(libed2k::libed2k_exception e)
+        {
             ec = e.error();
         }
     }
@@ -465,6 +469,15 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
+
+    {
+        QFile f(misc::toQStringU(atp.file_path));
+        if (!f.exists())
+        {
+            f.open(QIODevice::WriteOnly);
+        }
+    }
+
     return QED2KHandle(delegate()->add_transfer(atp));
 }
 

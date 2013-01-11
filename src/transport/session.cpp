@@ -520,7 +520,8 @@ void Session::on_registerNode(Transfer t)
         qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
         n = node(t.absolute_files_path().at(0));
         Q_ASSERT(n != &m_root);
-        n->on_transfer_finished(t);
+        if (n != &m_root)
+            n->on_transfer_finished(t);
     }
 }
 

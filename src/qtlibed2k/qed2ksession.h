@@ -107,10 +107,7 @@ public:
     void cancelTransferParameters(const QString& filepath);
     std::pair<libed2k::add_transfer_params, libed2k::error_code> makeTransferParameters(const QString& filepath) const;
 
-    /**
-      * scan ed2k backup directory and load all files were matched name filter
-      *
-    */
+    /** scan ed2k backup directory and load all files were matched name filter */
     void loadFastResumeData();
 
     libed2k::session* delegate() const;
