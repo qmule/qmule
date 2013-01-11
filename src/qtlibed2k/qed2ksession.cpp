@@ -471,9 +471,14 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
 
     {
+        // do not create file on windows with last point because of Qt truncate it point!
+        bool touch = true;
+#ifdef Q_WS_WIN
+        touch = (!atp.file_path.empty() && (atp.file_path.at(atp.file_path.size() - 1) != '.'));
+#endif
         QFile f(misc::toQStringU(atp.file_path));
-        if (!f.exists())
-        {
+        if (!f.exists() && touch)
+        {                  
             f.open(QIODevice::WriteOnly);
         }
     }
