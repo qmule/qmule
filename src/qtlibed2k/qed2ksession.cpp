@@ -431,10 +431,13 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
         atp.file_path = filepath.toUtf8().constData();
         atp.file_size = ece.m_filesize;
         atp.duplicate_is_error = true;
-        try {
-            h = QED2KHandle(delegate()->add_transfer(atp));
+
+        try
+        {
+            h = addTransfer(atp);
         }
-        catch(libed2k::libed2k_exception e){
+        catch(libed2k::libed2k_exception e)
+        {
             ec = e.error();
         }
     }
