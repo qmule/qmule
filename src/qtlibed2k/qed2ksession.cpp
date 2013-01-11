@@ -466,6 +466,15 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
     qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
+
+    {
+        QFile f(misc::toQStringU(atp.file_path));
+        if (!f.exists())
+        {
+            f.open(QIODevice::WriteOnly);
+        }
+    }
+
     return QED2KHandle(delegate()->add_transfer(atp));
 }
 
