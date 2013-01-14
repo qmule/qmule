@@ -210,6 +210,9 @@ void messages_widget::startChat(const QString& user_name, const libed2k::net_ide
 {
     QTextEdit* edit = new QTextEdit(this);
     edit->setReadOnly(true);
+    QTextOption to;
+    to.setTextDirection(Qt::LeftToRight);
+    edit->document()->setDefaultTextOption(to);
     int new_tab = tabWidget->addTab(edit, QIcon(":/emule/users/Chat.ico"), user_name);    
     tabWidget->setCurrentIndex(new_tab);
 
@@ -687,8 +690,8 @@ void messages_widget::enableButtons(bool enable)
 
 void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color)
 {
-    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + color + "'>" +
-                       name + ": </font><font color='000000'>" + msg + "</font><br>";
+    QString htmlText = "<tr><td>&#91;" + QDateTime::currentDateTime().toString("hh:mm") + "&#93;" + "<font color='" + color + "'>&#x200D;" +
+                       name + ": &#x200D;</font><font color='#000000'>" + msg + "</font></td></tr>";
     edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
     edit->moveCursor(QTextCursor::End);
@@ -696,8 +699,8 @@ void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QSt
 
 void messages_widget::addSystemMessage(QTextEdit* edit, const QString& msg)
 {
-    QString htmlText = "[" + QDateTime::currentDateTime().toString("hh:mm") + "] " + "<font color='" + systemColor + "'>" +
-                       msg + "</font><br>";
+    QString htmlText = "<tr><td>&#91;" + QDateTime::currentDateTime().toString("hh:mm") + "&#93;" + "<font color='" + systemColor + "'>&#x200D;" +
+                       msg + "&#x200D;</font></td></tr>";
     edit->moveCursor(QTextCursor::End);
     edit->insertHtml(htmlText);
     edit->moveCursor(QTextCursor::End);
