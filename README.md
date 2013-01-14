@@ -19,3 +19,5 @@ Dependencies:
 - Qt4
 - libtorrent-rasterbar
 - libed2k
+
+See [screenshots](https://github.com/qmule/qmule/wiki/Screenshots).
