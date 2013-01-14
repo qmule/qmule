@@ -415,17 +415,20 @@ void QED2KSession::configureSession()
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
-Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
+QPair<Transfer,ErrorCode> QED2KSession::addLink(QString strLink, bool resumed /* = false */)
 {
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
-    libed2k::emule_collection_entry ece = libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+    libed2k::emule_collection_entry ece =
+        libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
     QED2KHandle h;
+    ErrorCode ec;
 
     if (ece.defined())
     {
         qDebug("Link is correct, add transfer");
-        QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+        QString filepath = QDir(Preferences().getSavePath()).filePath(
+            QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8().constData();
@@ -444,18 +447,20 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
     else
         ec = "Incorrect link";
 
-    return h;
+    return qMakePair(Transfer(h), ec);
 }
 
 void QED2KSession::addTransferFromFile(const QString& filename)
 {
     if (QFile::exists(filename))
     {
-        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(filename.toLocal8Bit().constData());
+        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(
+            filename.toLocal8Bit().constData());
 
         foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
         {
-            QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+            QString filepath = QDir(Preferences().getSavePath()).filePath(
+                QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
             qDebug() << "add transfer " << filepath;
             libed2k::add_transfer_params atp;
             atp.file_hash = ece.m_filehash;

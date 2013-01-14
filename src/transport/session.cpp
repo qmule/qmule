@@ -310,7 +310,7 @@ void Session::deferPlayMedia(Transfer t, int fileIndex)
 
 void Session::playLink(const QString& strLink)
 {
-    deferPlayMedia(addLink(strLink), 0);
+    deferPlayMedia(addLink(strLink).first, 0);
 }
 
 bool Session::playMedia(Transfer t, int fileIndex)
@@ -366,22 +366,16 @@ void Session::enableIPFilter(const QString &filter_path, bool force/*=false*/)
     for_each(boost::bind(&SessionBase::enableIPFilter, _1, filter_path, force));
 }
 
-Transfer Session::addLink(QString strLink, bool resumed, ErrorCode& ec)
+QPair<Transfer,ErrorCode> Session::addLink(QString strLink, bool resumed /* = false */)
 {
     qDebug() << "add ED2K/magnet link: " << strLink;
 
     if (strLink.startsWith("ed2k://"))
     {
-        return m_edSession.addLink(strLink, resumed, ec);
+        return m_edSession.addLink(strLink, resumed);
     }
 
-    return m_btSession.addLink(strLink, resumed, ec);
-}
-
-Transfer Session::addLink(QString strLink, bool resumed /* = false */)
-{
-    ErrorCode ec;
-    return addLink(strLink, resumed, ec);
+    return m_btSession.addLink(strLink, resumed);
 }
 
 void Session::addTransferFromFile(const QString& filename)

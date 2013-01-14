@@ -84,11 +84,8 @@ public slots:
 	void enableIPFilter(const QString &filter_path, bool force=false);
     void playLink(const QString& strLink);
 
-    /**
-     * select appropriate session and run command on it
-     */
-    Transfer addLink(QString strLink, bool resumed, ErrorCode& ec);
-    Transfer addLink(QString strLink, bool resumed = false);
+    /** select appropriate session and run command on it */
+    QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false);
     void addTransferFromFile(const QString& filename);
 
 signals:

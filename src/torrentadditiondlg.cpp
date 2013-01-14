@@ -698,7 +698,7 @@ void torrentAdditionDialog::on_OkButton_clicked() {
   // Add to download list
   Transfer th;
   if (is_magnet)
-    th = Session::instance()->addLink(from_url, false);
+    th = Session::instance()->addLink(from_url, false).first;
   else
     th = Session::instance()->addTorrent(filePath, false, from_url);
   if (addInPause->isChecked() && th.is_valid()) {

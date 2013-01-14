@@ -90,7 +90,7 @@ public:
     virtual void readAlerts() = 0;
     virtual void saveTempFastResumeData() = 0;
     virtual void saveFastResumeData() = 0;
-    virtual Transfer addLink(QString strLink, bool resumed, ErrorCode& ec) = 0;
+    virtual QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false) = 0;
     virtual void addTransferFromFile(const QString& filename) = 0;
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&) = 0;   //!< ed2k session only
 
@@ -221,12 +221,8 @@ public:
     void readAlerts() { DEFER0(readAlerts); }
     void saveTempFastResumeData() { DEFER0(saveTempFastResumeData); }
     void saveFastResumeData() { DEFER0(saveFastResumeData); }
-    Transfer addLink(QString strLink, bool resumed, ErrorCode& ec)
-    {
-        // TODO: add link deferring is not supported
-        Q_ASSERT(S::started());
-        return S::addLink(strLink, resumed, ec);
-    }
+    QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false) {
+        DEFER_RETURN2(addLink, strLink, resumed, (QPair<Transfer,ErrorCode>())); }
     void addTransferFromFile(const QString& filename) { DEFER1(addTransferFromFile, filename); }
     QED2KHandle addTransfer(const libed2k::add_transfer_params& atp) {
         DEFER_RETURN1(addTransfer, atp, QED2KHandle()); }
