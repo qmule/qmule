@@ -148,6 +148,7 @@ options_imp::options_imp(QWidget *parent):
   connect(checkAssociateTorrents, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAssociateMagnetLinks, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAssociateecolls, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(checkAssociateED2KLinks, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
 #endif
   // Downloads tab
   connect(textSavePath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
@@ -359,8 +360,9 @@ void options_imp::saveOptions() {
 #ifdef Q_WS_WIN
   // Windows: file association settings
   Preferences::setTorrentFileAssoc(checkAssociateTorrents->isChecked());
-  Preferences::setMagnetLinkAssoc(checkAssociateMagnetLinks->isChecked());
+  Preferences::setLinkAssoc("Magnet", checkAssociateMagnetLinks->isChecked());
   Preferences::setEmuleFileAssoc(checkAssociateecolls->isChecked());
+  Preferences::setLinkAssoc("ed2k", checkAssociateED2KLinks->isChecked());
   Preferences::setCommonAssocSection(checkAssociateTorrents->isChecked() || checkAssociateecolls->isChecked());
 #endif
   // End General preferences
@@ -530,8 +532,9 @@ void options_imp::loadOptions() {
 #ifdef Q_WS_WIN
   // Windows: file association settings
   checkAssociateTorrents->setChecked(Preferences::isTorrentFileAssocSet());
-  checkAssociateMagnetLinks->setChecked(Preferences::isMagnetLinkAssocSet());
+  checkAssociateMagnetLinks->setChecked(Preferences::isLinkAssocSet("Magnet"));
   checkAssociateecolls->setChecked(Preferences::isEmuleFileAssocSet());
+  checkAssociateED2KLinks->setChecked(Preferences::isLinkAssocSet("ed2k"));
 #endif
   // End General preferences
   // Downloads preferences
@@ -1246,7 +1249,7 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Danish: return QString::fromUtf8("Dansk");
   case QLocale::Bulgarian: return QString::fromUtf8("Български");
   case QLocale::Ukrainian: return QString::fromUtf8("Українська");
-  case QLocale::Russian: return QString::fromUtf8("Русский");
+  case QLocale::Russian: return QString::fromUtf8("� усский");
   case QLocale::Japanese: return QString::fromUtf8("日本語");
   case QLocale::Arabic: return QString::fromUtf8("عربي");
   case QLocale::Georgian: return QString::fromUtf8("ქა �თული");

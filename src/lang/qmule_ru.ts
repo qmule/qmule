@@ -3131,6 +3131,10 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation>Использовать qMule для .torrent файлов</translation>
     </message>
     <message>
+        <source>Use qMule for ed2k links</source>
+        <translation>Использовать qMule для ed2k ссылок</translation>
+    </message>
+    <message>
         <source>Use qMule for magnet links</source>
         <translation>Использовать qMule для magnet ссылок</translation>
     </message>

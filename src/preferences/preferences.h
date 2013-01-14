@@ -1368,12 +1368,13 @@ public:
       setFileAssoc(QString(".emulecollection"), set);
   }
 
-  static bool isMagnetLinkAssocSet() {
+  static bool isLinkAssocSet(const QString& link)
+  {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // Check magnet link assoc
     QRegExp exe_reg("\"([^\"]+)\".*");
-    QString shell_command = settings.value("Magnet/shell/open/command/Default", "").toString();
+    QString shell_command = settings.value(link + "/shell/open/command/Default", "").toString();
     if (exe_reg.indexIn(shell_command) < 0)
       return false;
     QString assoc_exe = exe_reg.cap(1);
@@ -1383,7 +1384,7 @@ public:
     return true;
   }
 
-  static void setMagnetLinkAssoc(bool set) {
+  static void setLinkAssoc(const QString& link, bool set) {
     QSettings settings("HKEY_CURRENT_USER\\Software\\Classes", QIniSettings::NativeFormat);
 
     // Magnet association
@@ -1391,19 +1392,19 @@ public:
       const QString command_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\" \"%1\"";
       const QString icon_str = "\""+qApp->applicationFilePath().replace("/", "\\")+"\",1";
 
-      settings.setValue("Magnet/Default", "Magnet URI");
-      settings.setValue("Magnet/Content Type", "application/x-magnet");
-      settings.setValue("Magnet/URL Protocol", "");
-      settings.setValue("Magnet/DefaultIcon/Default", icon_str);
-      settings.setValue("Magnet/shell/Default", "open");
-      settings.setValue("Magnet/shell/open/command/Default", command_str);
+      settings.setValue(link + "/Default", QString(link + QString(" URI")));
+      settings.setValue(link + "/Content Type", QString("application/x-" + link.toLower()));
+      settings.setValue(link + "/URL Protocol", "");
+      settings.setValue(link + "/DefaultIcon/Default", icon_str);
+      settings.setValue(link + "/shell/Default", "open");
+      settings.setValue(link + "/shell/open/command/Default", command_str);
     } else {
-      settings.remove("Magnet/Default");
-      settings.remove("Magnet/Content Type");
-      settings.remove("Magnet/URL Protocol");
-      settings.remove("Magnet/DefaultIcon/Default");
-      settings.remove("Magnet/shell/Default");
-      settings.remove("Magnet/shell/open/command/Default");
+      settings.remove(link + "/Default");
+      settings.remove(link + "/Content Type");
+      settings.remove(link + "/URL Protocol");
+      settings.remove(link + "/DefaultIcon/Default");
+      settings.remove(link + "/shell/Default");
+      settings.remove(link + "/shell/open/command/Default");
     }
   }
 #endif

@@ -1054,13 +1054,14 @@ void MainWindow::on_actionConnect_triggered()
 // the right addTorrent function, considering
 // the parameter type.
 void MainWindow::processParams(const QString& params_str) {
-  processParams(params_str.split("|", QString::SkipEmptyParts));
+  processParams(params_str.split(" ", QString::SkipEmptyParts));
 }
 
 void MainWindow::processParams(const QStringList& params)
 {
   Preferences pref;    
   const bool useTorrentAdditionDialog = pref.useAdditionDialog();
+  qDebug() << "process params: " << params;
 
   foreach (QString param, params)
   {
@@ -1675,14 +1676,18 @@ void MainWindow::on_endLoadSharedFileSystem()
 #ifdef Q_WS_WIN
     Preferences pref;
     if (!pref.neverCheckFileAssoc() &&
-          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
+          (!Preferences::isTorrentFileAssocSet() ||
+           !Preferences::isLinkAssocSet("Magnet") ||
+           !Preferences::isEmuleFileAssocSet()) ||
+           !Preferences::isLinkAssocSet("ed2k"))
     {
         if (QMessageBox::question(0, tr("Torrent file association"),
                                  tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
                                  QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
         {
             Preferences::setTorrentFileAssoc(true);
-            Preferences::setMagnetLinkAssoc(true);
+            Preferences::setLinkAssoc("Magnet", true);
+            Preferences::setLinkAssoc("ed2k", true);
             Preferences::setEmuleFileAssoc(true);
             Preferences::setCommonAssocSection(true); // enable common section
         }
