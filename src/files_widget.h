@@ -33,6 +33,7 @@ private:
     QAction* m_filesExchSubdir;
     QAction* m_filesUnexchDir;
     QAction* m_filesUnexchSubdir;
+    QAction* m_reloadDirectory;
 
     DirectoryModel* m_dir_model;
     FilesModel*     m_file_model;
@@ -61,6 +62,7 @@ private slots:
     void exchangeSubdir();
     void unexchangeDir();
     void unxchangeSubdir();
+    void reloadDir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
     void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
     void on_treeViewSelChanged(const QItemSelection &, const QItemSelection &);

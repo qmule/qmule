@@ -79,6 +79,11 @@ files_widget::files_widget(QWidget *parent)
     m_filesUnexchSubdir->setIcon(QIcon(":/emule/common/folder_unshare.ico"));
     m_filesUnexchSubdir->setText(tr("Don't exchange with subdirs"));
 
+    m_reloadDirectory = new QAction(this);
+    m_reloadDirectory->setObjectName(QString::fromUtf8("reloadDir"));
+    m_reloadDirectory->setIcon(QIcon(":/emule/common/folder_reload.ico"));
+    m_reloadDirectory->setText(tr("Reload directory"));
+
     m_filesMenu->addAction(m_openFolder);
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesExchDir);
@@ -86,6 +91,8 @@ files_widget::files_widget(QWidget *parent)
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesUnexchDir);
     m_filesMenu->addAction(m_filesUnexchSubdir);
+    m_filesMenu->addSeparator();
+    m_filesMenu->addAction(m_reloadDirectory);
 
     connect(tableView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
@@ -102,6 +109,7 @@ files_widget::files_widget(QWidget *parent)
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
     connect(m_filesUnexchSubdir,  SIGNAL(triggered()), this, SLOT(unxchangeSubdir()));
+    connect(m_reloadDirectory,    SIGNAL(triggered()), this, SLOT(reloadDir()));
 
     connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
 
@@ -251,6 +259,19 @@ void files_widget::unxchangeSubdir()
        QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call unshareDirectoryR";
        static_cast<FileNode*>(indx.internalPointer())->unshare(true);
+       QApplication::restoreOverrideCursor();
+    }
+}
+
+void files_widget::reloadDir()
+{
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
+
+    if (indx.isValid())
+    {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
+       qDebug() << "call reload dir";
+       static_cast<DirNode*>(indx.internalPointer())->populate(true);
        QApplication::restoreOverrideCursor();
     }
 }

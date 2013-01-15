@@ -6338,6 +6338,10 @@ However, those plugins were disabled.</source>
         <translation>Не обмениваться вместе с подпапками</translation>
     </message>
     <message>
+        <source>Reload directory</source>
+        <translation>Обновить содержимое директории</translation>
+    </message>
+    <message>
         <source>FileSystem browser</source>
         <translation>Файловая система</translation>
     </message>
