@@ -392,6 +392,12 @@ search_widget::search_widget(QWidget *parent)
     fileDownload->setIcon(QIcon(":/emule/search/Download.png"));
     fileDownload->setEnabled(false);
 
+    fileDownloadPause = new QAction(this);
+    fileDownloadPause->setObjectName(QString::fromUtf8("fileDownloadPause"));
+    fileDownloadPause->setText(tr("Download(Pause)"));
+    fileDownloadPause->setIcon(QIcon(":/emule/search/Download.png"));
+    fileDownloadPause->setEnabled(false);
+
     filePreview = new QAction(this);
     filePreview->setObjectName(QString::fromUtf8("filePreview"));
     filePreview->setText(tr("Preview"));
@@ -416,6 +422,7 @@ search_widget::search_widget(QWidget *parent)
     btnPreview->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     fileMenu->addAction(fileDownload);
+    fileMenu->addAction(fileDownloadPause);
     fileMenu->addAction(filePreview);
     fileMenu->addAction(fileED2KLink);
     fileMenu->addSeparator();
@@ -429,10 +436,11 @@ search_widget::search_widget(QWidget *parent)
     connect(userAddToFriends,  SIGNAL(triggered()), this, SLOT(addToFriends()));
     connect(userDetails,  SIGNAL(triggered()), this, SLOT(getUserDetails()));
 
-    connect(fileDownload,  SIGNAL(triggered()), this, SLOT(download()));
-    connect(filePreview,  SIGNAL(triggered()), this, SLOT(preview()));
-    connect(fileSearchRelated,  SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
-    connect(fileED2KLink,  SIGNAL(triggered()), this, SLOT(createED2KLink()));
+    connect(fileDownload, SIGNAL(triggered()), this, SLOT(download()));
+    connect(fileDownloadPause, SIGNAL(triggered()), this, SLOT(downloadPause()));
+    connect(filePreview, SIGNAL(triggered()), this, SLOT(preview()));
+    connect(fileSearchRelated, SIGNAL(triggered()), this, SLOT(searchRelatedFiles()));
+    connect(fileED2KLink, SIGNAL(triggered()), this, SLOT(createED2KLink()));
 
     connect(Session::instance()->get_ed2k_session(),
     		SIGNAL(peerConnected(const libed2k::net_identifier&, const QString&, bool)),
@@ -1366,19 +1374,19 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
     updateFileActions();
 }
 
-void search_widget::download()
+Transfer search_widget::download()
 {
     // Possible only with double click.
     if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
     {
         initPeer();
-        return;
+        return Transfer();
     }
 
     if (!hasSelectedFiles())
     {
         qDebug("some files should be selected for downloading");
-        return;
+        return Transfer();
     }
 
     bool bDirs =
@@ -1448,8 +1456,13 @@ void search_widget::download()
             continue;
         }
 
-        addTransfer(*iter);
+        return addTransfer(*iter);
     }
+}
+
+void search_widget::downloadPause()
+{
+    download().pause();
 }
 
 void search_widget::preview()
@@ -1539,7 +1552,9 @@ bool search_widget::hasSelectedFiles()
 
 void search_widget::updateFileActions()
 {
-    fileDownload->setEnabled(hasSelectedFiles());
+    bool hasSelFiles = hasSelectedFiles();
+    fileDownload->setEnabled(hasSelFiles);
+    fileDownloadPause->setEnabled(hasSelFiles);
     filePreview->setEnabled(hasSelectedMedia());
 }
 
