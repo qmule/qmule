@@ -272,6 +272,7 @@ void files_widget::reloadDir()
        QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call reload dir";
        static_cast<DirNode*>(indx.internalPointer())->populate(true);
+       //static_cast<DirNode*>(indx.internalPointer())->deleteTransfer();
        QApplication::restoreOverrideCursor();
     }
 }

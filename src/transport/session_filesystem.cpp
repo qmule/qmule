@@ -622,6 +622,18 @@ void DirNode::populate(bool force /* = false*/)
     }
     else
     {
+        QHash<QString, FileNode*> current_files;
+        // prepare all files
+        foreach (DirNode* p, m_dir_children)
+        {
+            current_files.insert(p->filename(), p);
+        }
+
+        foreach (FileNode* p, m_file_children)
+        {
+            current_files.insert(p->filename(), p);
+        }
+
         QString itPath = QDir::fromNativeSeparators(path);
         QDirIterator dirIt(itPath, QDir::NoDotAndDotDot| QDir::AllEntries | QDir::System | QDir::Hidden);
         QList<QDir> incompleteFiles = Session::instance()->incompleteFiles();
@@ -630,6 +642,8 @@ void DirNode::populate(bool force /* = false*/)
         {
             dirIt.next();
             QFileInfo fileInfo = dirIt.fileInfo();
+
+            current_files.remove(fileInfo.fileName());
 
             if (fileInfo.isDir() && !m_dir_children.contains(fileInfo.fileName()))
             {
@@ -643,6 +657,14 @@ void DirNode::populate(bool force /* = false*/)
                 add_node(new FileNode(this, fileInfo));
                 continue;
             }
+        }
+
+        // remove erased files/nodes
+        // it we have transfer on removed file - unshare it
+        foreach(FileNode* p, current_files.values())
+        {
+            p->unshare(true);
+            delete_node(p);
         }
     }
 
