@@ -7001,6 +7001,10 @@ However, those plugins were disabled.</source>
         <translation>Приём</translation>
     </message>
     <message>
+        <source>Download(Pause)</source>
+        <translation>Приём(Пауза)</translation>
+    </message>
+    <message>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
