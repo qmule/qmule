@@ -119,6 +119,7 @@ private:
   QSortFilterProxyModel *labelFilterModel;
   Session* BTSession;
   MainWindow *main_window;
+  QAction* actionAddLink;
 };
 
 #endif // TRANSFERLISTWIDGET_H
