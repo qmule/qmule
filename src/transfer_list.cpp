@@ -151,7 +151,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionDelete->setObjectName(QString::fromUtf8("actionDelete"));
     actionDelete->setToolTip(tr("Delete"));
     actionDelete->setIcon(IconProvider::instance()->getIcon("list-remove"));
-    actionDelete->setShortcut(QKeySequence(QString::fromUtf8("Del")));
 
     actionStart = new QAction(this);
     actionStart->setObjectName(QString::fromUtf8("actionStart"));
@@ -162,13 +161,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionPause->setObjectName(QString::fromUtf8("actionPause"));
     actionPause->setToolTip(tr("Pause"));
     actionPause->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
-
-    actionLaunch = new QAction(this);
-    actionLaunch->setObjectName(QString::fromUtf8("actionLaunch"));
-    actionLaunch->setToolTip(tr("Launch"));
-    actionLaunch->setShortcut(QKeySequence(QString::fromUtf8("Return")));
-    actionLaunch->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
-    addAction(actionLaunch);
 
     mainToolBar->addAction(actionOpen);
     mainToolBar->addAction(actionDelete);
@@ -181,7 +173,6 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     connect(actionDelete, SIGNAL(triggered()), transferList, SLOT(deleteSelectedTorrents()));
     connect(actionStart, SIGNAL(triggered()), transferList, SLOT(startSelectedTorrents()));
     connect(actionPause, SIGNAL(triggered()), transferList, SLOT(pauseSelectedTorrents()));
-    connect(actionLaunch, SIGNAL(triggered()), transferList, SLOT(launchSelectedTorrents()));
       
     connect(peersList, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(sendMessageToPeer(const QString&, const libed2k::net_identifier&)));
     connect(peersList, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addPeerToFriends(const QString&, const libed2k::net_identifier&)));
