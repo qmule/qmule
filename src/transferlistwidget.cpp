@@ -133,6 +133,16 @@ TransferListWidget::TransferListWidget(QWidget *parent, MainWindow *main_window,
   actionAddLink->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+V")));
   addAction(actionAddLink);
   connect(actionAddLink, SIGNAL(triggered()), this, SLOT(addLinkDialog()));
+
+  actionDelete = new QAction(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), this);
+  actionDelete->setShortcut(QKeySequence(QString::fromUtf8("Del")));
+  addAction(actionDelete);
+  connect(actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
+
+  actionLaunch = new QAction(this);
+  actionLaunch->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+  addAction(actionLaunch);
+  connect(actionLaunch, SIGNAL(triggered()), this, SLOT(launchSelectedTorrents()));
 }
 
 TransferListWidget::~TransferListWidget() {
@@ -724,8 +734,6 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionStart, SIGNAL(triggered()), this, SLOT(startSelectedTorrents()));
   QAction actionPause(IconProvider::instance()->getIcon("media-playback-pause"), tr("Pause", "Pause the torrent"), 0);
   connect(&actionPause, SIGNAL(triggered()), this, SLOT(pauseSelectedTorrents()));
-  QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), 0);
-  connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
   QAction actionPreview_file(IconProvider::instance()->getIcon("view-preview"), tr("Preview file..."), 0);
   connect(&actionPreview_file, SIGNAL(triggered()), this, SLOT(previewSelectedTorrents()));
   QAction actionView_file(IconProvider::instance()->getIcon("view-preview"), tr("View file..."), 0);
@@ -840,7 +848,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   }
   if (selectedIndexes.size() > 0) {
     listMenu.addSeparator();
-    listMenu.addAction(&actionDelete);
+    listMenu.addAction(actionDelete);
     listMenu.addSeparator();
     if (!one_seed)
       listMenu.addAction(&actionSetTorrentPath);
