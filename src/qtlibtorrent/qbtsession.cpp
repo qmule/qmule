@@ -911,9 +911,18 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
   // Adding torrent to Bittorrent session
   try
   {
+      std::string local_str = libed2k::url_decode(strLink.toUtf8().constData());
 
-      std::string local_str = libed2k::url_decode(strLink.toLocal8Bit().constData());
-      h =  QTorrentHandle(add_magnet_uri(*s, QString::fromLocal8Bit(local_str.c_str()).toUtf8().constData(), p));
+      // check unicode
+      if (QString::fromUtf8(local_str.c_str()).toUtf8().constData() != local_str)
+      {
+          h =  QTorrentHandle(add_magnet_uri(*s, QString::fromLocal8Bit(local_str.c_str()).toUtf8().constData(), p));
+      }
+      else
+      {
+          h =  QTorrentHandle(add_magnet_uri(*s, QString::fromUtf8(local_str.c_str()).toUtf8().constData(), p));
+      }
+
   }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
     ec = e.error();
