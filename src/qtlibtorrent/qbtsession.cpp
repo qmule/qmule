@@ -78,6 +78,8 @@
 #if LIBTORRENT_VERSION_MINOR > 15
 #include "libtorrent/error_code.hpp"
 #endif
+
+#include <libed2k/util.hpp>
 #include <queue>
 #include <string.h>
 #include "dnsupdater.h"
@@ -907,7 +909,9 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
 
   // Adding torrent to Bittorrent session
   try {
-    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toUtf8().constData(), p));
+      h =  QTorrentHandle(add_magnet_uri(*s,
+                                         QString::fromLocal8Bit(libed2k::url_decode(strLink.toUtf8().constData()).c_str()).toUtf8().constData(), p));
+                                         //QUrl::fromPercentEncoding(strLink.toUtf8()).toUtf8().constData(), p));
   }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
     ec = e.error();

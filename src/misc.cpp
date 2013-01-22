@@ -1100,6 +1100,26 @@ QStringList misc::getFileLines(const QString& filename, const char* codec /*= NU
     return slist;
 }
 
+QStringList misc::cmd2list(const QString& text)
+{
+    QStringList res;
+    qDebug() << "cmd2list: " << text;
+    QRegExp rx("((?:[^\\s\"]+)|(?:\"(?:\\\\\"|[^\"])*\"))");
+    int pos = 0;
+
+    while ((pos = rx.indexIn(text, pos)) != -1)
+    {
+        QString s = rx.cap(1);
+        s.replace(QRegExp("^\""), "");
+        s.replace(QRegExp("\"$"), "");
+        res << s;
+        pos += rx.matchedLength();
+    }
+
+    return res;
+}
+
+
 #ifdef Q_WS_WIN32
 
 QString ShellGetFolderPath(int iCSIDL)

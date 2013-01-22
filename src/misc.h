@@ -199,6 +199,8 @@ public:
   static bool isValidTorrentFile(const QString &path);
   static QSet<QString> torrentRoots(const QTorrentHandle& h);
 
+  static QStringList cmd2list(const QString&);
+
   /**
     * eMule migration functions
     * helpers for quiet migration
