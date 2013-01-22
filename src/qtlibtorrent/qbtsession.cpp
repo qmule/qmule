@@ -35,6 +35,7 @@
 #include <QHostAddress>
 #include <QNetworkAddressEntry>
 #include <QProcess>
+#include <QTextCodec>
 #include <stdlib.h>
 
 #include "smtp.h"
@@ -908,10 +909,11 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
   qDebug("Adding magnet URI: %s", qPrintable(strLink));
 
   // Adding torrent to Bittorrent session
-  try {
-      h =  QTorrentHandle(add_magnet_uri(*s,
-                                         QString::fromLocal8Bit(libed2k::url_decode(strLink.toUtf8().constData()).c_str()).toUtf8().constData(), p));
-                                         //QUrl::fromPercentEncoding(strLink.toUtf8()).toUtf8().constData(), p));
+  try
+  {
+
+      std::string local_str = libed2k::url_decode(strLink.toLocal8Bit().constData());
+      h =  QTorrentHandle(add_magnet_uri(*s, QString::fromLocal8Bit(local_str.c_str()).toUtf8().constData(), p));
   }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
     ec = e.error();
