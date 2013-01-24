@@ -35,6 +35,7 @@
 #include <QHostAddress>
 #include <QNetworkAddressEntry>
 #include <QProcess>
+#include <QTextCodec>
 #include <stdlib.h>
 
 #include "smtp.h"
@@ -78,6 +79,8 @@
 #if LIBTORRENT_VERSION_MINOR > 15
 #include "libtorrent/error_code.hpp"
 #endif
+
+#include <libed2k/util.hpp>
 #include <queue>
 #include <string.h>
 #include "dnsupdater.h"
@@ -906,8 +909,20 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
   qDebug("Adding magnet URI: %s", qPrintable(strLink));
 
   // Adding torrent to Bittorrent session
-  try {
-    h =  QTorrentHandle(add_magnet_uri(*s, strLink.toUtf8().constData(), p));
+  try
+  {
+      std::string local_str = libed2k::url_decode(strLink.toUtf8().constData());
+
+      // check unicode
+      if (QString::fromUtf8(local_str.c_str()).toUtf8().constData() != local_str)
+      {
+          h =  QTorrentHandle(add_magnet_uri(*s, QString::fromLocal8Bit(local_str.c_str()).toUtf8().constData(), p));
+      }
+      else
+      {
+          h =  QTorrentHandle(add_magnet_uri(*s, QString::fromUtf8(local_str.c_str()).toUtf8().constData(), p));
+      }
+
   }catch(libtorrent::libtorrent_exception e) {
     qDebug("Error: %s", e.what());
     ec = e.error();

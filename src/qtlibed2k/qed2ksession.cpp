@@ -232,7 +232,7 @@ void QED2KSession::start()
     settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
     settings.client_name  = pref.nick().toUtf8().constData();
     settings.mod_name = misc::productName().toUtf8().constData();
-    settings.m_announce_timeout = 10; // announcing every 10 seconds
+    settings.m_announce_timeout = 60; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(settings.m_known_file);

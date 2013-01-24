@@ -84,6 +84,14 @@ files_widget::files_widget(QWidget *parent)
     m_reloadDirectory->setIcon(QIcon(":/emule/common/folder_reload.ico"));
     m_reloadDirectory->setText(tr("Reload directory"));
 
+    m_openFile = new QAction(this);
+    m_openFile->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+    tableView->addAction(m_openFile);
+
+    m_openSumFile = new QAction(this);
+    m_openSumFile->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+    tableView_files->addAction(m_openSumFile);
+
     m_filesMenu->addAction(m_openFolder);
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesExchDir);
@@ -110,6 +118,8 @@ files_widget::files_widget(QWidget *parent)
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
     connect(m_filesUnexchSubdir,  SIGNAL(triggered()), this, SLOT(unxchangeSubdir()));
     connect(m_reloadDirectory,    SIGNAL(triggered()), this, SLOT(reloadDir()));
+    connect(m_openFile,           SIGNAL(triggered()), this, SLOT(openSelectedFile()));
+    connect(m_openSumFile,        SIGNAL(triggered()), this, SLOT(openSelectedSumFile()));
 
     connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
 
@@ -125,6 +135,8 @@ files_widget::files_widget(QWidget *parent)
 
     treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
     tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);        
+
+    connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFile(QModelIndex)));
 
     // ======== summary page ==============
 
@@ -174,6 +186,8 @@ files_widget::files_widget(QWidget *parent)
     tableView_files->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tableView_files->horizontalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(displayHSMenuSummary(const QPoint&)));
+
+    connect(tableView_files, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openSumFile(QModelIndex)));
 
     // pre-sort summary models
     tableView_paths->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
@@ -594,4 +608,30 @@ void files_widget::on_tabWidget_currentChanged(int index)
 {
     tableView->clearSelection();
     tableView_files->clearSelection();
+}
+
+void files_widget::openFile(const QModelIndex& index)
+{
+    QModelIndex fileIndex = sort2file(index);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_file_model->filepath(fileIndex)));
+}
+
+void files_widget::openSelectedFile()
+{
+    const QModelIndexList selectedIndexes = tableView->selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        openFile(selectedIndexes.first());
+}
+
+void files_widget::openSumFile(const QModelIndex& index)
+{
+    QModelIndex fileIndex = sort2file_sum(index);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_file_model->filepath(fileIndex)));
+}
+
+void files_widget::openSelectedSumFile()
+{
+    const QModelIndexList selectedIndexes = tableView_files->selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        openSumFile(selectedIndexes.first());
 }

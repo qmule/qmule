@@ -128,6 +128,21 @@ TransferListWidget::TransferListWidget(QWidget *parent, MainWindow *main_window,
   connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayListMenu(const QPoint&)));
   header()->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(header(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(displayDLHoSMenu(const QPoint&)));
+
+  actionAddLink = new QAction(QIcon(QString::fromUtf8(":/emule/common/eD2kLink.png")), tr("Add link..."), this);
+  actionAddLink->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+V")));
+  addAction(actionAddLink);
+  connect(actionAddLink, SIGNAL(triggered()), this, SLOT(addLinkDialog()));
+
+  actionDelete = new QAction(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), this);
+  actionDelete->setShortcut(QKeySequence(QString::fromUtf8("Del")));
+  addAction(actionDelete);
+  connect(actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
+
+  actionLaunch = new QAction(this);
+  actionLaunch->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+  addAction(actionLaunch);
+  connect(actionLaunch, SIGNAL(triggered()), this, SLOT(launchSelectedTorrents()));
 }
 
 TransferListWidget::~TransferListWidget() {
@@ -295,12 +310,12 @@ void TransferListWidget::deleteSelectedTorrents()
   // search torrent or completed ed2k transfer and active file control
   foreach (const QString &hash, hashes)
   {
-        Transfer t = BTSession->getTransfer(hash);
-        if (t.type() == Transfer::ED2K &&  !t.is_seed())
-            continue;
+      Transfer t = BTSession->getTransfer(hash);
+      if (t.type() == Transfer::ED2K &&  !t.is_seed())
+          continue;
 
-        file_control_active = true;
-        break;
+      file_control_active = true;
+      break;
   }
 
   if (Preferences().confirmTorrentDeletion() &&
@@ -453,8 +468,7 @@ void TransferListWidget::addLinkDialog() {
     link = QInputDialog::getText(
       this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
     if (ok && !link.isEmpty()) {
-      QPair<Transfer,ErrorCode> res = BTSession->addLink(
-        QString::fromUtf8(libed2k::url_decode(link.toUtf8().constData()).c_str()).trimmed());
+      QPair<Transfer,ErrorCode> res = BTSession->addLink(link.trimmed());
       t = res.first;
       ec = res.second;
 
@@ -719,8 +733,6 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionStart, SIGNAL(triggered()), this, SLOT(startSelectedTorrents()));
   QAction actionPause(IconProvider::instance()->getIcon("media-playback-pause"), tr("Pause", "Pause the torrent"), 0);
   connect(&actionPause, SIGNAL(triggered()), this, SLOT(pauseSelectedTorrents()));
-  QAction actionDelete(IconProvider::instance()->getIcon("edit-delete"), tr("Delete", "Delete the torrent"), 0);
-  connect(&actionDelete, SIGNAL(triggered()), this, SLOT(deleteSelectedTorrents()));
   QAction actionPreview_file(IconProvider::instance()->getIcon("view-preview"), tr("Preview file..."), 0);
   connect(&actionPreview_file, SIGNAL(triggered()), this, SLOT(previewSelectedTorrents()));
   QAction actionView_file(IconProvider::instance()->getIcon("view-preview"), tr("View file..."), 0);
@@ -731,8 +743,6 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   connect(&actionSet_upload_limit, SIGNAL(triggered()), this, SLOT(setUpLimitSelectedTorrents()));
   QAction actionSet_download_limit(QIcon(QString::fromUtf8(":/Icons/skin/download.png")), tr("Limit download rate..."), 0);
   connect(&actionSet_download_limit, SIGNAL(triggered()), this, SLOT(setDlLimitSelectedTorrents()));
-  QAction actionAddLink(QIcon(QString::fromUtf8(":/emule/common/eD2kLink.png")), tr("Add link..."), 0);
-  connect(&actionAddLink, SIGNAL(triggered()), this, SLOT(addLinkDialog()));
   QAction actionOpen_destination_folder(IconProvider::instance()->getIcon("inode-directory"), tr("Open destination folder"), 0);
   connect(&actionOpen_destination_folder, SIGNAL(triggered()), this, SLOT(openSelectedTorrentsFolder()));
   QAction actionIncreasePriority(IconProvider::instance()->getIcon("go-up"), tr("Move up", "i.e. move up in the queue"), 0);
@@ -837,7 +847,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
   }
   if (selectedIndexes.size() > 0) {
     listMenu.addSeparator();
-    listMenu.addAction(&actionDelete);
+    listMenu.addAction(actionDelete);
     listMenu.addSeparator();
     if (!one_seed)
       listMenu.addAction(&actionSetTorrentPath);
@@ -917,7 +927,7 @@ void TransferListWidget::displayListMenu(const QPoint&) {
     listMenu.addSeparator();
   }
   if (selectedIndexes.size() == 0) {
-    listMenu.addAction(&actionAddLink);
+    listMenu.addAction(actionAddLink);
     listMenu.addSeparator();
   }
   listMenu.addAction(&actionOpen_destination_folder);
