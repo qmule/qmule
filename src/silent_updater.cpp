@@ -131,6 +131,11 @@ void silent_updater::on_update_check_finished()
                                 else
                                 {
                                     qDebug() << "start network request";
+                                    // store new version
+                                    m_major = vlist.at(0).toInt();
+                                    m_minor = vlist.at(1).toInt();
+                                    m_update= vlist.at(2).toInt();
+                                    m_build = vlist.at(3).toInt();
                                     // start async request and return
                                     m_reply = m_nm->get(QNetworkRequest(QUrl(element.attribute("url"))));
                                     connect(m_reply, SIGNAL(readyRead()), SLOT(on_data_ready()));
@@ -228,6 +233,7 @@ void silent_updater::on_data_finished()
                 qDebug() << "new program succesfully copied";
                 QFile::setPermissions(current_filename(),
                                       QFile::permissions(current_filename()) | QFile::ExeUser | QFile::ExeGroup);
+                emit new_version_ready(m_major, m_minor, m_update, m_build);
             }
             else
             {

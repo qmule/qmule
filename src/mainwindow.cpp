@@ -345,6 +345,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connectioh_state = csDisconnected;
   m_info_dlg.reset(new is_info_dlg(this));
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
+  connect(m_updater.data(), SIGNAL(new_version_ready(int,int,int,int)), this, SLOT(on_new_version_ready(int,int,int,int)));
 
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(quint32, quint32, quint32)));
@@ -359,6 +360,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
   connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
   connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
+
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   Session::instance()->start();
@@ -1537,8 +1539,10 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
     }
 
     m_info_dlg->start();    // start message watcher
-    //temporary commented
-    //m_updater->start();
+
+#ifdef Q_WS_WIN
+    m_updater->start();
+#endif
 
     QString log_msg("Client ID: ");
     QString id;
@@ -1697,4 +1701,13 @@ void MainWindow::on_endLoadSharedFileSystem()
         }
     }
 #endif
+}
+
+void MainWindow::on_new_version_ready(int major,int minor, int update,int build)
+{
+    QMessageBox::information(this, tr("Update"), tr("New version %1.%2.%3.%4 was set")
+                             .arg(major)
+                             .arg(minor)
+                             .arg(update)
+                             .arg(build));
 }

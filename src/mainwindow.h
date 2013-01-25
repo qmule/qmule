@@ -269,6 +269,8 @@ private slots:
     void on_actionOpenDownloadPath_triggered();
     void on_beginLoadSharedFileSystem();
     void on_endLoadSharedFileSystem();
+
+    void on_new_version_ready(int,int,int,int);
 };
 
 #endif

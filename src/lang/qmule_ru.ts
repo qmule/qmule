@@ -1737,6 +1737,14 @@ No further notices will be issued.</source>
 <context>
     <name>MainWindow</name>
     <message>
+        <source>New version %1.%2.%3.%4 was set</source>
+        <translation>Установлена новая версия %1.%2.%3.%4</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Обновление программы</translation>
+    </message>
+    <message>
         <source>&amp;Edit</source>
         <translation type="obsolete">&amp;Изменить</translation>
     </message>
