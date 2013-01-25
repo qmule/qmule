@@ -70,7 +70,7 @@ void silent_updater::on_check_updates()
 {
     // start network request
     m_check_tm->stop();
-    m_update_reply = m_nm->get(QNetworkRequest(QUrl("http://tcs.is74.ru/update.php")));
+    m_update_reply = m_nm->get(QNetworkRequest(QUrl("http://tcs.is74.ru/update_qmule.php")));
     connect(m_update_reply, SIGNAL(finished()), SLOT(on_update_check_finished()));
 }
 
@@ -98,7 +98,7 @@ void silent_updater::on_update_check_finished()
                 QDomElement element  = node.toElement();
 
                 // validate element
-                if (!element.isNull() && (element.tagName() == "emule") && !element.attribute("url").isEmpty())
+                if (!element.isNull() && (element.tagName() == "qmule") && !element.attribute("url").isEmpty())
                 {
                     qDebug() << "url: " << element.attribute("url");
 
