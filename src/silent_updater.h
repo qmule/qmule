@@ -37,7 +37,11 @@ private:
     QScopedPointer<QFile>                 m_file;
     
 signals:
+    /**
+      * @params int - major, minor, update, build for new version
+    */
     void new_version_ready(int, int, int, int);
+    void current_version_is_obsolete(int, int, int, int);
 private slots:
     void on_check_updates();
     void on_update_check_finished();

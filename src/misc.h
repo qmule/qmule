@@ -50,7 +50,7 @@
 #endif
 
 #define PRODUCT_NAME "qMule"
-#define COMPANY_NAME "intersvyaz"
+#define COMPANY_NAME "mulehome"
 
 const qlonglong MAX_ETA = 8640000;
 
@@ -77,8 +77,14 @@ private:
 public:
   static QString productName()
   {
-      static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
-      return tr("%1 %2: %3", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION).arg(strBuildDate);
+      // do not use build date after actual version
+      //static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
+      return tr("%1 v%2.%3.%4.%5", "e.g: qMule v0.x")
+              .arg(PRODUCT_NAME)
+              .arg(VERSION_MAJOR)
+              .arg(VERSION_MINOR)
+              .arg(VERSION_UPDATE)
+              .arg(VERSION_BUILD);
   }
 
   static inline QString toQString(const std::string &str) {

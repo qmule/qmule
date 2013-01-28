@@ -111,38 +111,54 @@ void silent_updater::on_update_check_finished()
 
                         if (vlist.size() == 4)
                         {
-                            if (vlist.at(0).toInt() > m_major ||
-                                vlist.at(1).toInt() > m_minor ||
-                                vlist.at(2).toInt() > m_update ||
-                                vlist.at(3).toInt() > m_build)
+                            if (vlist.at(0).toInt() > m_major)
                             {
-                                // need update !
-                                qDebug() << "new version was found " << element.attribute("version");
+                                // current version is obsolete
+                                emit current_version_is_obsolete(vlist.at(0).toInt(),
+                                                                 vlist.at(1).toInt(),
+                                                                 vlist.at(2).toInt(),
+                                                                 vlist.at(3).toInt());
+                            }
+                            else
+                            {
 
-                                m_file.reset(new QFile(update_filename()));
-                                if (QFile::exists(update_filename())) QFile::remove(update_filename());
+                                bool update = false;
+                                if (vlist.at(3).toInt() > m_build)  update = true;
+                                if (vlist.at(2).toInt() > m_update) update = true;
+                                if (vlist.at(2).toInt() < m_update) update = false;
+                                if (vlist.at(1).toInt() > m_minor)  update = true;
+                                if (vlist.at(1).toInt() < m_minor)  update = false;
 
-                                // check file
-                                if (!m_file->open(QIODevice::WriteOnly))
+                                if (update)
                                 {
-                                    qDebug() << "can't create file " << update_filename();
-                                    m_file.reset();
-                                }
-                                else
-                                {
-                                    qDebug() << "start network request";
-                                    // store new version
-                                    m_major = vlist.at(0).toInt();
-                                    m_minor = vlist.at(1).toInt();
-                                    m_update= vlist.at(2).toInt();
-                                    m_build = vlist.at(3).toInt();
-                                    // start async request and return
-                                    m_reply = m_nm->get(QNetworkRequest(QUrl(element.attribute("url"))));
-                                    connect(m_reply, SIGNAL(readyRead()), SLOT(on_data_ready()));
-                                    connect(m_reply, SIGNAL(finished()), SLOT(on_data_finished()));
-                                    m_update_reply->deleteLater();
-                                    m_update_reply = NULL;
-                                    return;
+                                    // need update !
+                                    qDebug() << "new version was found " << element.attribute("version");
+
+                                    m_file.reset(new QFile(update_filename()));
+                                    if (QFile::exists(update_filename())) QFile::remove(update_filename());
+
+                                    // check file
+                                    if (!m_file->open(QIODevice::WriteOnly))
+                                    {
+                                        qDebug() << "can't create file " << update_filename();
+                                        m_file.reset();
+                                    }
+                                    else
+                                    {
+                                        qDebug() << "start network request";
+                                        // store new version
+                                        m_major = vlist.at(0).toInt();
+                                        m_minor = vlist.at(1).toInt();
+                                        m_update= vlist.at(2).toInt();
+                                        m_build = vlist.at(3).toInt();
+                                        // start async request and return
+                                        m_reply = m_nm->get(QNetworkRequest(QUrl(element.attribute("url"))));
+                                        connect(m_reply, SIGNAL(readyRead()), SLOT(on_data_ready()));
+                                        connect(m_reply, SIGNAL(finished()), SLOT(on_data_finished()));
+                                        m_update_reply->deleteLater();
+                                        m_update_reply = NULL;
+                                        return;
+                                    }
                                 }
                             }
                         }
