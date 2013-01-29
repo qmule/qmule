@@ -197,12 +197,12 @@ search_widget::search_widget(QWidget *parent)
 
     defKilos = new QAction(this);
     defKilos->setObjectName(QString::fromUtf8("defKilos"));
-    defKilos->setText(tr("kB"));
+    defKilos->setText(tr("KiB"));
     defKilos->setCheckable(true);
 
     defMegas = new QAction(this);
     defMegas->setObjectName(QString::fromUtf8("defMegas"));
-    defMegas->setText(tr("MB"));
+    defMegas->setText(tr("MiB"));
     defMegas->setCheckable(true);
 
     menuSubResults->addAction(defValue);
@@ -248,9 +248,9 @@ search_widget::search_widget(QWidget *parent)
     tableCond->setEditTriggers(QAbstractItemView::AllEditTriggers);
     tableCond->setColumnWidth(0, 200);
     addCondRow();
-    tableCond->item(0, 0)->setText(tr("Min. size [MB]"));
+    tableCond->item(0, 0)->setText(tr("Min. size [MiB]"));
     addCondRow();
-    tableCond->item(1, 0)->setText(tr("Max. size [MB]"));
+    tableCond->item(1, 0)->setText(tr("Max. size [MiB]"));
     addCondRow();
     tableCond->item(2, 0)->setText(tr("Availability"));
     addCondRow();
@@ -1891,9 +1891,9 @@ qulonglong parseSize(const QString& strSize)
     {
         base = lst[0].toFloat();
 
-        if (lst[1] == "KB") mes = 1024;
-        else if (lst[1] == "MB") mes = 1024 * 1024;
-        else if (lst[1] == "GB") mes = 1024 * 1024 * 1024;
+        if (lst[1] == "KB") mes = 1000;
+        else if (lst[1] == "MB") mes = 1000 * 1000;
+        else if (lst[1] == "GB") mes = 1000 * 1000 * 1000;
         else mes = 0;
     }
 

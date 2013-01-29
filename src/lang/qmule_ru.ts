@@ -6683,7 +6683,7 @@ However, those plugins were disabled.</source>
     <message>
         <source>KiB</source>
         <comment>kibibytes (1024 bytes)</comment>
-        <translation>Кб</translation>
+        <translation>КиБ</translation>
     </message>
     <message>
         <source>MiB</source>
@@ -7025,8 +7025,16 @@ However, those plugins were disabled.</source>
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <source>kB</source>
-        <translation>Кб</translation>
+        <source>KiB</source>
+        <translation>КиБ</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>МиБ</translation>
+    </message>
+    <message>
+        <source>KB</source>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MB</source>
@@ -7077,12 +7085,12 @@ However, those plugins were disabled.</source>
         <translation>Пользователи</translation>
     </message>
     <message>
-        <source>Min. size [MB]</source>
-        <translation>Мин. размер [МБ]</translation>
+        <source>Min. size [MiB]</source>
+        <translation>Мин. размер [МиБ]</translation>
     </message>
     <message>
-        <source>Max. size [MB]</source>
-        <translation>Макс. размер [МБ]</translation>
+        <source>Max. size [MiB]</source>
+        <translation>Макс. размер [МиБ]</translation>
     </message>
     <message>
         <source>Availability</source>
