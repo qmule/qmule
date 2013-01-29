@@ -160,7 +160,8 @@ nox {
               taskbar_iface.h \
               user_properties.h \
               torrent_properties.h \
-              ed2k_link_maker.h
+              ed2k_link_maker.h \
+              delay.h
 
   SOURCES += mainwindow.cpp \
              ico.cpp \
@@ -190,7 +191,8 @@ nox {
              taskbar_iface.cpp \
              user_properties.cpp \
              torrent_properties.cpp \
-             ed2k_link_maker.cpp
+             ed2k_link_maker.cpp \
+             delay.cpp
 
   macx {
     HEADERS += qmacapplication.h 
