@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <queue>
-
+#include <boost/bind.hpp>
 #include <libtorrent/session_status.hpp>
 #include <libed2k/add_transfer_params.hpp>
 #include <libed2k/session_status.hpp>

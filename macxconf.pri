@@ -8,7 +8,9 @@ PKGCONFIG += libtorrent-rasterbar
 
 # Special include/libs paths (macports)
 INCLUDEPATH += /usr/include/openssl /usr/include /opt/local/include/boost /opt/local/include
+INCLUDEPATH += $$(LIBED2K_ROOT)/include
 LIBS += -L/opt/local/lib
+LIBS += -L$$(LIBED2K_ROOT)/lib
 
 # OpenSSL lib
 LIBS += -lssl -lcrypto
@@ -18,7 +20,7 @@ LIBS += -lboost_system-mt
 LIBS += -lboost_filesystem-mt
 # Carbon
 LIBS += -framework Carbon -framework IOKit
-
+QMAKE_CXXFLAGS += -fpermissive
 document_icon.path = Contents/Resources
 document_icon.files = Icons/qMuleDocument.icns
 
