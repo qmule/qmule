@@ -252,8 +252,12 @@ int main(int argc, char *argv[]) {
   {
     QPixmap splash_img(":/Icons/skin/Logo.png");
     QPainter painter(&splash_img);
-    QString prog_name = "eMule - qMule";
-    QString version = "v0.01";
+    QString prog_name = "qMule";
+    QString version = QString("v%1.%2.%3.%4")
+            .arg(VERSION_MAJOR)
+            .arg(VERSION_MINOR)
+            .arg(VERSION_UPDATE)
+            .arg(VERSION_BUILD);
     painter.setPen(QPen(Qt::black));
     painter.setFont(QFont("Arial", 22, QFont::Black));
     painter.drawText(175 - painter.fontMetrics().width(prog_name) / 2, 220, prog_name);
