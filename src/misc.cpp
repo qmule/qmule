@@ -40,7 +40,6 @@
 #include <QSettings>
 #include <QNetworkInterface>
 #include <QTextCodec>
-
 #ifdef DISABLE_GUI
 #include <QCoreApplication>
 #else
@@ -75,7 +74,8 @@ const int UNLEN = 256;
 #endif
 
 #include "libtorrent/bencode.hpp"
-#include "transport/session.h"
+// need to be activated on windows
+//#include "transport/session.h"
 #include "torrentpersistentdata.h"
 
 #ifndef DISABLE_GUI
