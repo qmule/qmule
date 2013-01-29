@@ -6444,11 +6444,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>%1 MB</source>
-        <translation>%1 Мб</translation>
+        <translation>%1 МБ</translation>
     </message>
     <message>
         <source>%1 KB</source>
-        <translation>%1 Кб</translation>
+        <translation>%1 КБ</translation>
     </message>
     <message>
         <source>%1 bytes</source>
@@ -6688,17 +6688,17 @@ However, those plugins were disabled.</source>
     <message>
         <source>MiB</source>
         <comment>mebibytes (1024 kibibytes)</comment>
-        <translation>Мб</translation>
+        <translation>МиБ</translation>
     </message>
     <message>
         <source>GiB</source>
         <comment>gibibytes (1024 mibibytes)</comment>
-        <translation>Гб</translation>
+        <translation>ГиБ</translation>
     </message>
     <message>
         <source>TiB</source>
         <comment>tebibytes (1024 gibibytes)</comment>
-        <translation>Тб</translation>
+        <translation>ТиБ</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -7030,7 +7030,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>MB</source>
-        <translation>Мб</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>Any</source>
@@ -7078,11 +7078,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Min. size [MB]</source>
-        <translation>Мин. размер [Мб]</translation>
+        <translation>Мин. размер [МБ]</translation>
     </message>
     <message>
         <source>Max. size [MB]</source>
-        <translation>Макс. размер [Мб]</translation>
+        <translation>Макс. размер [МБ]</translation>
     </message>
     <message>
         <source>Availability</source>
