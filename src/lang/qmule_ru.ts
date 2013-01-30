@@ -1737,8 +1737,8 @@ No further notices will be issued.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>New version %1.%2.%3.%4 was set</source>
-        <translation>Установлена новая версия %1.%2.%3.%4</translation>
+        <source>New version %1.%2.%3.%4 was set, changes will activate after program restart</source>
+        <translation>Установлена новая версия %1.%2.%3.%4, изменения вступят в силу после перезагрузки программы</translation>
     </message>
     <message>
         <source>Update</source>
@@ -6462,8 +6462,44 @@ However, those plugins were disabled.</source>
         <translation>Все раздаваемые файлы</translation>
     </message>
     <message>
-        <source>Filepath</source>
-        <translation>Директории</translation>
+        <source>Any</source>
+        <translation>Без категории</translation>
+    </message>
+    <message>
+        <source>Audios</source>
+        <translation>Аудио</translation>
+    </message>
+    <message>
+        <source>Videos</source>
+        <translation>Видео</translation>
+    </message>
+    <message>
+        <source>Pictures</source>
+        <translation>Картинки</translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation>Программы</translation>
+    </message>
+    <message>
+        <source>Documents</source>
+        <translation>Документы</translation>
+    </message>
+    <message>
+        <source>Archives</source>
+        <translation>Архивы</translation>
+    </message>
+    <message>
+        <source>CD images</source>
+        <translation>CD образы</translation>
+    </message>
+    <message>
+        <source>Emule collections</source>
+        <translation>Emule коллекции</translation>
+    </message>
+    <message>
+        <source>Filter/Filepath</source>
+        <translation>Фильры/Директории</translation>
     </message>
 </context>
 <context>

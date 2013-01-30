@@ -121,7 +121,8 @@ files_widget::files_widget(QWidget *parent)
     connect(m_openFile,           SIGNAL(triggered()), this, SLOT(openSelectedFile()));
     connect(m_openSumFile,        SIGNAL(triggered()), this, SLOT(openSelectedSumFile()));
 
-    connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
+    connect(m_file_model, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)),
+            this, SLOT(on_changeRow(const QModelIndex&,const QModelIndex&)));
 
     connect(tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(sortChanged(int, Qt::SortOrder)));
@@ -485,7 +486,7 @@ void files_widget::on_tableViewPathsSumSelChanged(const QItemSelection&, const Q
     if (index.isValid())
     {
         switchLinkWidget(QStringList());
-        m_sum_file_model->setFilter(m_path_model->filepath(index));
+        m_sum_file_model->setFilter(m_path_model->filter(index));
     }
 }
 

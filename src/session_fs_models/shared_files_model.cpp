@@ -37,15 +37,12 @@ QModelIndex SFModel::index(int row, int column,
     return createIndex(row, column, childNode);
 }
 
-void SFModel::setFilter(const QString& filter)
+void SFModel::setFilter(BaseFilter* filter)
 {
-    if (filter != m_filter)
-    {
-        m_filter = filter;
-        m_files.clear();
-        sync();
-        reset();
-    }
+    m_filter.reset(filter);
+    m_files.clear();
+    sync();
+    reset();
 }
 
 int SFModel::node2row(const FileNode* node) const
@@ -66,7 +63,7 @@ void SFModel::sync()
 {
     foreach(FileNode* p, Session::instance()->files().values())
     {
-        if (m_filter.isEmpty() || (p->parent_path() == m_filter))
+        if (!m_filter.isNull() && (m_filter->match(p->parent_path(), p->filename())))
             m_files.append(p);
     }
 }
@@ -85,7 +82,7 @@ void SFModel::on_removeSharedFile(FileNode* node)
 
 void SFModel::on_insertSharedFile(FileNode* node)
 {
-    if (m_filter.isEmpty() || (m_filter == node->parent_path()))
+    if (!m_filter.isNull() && (m_filter->match(node->parent_path(), node->filename())))
     {
         beginInsertRows(QModelIndex(), m_files.size(), m_files.size());
         m_files.append(node);
