@@ -267,10 +267,11 @@ private slots:
     void ed2kConnectionClosed(QString strError);
 
     void on_actionOpenDownloadPath_triggered();
-    void on_beginLoadSharedFileSystem();
-    void on_endLoadSharedFileSystem();
+    void beginLoadSharedFileSystem();
+    void endLoadSharedFileSystem();
 
-    void on_new_version_ready(int,int,int,int);
+    void new_version_ready(int,int,int,int);
+    void current_version_obsolete(int,int,int,int);
 };
 
 #endif

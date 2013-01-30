@@ -1741,6 +1741,10 @@ No further notices will be issued.</source>
         <translation>Установлена новая версия %1.%2.%3.%4, изменения вступят в силу после перезагрузки программы</translation>
     </message>
     <message>
+        <source>Your version is obsolete, new version %1.%2.%3.%4 avaialable</source>
+        <translation>Ваша версия программы более не поддерживается, рекомендуем скачать и установить новую версию %1.%2.%3.%4</translation>
+    </message>
+    <message>
         <source>Update</source>
         <translation>Обновление программы</translation>
     </message>

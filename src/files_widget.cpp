@@ -104,12 +104,12 @@ files_widget::files_widget(QWidget *parent)
 
     connect(tableView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewSelChanged(const QItemSelection &, const QItemSelection &))
+        SLOT(tableViewSelChanged(const QItemSelection &, const QItemSelection &))
     );   
 
     connect(treeView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_treeViewSelChanged(const QItemSelection &, const QItemSelection &))
+        SLOT(treeViewSelChanged(const QItemSelection &, const QItemSelection &))
     );
 
     connect(m_openFolder,         SIGNAL(triggered()), this, SLOT(openFolder()));
@@ -122,7 +122,7 @@ files_widget::files_widget(QWidget *parent)
     connect(m_openSumFile,        SIGNAL(triggered()), this, SLOT(openSelectedSumFile()));
 
     connect(m_file_model, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)),
-            this, SLOT(on_changeRow(const QModelIndex&,const QModelIndex&)));
+            this, SLOT(changeRow(const QModelIndex&,const QModelIndex&)));
 
     connect(tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(sortChanged(int, Qt::SortOrder)));
@@ -172,11 +172,11 @@ files_widget::files_widget(QWidget *parent)
 
     connect(tableView_paths->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewPathsSumSelChanged(QItemSelection,QItemSelection)));
+        SLOT(tableViewPathsSumSelChanged(QItemSelection,QItemSelection)));
 
     connect(tableView_files->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewFilesSumSelChanged(const QItemSelection &, const QItemSelection &)));
+        SLOT(tableViewFilesSumSelChanged(const QItemSelection &, const QItemSelection &)));
 
     connect(tableView_paths->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(paths_sortChanged(int, Qt::SortOrder)));
@@ -463,12 +463,12 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
     }
 }
 
-void files_widget::on_tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
+void files_widget::tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
 {    
     switchLinkWidget(generateLinks());
 }
 
-void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::treeViewSelChanged(const QItemSelection&, const QItemSelection&)
 {   
     QModelIndex index = sort2dir(treeView->currentIndex());
 
@@ -479,7 +479,7 @@ void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelec
     }
 }
 
-void files_widget::on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&)
 {
     QModelIndex index = sort2dir_sum(tableView_paths->currentIndex());
 
@@ -490,7 +490,7 @@ void files_widget::on_tableViewPathsSumSelChanged(const QItemSelection&, const Q
     }
 }
 
-void files_widget::on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
 {
     switchLinkWidget(generateLinksSum());
 }
@@ -537,7 +537,7 @@ void files_widget::on_btnCopy_clicked()
     putToClipboard();
 }
 
-void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& right)
+void files_widget::changeRow(const QModelIndex& left, const QModelIndex& right)
 {
     Q_UNUSED(right);    
 

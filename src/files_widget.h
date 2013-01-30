@@ -66,10 +66,10 @@ private slots:
     void unxchangeSubdir();
     void reloadDir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
-    void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
-    void on_treeViewSelChanged(const QItemSelection &, const QItemSelection &);
-    void on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
-    void on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void tableViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void treeViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&);
     void sortChanged(int, Qt::SortOrder);
     void sortChangedDirectory(int, Qt::SortOrder);
     void paths_sortChanged(int, Qt::SortOrder);
@@ -78,7 +78,7 @@ private slots:
     void on_checkForum_toggled(bool checked);
     void on_checkSize_toggled(bool checked);
     void on_btnCopy_clicked();
-    void on_changeRow(const QModelIndex& left, const QModelIndex& right);
+    void changeRow(const QModelIndex& left, const QModelIndex& right);
     void displayHSMenu(const QPoint&);
     void displayHSMenuSummary(const QPoint&);
     void on_tabWidget_currentChanged(int index);
