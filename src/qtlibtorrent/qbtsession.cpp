@@ -83,7 +83,6 @@
 #include <libed2k/util.hpp>
 #include <queue>
 #include <string.h>
-#include "dnsupdater.h"
 
 using namespace libtorrent;
 
@@ -112,7 +111,7 @@ QBtSession::QBtSession()
   , geoipDBLoaded(false), resolve_countries(false)
   #endif
   , m_tracker(0), m_shutdownAct(NO_SHUTDOWN),
-    m_upnp(0), m_natpmp(0), m_dynDNSUpdater(0)
+    m_upnp(0), m_natpmp(0)
 {}
 
 void QBtSession::start()

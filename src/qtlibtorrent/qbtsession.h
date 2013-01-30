@@ -61,7 +61,6 @@ class HttpServer;
 #endif
 class BandwidthScheduler;
 class ScanFoldersModel;
-class DNSUpdater;
 
 namespace aux
 {
@@ -249,8 +248,6 @@ private:
   // Port forwarding
   libtorrent::upnp *m_upnp;
   libtorrent::natpmp *m_natpmp;
-  // DynDNS
-  DNSUpdater *m_dynDNSUpdater;
 };
 
 }

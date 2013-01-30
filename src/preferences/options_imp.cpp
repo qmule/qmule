@@ -50,7 +50,6 @@
 #include "scannedfoldersmodel.h"
 #include "transport/session.h"
 #include "iconprovider.h"
-#include "dnsupdater.h"
 
 #ifndef QT_NO_OPENSSL
 #include <QSslKey>
