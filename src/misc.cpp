@@ -74,8 +74,11 @@ const int UNLEN = 256;
 #endif
 
 #include "libtorrent/bencode.hpp"
-// need to be activated on windows
-//#include "transport/session.h"
+
+#ifdef Q_WS_WIN
+// migration
+#include "transport/session.h"
+#endif
 #include "torrentpersistentdata.h"
 
 #ifndef DISABLE_GUI
