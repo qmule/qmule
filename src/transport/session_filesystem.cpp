@@ -571,12 +571,12 @@ void DirNode::delete_node(const FileNode* node)
     {
         m_dir_vector.erase(std::remove(m_dir_vector.begin(), m_dir_vector.end(), node), m_dir_vector.end());
         Session::instance()->removeDirectory((DirNode*)node);
-        Q_ASSERT(m_dir_children.take(node->filename()));
+        m_dir_children.take(node->filename());
     }
     else
     {
         m_file_vector.erase(std::remove(m_file_vector.begin(), m_file_vector.end(), node), m_file_vector.end());
-        Q_ASSERT(m_file_children.take(node->filename()));
+        m_file_children.take(node->filename());
     }
 
     delete node;
