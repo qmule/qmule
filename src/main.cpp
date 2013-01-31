@@ -100,7 +100,7 @@ void sigsegvHandler(int) {
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
   std::cerr << "Catching SIGSEGV, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
-  std::cerr << "qMule version: " << VERSION << std::endl;
+  std::cerr << "qMule version: " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_UPDATE << "." << VERSION_BUILD << std::endl;
   print_stacktrace();
   raise(SIGSEGV);
 }
@@ -110,7 +110,7 @@ void sigabrtHandler(int) {
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
   std::cerr << "Catching SIGABRT, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
-  std::cerr << "qMule version: " << VERSION << std::endl;
+  std::cerr << "qMule version: " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_UPDATE << "." << VERSION_BUILD << std::endl;
   print_stacktrace();
   raise(SIGABRT);
 }
