@@ -86,6 +86,8 @@ private slots:
     void openSelectedFile();
     void openSumFile(const QModelIndex& index);
     void openSelectedSumFile();
+    void on_treeView_expanded(const QModelIndex &index);
+    void on_treeView_collapsed(const QModelIndex &index);
 };
 
 #endif // FILES_WIDGET_H

@@ -636,3 +636,13 @@ void files_widget::openSelectedSumFile()
     if (selectedIndexes.size() == 1)
         openSumFile(selectedIndexes.first());
 }
+
+void files_widget::on_treeView_expanded(const QModelIndex &index)
+{
+    treeView->resizeColumnToContents(0);
+}
+
+void files_widget::on_treeView_collapsed(const QModelIndex &index)
+{
+    treeView->resizeColumnToContents(0);
+}
