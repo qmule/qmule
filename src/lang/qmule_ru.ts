@@ -1741,7 +1741,7 @@ No further notices will be issued.</source>
         <translation>Установлена новая версия %1.%2.%3.%4, изменения вступят в силу после перезагрузки программы</translation>
     </message>
     <message>
-        <source>Your version is obsolete, new version %1.%2.%3.%4 avaialable</source>
+        <source>Your version is obsolete, new version %1.%2.%3.%4 available</source>
         <translation>Ваша версия программы более не поддерживается, рекомендуем скачать и установить новую версию %1.%2.%3.%4</translation>
     </message>
     <message>
@@ -6503,7 +6503,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Filter/Filepath</source>
-        <translation>Фильры/Директории</translation>
+        <translation>Фильтры/Директории</translation>
     </message>
 </context>
 <context>

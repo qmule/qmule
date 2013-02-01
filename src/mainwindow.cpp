@@ -1715,7 +1715,7 @@ void MainWindow::new_version_ready(int major,int minor, int update,int build)
 
 void MainWindow::current_version_obsolete(int major, int minor, int update, int build)
 {
-    QMessageBox::information(this, tr("Update"), tr("Your version is obsolete, new version %1.%2.%3.%4 avaialable")
+    QMessageBox::information(this, tr("Update"), tr("Your version is obsolete, new version %1.%2.%3.%4 available")
                              .arg(major)
                              .arg(minor)
                              .arg(update)
