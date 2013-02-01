@@ -857,7 +857,7 @@ void QBtSession::loadTorrentSettings(QTorrentHandle& h) {
 #endif
 }
 
-void correctMagnetSavings(const QString& magnetHash)
+QString fixMagnetPersistentData(const QString& magnetHash)
 {
     QDir torrentBackup(misc::BTBackupLocation());
     QString torrentPath = torrentBackup.absoluteFilePath(magnetHash+".torrent");
@@ -867,8 +867,12 @@ void correctMagnetSavings(const QString& magnetHash)
     if (magnetHash != torrentHash)
     {
         torrentBackup.rename(magnetHash+".torrent", torrentHash+".torrent");
-        torrentBackup.rename(magnetHash+".fastresume", torrentHash+".fastresume");
+        torrentBackup.remove(magnetHash+".fastresume");
+        TorrentPersistentData::saveHash(magnetHash, torrentHash);
+        TorrentPersistentData::saveMagnet(torrentHash, false);
     }
+
+    return torrentHash;
 }
 
 QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* = false */)
@@ -884,10 +888,10 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
   const QDir torrentBackup(misc::BTBackupLocation());
   if (resumed) {
     // Load metadata
-    const QString torrent_path = torrentBackup.absoluteFilePath(hash+".torrent");
+    QString torrent_path = torrentBackup.absoluteFilePath(hash+".torrent");
     if (QFile::exists(torrent_path))
     {
-        //correctMagnetSavings(hash);
+      torrent_path = torrentBackup.absoluteFilePath(fixMagnetPersistentData(hash)+".torrent");
       return qMakePair(Transfer(addTorrent(torrent_path, false, QString::null, true)), ec);
     }
   }
