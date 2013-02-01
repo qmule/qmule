@@ -857,6 +857,20 @@ void QBtSession::loadTorrentSettings(QTorrentHandle& h) {
 #endif
 }
 
+void correctMagnetSavings(const QString& magnetHash)
+{
+    QDir torrentBackup(misc::BTBackupLocation());
+    QString torrentPath = torrentBackup.absoluteFilePath(magnetHash+".torrent");
+    torrent_info info(torrentPath.toUtf8().constData());
+    QString torrentHash = misc::toQString(info.info_hash());
+
+    if (magnetHash != torrentHash)
+    {
+        torrentBackup.rename(magnetHash+".torrent", torrentHash+".torrent");
+        torrentBackup.rename(magnetHash+".fastresume", torrentHash+".fastresume");
+    }
+}
+
 QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* = false */)
 {
   QTorrentHandle h;
@@ -872,7 +886,10 @@ QPair<Transfer,ErrorCode> QBtSession::addLink(QString strLink, bool resumed /* =
     // Load metadata
     const QString torrent_path = torrentBackup.absoluteFilePath(hash+".torrent");
     if (QFile::exists(torrent_path))
+    {
+        //correctMagnetSavings(hash);
       return qMakePair(Transfer(addTorrent(torrent_path, false, QString::null, true)), ec);
+    }
   }
 
   qDebug("Adding a magnet URI: %s", qPrintable(hash));
