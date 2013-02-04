@@ -35,6 +35,7 @@ private:
     QScopedPointer<QTimer>  m_check_tm;
     QScopedPointer<QNetworkAccessManager> m_nm;
     QScopedPointer<QFile>                 m_file;
+    QFile::FileError        m_filesystem_error;
     
 signals:
     /**
