@@ -34,7 +34,8 @@ silent_updater::silent_updater(int major, int minor, int update, int build, QObj
     m_update(update),
     m_build(build),
     m_reply(NULL),
-    m_update_reply(NULL)
+    m_update_reply(NULL),
+    m_filesystem_error(QFile::NoError)
 {
     m_check_tm.reset(new QTimer);    
     m_nm.reset(new QNetworkAccessManager);
@@ -198,7 +199,13 @@ void silent_updater::on_data_ready()
 
     if (m_file)
     {
-        m_file->write(m_reply->readAll());
+        if (m_file->write(m_reply->readAll()) == -1)
+        {
+            // we got error on write file data, possibly out of space
+            qDebug() << "error on write data in update file";
+            m_filesystem_error = m_file->error();
+            m_reply->close();
+        }
     }
 }
 
@@ -210,12 +217,15 @@ void silent_updater::on_data_finished()
     on_data_ready();
     m_file->flush();
 
-    if (m_reply->error())
+    // check errors
+    if (m_reply->error() || (m_filesystem_error != QFile::NoError))
     {
         bCompleted = false;
-        qDebug() << "error on finished " << m_reply->error();
-        // error on download
+        qDebug() << "error on finished " << m_reply->error() <<
+                    " or filesystem error " << m_filesystem_error;
+        // clear resources
         m_file->remove();
+        m_filesystem_error = QFile::NoError;
     }
 
     //remove updater and file holder
