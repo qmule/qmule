@@ -10,7 +10,6 @@ INCLUDEPATH += $$(LIBTORRENT_ROOT)/zlib
 INCLUDEPATH += $$(OPENSSL_ROOT)/include
 #Point this to the ed2klib include folder
 INCLUDEPATH += $$(LIBED2K_ROOT)/include
-INCLUDEPATH += $$(CRYPTOPP_ROOT)
 
 #Point this to the openssl lib folder
 LIBS += -L$$(OPENSSL_ROOT)/lib/VC
@@ -18,10 +17,6 @@ LIBS += -L$$(OPENSSL_ROOT)/lib/VC
 LIBS += -L$$(LIBTORRENT_ROOT)/lib
 #Point this to the boost lib folder
 LIBS += -L$$(BOOST_ROOT)/stage/lib
-
-# select appropriate crypto++ library
-Debug:LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 
-Release:LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Release -L$$(CRYPTOPP_ROOT)/Win32/Output/Release
 
 #Point this to the ed2klib lib folder
 Debug:LIBS += -L$$(LIBED2K_ROOT)/Win32/Debug
