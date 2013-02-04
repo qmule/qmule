@@ -50,7 +50,6 @@
 #include "qtsinglecoreapplication.h"
 #include <iostream>
 #include <stdio.h>
-#include "headlessloader.h"
 #endif
 
 #include "preferences.h"
@@ -293,8 +292,6 @@ int main(int argc, char *argv[]) {
                    &window, SLOT(processParams(const QString&)));  
   app.setActivationWindow(&window);
 #else
-  // Load Headless class
-  HeadlessLoader loader(dataList);
   QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
                    &loader, SLOT(processParams(const QString&)));
 #endif

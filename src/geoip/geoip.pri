@@ -15,5 +15,5 @@ contains(DEFINES, WITH_GEOIP_EMBEDDED) {
     error("GeoIP.dat was not found in src/geoip/ folder, please follow instructions in src/geoip/README.")
   }
 } else {
-  message("GeoIP database will not be embedded in qBittorrent executable.")
+  message("GeoIP database will not be embedded in qMule executable.")
 }

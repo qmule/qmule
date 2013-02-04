@@ -749,34 +749,6 @@ You should get this information from your Web browser preferences.</source>
     </message>
 </context>
 <context>
-    <name>HeadlessLoader</name>
-    <message>
-        <location filename="../headlessloader.h" line="54"/>
-        <source>Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../headlessloader.h" line="55"/>
-        <source>To control qMule, access the Web UI at http://localhost:%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../headlessloader.h" line="56"/>
-        <source>The Web UI administrator user name is: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../headlessloader.h" line="59"/>
-        <source>The Web UI administrator password is still the default one: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../headlessloader.h" line="60"/>
-        <source>This is a security risk, please consider changing your password from program preferences.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>HttpConnection</name>
     <message>
         <location filename="../webui/httpconnection.cpp" line="184"/>

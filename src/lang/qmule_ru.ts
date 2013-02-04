@@ -1530,29 +1530,6 @@ Would you like to update qMule to version %1?</source>
     </message>
 </context>
 <context>
-    <name>HeadlessLoader</name>
-    <message>
-        <source>Information</source>
-        <translation type="obsolete">Информация</translation>
-    </message>
-    <message>
-        <source>To control qMule, access the Web UI at http://localhost:%1</source>
-        <translation type="obsolete">Чтобы управлять qMule откройте браузер по адресу http://localhost:%1</translation>
-    </message>
-    <message>
-        <source>The Web UI administrator user name is: %1</source>
-        <translation type="obsolete">Администратор Web интерфейса: %1</translation>
-    </message>
-    <message>
-        <source>The Web UI administrator password is still the default one: %1</source>
-        <translation type="obsolete">Пароль администратора Web интерфейса все еще пароль по умолчанию: %1</translation>
-    </message>
-    <message>
-        <source>This is a security risk, please consider changing your password from program preferences.</source>
-        <translation type="obsolete">Риск безопасности, пожалуйста, смените ваш пароль в настройках программы.</translation>
-    </message>
-</context>
-<context>
     <name>HttpConnection</name>
     <message>
         <source>Your IP address has been banned after too many failed authentication attempts.</source>

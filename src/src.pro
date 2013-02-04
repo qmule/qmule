@@ -116,9 +116,6 @@ SOURCES += main.cpp \
            misc.cpp \
            smtp.cpp
 
-nox {
-  HEADERS += headlessloader.h
-} else {
   HEADERS +=  mainwindow.h\
               transferlistwidget.h \
               transferlistdelegate.h \
@@ -218,7 +215,6 @@ nox {
            user_properties.ui \
            torrent_properties.ui \
            ed2k_link_maker.ui
-}
 
 DESTDIR = .
 
