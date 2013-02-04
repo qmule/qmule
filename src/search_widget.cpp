@@ -475,6 +475,9 @@ void search_widget::load()
 {
     Preferences pref;
     pref.beginGroup("SearchWidget");
+    checkPlus->setChecked(pref.value("CheckPlus", false).toBool());
+    checkOwn->setChecked(pref.value("CheckOwn", false).toBool());
+
 
     if(pref.contains("TreeResultHeader"))
     {
@@ -523,6 +526,8 @@ void search_widget::save() const
 {
     Preferences pref;
     pref.beginGroup("SearchWidget");
+    pref.setValue("CheckPlus", checkPlus->isChecked());
+    pref.setValue("CheckOwn", checkOwn->isChecked());
     pref.setValue("CurrentTab", tabSearch->currentIndex());
     pref.setValue("TreeResultHeader", treeResult->header()->saveState());
     pref.beginWriteArray("SearchResults", searchItems.size());
