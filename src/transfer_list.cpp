@@ -220,7 +220,6 @@ void transfer_list::btnSwitchClick()
     btnSwitch->setText(btnText[ii]);
 
     ProcessTopButton(ii);
-    Preferences().setValue("TransferList\TopButton", ii);
 }
 
 void transfer_list::btnSwitchClick2()
@@ -237,8 +236,6 @@ void transfer_list::btnSwitchClick2()
     btnSwitch2->setText(btnText[ii + 2]);
 
     ProcessBottomButton(ii);
-
-    Preferences().setValue("TransferList\BottomButton", ii);
 }
 
 void transfer_list::btnTopClick()
