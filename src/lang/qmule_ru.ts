@@ -5384,8 +5384,12 @@ Do you want to install it now?</source>
         <translation>Был виден:</translation>
     </message>
     <message>
-        <source>Incorrect IP and port!</source>
-        <translation>ВВедите верный IP и порт!</translation>
+        <source>Empty IP or user name</source>
+        <translation>IP адрес и имя пользователя не могут быть пустыми</translation>
+    </message>
+    <message>
+        <source>Incorrect IP</source>
+        <translation>Неправильный IP адрес</translation>
     </message>
     <message>
         <source>Add...</source>

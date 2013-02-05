@@ -17,24 +17,25 @@ add_friend::~add_friend()
 
 void add_friend::onAccept()
 {
-    if (!editIP->text().length() || !editPort->text().length())
+    if (editIP->text().isEmpty() ||
+            editName->text().isEmpty())
     {
-        bool bok;
-        editPort->text().toInt(&bok);
-        QRegExpValidator validatorIP(QRegExp("[0-9]{1,3}(.[0-9]{1,3}){3,3}"), this);
-        int pos;
-        QString strIP = editIP->text();
+        QMessageBox::warning(NULL, "qMule", tr("Empty IP or user name"), QMessageBox::Ok);
+        return;
+    }
 
-        if (!bok || validatorIP.validate(strIP, pos) != QValidator::Acceptable)
-        {
-            QMessageBox::warning(NULL, "eMule", tr("Incorrect IP and port!"), QMessageBox::Ok);
-            return;
-        }
-    }
-    else
+    QRegExpValidator validatorIP(QRegExp("(\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3})"), this);
+
+    int pos;
+    QString strIP = editIP->text();
+
+    if (validatorIP.validate(strIP, pos) != QValidator::Acceptable)
     {
-        accept();
+        QMessageBox::warning(NULL, "qMule", tr("Incorrect IP"), QMessageBox::Ok);
+        return;
     }
+
+    accept();
 }
 
 void add_friend::onReject()
