@@ -6,8 +6,10 @@
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
 #include <libed2k/error_code.hpp>
-#include "libed2k/transfer_handle.hpp"
-#include "libed2k/alert_types.hpp"
+#include <libed2k/transfer_handle.hpp>
+#include <libed2k/alert_types.hpp>
+#include <libed2k/ip_filter.hpp>
+#include <libed2k/util.hpp>
 
 
 #include <QNetworkInterface>
@@ -252,6 +254,38 @@ void QED2KSession::start()
 
     m_session->set_alert_mask(alert::all_categories);
     m_session->set_alert_queue_size_limit(100000);
+
+    // attempt load filters
+    QFile fdata(misc::ED2KMetaLocation("ipfilter.dat"));
+    if (fdata.open(QFile::ReadOnly))
+    {
+        qDebug() << "ipfilter.dat was opened";
+        int filters_count = 0;
+        libed2k::ip_filter filter;
+        QTextStream fstream(&fdata);
+
+        while(!fstream.atEnd())
+        {
+            libed2k::error_code ec;
+            libed2k::dat_rule drule = libed2k::datline2filter(fstream.readLine().toStdString(), ec);
+
+            if (!ec && drule.level < 127)
+            {
+                filter.add_rule(drule.begin, drule.end, libed2k::ip_filter::blocked);
+                ++filters_count;
+            }
+        }
+
+        m_session->set_ip_filter(filter);
+        qDebug() << filters_count << " were added";
+
+        fdata.close();
+    }
+    else
+    {
+        qDebug() << "ipfilter.dat wasn't found";
+    }
+
     // start listening on special interface and port and start server connection
     configureSession();
 }
