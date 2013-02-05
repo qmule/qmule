@@ -1463,6 +1463,8 @@ Transfer search_widget::download()
 
         return addTransfer(*iter);
     }
+
+    return Transfer();
 }
 
 void search_widget::downloadPause()
