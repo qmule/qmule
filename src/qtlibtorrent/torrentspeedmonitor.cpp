@@ -121,7 +121,7 @@ qlonglong TorrentSpeedMonitor::getETA(const QString &hash) const
 
 void TorrentSpeedMonitor::getSamples()
 {
-  const std::vector<Transfer> torrents = m_session->getTransfers();
+  const std::vector<Transfer> torrents = m_session->getActiveTransfers();
   std::vector<Transfer>::const_iterator it;
   for (it = torrents.begin(); it != torrents.end(); it++) {
     try {

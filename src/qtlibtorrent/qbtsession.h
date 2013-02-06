@@ -85,6 +85,7 @@ public:
   std::vector<libtorrent::torrent_handle> getTorrents() const;
   Transfer getTransfer(const QString& hash) const;
   std::vector<Transfer> getTransfers() const;
+  std::vector<Transfer> getActiveTransfers() const;
   qreal getPayloadDownloadRate() const;
   qreal getPayloadUploadRate() const;
   SessionStatus getSessionStatus() const;

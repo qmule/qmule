@@ -832,6 +832,10 @@ std::vector<Transfer> QBtSession::getTransfers() const {
   return transfers;
 }
 
+std::vector<Transfer> QBtSession::getActiveTransfers() const {
+  return getTransfers();
+}
+
 bool QBtSession::loadFastResumeData(const QString &hash, std::vector<char> &buf) {
   const QString fastresume_path = QDir(misc::BTBackupLocation()).absoluteFilePath(hash+QString(".fastresume"));
   qDebug("Trying to load fastresume data: %s", qPrintable(fastresume_path));
