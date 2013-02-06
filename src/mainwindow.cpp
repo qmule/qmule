@@ -365,6 +365,8 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   Session::instance()->start();
+  // after start download new ipfilter.dat
+  m_ipf_getter.reset(new wgetter("tcs.is74.ru/ipfilter.dat", misc::ED2KMetaLocation("ipfilter.dat")));
 }
 
 void MainWindow::deleteSession()
