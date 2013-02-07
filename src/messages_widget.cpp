@@ -372,9 +372,16 @@ void messages_widget::addFriendDlg()
     {
         QString user_name = dlg.getName();
         libed2k::net_identifier netPoint;
-        netPoint.m_nIP = address2int(ip::address::from_string(dlg.getIP().toUtf8().constData()));
-        netPoint.m_nPort = dlg.getPort();
-        addFriend(user_name, netPoint);
+        try
+        {
+            netPoint.m_nIP = address2int(ip::address::from_string(dlg.getIP().toUtf8().constData()));
+            netPoint.m_nPort = dlg.getPort();
+            addFriend(user_name, netPoint);
+        }
+        catch(...)
+        {
+            qDebug() << "error on add user";
+        }
     }
 }
 
