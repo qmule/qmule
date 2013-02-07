@@ -1685,8 +1685,8 @@ void MainWindow::endLoadSharedFileSystem()
     if (!pref.neverCheckFileAssoc() &&
           (!Preferences::isTorrentFileAssocSet() ||
            !Preferences::isLinkAssocSet("Magnet") ||
-           !Preferences::isEmuleFileAssocSet()) ||
-           !Preferences::isLinkAssocSet("ed2k"))
+           !Preferences::isEmuleFileAssocSet() ||
+           !Preferences::isLinkAssocSet("ed2k")))
     {
         if (QMessageBox::question(0, tr("Torrent file association"),
                                  tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
