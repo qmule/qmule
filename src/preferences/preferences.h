@@ -91,6 +91,16 @@ public:
           setED2KDownloadLimit((maxDownload.toLong()==0)?ed2k_max_download:maxDownload.toLong());
           setED2KUploadLimit((maxUpload.toLong()==0)?ed2k_max_upload:maxUpload.toLong());
           misc::migrateTorrents();
+          // migrate old ipfilter.dat file
+          if (QFile::copy(misc::emuleConfig("ipfilter.dat"), misc::ED2KMetaLocation("ipfilter.dat")))
+          {
+              qDebug() << "succesfully migrate ipfilter.dat";
+          }
+          else
+          {
+              qDebug() << "unable to copy " << misc::emuleConfig("ipfilter.dat");
+          }
+
           sync();
       }
   }

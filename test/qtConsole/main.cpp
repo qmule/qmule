@@ -6,12 +6,13 @@
 #include <QFileInfo>
 #include <QDirIterator>
 
-#include <libed2k/is_crypto.hpp>
 #ifdef Q_WS_WIN
 #include <PowrProf.h>
 #include "windows.h"
 #include "Shlobj.h"
 #endif
+
+#include "../../src/wgetter.h"
 
 QString getUserIDString()
 {
@@ -282,7 +283,7 @@ QStringList getSubDirs(const QString& strBase)
 }
 
 int main(int argc, char *argv[])
-{
+{    
     QCoreApplication a(argc, argv);
     QStringList al = a.arguments();
     al.removeFirst();
@@ -305,10 +306,6 @@ int main(int argc, char *argv[])
     qDebug() << emuleSharedFiles();
     qDebug() << emuleSharedDirs();
 
-    QString qPwd = QString::fromStdString(is_crypto::DecryptPasswd(emuleAuthPassword().toStdString(), emuleKeyFile().toStdString()));
-    //QString qEPwd = QString::fromStdString(is_crypto::EncryptPasswd(qPwd.toStdString(), emuleKeyFile().toStdString()));
-
-    qDebug() << "Decrypted password: " << qPwd << " enc "; // << qEPwd;
     qDebug() << " ==== shared files ======";
     qDebug() << getSharedFiles();
 
@@ -357,5 +354,7 @@ int main(int argc, char *argv[])
     }
 
     qDebug() << getSubDirs("/home/apavlov/work/newmule");
+
+    wgetter w("http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz", "/root/xxx.dat.gz");
     return a.exec();
 }
