@@ -171,7 +171,7 @@ public:
   static QString searchEngineLocation();
   static QString BTBackupLocation();
   static QString ED2KBackupLocation();
-  static QString ED2KKeyFile();
+  static QString ED2KMetaLocation(const QString&);
   static QString ED2KCollectionLocation();
   static QString XCatalogCacheLocation();
   static QString cacheLocation();

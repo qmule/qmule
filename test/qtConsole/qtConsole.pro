@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core network
 
 QT       -= gui
 
@@ -14,8 +14,10 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+HEADERS += ../../src/wgetter.h
+SOURCES += main.cpp \
+           ../../src/wgetter.cpp
 
-SOURCES += main.cpp
 win32{
   	INCLUDEPATH += $$(LIBED2K_ROOT)\\include $$(CRYPTOPP_ROOT)
 	LIBS += -L$$(CRYPTOPP_ROOT)/Win32/DLL_Output/Debug -L$$(CRYPTOPP_ROOT)/Win32/Output/Debug 

@@ -475,8 +475,8 @@ void search_widget::load()
 {
     Preferences pref;
     pref.beginGroup("SearchWidget");
-    checkPlus->setChecked(pref.value("CheckPlus", false).toBool());
-    checkOwn->setChecked(pref.value("CheckOwn", false).toBool());
+    checkPlus->setChecked(pref.value("CheckPlus", true).toBool());
+    checkOwn->setChecked(pref.value("CheckOwn", true).toBool());
 
 
     if(pref.contains("TreeResultHeader"))
