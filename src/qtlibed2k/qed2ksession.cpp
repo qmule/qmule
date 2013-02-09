@@ -44,7 +44,11 @@ QED2KSearchResultEntry::QED2KSearchResultEntry() :
 
 QED2KSearchResultEntry::QED2KSearchResultEntry(const Preferences& pref)
 {
+#ifdef Q_WS_MAC
+    m_nFilesize = pref.value("Filesize", 0).toString().toULongLong();
+#else
     m_nFilesize = pref.value("Filesize", 0).toULongLong();
+#endif
     m_nSources  = pref.value("Sources", 0).toULongLong();
     m_nCompleteSources  = pref.value("CompleteSources", 0).toULongLong();
     m_nMediaBitrate     = pref.value("MediaBitrate", 0).toULongLong();
@@ -58,7 +62,11 @@ QED2KSearchResultEntry::QED2KSearchResultEntry(const Preferences& pref)
 
 void QED2KSearchResultEntry::save(Preferences& pref) const
 {
+#ifdef Q_WS_MAC
+    pref.setValue("Filesize",       QString::number(m_nFilesize));
+#else
     pref.setValue("Filesize",       m_nFilesize);
+#endif
     pref.setValue("Sources",        m_nSources);
     pref.setValue("CompleteSources",m_nCompleteSources);
     pref.setValue("MediaBitrate",   m_nMediaBitrate);
