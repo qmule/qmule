@@ -44,6 +44,7 @@
 #include "infodlg.h"
 #include "silent_updater.h"
 #include "taskbar_iface.h"
+#include "wgetter.h"
 
 class downloadFromURL;
 class options_imp;
@@ -227,6 +228,7 @@ private:
   QScopedPointer<silent_updater> m_updater;
   QScopedPointer<taskbar_iface>  m_tbar;
   QScopedPointer<QSplashScreen>  m_sscrn;
+  QScopedPointer<wgetter>        m_ipf_getter;
   unsigned int m_nTaskbarButtonCreated;
 
   QIcon icon_disconnected;
@@ -267,8 +269,11 @@ private slots:
     void ed2kConnectionClosed(QString strError);
 
     void on_actionOpenDownloadPath_triggered();
-    void on_beginLoadSharedFileSystem();
-    void on_endLoadSharedFileSystem();
+    void beginLoadSharedFileSystem();
+    void endLoadSharedFileSystem();
+
+    void new_version_ready(int,int,int,int);
+    void current_version_obsolete(int,int,int,int);
 };
 
 #endif

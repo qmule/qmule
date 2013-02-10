@@ -2,9 +2,7 @@
 #include "session.h"
 
 PathModel::PathModel(QObject *parent /* = 0*/)
-    : QAbstractListModel(parent),
-      m_all_icon(":/emule/files/all.ico"),
-      m_sd_icon(":/emule/common/folder_share.ico")
+    : QAbstractListModel(parent)
 {
     foreach(const DirNode* node, Session::instance()->directories())
     {
@@ -17,37 +15,99 @@ PathModel::PathModel(QObject *parent /* = 0*/)
 
 int PathModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-    return m_paths.size() + 1;
+    return m_paths.size() + filters_count;
 }
 
 QVariant PathModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
+    QVariant res;
 
-    if (index.row() > m_paths.size())
-        return QVariant();
+    if (!index.isValid())
+        return res;
+
+    if (index.row() > m_paths.size() + filters_count)
+        return res;
 
     if (role == Qt::DisplayRole)
     {
-        if (index.row() == 0)
+        switch(index.row())
         {
-            return tr("All shared files");
+            case libed2k::ED2KFT_ANY:
+                res = tr("Any");
+                break;
+            case libed2k::ED2KFT_AUDIO:
+                res = tr("Audios");
+                break;
+            case libed2k::ED2KFT_VIDEO:
+                res = tr("Videos");
+                break;
+            case libed2k::ED2KFT_IMAGE:
+                res = tr("Pictures");
+                break;
+            case libed2k::ED2KFT_PROGRAM:
+                res = tr("Programs");
+                break;
+            case libed2k::ED2KFT_DOCUMENT:
+                res = tr("Documents");
+                break;
+            case libed2k::ED2KFT_ARCHIVE:
+                res = tr("Archives");
+                break;
+            case libed2k::ED2KFT_CDIMAGE:
+                res = tr("CD images");
+                break;
+            case libed2k::ED2KFT_EMULECOLLECTION:
+                res = tr("Emule collections");
+                break;
+            case all_files:
+                res = tr("All shared files");
+                break;
+            default:
+                res = m_paths.at(index.row() - filters_count)->filepath();
+                break;
         }
-
-        return m_paths.at(index.row() - 1)->filepath();
     }
     else if (role == Qt::DecorationRole)
     {
-        if (index.row() == 0)
+        switch(index.row())
         {
-            return m_all_icon;
+            case libed2k::ED2KFT_ANY:
+                res = QIcon(":/emule/common/FileTypeAny.ico");
+                break;
+            case libed2k::ED2KFT_AUDIO:
+                res = QIcon(":/emule/common/FileTypeAudio.ico");
+                break;
+            case libed2k::ED2KFT_VIDEO:
+                res = QIcon(":/emule/common/FileTypeVideo.ico");
+                break;
+            case libed2k::ED2KFT_IMAGE:
+                res = QIcon(":/emule/common/FileTypePicture.ico");
+                break;
+            case libed2k::ED2KFT_PROGRAM:
+                res = QIcon(":/emule/common/FileTypeProgram.ico");
+                break;
+            case libed2k::ED2KFT_DOCUMENT:
+                res = QIcon(":/emule/common/FileTypeDocument.ico");
+                break;
+            case libed2k::ED2KFT_ARCHIVE:
+                res = QIcon(":/emule/common/FileTypeArchive.ico");
+                break;
+            case libed2k::ED2KFT_CDIMAGE:
+                res = QIcon(":/emule/common/FileTypeCDImage.ico");
+                break;
+            case libed2k::ED2KFT_EMULECOLLECTION:
+                res = QIcon(":/emule/common/FileTypeEmuleCollection.ico");
+                break;
+            case all_files:
+                res = QIcon(":/emule/files/all.ico");
+                break;
+            default:
+                res = QIcon(":/emule/common/folder_share.ico");
+                break;
         }
-
-        return m_sd_icon;
     }
 
-    return QVariant();
+    return res;
 }
 
 QVariant PathModel::headerData(int section, Qt::Orientation orientation,
@@ -57,7 +117,7 @@ QVariant PathModel::headerData(int section, Qt::Orientation orientation,
         return QVariant();
 
     if (orientation == Qt::Horizontal)
-        return tr("Filepath");
+        return tr("Filter/Filepath");
 
     return QVariant();
 }
@@ -68,9 +128,9 @@ const DirNode* PathModel::node(const QModelIndex& indx) const
 
     if (indx.isValid())
     {
-        if (indx.row() != 0)
+        if (indx.row() >= filters_count)
         {
-            res = m_paths.at(indx.row() - 1);            
+            res = m_paths.at(indx.row() - filters_count);
         }
     }
 
@@ -83,9 +143,32 @@ const QString PathModel::filepath(const QModelIndex& indx) const
 
     if (indx.isValid())
     {
-        if (indx.row() != 0)
+        if (indx.row() >= filters_count)
         {
-            res = m_paths.at(indx.row() - 1)->filepath();
+            res = m_paths.at(indx.row() - filters_count)->filepath();
+        }
+    }
+
+    return res;
+}
+
+BaseFilter* PathModel::filter(const QModelIndex& index) const
+{
+    BaseFilter* res = NULL;
+
+    if (index.isValid())
+    {
+        if (index.row() == all_files)
+        {
+            res = new BaseFilter();
+        }
+        else if (index.row() < filters_count)
+        {
+            res = new TypeFilter((libed2k::EED2KFileType)index.row());
+        }
+        else
+        {
+            res = new PathFilter(m_paths.at(index.row() - filters_count)->filepath());
         }
     }
 

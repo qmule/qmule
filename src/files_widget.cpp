@@ -79,6 +79,19 @@ files_widget::files_widget(QWidget *parent)
     m_filesUnexchSubdir->setIcon(QIcon(":/emule/common/folder_unshare.ico"));
     m_filesUnexchSubdir->setText(tr("Don't exchange with subdirs"));
 
+    m_reloadDirectory = new QAction(this);
+    m_reloadDirectory->setObjectName(QString::fromUtf8("reloadDir"));
+    m_reloadDirectory->setIcon(QIcon(":/emule/common/folder_reload.ico"));
+    m_reloadDirectory->setText(tr("Reload directory"));
+
+    m_openFile = new QAction(this);
+    m_openFile->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+    tableView->addAction(m_openFile);
+
+    m_openSumFile = new QAction(this);
+    m_openSumFile->setShortcut(QKeySequence(QString::fromUtf8("Return")));
+    tableView_files->addAction(m_openSumFile);
+
     m_filesMenu->addAction(m_openFolder);
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesExchDir);
@@ -86,15 +99,17 @@ files_widget::files_widget(QWidget *parent)
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_filesUnexchDir);
     m_filesMenu->addAction(m_filesUnexchSubdir);
+    m_filesMenu->addSeparator();
+    m_filesMenu->addAction(m_reloadDirectory);
 
     connect(tableView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewSelChanged(const QItemSelection &, const QItemSelection &))
+        SLOT(tableViewSelChanged(const QItemSelection &, const QItemSelection &))
     );   
 
     connect(treeView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_treeViewSelChanged(const QItemSelection &, const QItemSelection &))
+        SLOT(treeViewSelChanged(const QItemSelection &, const QItemSelection &))
     );
 
     connect(m_openFolder,         SIGNAL(triggered()), this, SLOT(openFolder()));
@@ -102,8 +117,12 @@ files_widget::files_widget(QWidget *parent)
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
     connect(m_filesUnexchSubdir,  SIGNAL(triggered()), this, SLOT(unxchangeSubdir()));
+    connect(m_reloadDirectory,    SIGNAL(triggered()), this, SLOT(reloadDir()));
+    connect(m_openFile,           SIGNAL(triggered()), this, SLOT(openSelectedFile()));
+    connect(m_openSumFile,        SIGNAL(triggered()), this, SLOT(openSelectedSumFile()));
 
-    connect(m_file_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(on_changeRow(QModelIndex,QModelIndex)));
+    connect(m_file_model, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)),
+            this, SLOT(changeRow(const QModelIndex&,const QModelIndex&)));
 
     connect(tableView->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(sortChanged(int, Qt::SortOrder)));
@@ -117,6 +136,8 @@ files_widget::files_widget(QWidget *parent)
 
     treeView->header()->setSortIndicator(BaseModel::DC_STATUS, Qt::AscendingOrder);
     tableView->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);        
+
+    connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFile(QModelIndex)));
 
     // ======== summary page ==============
 
@@ -151,11 +172,11 @@ files_widget::files_widget(QWidget *parent)
 
     connect(tableView_paths->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewPathsSumSelChanged(QItemSelection,QItemSelection)));
+        SLOT(tableViewPathsSumSelChanged(QItemSelection,QItemSelection)));
 
     connect(tableView_files->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        SLOT(on_tableViewFilesSumSelChanged(const QItemSelection &, const QItemSelection &)));
+        SLOT(tableViewFilesSumSelChanged(const QItemSelection &, const QItemSelection &)));
 
     connect(tableView_paths->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
             this, SLOT(paths_sortChanged(int, Qt::SortOrder)));
@@ -166,6 +187,8 @@ files_widget::files_widget(QWidget *parent)
     tableView_files->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tableView_files->horizontalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(displayHSMenuSummary(const QPoint&)));
+
+    connect(tableView_files, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openSumFile(QModelIndex)));
 
     // pre-sort summary models
     tableView_paths->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
@@ -251,6 +274,20 @@ void files_widget::unxchangeSubdir()
        QApplication::setOverrideCursor(Qt::WaitCursor);
        qDebug() << "call unshareDirectoryR";
        static_cast<FileNode*>(indx.internalPointer())->unshare(true);
+       QApplication::restoreOverrideCursor();
+    }
+}
+
+void files_widget::reloadDir()
+{
+    QModelIndex indx = sort2dir(treeView->selectionModel()->currentIndex());
+
+    if (indx.isValid())
+    {
+       QApplication::setOverrideCursor(Qt::WaitCursor);
+       qDebug() << "call reload dir";
+       static_cast<DirNode*>(indx.internalPointer())->populate(true);
+       //static_cast<DirNode*>(indx.internalPointer())->deleteTransfer();
        QApplication::restoreOverrideCursor();
     }
 }
@@ -426,12 +463,12 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
     }
 }
 
-void files_widget::on_tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
+void files_widget::tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
 {    
     switchLinkWidget(generateLinks());
 }
 
-void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::treeViewSelChanged(const QItemSelection&, const QItemSelection&)
 {   
     QModelIndex index = sort2dir(treeView->currentIndex());
 
@@ -442,18 +479,18 @@ void files_widget::on_treeViewSelChanged(const QItemSelection&, const QItemSelec
     }
 }
 
-void files_widget::on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&)
 {
     QModelIndex index = sort2dir_sum(tableView_paths->currentIndex());
 
     if (index.isValid())
     {
         switchLinkWidget(QStringList());
-        m_sum_file_model->setFilter(m_path_model->filepath(index));
+        m_sum_file_model->setFilter(m_path_model->filter(index));
     }
 }
 
-void files_widget::on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
+void files_widget::tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
 {
     switchLinkWidget(generateLinksSum());
 }
@@ -500,7 +537,7 @@ void files_widget::on_btnCopy_clicked()
     putToClipboard();
 }
 
-void files_widget::on_changeRow(const QModelIndex& left, const QModelIndex& right)
+void files_widget::changeRow(const QModelIndex& left, const QModelIndex& right)
 {
     Q_UNUSED(right);    
 
@@ -572,4 +609,40 @@ void files_widget::on_tabWidget_currentChanged(int index)
 {
     tableView->clearSelection();
     tableView_files->clearSelection();
+}
+
+void files_widget::openFile(const QModelIndex& index)
+{
+    QModelIndex fileIndex = sort2file(index);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_file_model->filepath(fileIndex)));
+}
+
+void files_widget::openSelectedFile()
+{
+    const QModelIndexList selectedIndexes = tableView->selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        openFile(selectedIndexes.first());
+}
+
+void files_widget::openSumFile(const QModelIndex& index)
+{
+    QModelIndex fileIndex = sort2file_sum(index);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_file_model->filepath(fileIndex)));
+}
+
+void files_widget::openSelectedSumFile()
+{
+    const QModelIndexList selectedIndexes = tableView_files->selectionModel()->selectedRows();
+    if (selectedIndexes.size() == 1)
+        openSumFile(selectedIndexes.first());
+}
+
+void files_widget::on_treeView_expanded(const QModelIndex &index)
+{
+    treeView->resizeColumnToContents(0);
+}
+
+void files_widget::on_treeView_collapsed(const QModelIndex &index)
+{
+    treeView->resizeColumnToContents(0);
 }

@@ -108,89 +108,88 @@ HEADERS += misc.h \
            filesystemwatcher.h \
            scannedfoldersmodel.h \
            qinisettings.h \
-           smtp.h \
-           dnsupdater.h
+           smtp.h
 
 SOURCES += main.cpp \
            downloadthread.cpp \
            scannedfoldersmodel.cpp \
            misc.cpp \
-           smtp.cpp \
-           dnsupdater.cpp
+           smtp.cpp
 
-nox {
-  HEADERS += headlessloader.h
-} else {
-  HEADERS +=  mainwindow.h\
-              transferlistwidget.h \
-              transferlistdelegate.h \
-              transferlistfilterswidget.h \
-              torrentcontentmodel.h \
-              torrentcontentmodelitem.h \
-              torrentcontentfiltermodel.h \
-              deletionconfirmationdlg.h \
-              reverseresolution.h \
-              ico.h \
-              speedlimitdlg.h \
-              previewselect.h \
-              previewlistdelegate.h \
-              downloadfromurldlg.h \
-              torrentadditiondlg.h \
-              trackerlogin.h \
-              hidabletabwidget.h \
-              sessionapplication.h \
-              torrentimportdlg.h \
-              executionlog.h \
-              iconprovider.h \
-              updownratiodlg.h \
-              loglistwidget.h \
-              transfer_list.h \
-              status_widget.h  \
-              search_widget.h \
-              search_widget_delegate.h \
-              search_filter.h \
-              messages_widget.h \
-              add_friend.h \
-              files_widget.h \
-              status_bar.h \
-              clicked_label.h \
-              collection_save_dlg.h \ 
-              infodlg.h \
-              silent_updater.h\
-              taskbar_iface.h \
-              user_properties.h \
-              torrent_properties.h \
-              ed2k_link_maker.h
+HEADERS +=  mainwindow.h\
+          transferlistwidget.h \
+          transferlistdelegate.h \
+          transferlistfilterswidget.h \
+          torrentcontentmodel.h \
+          torrentcontentmodelitem.h \
+          torrentcontentfiltermodel.h \
+          deletionconfirmationdlg.h \
+          reverseresolution.h \
+          ico.h \
+          speedlimitdlg.h \
+          previewselect.h \
+          previewlistdelegate.h \
+          downloadfromurldlg.h \
+          torrentadditiondlg.h \
+          trackerlogin.h \
+          hidabletabwidget.h \
+          sessionapplication.h \
+          torrentimportdlg.h \
+          executionlog.h \
+          iconprovider.h \
+          updownratiodlg.h \
+          loglistwidget.h \
+          transfer_list.h \
+          status_widget.h  \
+          search_widget.h \
+          search_widget_delegate.h \
+          search_filter.h \
+          messages_widget.h \
+          add_friend.h \
+          files_widget.h \
+          status_bar.h \
+          clicked_label.h \
+          collection_save_dlg.h \
+          infodlg.h \
+          silent_updater.h\
+          taskbar_iface.h \
+          user_properties.h \
+          torrent_properties.h \
+          ed2k_link_maker.h \
+          delay.h \
+          wgetter.h
 
-  SOURCES += mainwindow.cpp \
-             ico.cpp \
-             transferlistwidget.cpp \
-             torrentcontentmodel.cpp \
-             torrentcontentmodelitem.cpp \
-             torrentcontentfiltermodel.cpp \
-             torrentadditiondlg.cpp \
-             sessionapplication.cpp \
-             torrentimportdlg.cpp \
-             executionlog.cpp \
-             previewselect.cpp \
-             iconprovider.cpp \
-             updownratiodlg.cpp \
-             loglistwidget.cpp \
-             transfer_list.cpp \
-     	     status_widget.cpp  \
-             search_widget.cpp \
-             search_filter.cpp \
-             messages_widget.cpp \
-             add_friend.cpp \
-             files_widget.cpp \
-             status_bar.cpp \
-             collection_save_dlg.cpp \ 
-             infodlg.cpp \
-             silent_updater.cpp\
-             taskbar_iface.cpp \
-             user_properties.cpp \
-             torrent_properties.cpp \
-             ed2k_link_maker.cpp
+SOURCES += mainwindow.cpp \
+         ico.cpp \
+         transferlistwidget.cpp \
+         torrentcontentmodel.cpp \
+         torrentcontentmodelitem.cpp \
+         torrentcontentfiltermodel.cpp \
+         torrentadditiondlg.cpp \
+         sessionapplication.cpp \
+         torrentimportdlg.cpp \
+         executionlog.cpp \
+         previewselect.cpp \
+         iconprovider.cpp \
+         updownratiodlg.cpp \
+         loglistwidget.cpp \
+         transfer_list.cpp \
+         status_widget.cpp  \
+         search_widget.cpp \
+         search_filter.cpp \
+         messages_widget.cpp \
+         add_friend.cpp \
+         files_widget.cpp \
+         status_bar.cpp \
+         collection_save_dlg.cpp \
+         infodlg.cpp \
+         silent_updater.cpp\
+         taskbar_iface.cpp \
+         user_properties.cpp \
+         torrent_properties.cpp \
+         ed2k_link_maker.cpp \
+         delay.cpp \
+         wgetter.cpp
 
   macx {
     HEADERS += qmacapplication.h 
@@ -218,7 +217,6 @@ nox {
            user_properties.ui \
            torrent_properties.ui \
            ed2k_link_maker.ui
-}
 
 DESTDIR = .
 

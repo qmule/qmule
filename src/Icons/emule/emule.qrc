@@ -75,5 +75,6 @@
         <file>common/folder_unshare.ico</file>
         <file>common/folder_share.ico</file>
         <file>common/folder_open.ico</file>
+        <file>common/folder_reload.ico</file>
     </qresource>
 </RCC>

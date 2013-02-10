@@ -43,6 +43,7 @@
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/entry.hpp>
+#include <libtorrent/peer_info.hpp>
 #if LIBTORRENT_VERSION_MINOR < 15
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #endif

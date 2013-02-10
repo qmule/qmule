@@ -33,6 +33,9 @@ private:
     QAction* m_filesExchSubdir;
     QAction* m_filesUnexchDir;
     QAction* m_filesUnexchSubdir;
+    QAction* m_reloadDirectory;
+    QAction* m_openFile;
+    QAction* m_openSumFile;
 
     DirectoryModel* m_dir_model;
     FilesModel*     m_file_model;
@@ -61,24 +64,30 @@ private slots:
     void exchangeSubdir();
     void unexchangeDir();
     void unxchangeSubdir();
+    void reloadDir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
-    void on_tableViewSelChanged(const QItemSelection &, const QItemSelection &);
-    void on_treeViewSelChanged(const QItemSelection &, const QItemSelection &);
-    void on_tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
-    void on_tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void tableViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void treeViewSelChanged(const QItemSelection &, const QItemSelection &);
+    void tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
+    void tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&);
     void sortChanged(int, Qt::SortOrder);
     void sortChangedDirectory(int, Qt::SortOrder);
-
     void paths_sortChanged(int, Qt::SortOrder);
     void files_sortChanged(int, Qt::SortOrder);
     void on_editLink_textChanged();
     void on_checkForum_toggled(bool checked);
     void on_checkSize_toggled(bool checked);
     void on_btnCopy_clicked();
-    void on_changeRow(const QModelIndex& left, const QModelIndex& right);
+    void changeRow(const QModelIndex& left, const QModelIndex& right);
     void displayHSMenu(const QPoint&);
     void displayHSMenuSummary(const QPoint&);
     void on_tabWidget_currentChanged(int index);
+    void openFile(const QModelIndex& index);
+    void openSelectedFile();
+    void openSumFile(const QModelIndex& index);
+    void openSelectedSumFile();
+    void on_treeView_expanded(const QModelIndex &index);
+    void on_treeView_collapsed(const QModelIndex &index);
 };
 
 #endif // FILES_WIDGET_H

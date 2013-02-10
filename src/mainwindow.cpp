@@ -317,8 +317,8 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(executable_watcher, SIGNAL(fileChanged(QString)), this, SLOT(notifyOfUpdate(QString)));
   executable_watcher->addPath(qApp->applicationFilePath());
 
-  connect(Session::instance(), SIGNAL(beginLoadSharedFileSystem()), this, SLOT(on_beginLoadSharedFileSystem()));
-  connect(Session::instance(), SIGNAL(endLoadSharedFileSystem()), this, SLOT(on_endLoadSharedFileSystem()));
+  connect(Session::instance(), SIGNAL(beginLoadSharedFileSystem()), this, SLOT(beginLoadSharedFileSystem()));
+  connect(Session::instance(), SIGNAL(endLoadSharedFileSystem()), this, SLOT(endLoadSharedFileSystem()));
 
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup transfers..."), Qt::AlignLeft | Qt::AlignBottom);
@@ -345,6 +345,8 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connectioh_state = csDisconnected;
   m_info_dlg.reset(new is_info_dlg(this));
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
+  connect(m_updater.data(), SIGNAL(new_version_ready(int,int,int,int)), this, SLOT(new_version_ready(int,int,int,int)));
+  connect(m_updater.data(), SIGNAL(current_version_is_obsolete(int,int,int,int)), SLOT(current_version_obsolete(int,int,int,int)));
 
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(quint32, quint32, quint32)));
@@ -359,9 +361,12 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(actionToggleVisibility, SIGNAL(triggered()), this, SLOT(toggleVisibility()));
   connect(actionStart_All, SIGNAL(triggered()), Session::instance(), SLOT(resumeAllTransfers()));
   connect(actionPause_All, SIGNAL(triggered()), Session::instance(), SLOT(pauseAllTransfers()));
+
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
   Session::instance()->start();
+  // after start download new ipfilter.dat
+  m_ipf_getter.reset(new wgetter("http://tcs.is74.ru/ipfilter.dat", misc::ED2KMetaLocation("ipfilter.dat")));
 }
 
 void MainWindow::deleteSession()
@@ -1054,13 +1059,14 @@ void MainWindow::on_actionConnect_triggered()
 // the right addTorrent function, considering
 // the parameter type.
 void MainWindow::processParams(const QString& params_str) {
-  processParams(params_str.split("|", QString::SkipEmptyParts));
+  processParams(QStringList(params_str));
 }
 
 void MainWindow::processParams(const QStringList& params)
 {
   Preferences pref;    
   const bool useTorrentAdditionDialog = pref.useAdditionDialog();
+  qDebug() << "process params: " << params;
 
   foreach (QString param, params)
   {
@@ -1536,8 +1542,10 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
     }
 
     m_info_dlg->start();    // start message watcher
-    //temporary commented
-    //m_updater->start();
+
+#ifdef Q_WS_WIN
+    m_updater->start();
+#endif
 
     QString log_msg("Client ID: ");
     QString id;
@@ -1657,13 +1665,13 @@ void MainWindow::on_actionOpenDownloadPath_triggered()
     QDesktopServices::openUrl(QUrl::fromLocalFile(pref.getSavePath()));
 }
 
-void MainWindow::on_beginLoadSharedFileSystem()
+void MainWindow::beginLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
         m_sscrn->showMessage(tr("Begin load shared filesystem..."), Qt::AlignLeft | Qt::AlignBottom);
 }
 
-void MainWindow::on_endLoadSharedFileSystem()
+void MainWindow::endLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
     {
@@ -1675,14 +1683,18 @@ void MainWindow::on_endLoadSharedFileSystem()
 #ifdef Q_WS_WIN
     Preferences pref;
     if (!pref.neverCheckFileAssoc() &&
-          (!Preferences::isTorrentFileAssocSet() || !Preferences::isMagnetLinkAssocSet() || !Preferences::isEmuleFileAssocSet()))
+          (!Preferences::isTorrentFileAssocSet() ||
+           !Preferences::isLinkAssocSet("Magnet") ||
+           !Preferences::isEmuleFileAssocSet() ||
+           !Preferences::isLinkAssocSet("ed2k")))
     {
         if (QMessageBox::question(0, tr("Torrent file association"),
                                  tr("qMule is not the default application to open torrent files, Magnet links or eMule collections.\nDo you want to associate qMule to torrent files, Magnet links and eMule collections?"),
                                  QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
         {
             Preferences::setTorrentFileAssoc(true);
-            Preferences::setMagnetLinkAssoc(true);
+            Preferences::setLinkAssoc("Magnet", true);
+            Preferences::setLinkAssoc("ed2k", true);
             Preferences::setEmuleFileAssoc(true);
             Preferences::setCommonAssocSection(true); // enable common section
         }
@@ -1692,4 +1704,22 @@ void MainWindow::on_endLoadSharedFileSystem()
         }
     }
 #endif
+}
+
+void MainWindow::new_version_ready(int major,int minor, int update,int build)
+{
+    QMessageBox::information(this, tr("Update"), tr("New version %1.%2.%3.%4 was set, changes will activate after program restart")
+                             .arg(major)
+                             .arg(minor)
+                             .arg(update)
+                             .arg(build));
+}
+
+void MainWindow::current_version_obsolete(int major, int minor, int update, int build)
+{
+    QMessageBox::information(this, tr("Update"), tr("Your version is obsolete, new version %1.%2.%3.%4 available")
+                             .arg(major)
+                             .arg(minor)
+                             .arg(update)
+                             .arg(build));
 }

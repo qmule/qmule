@@ -31,7 +31,6 @@
 #ifndef MISC_H
 #define MISC_H
 
-#include <boost/function.hpp>
 #include <libtorrent/version.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/torrent_handle.hpp>
@@ -44,13 +43,12 @@
 #include <QPoint>
 #include <QFile>
 #include <QDir>
-#include <QTimer>
 #ifndef DISABLE_GUI
 #include <QIcon>
 #endif
 
 #define PRODUCT_NAME "qMule"
-#define COMPANY_NAME "intersvyaz"
+#define COMPANY_NAME "mulehome"
 
 const qlonglong MAX_ETA = 8640000;
 
@@ -77,8 +75,14 @@ private:
 public:
   static QString productName()
   {
-      static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
-      return tr("%1 %2: %3", "e.g: qMule v0.x").arg(PRODUCT_NAME).arg(VERSION).arg(strBuildDate);
+      // do not use build date after actual version
+      //static QString strBuildDate = QString::fromLocal8Bit(BUILDDATE).remove(QChar('\n'));
+      return tr("%1 v%2.%3.%4.%5", "e.g: qMule v0.x")
+              .arg(PRODUCT_NAME)
+              .arg(VERSION_MAJOR)
+              .arg(VERSION_MINOR)
+              .arg(VERSION_UPDATE)
+              .arg(VERSION_BUILD);
   }
 
   static inline QString toQString(const std::string &str) {
@@ -167,7 +171,7 @@ public:
   static QString searchEngineLocation();
   static QString BTBackupLocation();
   static QString ED2KBackupLocation();
-  static QString ED2KKeyFile();
+  static QString ED2KMetaLocation(const QString&);
   static QString ED2KCollectionLocation();
   static QString XCatalogCacheLocation();
   static QString cacheLocation();
@@ -199,6 +203,8 @@ public:
   static bool isValidTorrentFile(const QString &path);
   static QSet<QString> torrentRoots(const QTorrentHandle& h);
 
+  static QStringList cmd2list(const QString&);
+
   /**
     * eMule migration functions
     * helpers for quiet migration
@@ -221,22 +227,6 @@ public:
   static QStringList migrationSharedFiles();
   static void migrateTorrents();
 
-};
-
-class Delay : QObject
-{
-    Q_OBJECT
-public:
-    Delay(int mseconds);
-    ~Delay();
-    void execute(boost::function<void()>);
-    void cancel();
-private:
-    int m_mseconds;
-    QTimer m_timer;
-    boost::function<void()> m_delegate;
-private slots:
-    void on_timeout();
 };
 
 //  Trick to get a portable sleep() function

@@ -35,9 +35,14 @@ private:
     QScopedPointer<QTimer>  m_check_tm;
     QScopedPointer<QNetworkAccessManager> m_nm;
     QScopedPointer<QFile>                 m_file;
+    QFile::FileError        m_filesystem_error;
     
 signals:
-    
+    /**
+      * @params int - major, minor, update, build for new version
+    */
+    void new_version_ready(int, int, int, int);
+    void current_version_is_obsolete(int, int, int, int);
 private slots:
     void on_check_updates();
     void on_update_check_finished();

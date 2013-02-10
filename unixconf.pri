@@ -6,7 +6,7 @@ include(conf.pri)
   QT += dbus
 }
 
-QMAKE_CXXFLAGS += -Wformat -Wformat-security -DBOOST_FILESYSTEM_VERSION=2
+QMAKE_CXXFLAGS += -Wformat -Wformat-security -Werror=return-type -DBOOST_FILESYSTEM_VERSION=2
 QMAKE_LFLAGS_APP += -rdynamic
 CONFIG += link_pkgconfig
 PKGCONFIG += libtorrent-rasterbar

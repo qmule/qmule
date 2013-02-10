@@ -40,6 +40,7 @@
 #include "qed2kpeerhandle.h"
 #include "libed2k/util.hpp"
 #include "user_properties.h"
+#include <libtorrent/peer_info.hpp>
 
 #include <QMessageBox>
 #include <QStandardItemModel>

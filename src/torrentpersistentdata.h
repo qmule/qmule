@@ -405,6 +405,24 @@ public:
     }
   }
 
+  static void saveHash(const QString& oldHash, const QString& newHash) {
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
+    QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
+    QHash<QString, QVariant> data = all_data[oldHash].toHash();
+    all_data.remove(oldHash);
+    all_data[newHash] = data;
+    settings.setValue("torrents", all_data);
+  }
+
+  static void saveMagnet(const QString& hash, bool isMagnet) {
+    QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));
+    QHash<QString, QVariant> all_data = settings.value("torrents").toHash();
+    QHash<QString, QVariant> data = all_data[hash].toHash();
+    data["is_magnet"] = isMagnet;
+    all_data[hash] = data;
+    settings.setValue("torrents", all_data);
+  }
+
   // Getters
   static QString getSavePath(QString hash) {
     QIniSettings settings(QString::fromUtf8(COMPANY_NAME), QString::fromUtf8(PRODUCT_NAME "-resume"));

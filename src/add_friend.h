@@ -14,7 +14,7 @@ public:
 
     QString getName() { return editName->text(); }
     QString getIP()   { return editIP->text(); }
-    QString getPort() { return editPort->text(); }
+    int getPort() { return spinPort->value(); }
 
 private slots:
     void onAccept();

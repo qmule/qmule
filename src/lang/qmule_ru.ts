@@ -1530,29 +1530,6 @@ Would you like to update qMule to version %1?</source>
     </message>
 </context>
 <context>
-    <name>HeadlessLoader</name>
-    <message>
-        <source>Information</source>
-        <translation type="obsolete">Информация</translation>
-    </message>
-    <message>
-        <source>To control qMule, access the Web UI at http://localhost:%1</source>
-        <translation type="obsolete">Чтобы управлять qMule откройте браузер по адресу http://localhost:%1</translation>
-    </message>
-    <message>
-        <source>The Web UI administrator user name is: %1</source>
-        <translation type="obsolete">Администратор Web интерфейса: %1</translation>
-    </message>
-    <message>
-        <source>The Web UI administrator password is still the default one: %1</source>
-        <translation type="obsolete">Пароль администратора Web интерфейса все еще пароль по умолчанию: %1</translation>
-    </message>
-    <message>
-        <source>This is a security risk, please consider changing your password from program preferences.</source>
-        <translation type="obsolete">Риск безопасности, пожалуйста, смените ваш пароль в настройках программы.</translation>
-    </message>
-</context>
-<context>
     <name>HttpConnection</name>
     <message>
         <source>Your IP address has been banned after too many failed authentication attempts.</source>
@@ -1736,6 +1713,18 @@ No further notices will be issued.</source>
 </context>
 <context>
     <name>MainWindow</name>
+    <message>
+        <source>New version %1.%2.%3.%4 was set, changes will activate after program restart</source>
+        <translation>Установлена новая версия %1.%2.%3.%4, изменения вступят в силу после перезагрузки программы</translation>
+    </message>
+    <message>
+        <source>Your version is obsolete, new version %1.%2.%3.%4 available</source>
+        <translation>Ваша версия программы более не поддерживается, рекомендуем скачать и установить новую версию %1.%2.%3.%4</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Обновление программы</translation>
+    </message>
     <message>
         <source>&amp;Edit</source>
         <translation type="obsolete">&amp;Изменить</translation>
@@ -3129,6 +3118,10 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>Use qMule for .torrent files</source>
         <translation>Использовать qMule для .torrent файлов</translation>
+    </message>
+    <message>
+        <source>Use qMule for ed2k links</source>
+        <translation>Использовать qMule для ed2k ссылок</translation>
     </message>
     <message>
         <source>Use qMule for magnet links</source>
@@ -5391,8 +5384,12 @@ Do you want to install it now?</source>
         <translation>Был виден:</translation>
     </message>
     <message>
-        <source>Incorrect IP and port!</source>
-        <translation>ВВедите верный IP и порт!</translation>
+        <source>Empty IP or user name</source>
+        <translation>IP адрес и имя пользователя не могут быть пустыми</translation>
+    </message>
+    <message>
+        <source>Incorrect IP</source>
+        <translation>Неправильный IP адрес</translation>
     </message>
     <message>
         <source>Add...</source>
@@ -6334,6 +6331,10 @@ However, those plugins were disabled.</source>
         <translation>Не обмениваться вместе с подпапками</translation>
     </message>
     <message>
+        <source>Reload directory</source>
+        <translation>Обновить содержимое директории</translation>
+    </message>
+    <message>
         <source>FileSystem browser</source>
         <translation>Файловая система</translation>
     </message>
@@ -6428,11 +6429,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>%1 MB</source>
-        <translation>%1 Мб</translation>
+        <translation>%1 МБ</translation>
     </message>
     <message>
         <source>%1 KB</source>
-        <translation>%1 Кб</translation>
+        <translation>%1 КБ</translation>
     </message>
     <message>
         <source>%1 bytes</source>
@@ -6446,8 +6447,44 @@ However, those plugins were disabled.</source>
         <translation>Все раздаваемые файлы</translation>
     </message>
     <message>
-        <source>Filepath</source>
-        <translation>Директории</translation>
+        <source>Any</source>
+        <translation>Без категории</translation>
+    </message>
+    <message>
+        <source>Audios</source>
+        <translation>Аудио</translation>
+    </message>
+    <message>
+        <source>Videos</source>
+        <translation>Видео</translation>
+    </message>
+    <message>
+        <source>Pictures</source>
+        <translation>Картинки</translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation>Программы</translation>
+    </message>
+    <message>
+        <source>Documents</source>
+        <translation>Документы</translation>
+    </message>
+    <message>
+        <source>Archives</source>
+        <translation>Архивы</translation>
+    </message>
+    <message>
+        <source>CD images</source>
+        <translation>CD образы</translation>
+    </message>
+    <message>
+        <source>Emule collections</source>
+        <translation>Emule коллекции</translation>
+    </message>
+    <message>
+        <source>Filter/Filepath</source>
+        <translation>Фильтры/Директории</translation>
     </message>
 </context>
 <context>
@@ -6667,22 +6704,22 @@ However, those plugins were disabled.</source>
     <message>
         <source>KiB</source>
         <comment>kibibytes (1024 bytes)</comment>
-        <translation>Кб</translation>
+        <translation>КиБ</translation>
     </message>
     <message>
         <source>MiB</source>
         <comment>mebibytes (1024 kibibytes)</comment>
-        <translation>Мб</translation>
+        <translation>МиБ</translation>
     </message>
     <message>
         <source>GiB</source>
         <comment>gibibytes (1024 mibibytes)</comment>
-        <translation>Гб</translation>
+        <translation>ГиБ</translation>
     </message>
     <message>
         <source>TiB</source>
         <comment>tebibytes (1024 gibibytes)</comment>
-        <translation>Тб</translation>
+        <translation>ТиБ</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -6993,6 +7030,10 @@ However, those plugins were disabled.</source>
         <translation>Приём</translation>
     </message>
     <message>
+        <source>Download(Pause)</source>
+        <translation>Приём(Пауза)</translation>
+    </message>
+    <message>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
@@ -7005,12 +7046,20 @@ However, those plugins were disabled.</source>
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <source>kB</source>
-        <translation>Кб</translation>
+        <source>KiB</source>
+        <translation>КиБ</translation>
+    </message>
+    <message>
+        <source>MiB</source>
+        <translation>МиБ</translation>
+    </message>
+    <message>
+        <source>KB</source>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MB</source>
-        <translation>Мб</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>Any</source>
@@ -7057,12 +7106,12 @@ However, those plugins were disabled.</source>
         <translation>Пользователи</translation>
     </message>
     <message>
-        <source>Min. size [MB]</source>
-        <translation>Мин. размер [Мб]</translation>
+        <source>Min. size [MiB]</source>
+        <translation>Мин. размер [МиБ]</translation>
     </message>
     <message>
-        <source>Max. size [MB]</source>
-        <translation>Макс. размер [Мб]</translation>
+        <source>Max. size [MiB]</source>
+        <translation>Макс. размер [МиБ]</translation>
     </message>
     <message>
         <source>Availability</source>

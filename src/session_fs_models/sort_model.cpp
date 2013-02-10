@@ -1,5 +1,6 @@
 #include "sort_model.h"
 #include "base_model.h"
+#include "path_model.h"
 
 
 QChar getNextChar(const QString &s, int location)
@@ -102,11 +103,11 @@ bool PathsSort::lessThan(const QModelIndex& left, const QModelIndex& right) cons
 {
     if (left.column() == 0)
     {
-        if (left.row() == 0)
+        if (left.row() < PathModel::filters_count)
         {
             return (sortOrder() == Qt::AscendingOrder);
         }
-        else if (right.row() == 0)
+        else if (right.row() < PathModel::filters_count)
         {
             return (sortOrder() != Qt::AscendingOrder);
         }

@@ -50,7 +50,6 @@
 #include "qtsinglecoreapplication.h"
 #include <iostream>
 #include <stdio.h>
-#include "headlessloader.h"
 #endif
 
 #include "preferences.h"
@@ -100,7 +99,7 @@ void sigsegvHandler(int) {
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
   std::cerr << "Catching SIGSEGV, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
-  std::cerr << "qMule version: " << VERSION << std::endl;
+  std::cerr << "qMule version: " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_UPDATE << "." << VERSION_BUILD << std::endl;
   print_stacktrace();
   raise(SIGSEGV);
 }
@@ -110,7 +109,7 @@ void sigabrtHandler(int) {
   signal(SIGSEGV, 0);
   std::cerr << "\n\n*************************************************************\n";
   std::cerr << "Catching SIGABRT, please report a bug at http://tcs.is74.ru/crashrpt.php provide the following backtrace:\n";
-  std::cerr << "qMule version: " << VERSION << std::endl;
+  std::cerr << "qMule version: " << VERSION_MAJOR << "." << VERSION_MINOR << "." << VERSION_UPDATE << "." << VERSION_BUILD << std::endl;
   print_stacktrace();
   raise(SIGABRT);
 }
@@ -252,8 +251,12 @@ int main(int argc, char *argv[]) {
   {
     QPixmap splash_img(":/Icons/skin/Logo.png");
     QPainter painter(&splash_img);
-    QString prog_name = "eMule - qMule";
-    QString version = "v0.01";
+    QString prog_name = "qMule";
+    QString version = QString("v%1.%2.%3.%4")
+            .arg(VERSION_MAJOR)
+            .arg(VERSION_MINOR)
+            .arg(VERSION_UPDATE)
+            .arg(VERSION_BUILD);
     painter.setPen(QPen(Qt::black));
     painter.setFont(QFont("Arial", 22, QFont::Black));
     painter.drawText(175 - painter.fontMetrics().width(prog_name) / 2, 220, prog_name);
@@ -289,8 +292,6 @@ int main(int argc, char *argv[]) {
                    &window, SLOT(processParams(const QString&)));  
   app.setActivationWindow(&window);
 #else
-  // Load Headless class
-  HeadlessLoader loader(dataList);
   QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
                    &loader, SLOT(processParams(const QString&)));
 #endif

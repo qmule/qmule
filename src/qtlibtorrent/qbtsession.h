@@ -61,7 +61,6 @@ class HttpServer;
 #endif
 class BandwidthScheduler;
 class ScanFoldersModel;
-class DNSUpdater;
 
 namespace aux
 {
@@ -108,7 +107,7 @@ public slots:
   void addTransferFromFile(const QString& filename);
   QED2KHandle addTransfer(const libed2k::add_transfer_params&);
   QTorrentHandle addTorrent(QString path, bool fromScanDir = false, QString from_url = QString(), bool resumed = false);
-  Transfer addLink(QString strLink, bool resumed, ErrorCode& ec);
+  QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false);
   void loadSessionState();
   void saveSessionState();
   void downloadFromUrl(const QString &url);
@@ -249,8 +248,6 @@ private:
   // Port forwarding
   libtorrent::upnp *m_upnp;
   libtorrent::natpmp *m_natpmp;
-  // DynDNS
-  DNSUpdater *m_dynDNSUpdater;
 };
 
 }

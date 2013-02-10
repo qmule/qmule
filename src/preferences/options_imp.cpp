@@ -50,7 +50,6 @@
 #include "scannedfoldersmodel.h"
 #include "transport/session.h"
 #include "iconprovider.h"
-#include "dnsupdater.h"
 
 #ifndef QT_NO_OPENSSL
 #include <QSslKey>
@@ -148,6 +147,7 @@ options_imp::options_imp(QWidget *parent):
   connect(checkAssociateTorrents, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAssociateMagnetLinks, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAssociateecolls, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(checkAssociateED2KLinks, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
 #endif
   // Downloads tab
   connect(textSavePath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
@@ -359,8 +359,9 @@ void options_imp::saveOptions() {
 #ifdef Q_WS_WIN
   // Windows: file association settings
   Preferences::setTorrentFileAssoc(checkAssociateTorrents->isChecked());
-  Preferences::setMagnetLinkAssoc(checkAssociateMagnetLinks->isChecked());
+  Preferences::setLinkAssoc("Magnet", checkAssociateMagnetLinks->isChecked());
   Preferences::setEmuleFileAssoc(checkAssociateecolls->isChecked());
+  Preferences::setLinkAssoc("ed2k", checkAssociateED2KLinks->isChecked());
   Preferences::setCommonAssocSection(checkAssociateTorrents->isChecked() || checkAssociateecolls->isChecked());
 #endif
   // End General preferences
@@ -530,8 +531,9 @@ void options_imp::loadOptions() {
 #ifdef Q_WS_WIN
   // Windows: file association settings
   checkAssociateTorrents->setChecked(Preferences::isTorrentFileAssocSet());
-  checkAssociateMagnetLinks->setChecked(Preferences::isMagnetLinkAssocSet());
+  checkAssociateMagnetLinks->setChecked(Preferences::isLinkAssocSet("Magnet"));
   checkAssociateecolls->setChecked(Preferences::isEmuleFileAssocSet());
+  checkAssociateED2KLinks->setChecked(Preferences::isLinkAssocSet("ed2k"));
 #endif
   // End General preferences
   // Downloads preferences

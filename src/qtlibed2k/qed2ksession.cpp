@@ -6,8 +6,10 @@
 #include <libed2k/md4_hash.hpp>
 #include <libed2k/search.hpp>
 #include <libed2k/error_code.hpp>
-#include "libed2k/transfer_handle.hpp"
-#include "libed2k/alert_types.hpp"
+#include <libed2k/transfer_handle.hpp>
+#include <libed2k/alert_types.hpp>
+#include <libed2k/ip_filter.hpp>
+#include <libed2k/util.hpp>
 
 
 #include <QNetworkInterface>
@@ -42,7 +44,11 @@ QED2KSearchResultEntry::QED2KSearchResultEntry() :
 
 QED2KSearchResultEntry::QED2KSearchResultEntry(const Preferences& pref)
 {
+#ifdef Q_WS_MAC
+    m_nFilesize = pref.value("Filesize", 0).toString().toULongLong();
+#else
     m_nFilesize = pref.value("Filesize", 0).toULongLong();
+#endif
     m_nSources  = pref.value("Sources", 0).toULongLong();
     m_nCompleteSources  = pref.value("CompleteSources", 0).toULongLong();
     m_nMediaBitrate     = pref.value("MediaBitrate", 0).toULongLong();
@@ -56,7 +62,11 @@ QED2KSearchResultEntry::QED2KSearchResultEntry(const Preferences& pref)
 
 void QED2KSearchResultEntry::save(Preferences& pref) const
 {
+#ifdef Q_WS_MAC
+    pref.setValue("Filesize",       QString::number(m_nFilesize));
+#else
     pref.setValue("Filesize",       m_nFilesize);
+#endif
     pref.setValue("Sources",        m_nSources);
     pref.setValue("CompleteSources",m_nCompleteSources);
     pref.setValue("MediaBitrate",   m_nMediaBitrate);
@@ -232,7 +242,7 @@ void QED2KSession::start()
     settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
     settings.client_name  = pref.nick().toUtf8().constData();
     settings.mod_name = misc::productName().toUtf8().constData();
-    settings.m_announce_timeout = 10; // announcing every 10 seconds
+    settings.m_announce_timeout = 60; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(settings.m_known_file);
@@ -252,6 +262,38 @@ void QED2KSession::start()
 
     m_session->set_alert_mask(alert::all_categories);
     m_session->set_alert_queue_size_limit(100000);
+
+    // attempt load filters
+    QFile fdata(misc::ED2KMetaLocation("ipfilter.dat"));
+    if (fdata.open(QFile::ReadOnly))
+    {
+        qDebug() << "ipfilter.dat was opened";
+        int filters_count = 0;
+        libed2k::ip_filter filter;
+        QTextStream fstream(&fdata);
+
+        while(!fstream.atEnd())
+        {
+            libed2k::error_code ec;
+            libed2k::dat_rule drule = libed2k::datline2filter(fstream.readLine().toStdString(), ec);
+
+            if (!ec && drule.level < 127)
+            {
+                filter.add_rule(drule.begin, drule.end, libed2k::ip_filter::blocked);
+                ++filters_count;
+            }
+        }
+
+        m_session->set_ip_filter(filter);
+        qDebug() << filters_count << " were added";
+
+        fdata.close();
+    }
+    else
+    {
+        qDebug() << "ipfilter.dat wasn't found";
+    }
+
     // start listening on special interface and port and start server connection
     configureSession();
 }
@@ -415,17 +457,20 @@ void QED2KSession::configureSession()
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
 
-Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
+QPair<Transfer,ErrorCode> QED2KSession::addLink(QString strLink, bool resumed /* = false */)
 {
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
-    libed2k::emule_collection_entry ece = libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+    libed2k::emule_collection_entry ece =
+        libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
     QED2KHandle h;
+    ErrorCode ec;
 
     if (ece.defined())
     {
         qDebug("Link is correct, add transfer");
-        QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+        QString filepath = QDir(Preferences().getSavePath()).filePath(
+            QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
         libed2k::add_transfer_params atp;
         atp.file_hash = ece.m_filehash;
         atp.file_path = filepath.toUtf8().constData();
@@ -444,18 +489,20 @@ Transfer QED2KSession::addLink(QString strLink, bool resumed, ErrorCode& ec)
     else
         ec = "Incorrect link";
 
-    return h;
+    return qMakePair(Transfer(h), ec);
 }
 
 void QED2KSession::addTransferFromFile(const QString& filename)
 {
     if (QFile::exists(filename))
     {
-        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(filename.toLocal8Bit().constData());
+        libed2k::emule_collection ecoll = libed2k::emule_collection::fromFile(
+            filename.toLocal8Bit().constData());
 
         foreach(const libed2k::emule_collection_entry& ece, ecoll.m_files)
         {
-            QString filepath = QDir(Preferences().getSavePath()).filePath(QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
+            QString filepath = QDir(Preferences().getSavePath()).filePath(
+                QString::fromUtf8(ece.m_filename.c_str(), ece.m_filename.size()));
             qDebug() << "add transfer " << filepath;
             libed2k::add_transfer_params atp;
             atp.file_hash = ece.m_filehash;

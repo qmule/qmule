@@ -112,6 +112,7 @@ private:
 
     QMenu* fileMenu;
     QAction* fileDownload;
+    QAction* fileDownloadPause;
     QAction* filePreview;
     QAction* fileSearchRelated;
     QAction* fileED2KLink;
@@ -179,7 +180,8 @@ private slots:
     void peerConnected(const libed2k::net_identifier& np, const QString&, bool bActive);
     void peerDisconnected(const libed2k::net_identifier& np, const QString&, const libed2k::error_code ec);
     void resultSelectionChanged(const QItemSelection& sel, const QItemSelection& unsel);
-    void download();
+    Transfer download();
+    void downloadPause();
     void preview();
     void createED2KLink();
     void requestUserDirs();
