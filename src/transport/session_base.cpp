@@ -153,10 +153,11 @@ void SessionBase::cleanUpAutoRunProcess(int)
 
 float SessionBase::progress() const
 {
-    std::vector<Transfer> v = getTransfers();
-    v.erase(std::remove_if(v.begin(), v.end(), std::not1(std::mem_fun_ref(&Transfer::is_valid))), v.end());    
+    std::vector<Transfer> v = getActiveTransfers();
+    v.erase(std::remove_if(v.begin(), v.end(),
+                           std::not1(std::mem_fun_ref(&Transfer::is_valid))), v.end());
 
-    float min_progress = v.empty()?0:1;
+    float min_progress = v.empty() ? 0 : 1;
 
     for(std::vector<Transfer>::const_iterator itr = v.begin(); itr != v.end(); ++itr)
     {
