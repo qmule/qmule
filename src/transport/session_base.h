@@ -70,6 +70,7 @@ public:
 
     virtual Transfer getTransfer(const QString& hash) const = 0;
     virtual std::vector<Transfer> getTransfers() const = 0;
+    virtual std::vector<Transfer> getActiveTransfers() const = 0;
     virtual qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const = 0;
     virtual SessionStatus getSessionStatus() const = 0;
     virtual void changeLabelInSavePath(
@@ -194,6 +195,8 @@ public:
         FORWARD_RETURN(getTransfer(hash), Transfer()); }
     std::vector<Transfer> getTransfers() const {
         FORWARD_RETURN(getTransfers(), std::vector<Transfer>()); }
+    std::vector<Transfer> getActiveTransfers() const {
+        FORWARD_RETURN(getActiveTransfers(), std::vector<Transfer>()); }
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const {
         FORWARD_RETURN(getMaxRatioPerTransfer(hash, use_global), 0); }
     SessionStatus getSessionStatus() const { FORWARD_RETURN(getSessionStatus(), SessionStatus()); }
