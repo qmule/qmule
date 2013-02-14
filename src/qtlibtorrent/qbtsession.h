@@ -101,6 +101,9 @@ public:
   inline bool isPexEnabled() const { return PeXEnabled; }
   inline bool isQueueingEnabled() const { return queueingEnabled; }
 
+  inline libtorrent::upnp* getUPnP() { return m_upnp; }
+  inline libtorrent::natpmp* getNATPMP() { return m_natpmp; }
+
   virtual void saveTempFastResumeData();
   virtual void readAlerts();
 

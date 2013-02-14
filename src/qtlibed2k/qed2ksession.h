@@ -110,6 +110,7 @@ public:
 
     /** scan ed2k backup directory and load all files were matched name filter */
     void loadFastResumeData();
+    void enableUPnP(bool b);
 
     libed2k::session* delegate() const;
 
