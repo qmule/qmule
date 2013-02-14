@@ -56,6 +56,7 @@ public:
     setRowCount(ROW_COUNT);
     // Load settings
     loadAdvancedSettings();
+    combo_iface_mule.setEnabled(false);
   }
 
   ~AdvancedSettings() {
@@ -91,15 +92,15 @@ public slots:
       pref.setNetworkInterface(combo_iface.currentText());
     }
 
-    if (combo_iface_mule.currentIndex() == 0)
-    {
+    //if (combo_iface_mule.currentIndex() == 0)
+    //{
         // All interfaces (default)
         pref.setNetworkInterfaceMule(QString::null);
-    }
-    else
-    {
-        pref.setNetworkInterfaceMule(combo_iface_mule.currentText());
-    }
+    //}
+    //else
+    //{
+    //    pref.setNetworkInterfaceMule(combo_iface_mule.currentText());
+    //}
 
     // Network address
     QHostAddress addr(txt_network_address.text().trimmed());
