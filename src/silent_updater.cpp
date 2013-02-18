@@ -120,7 +120,7 @@ void silent_updater::on_update_check_finished()
                                                                  vlist.at(2).toInt(),
                                                                  vlist.at(3).toInt());
                             }
-                            else
+                            else if (vlist.at(0).toInt() == m_major) // execute update only when major versions are equals
                             {
 
                                 bool update = false;
@@ -161,6 +161,10 @@ void silent_updater::on_update_check_finished()
                                         return;
                                     }
                                 }
+                            }
+                            else
+                            {
+                                qDebug() << "incompatible majors: our: " << m_major << " web: " << vlist.at(0).toInt();
                             }
                         }
                         else

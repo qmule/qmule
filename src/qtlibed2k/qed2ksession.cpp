@@ -255,16 +255,9 @@ void QED2KSession::start()
     settings.server_hostname = "che-s-amd1";
 #else
     settings.server_hostname = "emule.is74.ru";
-#endif    
-    if (iface_name.isEmpty())
-    {
-        m_session.reset(new libed2k::session(finger, NULL, settings));
-    }
-    else
-    {
-        m_session.reset(new libed2k::session(finger, iface_name.toAscii().constData(), settings));
-    }
+#endif
 
+    m_session.reset(new libed2k::session(finger, NULL, settings));
     m_session->set_alert_mask(alert::all_categories);
     m_session->set_alert_queue_size_limit(100000);
 
@@ -419,7 +412,8 @@ void QED2KSession::configureSession()
     if (new_listenPort != old_listenPort)
     {
         qDebug() << "stop listen on " << old_listenPort << " and start on " << new_listenPort;
-        const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
+        // do not use iface name
+        const QString iface_name; // = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
         if (iface_name.isEmpty())
         {

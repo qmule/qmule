@@ -13,7 +13,7 @@ Supported protocols:
 Supported platforms:
 - Windows XP/Vista/7
 - Linux
-- MacOS, experimental, not tested
+- MacOS
 
 Dependencies:
 - Qt4
