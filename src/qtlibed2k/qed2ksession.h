@@ -84,6 +84,7 @@ public:
 
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
+    std::vector<Transfer> getActiveTransfers() const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     SessionStatus getSessionStatus() const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);
@@ -109,6 +110,7 @@ public:
 
     /** scan ed2k backup directory and load all files were matched name filter */
     void loadFastResumeData();
+    void enableUPnP(bool b);
 
     libed2k::session* delegate() const;
 

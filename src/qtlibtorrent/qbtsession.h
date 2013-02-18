@@ -85,6 +85,7 @@ public:
   std::vector<libtorrent::torrent_handle> getTorrents() const;
   Transfer getTransfer(const QString& hash) const;
   std::vector<Transfer> getTransfers() const;
+  std::vector<Transfer> getActiveTransfers() const;
   qreal getPayloadDownloadRate() const;
   qreal getPayloadUploadRate() const;
   SessionStatus getSessionStatus() const;
@@ -99,6 +100,9 @@ public:
   inline bool isLSDEnabled() const { return LSDEnabled; }
   inline bool isPexEnabled() const { return PeXEnabled; }
   inline bool isQueueingEnabled() const { return queueingEnabled; }
+
+  inline libtorrent::upnp* getUPnP() { return m_upnp; }
+  inline libtorrent::natpmp* getNATPMP() { return m_natpmp; }
 
   virtual void saveTempFastResumeData();
   virtual void readAlerts();

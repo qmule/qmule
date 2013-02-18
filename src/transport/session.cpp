@@ -215,6 +215,21 @@ std::vector<Transfer> Session::getTransfers() const
     return transfers;
 }
 
+std::vector<Transfer> Session::getActiveTransfers() const
+{
+    std::vector<Transfer> transfers;
+    for(std::vector<SessionBase*>::const_iterator si = m_sessions.begin();
+        si != m_sessions.end(); ++si)
+    {
+        std::vector<Transfer> sessionTransfers = (*si)->getActiveTransfers();
+        for(std::vector<Transfer>::iterator ti = sessionTransfers.begin();
+            ti != sessionTransfers.end(); ++ti)
+            transfers.push_back(*ti);
+    }
+
+    return transfers;
+}
+
 qlonglong Session::getETA(const QString& hash) const {
     return m_speedMonitor->getETA(hash);
 }

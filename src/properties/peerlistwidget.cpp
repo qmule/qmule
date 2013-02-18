@@ -359,7 +359,7 @@ void PeerListWidget::saveSettings() const
 
 void PeerListWidget::loadPeers(bool force_hostname_resolution) 
 {
-    std::vector<Transfer> transfers = Session::instance()->getTransfers();
+    std::vector<Transfer> transfers = Session::instance()->getActiveTransfers();
     std::vector<Transfer>::iterator transferIt;
     QSet<QString> old_peers_set = m_peerItems.keys().toSet();
     for(transferIt = transfers.begin(); transferIt != transfers.end(); transferIt++)

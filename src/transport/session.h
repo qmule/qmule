@@ -34,6 +34,7 @@ public:
 
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
+    std::vector<Transfer> getActiveTransfers() const;
     qlonglong getETA(const QString& hash) const;
     qreal getGlobalMaxRatio() const;
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;

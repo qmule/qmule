@@ -11,13 +11,17 @@
 #include <libed2k/ip_filter.hpp>
 #include <libed2k/util.hpp>
 
-
 #include <QNetworkInterface>
 #include <QMessageBox>
 #include <QDir>
 #include <QDirIterator>
 
 #include "preferences.h"
+
+// the next headers used to port forwarding by UPnP / NAT-MP
+#include <libtorrent/upnp.hpp>
+#include <libtorrent/natpmp.hpp>
+#include "transport/session.h"
 
 using namespace libed2k;
 
@@ -234,6 +238,7 @@ void QED2KSession::start()
     libed2k::fingerprint finger;
 
     // set zero to port for stop automatically listening
+	settings.user_agent  = libed2k::md4_hash::fromString("15f52879d10ec9cf57c2310ae41c6fd3"); // we are eMule :)
     settings.listen_port = pref.listenPort();
     settings.server_reconnect_timeout = 20;
     settings.server_keep_alive_timeout = -1;
@@ -316,6 +321,18 @@ Transfer QED2KSession::getTransfer(const QString &hash) const
 std::vector<Transfer> QED2KSession::getTransfers() const
 {
     std::vector<libed2k::transfer_handle> handles = m_session->get_transfers();
+    std::vector<Transfer> transfers;
+
+    for (std::vector<libed2k::transfer_handle>::iterator i = handles.begin();
+         i != handles.end(); ++i)
+        transfers.push_back(QED2KHandle(*i));
+
+    return transfers;
+}
+
+std::vector<Transfer> QED2KSession::getActiveTransfers() const
+{
+    std::vector<libed2k::transfer_handle> handles = m_session->get_active_transfers();
     std::vector<Transfer> transfers;
 
     for (std::vector<libed2k::transfer_handle>::iterator i = handles.begin();
@@ -447,6 +464,9 @@ void QED2KSession::configureSession()
         qDebug() << "don't execute re-listen";
     }
 
+    // UPnP / NAT-PMP
+    if (pref.isUPnPEnabled()) enableUPnP(true);
+    else enableUPnP(false);
 }
 
 void QED2KSession::enableIPFilter(const QString &filter_path, bool force /*=false*/){}
@@ -983,6 +1003,19 @@ void QED2KSession::loadFastResumeData()
         // no fast resume data found - session ready for share
         emit fastResumeDataLoadCompleted();
     }
+}
+
+void QED2KSession::enableUPnP(bool b)
+{
+    QBtSession* btSession = Session::instance()->get_torrent_session();
+    btSession->enableUPnP(b);
+
+    libtorrent::upnp* upnp = btSession->getUPnP();
+    libtorrent::natpmp* natpmp = btSession->getNATPMP();
+    unsigned short port = m_session->settings().listen_port;
+
+    if (upnp) upnp->add_mapping(libtorrent::upnp::tcp, port, port);
+    if (natpmp) natpmp->add_mapping(libtorrent::natpmp::tcp, port, port);
 }
 
 void QED2KSession::startServerConnection()
