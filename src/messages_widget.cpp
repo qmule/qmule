@@ -285,6 +285,7 @@ void messages_widget::pushMessage()
 
 void messages_widget::newMessage(const libed2k::net_identifier& np, const QString& hash, const QString& strMessage)
 {
+    Q_UNUSED(hash);
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
@@ -319,6 +320,7 @@ void messages_widget::newMessage(const libed2k::net_identifier& np, const QStrin
 
 void messages_widget::peerCaptchaRequest(const libed2k::net_identifier& np, const QString& hash, const QPixmap& pm)
 {
+    Q_UNUSED(hash);
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
@@ -332,6 +334,7 @@ void messages_widget::peerCaptchaRequest(const libed2k::net_identifier& np, cons
 
 void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const QString& hash, quint8 nResult)
 {
+    Q_UNUSED(hash);
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
@@ -346,7 +349,7 @@ void messages_widget::peerCaptchaResult(const libed2k::net_identifier& np, const
     }
 }
 
-void messages_widget::displayListMenu(const QPoint& pos) 
+void messages_widget::displayListMenu(const QPoint&)
 {
     QModelIndex index = listFriends->currentIndex();
 
@@ -368,8 +371,9 @@ void messages_widget::displayListMenu(const QPoint& pos)
     userMenu->exec(QCursor::pos());
 }
 
-void messages_widget::displayTabMenu(const QPoint& pos) 
+void messages_widget::displayTabMenu(const QPoint& pos)
 {
+    Q_UNUSED(pos);
     tabMenuNum = tabWidget->getTabNum(pos);
     if (tabMenuNum < 0)
         return;
@@ -644,8 +648,10 @@ bool messages_widget::eventFilter(QObject *obj, QEvent *e)
      }
  }
 
-void messages_widget::peerConnected(const libed2k::net_identifier& np, const QString& hash, bool bActive)
+void messages_widget::peerConnected(const libed2k::net_identifier& np, const QString& hash, bool active)
 {
+    Q_UNUSED(hash);
+    Q_UNUSED(active);
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
@@ -676,6 +682,8 @@ void messages_widget::peerConnected(const libed2k::net_identifier& np, const QSt
 
 void messages_widget::peerDisconnected(const libed2k::net_identifier& np, const QString& hash, const libed2k::error_code ec)
 {
+    Q_UNUSED(hash);
+    Q_UNUSED(ec);
     std::vector<USER>::iterator it = findUser(np);
     if ( it != users.end())
     {
@@ -788,6 +796,7 @@ void messages_widget::setFriendIcon(const libed2k::net_identifier& np, bool conn
 
 void messages_widget::friendSelected(const QModelIndex& index, const QModelIndex& prev)
 {
+    Q_UNUSED(prev);
     if (!index.isValid())
         return;
 
