@@ -4,9 +4,11 @@
 #include <QTextEdit>
 #include <QKeyEvent>
 #include <QStandardItemModel>
+#include <QTextBlock>
 
-#include "libed2k/util.hpp"
-#include "libed2k/session.hpp"
+#include <libed2k/util.hpp>
+#include <libed2k/session.hpp>
+#include <libed2k/packet_struct.hpp>
 #include "transport/session.h"
 #include "qed2kpeerhandle.h"
 
@@ -233,7 +235,26 @@ void messages_widget::startChat(const QString& user_name, const libed2k::net_ide
 
 void messages_widget::pushMessage()
 {
-    QString msg = textMsg->toPlainText();
+
+    QString msg;
+
+    QStringList lines;
+
+    for ( QTextBlock block = textMsg->document()->begin(); block.isValid(); block = block.next())
+    {
+        lines.append(qPrintable(block.text()));
+    }
+
+    msg = lines.join("\n");
+
+    if (msg.toUtf8().size() > libed2k::client_message::CLIENT_MAX_MESSAGE_LENGTH)
+    {
+        QMessageBox::warning(this,
+                             tr("Send message"),
+                             tr("Message contains %1 bytes with limit %2").arg(msg.toUtf8().size()).arg(libed2k::client_message::CLIENT_MAX_MESSAGE_LENGTH));
+        return;
+    }
+
     if (tabWidget->currentIndex() < 0 || !msg.length())
         return;
 
@@ -697,11 +718,28 @@ void messages_widget::enableButtons(bool enable)
 
 void messages_widget::addMessage(QTextEdit* edit, const QString& name, const QString& msg, const QString& color)
 {
-    QString htmlText = "<tr><td>&#91;" + QDateTime::currentDateTime().toString("hh:mm") + "&#93;" + "<font color='" + color + "'>&#x200D;" +
-                       name + ": &#x200D;</font><font color='#000000'>" + msg + "</font></td></tr>";
-    edit->moveCursor(QTextCursor::End);
-    edit->insertHtml(htmlText);
-    edit->moveCursor(QTextCursor::End);
+    QStringList lines = msg.split("\n");
+    int indx = 0;
+
+    foreach(const QString single_line, lines)
+    {
+        QString htmlText;
+        if (indx == 0)
+        {
+            htmlText = "<tr><td>&#91;" + QDateTime::currentDateTime().toString("hh:mm") + "&#93;" + "<font color='" + color + "'>&#x200D;" +
+                           QString(name).replace("&","&amp;").replace(">","&gt;").replace("<","&lt;") +
+                    ": &#x200D;</font><font color='#000000'>" + QString(single_line).replace("&","&amp;").replace(">","&gt;").replace("<","&lt;") + "</font></td></tr>";
+        }
+        else
+        {
+            htmlText = "<tr><td><font color='#000000'>" + QString(single_line).replace("&","&amp;").replace(">","&gt;").replace("<","&lt;") + "</font></td></tr>";
+        }
+
+        edit->moveCursor(QTextCursor::End);
+        edit->insertHtml(htmlText);
+        edit->moveCursor(QTextCursor::End);
+        ++indx;
+    }
 }
 
 void messages_widget::addSystemMessage(QTextEdit* edit, const QString& msg)
