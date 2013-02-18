@@ -13,11 +13,26 @@
 #include "preferences.h"
 
 enum AdvSettingsCols {PROPERTY, VALUE};
-enum AdvSettingsRows {DISK_CACHE, OUTGOING_PORT_MIN, OUTGOING_PORT_MAX, IGNORE_LIMIT_LAN, RECHECK_COMPLETED, LIST_REFRESH, RESOLVE_COUNTRIES, MAX_HALF_OPEN, SUPER_SEEDING, NETWORK_IFACE, MULE_NETWORK_IFACE, NETWORK_ADDRESS, PROGRAM_NOTIFICATIONS, TRACKER_STATUS, TRACKER_PORT,
+enum AdvSettingsRows {DISK_CACHE,
+                      OUTGOING_PORT_MIN,
+                      OUTGOING_PORT_MAX,
+                      IGNORE_LIMIT_LAN,
+                      RECHECK_COMPLETED,
+                      LIST_REFRESH,
+                      RESOLVE_COUNTRIES,
+                      MAX_HALF_OPEN,
+                      SUPER_SEEDING,
+                      NETWORK_IFACE,
+                      //MULE_NETWORK_IFACE,
+                      NETWORK_ADDRESS,
+                      PROGRAM_NOTIFICATIONS,
+                      TRACKER_STATUS,
+                      TRACKER_PORT,
                     #if defined(Q_WS_X11)
                       USE_ICON_THEME,
                     #endif
-                      CONFIRM_DELETE_TORRENT, TRACKER_EXCHANGE,
+                      CONFIRM_DELETE_TORRENT,
+                      TRACKER_EXCHANGE,
                       ANNOUNCE_ALL_TRACKERS,
                       ROW_COUNT};
 
@@ -233,7 +248,7 @@ private slots:
     }
 
     setRow(NETWORK_IFACE, tr("Network Interface (requires restart)"), &combo_iface);
-    setRow(MULE_NETWORK_IFACE, tr("Mule Network Interface (requires restart)"), &combo_iface_mule);
+    //setRow(MULE_NETWORK_IFACE, tr("Mule Network Interface (requires restart)"), &combo_iface_mule);
     // Network address
     txt_network_address.setText(pref.getNetworkAddress());
     setRow(NETWORK_ADDRESS, tr("IP Address to report to trackers (requires restart)"), &txt_network_address);
