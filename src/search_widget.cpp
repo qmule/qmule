@@ -1379,19 +1379,20 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
     updateFileActions();
 }
 
-Transfer search_widget::download()
+QList<Transfer> search_widget::download()
 {
+    QList<Transfer> result;
     // Possible only with double click.
     if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
     {
         initPeer();
-        return Transfer();
+        return result;
     }
 
     if (!hasSelectedFiles())
     {
         qDebug("some files should be selected for downloading");
-        return Transfer();
+        return result;
     }
 
     bool bDirs =
@@ -1461,15 +1462,16 @@ Transfer search_widget::download()
             continue;
         }
 
-        return addTransfer(*iter);
+        result << addTransfer(*iter);
     }
 
-    return Transfer();
+    return result;
 }
 
 void search_widget::downloadPause()
 {
-    download().pause();
+    foreach(Transfer t, download())
+        t.pause();
 }
 
 void search_widget::preview()
