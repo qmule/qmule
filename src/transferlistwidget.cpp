@@ -467,13 +467,20 @@ void TransferListWidget::addLinkDialog() {
   do {
     link = QInputDialog::getText(
       this, tr("Add link..."), tr("ED2K/magnet link:"), QLineEdit::Normal, link, &ok);
-    if (ok && !link.isEmpty()) {
-      QPair<Transfer,ErrorCode> res = BTSession->addLink(link.trimmed());
-      t = res.first;
-      ec = res.second;
+    if (ok && !link.isEmpty())
+    {
+        // Qt input dialog allow only 32K text and long link will be truncated, so we must normalize links end
+        if (link.startsWith("ed2k://") && (link.length() > 30*1024) && !link.endsWith("|/"))
+        {
+            link += "|/";
+        }
 
-      if (!t.is_valid())
-        QMessageBox::critical(this, tr("Error"), tr(ec ? ec.message().c_str() : "Incorrect link"));
+        QPair<Transfer,ErrorCode> res = BTSession->addLink(link.trimmed());
+        t = res.first;
+        ec = res.second;
+
+        if (!t.is_valid())
+            QMessageBox::critical(this, tr("Error"), tr(ec ? ec.message().c_str() : "Incorrect link"));
     }
   } while(ok && !t.is_valid());
 }
