@@ -476,7 +476,7 @@ QPair<Transfer,ErrorCode> QED2KSession::addLink(QString strLink, bool resumed /*
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
     libed2k::emule_collection_entry ece =
-        libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+        libed2k::emule_collection::fromLink(libed2k::url_decode(strLink.toUtf8().constData()));
     QED2KHandle h;
     ErrorCode ec;
 
