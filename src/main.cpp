@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     app.setLayoutDirection(Qt::LeftToRight);
   }
 #endif
-  app.setApplicationName(QString::fromUtf8("qMule"));
+  app.setApplicationName(QString::fromUtf8("eMule"));
 
   if (!al.filter(QRegExp("^-+help$")).isEmpty())
   {
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
   {
     QPixmap splash_img(":/Icons/skin/Logo.png");
     QPainter painter(&splash_img);
-    QString prog_name = "qMule";
+    QString prog_name = "eMule";
     QString version = QString("v%1.%2.%3.%4")
             .arg(VERSION_MAJOR)
             .arg(VERSION_MINOR)

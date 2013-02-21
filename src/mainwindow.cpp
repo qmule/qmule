@@ -1440,7 +1440,7 @@ void MainWindow::on_actionSpeed_in_title_bar_triggered() {
   if (displaySpeedInTitle)
     updateGUI();
   else
-    setWindowTitle(tr("qMule %1", "e.g: qMule v0.x").arg(QString::fromUtf8(VERSION)));
+    setWindowTitle(tr("eMule %1", "e.g: eMule v0.x").arg(QString::fromUtf8(VERSION)));
 }
 
 void MainWindow::on_action_Import_Torrent_triggered()

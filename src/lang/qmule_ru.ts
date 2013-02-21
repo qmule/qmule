@@ -2732,24 +2732,24 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation>Показать заставку при загрузке</translation>
     </message>
     <message>
-        <source>Start qMule minimized</source>
-        <translation>Запускать qMule свернутым</translation>
+        <source>Start eMule minimized</source>
+        <translation>Запускать eMule свернутым</translation>
     </message>
     <message>
-        <source>Show qMule icon in notification area</source>
+        <source>Show eMule icon in notification area</source>
         <translatorcomment>А может лучше &apos;в трее&apos;?</translatorcomment>
-        <translation type="obsolete">Показывать значок qMule в области уведомлений</translation>
+        <translation type="obsolete">Показывать значок eMule в области уведомлений</translation>
     </message>
     <message>
-        <source>Minimize qMule to notification area</source>
+        <source>Minimize eMule to notification area</source>
         <translatorcomment>А может лучше &apos;в трей&apos;? // не думаю, в том же KDE это именно уведомлений. А трей суть калька</translatorcomment>
-        <translation>Сворачивать qMule в область уведомлений</translation>
+        <translation>Сворачивать eMule в область уведомлений</translation>
     </message>
     <message>
-        <source>Close qMule to notification area</source>
+        <source>Close eMule to notification area</source>
         <comment>i.e: The systray tray icon will still be visible when closing the main window.</comment>
         <translatorcomment>Коряво, коряво...</translatorcomment>
-        <translation>Закрывать qMule в облать уведомлений</translation>
+        <translation>Закрывать eMule в облать уведомлений</translation>
     </message>
     <message>
         <source>Do not start the download automatically</source>
@@ -2996,8 +2996,8 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation>Список передач</translation>
     </message>
     <message>
-        <source>Show qMule in notification area</source>
-        <translation>Показывать qMule в области уведомлений</translation>
+        <source>Show eMule in notification area</source>
+        <translation>Показывать eMule в области уведомлений</translation>
     </message>
     <message>
         <source>Hard Disk</source>
@@ -3116,16 +3116,16 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation>Привязка файлов</translation>
     </message>
     <message>
-        <source>Use qMule for .torrent files</source>
-        <translation>Использовать qMule для .torrent файлов</translation>
+        <source>Use eMule for .torrent files</source>
+        <translation>Использовать eMule для .torrent файлов</translation>
     </message>
     <message>
-        <source>Use qMule for ed2k links</source>
-        <translation>Использовать qMule для ed2k ссылок</translation>
+        <source>Use eMule for ed2k links</source>
+        <translation>Использовать eMule для ed2k ссылок</translation>
     </message>
     <message>
-        <source>Use qMule for magnet links</source>
-        <translation>Использовать qMule для magnet ссылок</translation>
+        <source>Use eMule for magnet links</source>
+        <translation>Использовать eMule для magnet ссылок</translation>
     </message>
     <message>
         <source>Do not count slow torrents in these limits</source>
@@ -3160,8 +3160,8 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <translation type="obsolete">Порт</translation>
     </message>
     <message>
-        <source>Use qMule for cmule collections</source>
-        <translation>Исполезовать qMule для eMule коллекций</translation>
+        <source>Use eMule for cmule collections</source>
+        <translation>Исполезовать eMule для eMule коллекций</translation>
     </message>
     <message>
         <source>Torrent Rate Limits</source>
