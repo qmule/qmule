@@ -538,8 +538,9 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
         touch = (!atp.file_path.empty() && (atp.file_path.at(atp.file_path.size() - 1) != '.'));
 #endif
         QFile f(misc::toQStringU(atp.file_path));
-        if (!f.exists() && touch)
-        {                  
+        // file not exists, need touch and transfer are not exists
+        if (!f.exists() && touch && !QED2KHandle(delegate()->find_transfer(atp.file_hash)).is_valid())
+        {
             f.open(QIODevice::WriteOnly);
         }
     }
@@ -1020,11 +1021,17 @@ void QED2KSession::enableUPnP(bool b)
 
 void QED2KSession::startServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = 20;
+    delegate()->set_settings(settings);
     delegate()->server_conn_start();
 }
 
 void QED2KSession::stopServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = -1;
+    delegate()->set_settings(settings);
     delegate()->server_conn_stop();
 }
 

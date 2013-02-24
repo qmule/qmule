@@ -6693,6 +6693,10 @@ However, those plugins were disabled.</source>
         <source>*** Connection refused</source>
         <translation>*** Соединение не удалось</translation>
     </message>
+    <message>
+        <source>Message contains %1 bytes with limit %2, please truncate message</source>
+        <translation>Сообщение содержит %1 байт при установленном лимите в %2 байт, для отправки разбейте сообщение</translation>
+    </message>
 </context>
 <context>
     <name>misc</name>
@@ -7248,6 +7252,14 @@ However, those plugins were disabled.</source>
     <message>
         <source>ED2K link</source>
         <translation>ED2K ссылка</translation>
+    </message>
+    <message>
+        <source>Torrent search error</source>
+        <translation>Ошибка поиска по торрентам</translation>
+    </message>
+    <message>
+        <source>Torrent search service temporary unavailable</source>
+        <translation>Сервис поиска по торрентам временно недоступен</translation>
     </message>
 </context>
 <context>
