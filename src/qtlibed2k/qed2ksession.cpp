@@ -1021,11 +1021,17 @@ void QED2KSession::enableUPnP(bool b)
 
 void QED2KSession::startServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = 20;
+    delegate()->set_settings(settings);
     delegate()->server_conn_start();
 }
 
 void QED2KSession::stopServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = -1;
+    delegate()->set_settings(settings);
     delegate()->server_conn_stop();
 }
 
