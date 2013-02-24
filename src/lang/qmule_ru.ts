@@ -132,7 +132,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source> MiB</source>
-        <translation>МиБ</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>Outgoing ports (Min) [0: Disabled]</source>
@@ -551,7 +551,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Using a disk cache size of %1 MiB</source>
-        <translation type="obsolete">Используется дисковый кеш размером %1 МиБ</translation>
+        <translation type="obsolete">Используется дисковый кеш размером %1 МБ</translation>
     </message>
     <message>
         <source>PeX support [OFF]</source>
@@ -2089,12 +2089,12 @@ Are you sure you want to quit qMule?</source>
     <message>
         <source>DL speed: %1 KiB/s</source>
         <comment>e.g: Download speed: 10 KiB/s</comment>
-        <translation>Скач.: %1 КиБ/с</translation>
+        <translation>Скач.: %1 КБ/с</translation>
     </message>
     <message>
         <source>UP speed: %1 KiB/s</source>
         <comment>e.g: Upload speed: 10 KiB/s</comment>
-        <translation>Отдача.: %1 КиБ/с</translation>
+        <translation>Отдача.: %1 КБ/с</translation>
     </message>
     <message>
         <source>qMule %1 (Down: %2/s, Up: %3/s)</source>
@@ -2547,7 +2547,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>KiB/s</source>
-        <translation>КиБ/с</translation>
+        <translation>КБ/с</translation>
     </message>
     <message>
         <source>Bittorrent features</source>
@@ -3526,7 +3526,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Using a disk cache size of %1 MiB</source>
-        <translation type="obsolete">Используется дисковый кеш размером %1 МиБ</translation>
+        <translation type="obsolete">Используется дисковый кеш размером %1 МБ</translation>
     </message>
     <message>
         <source>DHT support [ON], port: UDP/%1</source>
@@ -4288,7 +4288,7 @@ Do you want to install it now?</source>
     <name>SpeedLimitDialog</name>
     <message>
         <source>KiB/s</source>
-        <translation>КиБ/с</translation>
+        <translation>КБ/с</translation>
     </message>
 </context>
 <context>
@@ -4780,7 +4780,7 @@ Do you want to install it now?</source>
     <message>
         <source>KiB/s</source>
         <comment>KiB/second (.i.e per second)</comment>
-        <translation>КиБ/с</translation>
+        <translation>КБ/с</translation>
     </message>
     <message>
         <source>Seeded for %1</source>
@@ -5836,35 +5836,35 @@ Do you want to install it now?</source>
     </message>
     <message>
         <source>32 KiB</source>
-        <translation>32 КиБ</translation>
+        <translation>32 КБ</translation>
     </message>
     <message>
         <source>64 KiB</source>
-        <translation>64 КиБ</translation>
+        <translation>64 КБ</translation>
     </message>
     <message>
         <source>128 KiB</source>
-        <translation>128 КиБ</translation>
+        <translation>128 КБ</translation>
     </message>
     <message>
         <source>256 KiB</source>
-        <translation>256 КиБ</translation>
+        <translation>256 КБ</translation>
     </message>
     <message>
         <source>512 KiB</source>
-        <translation>512 КиБ</translation>
+        <translation>512 КБ</translation>
     </message>
     <message>
         <source>1 MiB</source>
-        <translation>1 МиБ</translation>
+        <translation>1 МБ</translation>
     </message>
     <message>
         <source>2 MiB</source>
-        <translation>2 МиБ</translation>
+        <translation>2 МБ</translation>
     </message>
     <message>
         <source>4 MiB</source>
-        <translation>4 МиБ</translation>
+        <translation>4 МБ</translation>
     </message>
     <message>
         <source>Private (won&apos;t be distributed on DHT network if enabled)</source>
@@ -6708,22 +6708,22 @@ However, those plugins were disabled.</source>
     <message>
         <source>KiB</source>
         <comment>kibibytes (1024 bytes)</comment>
-        <translation>КиБ</translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MiB</source>
         <comment>mebibytes (1024 kibibytes)</comment>
-        <translation>МиБ</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>GiB</source>
         <comment>gibibytes (1024 mibibytes)</comment>
-        <translation>ГиБ</translation>
+        <translation>ГБ</translation>
     </message>
     <message>
         <source>TiB</source>
         <comment>tebibytes (1024 gibibytes)</comment>
-        <translation>ТиБ</translation>
+        <translation>ТБ</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -7051,11 +7051,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>KiB</source>
-        <translation>КиБ</translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <source>MiB</source>
-        <translation>МиБ</translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <source>KB</source>
@@ -7111,11 +7111,11 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Min. size [MiB]</source>
-        <translation>Мин. размер [МиБ]</translation>
+        <translation>Мин. размер [МБ]</translation>
     </message>
     <message>
         <source>Max. size [MiB]</source>
-        <translation>Макс. размер [МиБ]</translation>
+        <translation>Макс. размер [МБ]</translation>
     </message>
     <message>
         <source>Availability</source>
