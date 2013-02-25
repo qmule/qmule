@@ -3085,7 +3085,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Append .!qB extension to incomplete files</source>
-        <translation>Добавить расширение .!qB к незаконченным файлам</translation>
+        <translation>Добавить расширение .!qB к незаконченным файлам торрента</translation>
     </message>
     <message>
         <source>Use HTTPS instead of HTTP</source>
