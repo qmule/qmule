@@ -963,6 +963,18 @@ QSet<QString> misc::torrentRoots(const QTorrentHandle& h)
     return roots;
 }
 
+QDir misc::uniquePath(const QDir& path, const QList<QDir>& paths)
+{
+    QDir result = path;
+    for (int i = 1; paths.contains(result); ++i)
+    {
+        QFileInfo info(path.absolutePath());
+        result = info.dir().absoluteFilePath(info.baseName() + QString("(%1).").arg(i) + info.completeSuffix());
+    }
+
+    return result;
+}
+
 /**
  * Returns a path constructed from all the elements of file_path except the last.
  * A typical use is to obtain the parent path for a path supplied by the user.

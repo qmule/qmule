@@ -527,9 +527,14 @@ void QED2KSession::addTransferFromFile(const QString& filename)
     }
 }
 
-QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
+QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
 {
-    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
+    QDir fpath(QString::fromUtf8(_atp.file_path.c_str()));
+    fpath = misc::uniquePath(fpath, files());
+    add_transfer_params atp = _atp;
+    atp.file_path = fpath.absolutePath().toUtf8().constData();
+
+    qDebug() << "add transfer for " << fpath;
 
     {
         // do not create file on windows with last point because of Qt truncate it point!
