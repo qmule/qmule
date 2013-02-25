@@ -229,7 +229,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>80</width>
+           <width>90</width>
            <height>0</height>
           </size>
          </property>
@@ -260,7 +260,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>80</width>
+           <width>90</width>
            <height>0</height>
           </size>
          </property>
@@ -281,14 +281,14 @@
           <bool>false</bool>
          </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>80</width>
+           <width>90</width>
            <height>0</height>
           </size>
          </property>
