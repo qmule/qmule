@@ -281,7 +281,7 @@
           <bool>false</bool>
          </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -425,6 +425,9 @@
       <bool>true</bool>
      </attribute>
     </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
