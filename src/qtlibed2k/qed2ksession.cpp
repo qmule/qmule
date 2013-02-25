@@ -529,8 +529,7 @@ void QED2KSession::addTransferFromFile(const QString& filename)
 
 QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
 {
-    QDir fpath(QString::fromUtf8(_atp.file_path.c_str()));
-    fpath = misc::uniquePath(fpath, files());
+    QDir fpath = misc::uniquePath(QString::fromUtf8(_atp.file_path.c_str()), files());
     add_transfer_params atp = _atp;
     atp.file_path = fpath.absolutePath().toUtf8().constData();
 

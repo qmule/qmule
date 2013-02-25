@@ -969,7 +969,8 @@ QDir misc::uniquePath(const QDir& path, const QList<QDir>& paths)
     for (int i = 1; paths.contains(result); ++i)
     {
         QFileInfo info(path.absolutePath());
-        result = info.dir().absoluteFilePath(info.baseName() + QString("(%1).").arg(i) + info.completeSuffix());
+        result = info.dir().absoluteFilePath(
+            info.baseName() + QString("(%1).").arg(i) + info.completeSuffix());
     }
 
     return result;
