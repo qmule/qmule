@@ -21,12 +21,13 @@ LIBS += -lboost_filesystem-mt -lboost_thread-mt
 # Carbon
 LIBS += -framework Carbon -framework IOKit
 QMAKE_CXXFLAGS += -fpermissive
-document_icon.path = Contents/Resources
-document_icon.files = Icons/qMuleDocument.icns
+#document_icon.path = Contents/Resources
+#document_icon.files = Icons/qMuleDocument.icns
 
-QMAKE_BUNDLE_DATA += document_icon
+#QMAKE_BUNDLE_DATA += document_icon
+#ICON = Icons/qmule_mac.icns
+#QMAKE_INFO_PLIST = Info.plist
 ICON = Icons/qmule_mac.icns
-QMAKE_INFO_PLIST = Info.plist
 
 DEFINES += WITH_GEOIP_EMBEDDED
 DEFINES += LIBED2K_USE_BOOST_DATE_TIME
