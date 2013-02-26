@@ -114,11 +114,11 @@ QString misc::QDesktopServicesDataLocation() {
   if (SHGetSpecialFolderPath(0, path, CSIDL_LOCAL_APPDATA, FALSE))
 #endif
     result = QString::fromWCharArray(path);
-  if (!QCoreApplication::applicationName().isEmpty())
-    result = result + QLatin1String("\\") + qApp->applicationName();
-  if (!result.endsWith("\\"))
-    result += "\\";
-  return result;
+    result = result + QLatin1String("\\") + "qMule";
+    if (!result.endsWith("\\"))
+      result += "\\";
+
+    return result;
 #else
 #ifdef Q_WS_MAC
   FSRef ref;
@@ -135,8 +135,7 @@ QString misc::QDesktopServicesDataLocation() {
   QString xdgDataHome = QLatin1String(qgetenv("XDG_DATA_HOME"));
   if (xdgDataHome.isEmpty())
     xdgDataHome = QDir::homePath() + QLatin1String("/.local/share");
-  xdgDataHome += QLatin1String("/data/")
-      + qApp->applicationName();
+  xdgDataHome += QLatin1String("/data/") + "qMule";
   return xdgDataHome;
 #endif
 #endif
