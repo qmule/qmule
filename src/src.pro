@@ -89,6 +89,7 @@ include(qtlibtorrent/qtlibtorrent.pri)
 include(tracker/tracker.pri)
 include (preferences/preferences.pri)
 include(transport/transport.pri)
+include(xcatalog/xcatalog.pri)
 include(qtlibed2k/qtlibed2k.pri)
 include(session_fs_models/session_fs_models.pri)
 

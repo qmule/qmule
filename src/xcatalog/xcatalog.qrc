@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/fileinfo.template</file>
+        <file>resources/loading.template</file>
+        <file>images/catalog.png</file>
+        <file>images/folder.png</file>
+        <file>images/puzzle.png</file>
+        <file>images/search.png</file>
+        <file>images/editclear.png</file>
+        <file>images/filter.png</file>
+        <file>images/sort-alphabet.png</file>
+        <file>images/sort-number.png</file>
+        <file>images/refresh_files.png</file>
+        <file>images/refresh_folders.png</file>
+        <file>images/postreport.png</file>
+        <file>images/postlink.png</file>
+        <file>images/loading.gif</file>
+        <file>resources/error_loading.template</file>
+        <file>images/refresh.png</file>
+        <file>images/error.png</file>
+        <file>resources/common.css</file>
+        <file>images/preview16.png</file>
+        <file>images/preview32.png</file>
+        <file>images/date.png</file>
+    </qresource>
+</RCC>

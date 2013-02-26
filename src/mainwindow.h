@@ -60,6 +60,7 @@ class ExecutionLog;
 class PowerManagement;
 class status_widget;
 class search_widget;
+class XCatalogWidget;
 class messages_widget;
 class files_widget;
 
@@ -90,10 +91,11 @@ public:
   enum Widgets
   {
       wStatus       = 1,
-      wTransfer,
-      wSearch,
-      wMessages,
-      wFiles
+      wCatalog      = 2,
+      wTransfer     = 3,
+      wSearch       = 4,
+      wMessages     = 5,
+      wFiles        = 6
   };
 
   // Construct / Destruct
@@ -161,6 +163,7 @@ protected slots:
   void on_actionStatus_triggerd();
   void on_actionTransfer_triggerd();
   void on_actionSearch_triggerd();
+  void on_actionCatalog_triggerd();
   void on_actionConnect_triggered();
   void on_actionMessages_triggerd();
   void on_actionFiles_triggerd();
@@ -201,6 +204,7 @@ private:
   QDockWidget *dock;
   status_widget* status;
   search_widget* search;
+  XCatalogWidget* catalog;
   messages_widget* messages;
   files_widget* files;
 

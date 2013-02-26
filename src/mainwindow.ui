@@ -52,6 +52,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnect"/>
+   <addaction name="actionCatalog"/>
    <addaction name="actionTransfer"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
@@ -335,6 +336,21 @@
    </property>
    <property name="toolTip">
     <string>Connecting</string>
+   </property>
+  </action>
+  <action name="actionCatalog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/catalog_2.png</normaloff>:/emule/catalog_2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Catalog</string>
+   </property>
+   <property name="toolTip">
+    <string>Catalog</string>
    </property>
   </action>
   <action name="actionTransfer">
