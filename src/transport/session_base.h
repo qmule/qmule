@@ -103,6 +103,7 @@ public:
         QString msg, QColor color=QApplication::palette().color(QPalette::WindowText));
     virtual bool isFilePreviewPossible(const QString& hash) const;
     virtual void autoRunExternalProgram(const Transfer &t);
+    virtual QList<QDir> files() const;
     virtual QList<QDir> incompleteFiles() const;
 
 public slots:
