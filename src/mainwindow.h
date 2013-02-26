@@ -62,6 +62,7 @@ class status_widget;
 class search_widget;
 class messages_widget;
 class files_widget;
+class servers_widget;
 
 QT_BEGIN_NAMESPACE
 class QCloseEvent;
@@ -90,6 +91,7 @@ public:
   enum Widgets
   {
       wStatus       = 1,
+      wServers,
       wTransfer,
       wSearch,
       wMessages,
@@ -203,6 +205,7 @@ private:
   search_widget* search;
   messages_widget* messages;
   files_widget* files;
+  servers_widget* servers;
 
   bool displaySpeedInTitle;
   bool force_exit;
@@ -270,6 +273,7 @@ private slots:
 
     void new_version_ready(int,int,int,int);
     void current_version_obsolete(int,int,int,int);
+    void on_actionServers_triggered();
 };
 
 #endif

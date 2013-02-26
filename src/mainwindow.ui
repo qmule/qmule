@@ -52,6 +52,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnect"/>
+   <addaction name="actionServers"/>
    <addaction name="actionTransfer"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
@@ -378,6 +379,21 @@
    </property>
    <property name="text">
     <string>OpenDownloadPath</string>
+   </property>
+  </action>
+  <action name="actionServers">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Icons/emule/emule.qrc">
+     <normaloff>:/emule/status.png</normaloff>:/emule/status.png</iconset>
+   </property>
+   <property name="text">
+    <string>Servers</string>
+   </property>
+   <property name="toolTip">
+    <string>Add or delete servers</string>
    </property>
   </action>
  </widget>

@@ -71,6 +71,7 @@
 #include "search_widget.h"
 #include "messages_widget.h"
 #include "files_widget.h"
+#include "servers_widget.h"
 #include "status_bar.h"
 #include "collection_save_dlg.h"
 
@@ -219,6 +220,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   search = new search_widget(this);
   messages = new messages_widget(this);
   files = new files_widget(this);
+  servers = new servers_widget(this);
   statusBar = new status_bar(this, QMainWindow::statusBar());
 
 
@@ -227,6 +229,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   vboxLayout->addWidget(search);
   vboxLayout->addWidget(messages);
   vboxLayout->addWidget(files);
+  vboxLayout->addWidget(servers);
 
   connect(actionStatus, SIGNAL(triggered()), this, SLOT(on_actionStatus_triggerd()));
   connect(actionTransfer, SIGNAL(triggered()), this, SLOT(on_actionTransfer_triggerd()));
@@ -948,42 +951,41 @@ void MainWindow::selectWidget(Widgets wNum)
 {
     actionTransfer->setChecked(false);
     actionSearch->setChecked(false);
+    actionServers->setChecked(false);
 
     dock->hide();
     status->hide();
     search->hide();
     messages->hide();
     files->hide();
+    servers->hide();
 
     switch (wNum)
     {
         case wStatus:
-        {
             status->show();
             break;
-        }
+        case wServers:
+            servers->show();
+            actionServers->setChecked(true);
+            break;
         case wTransfer:
-        {
             actionTransfer->setChecked(true);
             dock->show();
             break;
-        }
         case wSearch:
-        {
             actionSearch->setChecked(true);
             search->show();
             break;
-        }
         case wMessages:
-        {
             messages->show();
             break;
-        }
         case wFiles:
-        {
             files->show();
             break;
-        }
+        default:
+            qDebug() << "we have problems";
+            break;
     }
 }
 
@@ -1698,4 +1700,9 @@ void MainWindow::current_version_obsolete(int major, int minor, int update, int 
                              .arg(minor)
                              .arg(update)
                              .arg(build));
+}
+
+void MainWindow::on_actionServers_triggered()
+{
+    selectWidget(wServers);
 }

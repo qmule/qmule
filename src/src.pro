@@ -107,13 +107,15 @@ HEADERS += misc.h \
            filesystemwatcher.h \
            scannedfoldersmodel.h \
            qinisettings.h \
-           smtp.h
+           smtp.h \
+           servers_widget.h
 
 SOURCES += main.cpp \
            downloadthread.cpp \
            scannedfoldersmodel.cpp \
            misc.cpp \
-           smtp.cpp
+           smtp.cpp \
+           servers_widget.cpp
 
 HEADERS +=  mainwindow.h\
           transferlistwidget.h \
@@ -215,7 +217,8 @@ SOURCES += mainwindow.cpp \
            infodlg.ui \
            user_properties.ui \
            torrent_properties.ui \
-           ed2k_link_maker.ui
+           ed2k_link_maker.ui \
+           servers_widget.ui
 
 DESTDIR = .
 
