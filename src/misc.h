@@ -202,7 +202,7 @@ public:
 
   static bool isValidTorrentFile(const QString &path);
   static QSet<QString> torrentRoots(const QTorrentHandle& h);
-
+  static QDir uniquePath(const QDir& path, const QList<QDir>& paths);
   static QStringList cmd2list(const QString&);
 
   /**

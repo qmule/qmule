@@ -179,3 +179,17 @@ QList<QDir> SessionBase::incompleteFiles() const
 
     return res;
 }
+
+QList<QDir> SessionBase::files() const
+{
+    std::vector<Transfer> transfers = getTransfers();
+    QList<QDir> res;
+
+    for (std::vector<Transfer>::const_iterator i = transfers.begin(); i != transfers.end(); ++i)
+    {
+        foreach(const QString& fp, i->absolute_files_path())
+            res << fp;
+    }
+
+    return res;
+}
