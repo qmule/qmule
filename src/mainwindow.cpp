@@ -74,8 +74,6 @@
 #include "status_bar.h"
 #include "collection_save_dlg.h"
 
-#include "xcatalog/catalogwidget.h"
-
 #ifdef Q_WS_MAC
 #include "qmacapplication.h"
 void qt_mac_set_dock_menu(QMenu *menu);
@@ -219,7 +217,6 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
 
   status = new status_widget(this);
   search = new search_widget(this);
-  catalog = new XCatalogWidget(this);
   messages = new messages_widget(this);
   files = new files_widget(this);
   statusBar = new status_bar(this, QMainWindow::statusBar());
@@ -228,14 +225,12 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   vboxLayout->addWidget(dock);
   vboxLayout->addWidget(status);
   vboxLayout->addWidget(search);
-  vboxLayout->addWidget(catalog);
   vboxLayout->addWidget(messages);
   vboxLayout->addWidget(files);
 
   connect(actionStatus, SIGNAL(triggered()), this, SLOT(on_actionStatus_triggerd()));
   connect(actionTransfer, SIGNAL(triggered()), this, SLOT(on_actionTransfer_triggerd()));
   connect(actionSearch, SIGNAL(triggered()), this, SLOT(on_actionSearch_triggerd()));
-  connect(actionCatalog, SIGNAL(triggered()), this, SLOT(on_actionCatalog_triggerd()));
   connect(actionMessages, SIGNAL(triggered()), this, SLOT(on_actionMessages_triggerd()));
   connect(actionFiles, SIGNAL(triggered()), this, SLOT(on_actionFiles_triggerd()));  
   connect(search, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
@@ -243,17 +238,12 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(transfer_List, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(startChat(const QString&, const libed2k::net_identifier&)));
   connect(transfer_List, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addFriend(const QString&, const libed2k::net_identifier&)));
 
-  // load from catalog link, temporary without deferred proxy
-  connect(catalog, SIGNAL(ed2kLinkEvent(QString,bool)), Session::instance(), SLOT(addLink(QString,bool)));
-  connect(catalog, SIGNAL(filePreviewEvent(QString)), Session::instance(), SLOT(playLink(QString)));
-
   connect(messages, SIGNAL(newMessage()), this, SLOT(startMessageFlickering()));
   connect(messages, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
   connect(statusBar, SIGNAL(stopMessageNotification()), this, SLOT(stopMessageFlickering()));
   flickerTimer = new QTimer(this);
   connect(flickerTimer, SIGNAL(timeout()), SLOT(on_flickerTimer()));
-  on_actionCatalog_triggerd();
-
+  on_actionTransfer_triggerd();
 
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
@@ -934,11 +924,6 @@ void MainWindow::on_actionStatus_triggerd()
     selectWidget(wStatus);
 }
 
-void MainWindow::on_actionCatalog_triggerd()
-{
-    selectWidget(wCatalog);
-}
-
 void MainWindow::on_actionTransfer_triggerd()
 {
     selectWidget(wTransfer);
@@ -961,14 +946,12 @@ void MainWindow::on_actionFiles_triggerd()
 
 void MainWindow::selectWidget(Widgets wNum)
 {
-    actionCatalog->setChecked(false);
     actionTransfer->setChecked(false);
     actionSearch->setChecked(false);
 
     dock->hide();
     status->hide();
     search->hide();
-    catalog->hide();
     messages->hide();
     files->hide();
 
@@ -977,12 +960,6 @@ void MainWindow::selectWidget(Widgets wNum)
         case wStatus:
         {
             status->show();
-            break;
-        }
-        case wCatalog:
-        {
-            actionCatalog->setChecked(true);
-            catalog->show();
             break;
         }
         case wTransfer:
@@ -1015,7 +992,6 @@ void MainWindow::activateControls(bool status)
     actionStatus->setDisabled(!status);
     actionTransfer->setDisabled(!status);
     actionSearch->setDisabled(!status);
-    actionCatalog->setDisabled(!status);
     menuStatus->setDisabled(!status);
 }
 
