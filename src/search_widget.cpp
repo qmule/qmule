@@ -1379,19 +1379,20 @@ void search_widget::resultSelectionChanged(const QItemSelection& sel, const QIte
     updateFileActions();
 }
 
-Transfer search_widget::download()
+QList<Transfer> search_widget::download()
 {
+    QList<Transfer> result;
     // Possible only with double click.
     if (searchItems[tabSearch->currentIndex()].resultType == RT_CLIENTS)
     {
         initPeer();
-        return Transfer();
+        return result;
     }
 
     if (!hasSelectedFiles())
     {
         qDebug("some files should be selected for downloading");
-        return Transfer();
+        return result;
     }
 
     bool bDirs =
@@ -1461,15 +1462,16 @@ Transfer search_widget::download()
             continue;
         }
 
-        return addTransfer(*iter);
+        result << addTransfer(*iter);
     }
 
-    return Transfer();
+    return result;
 }
 
 void search_widget::downloadPause()
 {
-    download().pause();
+    foreach(Transfer t, download())
+        t.pause();
 }
 
 void search_widget::preview()
@@ -1916,44 +1918,49 @@ void search_widget::ed2kSearchFinished(
 
 void search_widget::torrentSearchFinished(bool ok)
 {
-    if (!ok) return;
-
-    boost::optional<qulonglong> oMinSize = toULongLong(tableCond->item(0, 1)->text());
-    if (oMinSize) oMinSize = oMinSize.get() * 1024 * 1024;
-    boost::optional<qulonglong> oMaxSize = toULongLong(tableCond->item(1, 1)->text());
-    if (oMaxSize) oMaxSize = oMaxSize.get() * 1024 * 1024;
-    boost::optional<int> oAvail = toInt(tableCond->item(2, 1)->text());
-    boost::optional<int> oSources = toInt(tableCond->item(3, 1)->text());
-
-    QWebElementCollection res_rows =
-        torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
     std::vector<QED2KSearchResultEntry> entries;
 
-    foreach (QWebElement res, res_rows) {
-        QWebElement eText = res.findFirst("div[class=\"text\"] a");
-        QString name = eText.toPlainText();
-        QString href = eText.attribute("href");
-        QString magnet = res.findFirst("div[class=\"magnet\"] a").attribute("href");
-        QString type = res.findFirst("div[class=\"date\"]").toPlainText();
-        qulonglong size = parseSize(res.findFirst("div[class=\" col-3\"]").toPlainText());
-        int seeders = res.findFirst("div[class=\" col-4\"]").toPlainText().toInt();
-        int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
-        QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
+    if (ok) {
+        boost::optional<qulonglong> oMinSize = toULongLong(tableCond->item(0, 1)->text());
+        if (oMinSize) oMinSize = oMinSize.get() * 1024 * 1024;
+        boost::optional<qulonglong> oMaxSize = toULongLong(tableCond->item(1, 1)->text());
+        if (oMaxSize) oMaxSize = oMaxSize.get() * 1024 * 1024;
+        boost::optional<int> oAvail = toInt(tableCond->item(2, 1)->text());
+        boost::optional<int> oSources = toInt(tableCond->item(3, 1)->text());
 
-        if (!eText.isNull() && size &&
-            size >= oMinSize.get_value_or(0) &&
-            size <= oMaxSize.get_value_or(std::numeric_limits<qulonglong>::max()) &&
-            seeders >= oAvail.get_value_or(0) && seeders >= oSources.get_value_or(0))
-        {
-            QED2KSearchResultEntry entry;
-            entry.m_strFilename = eText.toOuterXml();
-            entry.m_nFilesize = size;
-            entry.m_nSources = seeders;
-            entry.m_nCompleteSources = seeders;
-            entry.m_strMediaCodec = type;
-            entry.m_hFile = site;
-            entries.push_back(entry);
+        QWebElementCollection res_rows =
+            torrentSearchView->page()->mainFrame()->findAllElements("table#res_table tbody tr");
+
+        foreach (QWebElement res, res_rows) {
+            QWebElement eText = res.findFirst("div[class=\"text\"] a");
+            QString name = eText.toPlainText();
+            QString href = eText.attribute("href");
+            QString magnet = res.findFirst("div[class=\"magnet\"] a").attribute("href");
+            QString type = res.findFirst("div[class=\"date\"]").toPlainText();
+            qulonglong size = parseSize(res.findFirst("div[class=\" col-3\"]").toPlainText());
+            int seeders = res.findFirst("div[class=\" col-4\"]").toPlainText().toInt();
+            int leechers = res.findFirst("div[class=\" col-5\"]").toPlainText().toInt();
+            QString site = res.findFirst("div[class=\" col-6\"] span").attribute("title");
+
+            if (!eText.isNull() && size &&
+                size >= oMinSize.get_value_or(0) &&
+                size <= oMaxSize.get_value_or(std::numeric_limits<qulonglong>::max()) &&
+                seeders >= oAvail.get_value_or(0) && seeders >= oSources.get_value_or(0))
+            {
+                QED2KSearchResultEntry entry;
+                entry.m_strFilename = eText.toOuterXml();
+                entry.m_nFilesize = size;
+                entry.m_nSources = seeders;
+                entry.m_nCompleteSources = seeders;
+                entry.m_strMediaCodec = type;
+                entry.m_hFile = site;
+                entries.push_back(entry);
+            }
         }
+    }
+    else {
+        QMessageBox::warning(
+            this, tr("Torrent search error"), tr("Torrent search service temporary unavailable"));
     }
 
     processSearchResult(entries, boost::optional<bool>());

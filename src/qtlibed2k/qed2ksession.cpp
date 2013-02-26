@@ -476,7 +476,7 @@ QPair<Transfer,ErrorCode> QED2KSession::addLink(QString strLink, bool resumed /*
     qDebug("Load ED2K link: %s", strLink.toUtf8().constData());
 
     libed2k::emule_collection_entry ece =
-        libed2k::emule_collection::fromLink(strLink.toUtf8().constData());
+        libed2k::emule_collection::fromLink(libed2k::url_decode(strLink.toUtf8().constData()));
     QED2KHandle h;
     ErrorCode ec;
 
@@ -527,9 +527,13 @@ void QED2KSession::addTransferFromFile(const QString& filename)
     }
 }
 
-QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
+QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
 {
-    qDebug() << "add transfer for " << QString::fromUtf8(atp.file_path.c_str());
+    QDir fpath = misc::uniquePath(QString::fromUtf8(_atp.file_path.c_str()), files());
+    add_transfer_params atp = _atp;
+    atp.file_path = fpath.absolutePath().toUtf8().constData();
+
+    qDebug() << "add transfer for " << fpath;
 
     {
         // do not create file on windows with last point because of Qt truncate it point!
@@ -1021,11 +1025,17 @@ void QED2KSession::enableUPnP(bool b)
 
 void QED2KSession::startServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = 20;
+    delegate()->set_settings(settings);
     delegate()->server_conn_start();
 }
 
 void QED2KSession::stopServerConnection()
 {
+    libed2k::session_settings settings = delegate()->settings();
+    settings.server_reconnect_timeout = -1;
+    delegate()->set_settings(settings);
     delegate()->server_conn_stop();
 }
 
