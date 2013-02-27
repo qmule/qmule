@@ -322,8 +322,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   icon_disconnected.addFile(QString::fromUtf8(":/emule/ConnectDoBig.png"), QSize(), QIcon::Normal, QIcon::Off);
   icon_connected.addFile(QString::fromUtf8(":/emule/ConnectDrop.png"), QSize(), QIcon::Normal, QIcon::Off);
   icon_connecting.addFile(QString::fromUtf8(":/emule/ConnectStop.png"), QSize(), QIcon::Normal, QIcon::Off);
-  connectioh_state = csDisconnected;
-  m_info_dlg.reset(new is_info_dlg(this));
+  connectioh_state = csDisconnected;  
   m_updater.reset(new silent_updater(VERSION_MAJOR, VERSION_MINOR, VERSION_UPDATE, VERSION_BUILD, this));
   connect(m_updater.data(), SIGNAL(new_version_ready(int,int,int,int)), this, SLOT(new_version_ready(int,int,int,int)));
   connect(m_updater.data(), SIGNAL(current_version_is_obsolete(int,int,int,int)), SLOT(current_version_obsolete(int,int,int,int)));
@@ -1509,10 +1508,8 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
         systrayIcon->setIcon(getSystrayIcon());
     }
 
-    m_info_dlg->start();    // start message watcher
-
 #ifdef Q_WS_WIN
-    m_updater->start();
+    //m_updater->start();
 #endif
 
     QString log_msg("Client ID: ");

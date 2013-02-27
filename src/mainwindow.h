@@ -41,7 +41,6 @@
 #include "ui_mainwindow.h"
 #include "qtorrenthandle.h"
 #include "transfer_list.h"
-#include "infodlg.h"
 #include "silent_updater.h"
 #include "taskbar_iface.h"
 #include "wgetter.h"
@@ -220,7 +219,6 @@ private:
   PowerManagement *m_pwr;
   QTimer *preventTimer;
   QTimer *flickerTimer;
-  QScopedPointer<is_info_dlg> m_info_dlg;
   QScopedPointer<silent_updater> m_updater;
   QScopedPointer<taskbar_iface>  m_tbar;
   QScopedPointer<QSplashScreen>  m_sscrn;

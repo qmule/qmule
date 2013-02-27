@@ -151,7 +151,6 @@ HEADERS +=  mainwindow.h\
           status_bar.h \
           clicked_label.h \
           collection_save_dlg.h \
-          infodlg.h \
           silent_updater.h\
           taskbar_iface.h \
           user_properties.h \
@@ -183,7 +182,6 @@ SOURCES += mainwindow.cpp \
          files_widget.cpp \
          status_bar.cpp \
          collection_save_dlg.cpp \
-         infodlg.cpp \
          silent_updater.cpp\
          taskbar_iface.cpp \
          user_properties.cpp \
@@ -214,7 +212,6 @@ SOURCES += mainwindow.cpp \
            files_widget.ui \
            status_bar.ui \
            collection_save_dlg.ui \
-           infodlg.ui \
            user_properties.ui \
            torrent_properties.ui \
            ed2k_link_maker.ui \
