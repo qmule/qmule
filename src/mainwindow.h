@@ -194,10 +194,7 @@ private:
   QPointer<TorrentCreatorDlg> createTorrentDlg;
   QPointer<QSystemTrayIcon> systrayIcon;
   QPointer<QTimer> systrayCreator;
-  QPointer<QMenu> myTrayIconMenu;
-
-  QMenu* menuStatus;
-  
+  QPointer<QMenu> myTrayIconMenu;  
   QWidget* transfer;
   transfer_list* transfer_List;
   QDockWidget *dock;

@@ -192,19 +192,6 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
 
   qDebug("create tabWidget");
 
-  menuStatus = new QMenu(this);
-  menuStatus->setObjectName(QString::fromUtf8("menuStatus"));
-  menuStatus->addAction(actionStatus);
-  menuStatus->addAction(actionFiles);
-  menuStatus->addAction(actionMessages);
-  menuStatus->addAction(actionOptions);
-  menuStatus->addSeparator();
-  menuStatus->addAction(actionOpenDownloadPath);
-
-  actionTools->setMenu(menuStatus);
-  if(QToolButton * btn = qobject_cast<QToolButton *>(toolBar->widgetForAction(actionTools)))
-    btn->setPopupMode(QToolButton::InstantPopup);
-
   // Transfer List tab
   dock = new QDockWidget(this, Qt::Popup);
   QWidget* titleWidget = new QWidget(this);
@@ -952,6 +939,8 @@ void MainWindow::selectWidget(Widgets wNum)
     actionTransfer->setChecked(false);
     actionSearch->setChecked(false);
     actionServers->setChecked(false);
+    actionFiles->setChecked(false);
+    actionMessages->setChecked(false);
 
     dock->hide();
     status->hide();
@@ -978,10 +967,12 @@ void MainWindow::selectWidget(Widgets wNum)
             search->show();
             break;
         case wMessages:
+            actionMessages->setChecked(true);
             messages->show();
             break;
         case wFiles:
-            files->show();
+            actionFiles->setChecked(true);
+            files->show();            
             break;
         default:
             qDebug() << "we have problems";
@@ -994,7 +985,6 @@ void MainWindow::activateControls(bool status)
     actionStatus->setDisabled(!status);
     actionTransfer->setDisabled(!status);
     actionSearch->setDisabled(!status);
-    menuStatus->setDisabled(!status);
 }
 
 void MainWindow::on_actionConnect_triggered()

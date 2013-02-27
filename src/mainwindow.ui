@@ -56,7 +56,9 @@
    <addaction name="actionTransfer"/>
    <addaction name="actionSearch"/>
    <addaction name="separator"/>
-   <addaction name="actionTools"/>
+   <addaction name="actionMessages"/>
+   <addaction name="actionFiles"/>
+   <addaction name="actionOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
@@ -311,21 +313,6 @@
     <string>Search</string>
    </property>
   </action>
-  <action name="actionTools">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="Icons/emule/emule.qrc">
-     <normaloff>:/emule/Tools.png</normaloff>:/emule/Tools.png</iconset>
-   </property>
-   <property name="text">
-    <string>Tools</string>
-   </property>
-   <property name="toolTip">
-    <string>Tools</string>
-   </property>
-  </action>
   <action name="actionConnect">
    <property name="icon">
     <iconset resource="Icons/emule/emule.qrc">
@@ -354,6 +341,9 @@
    </property>
   </action>
   <action name="actionMessages">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Icons/emule/emule.qrc">
      <normaloff>:/emule/Messages.ico</normaloff>:/emule/Messages.ico</iconset>
@@ -363,6 +353,9 @@
    </property>
   </action>
   <action name="actionFiles">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Icons/emule/emule.qrc">
      <normaloff>:/emule/SharedFiles.png</normaloff>:/emule/SharedFiles.png</iconset>
