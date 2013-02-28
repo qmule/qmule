@@ -29,8 +29,8 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QTableView" name="tableView"/>
-      <widget class="QPlainTextEdit" name="plainTextEdit">
+      <widget class="QTableView" name="tableServers"/>
+      <widget class="QPlainTextEdit" name="textLog">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
