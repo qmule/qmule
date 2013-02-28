@@ -9,6 +9,13 @@ class servers_table_model : public QAbstractTableModel
 {
     Q_OBJECT
 public:
+
+    enum DisplayColumns
+    {
+        DC_IP = 0,
+        DC_PORT
+    };
+
     explicit servers_table_model(QObject *parent = 0);    
     int rowCount(const QModelIndex& parent) const;
     int columnCount(const QModelIndex& parent) const;

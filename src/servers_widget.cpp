@@ -1,10 +1,16 @@
 #include "servers_widget.h"
 #include "preferences.h"
+#include "servers_table_model.h"
 
 servers_widget::servers_widget(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), m_smodel(NULL)
 {
     setupUi(this);
+
+    m_smodel = new servers_table_model(this);
+    m_smodel->load();
+    tableServers->setModel(m_smodel);
+
     Preferences pref;
 
     if (!hsplit->restoreState(pref.value("ServersWidget/HSplitter").toByteArray()))
@@ -15,7 +21,7 @@ servers_widget::servers_widget(QWidget *parent) :
     }
 
     vsplit->restoreState(pref.value("ServersWidget/VSplitter").toByteArray());
-    tableServers->horizontalHeader()->restoreState(pref.value("ServersWidget/TableServers").toByteArray());
+    //tableServers->horizontalHeader()->restoreState(pref.value("ServersWidget/TableServers").toByteArray());
 }
 
 servers_widget::~servers_widget()
