@@ -108,14 +108,16 @@ HEADERS += misc.h \
            scannedfoldersmodel.h \
            qinisettings.h \
            smtp.h \
-           servers_widget.h
+           servers_widget.h \
+           servers_table_model.h
 
 SOURCES += main.cpp \
            downloadthread.cpp \
            scannedfoldersmodel.cpp \
            misc.cpp \
            smtp.cpp \
-           servers_widget.cpp
+           servers_widget.cpp \
+           servers_table_model.cpp
 
 HEADERS +=  mainwindow.h\
           transferlistwidget.h \
