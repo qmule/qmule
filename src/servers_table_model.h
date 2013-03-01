@@ -12,8 +12,14 @@ public:
 
     enum DisplayColumns
     {
-        DC_IP = 0,
-        DC_PORT
+        DC_NAME = 0,
+        DC_IP,
+        DC_PORT,
+        DC_FILES,
+        DC_USERS,
+        DC_MAX_USERS,
+        DC_LOWID_USERS,
+        DC_DESCR
     };
 
     explicit servers_table_model(QObject *parent = 0);    
@@ -29,6 +35,20 @@ public:
     void load();
 private:
     libed2k::server_met server_met;
+
+    /**
+      * getters to container
+     */
+    QString ip(int) const;
+    qint16  port(int) const;
+    QString name(int) const;
+    QString description(int) const;
+    quint64 users(int) const;
+    quint64 files(int) const;
+    quint64 soft_files(int) const;
+    quint64 hard_files(int) const;
+    quint64 max_users(int) const;
+    quint64 lowid_users(int) const;
 signals:
     
 public slots:
