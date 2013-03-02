@@ -116,11 +116,13 @@ private:
   void endInsertTorrent();
   void beginRemoveTorrent(int row);
   void endRemoveTorrent();
-  void processPendingTransfers();
+  void processUncheckedTransfers();
+  void processDanglingTorrents();
 
 private:
   QList<TorrentModelItem*> m_torrents;
-  QList<Transfer> m_pendingTransfers;
+  QList<Transfer> m_uncheckedTransfers;
+  QHash<QString, int> m_danglingTorrents;
   int m_refreshInterval;
   QTimer m_refreshTimer;
 };

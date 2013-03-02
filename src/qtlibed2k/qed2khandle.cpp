@@ -110,6 +110,7 @@ bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequenti
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
 std::vector<int> QED2KHandle::piece_priorities() const { return m_delegate.piece_priorities(); }
+TransferSize QED2KHandle::total_size() const { return m_delegate.size(); }
 TransferSize QED2KHandle::piece_length() const { return libed2k::PIECE_SIZE; }
 bool QED2KHandle::extremity_pieces_first() const {
     const QString ext = misc::file_extension(filename_at(0));

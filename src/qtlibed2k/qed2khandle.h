@@ -43,6 +43,7 @@ public:
     void downloading_pieces(TransferBitfield& bf) const;
     void piece_availability(std::vector<int>& avail) const;
     std::vector<int> piece_priorities() const;
+    TransferSize total_size() const;
     TransferSize piece_length() const;
     bool extremity_pieces_first() const;
     void file_progress(std::vector<TransferSize>& fp) const;
