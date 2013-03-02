@@ -12,7 +12,7 @@ servers_table_model::servers_table_model(QObject *parent) :
 
 int servers_table_model::rowCount(const QModelIndex& parent) const
 {
-    return server_met.m_servers.count();
+    return server_met.m_servers.m_collection.size();
 }
 
 int servers_table_model::columnCount(const QModelIndex& parent) const
@@ -127,7 +127,7 @@ void servers_table_model::load()
         {
             libed2k::archive::ed2k_iarchive ia(fs);
             ia >> server_met;
-            qDebug() << "loaded " << server_met.m_servers.count() << " servers";
+            qDebug() << "loaded " << server_met.m_servers.m_collection.size() << " servers";
         }
     }
     catch(libed2k::libed2k_exception& e)
@@ -136,62 +136,104 @@ void servers_table_model::load()
     }
 }
 
+void servers_table_model::removeServer(const QModelIndex& index)
+{
+    if (index.isValid())
+    {
+        emit beginRemoveRows(QModelIndex(), index.row(), index.row());
+        server_met.m_servers.m_collection.erase(server_met.m_servers.m_collection.begin() + index.row());
+        server_met.m_servers.m_size = server_met.m_servers.m_collection.size();
+        emit endRemoveRows();
+    }
+}
+
+void servers_table_model::addServer(const QString& name, const libed2k::net_identifier& point)
+{
+    libed2k::server_met_entry sme;
+    sme.m_network_point = point;
+
+    if (std::find(server_met.m_servers.m_collection.begin(), server_met.m_servers.m_collection.end(), sme) ==
+            server_met.m_servers.m_collection.end())
+    {
+        beginInsertRows(QModelIndex(), server_met.m_servers.m_collection.size(), server_met.m_servers.m_collection.size());
+        sme.m_list.add_tag(boost::shared_ptr<libed2k::base_tag>(new libed2k::string_tag(name.toUtf8().constData(), libed2k::FT_FILENAME, true)));
+        server_met.m_servers.m_collection.push_back(sme);
+        endInsertRows();
+    }
+}
+
+void servers_table_model::clear()
+{
+    if (!server_met.m_servers.m_collection.empty())
+    {
+        emit beginRemoveRows(QModelIndex(), 0, server_met.m_servers.m_collection.size()-1);
+        server_met.m_servers.m_collection.clear();
+        emit endRemoveRows();
+    }
+}
+
 QString servers_table_model::ip(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return QString::fromStdString(libed2k::int2ipstr(server_met.m_servers.m_collection.at(row).m_network_point.m_nIP));
 }
 
 qint16  servers_table_model::port(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_network_point.m_nPort;
 }
 
 QString servers_table_model::name(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return QString::fromStdString(server_met.m_servers.m_collection.at(row).m_list.getStringTagByNameId(libed2k::FT_FILENAME));
 }
 
 QString servers_table_model::description(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return QString::fromStdString(server_met.m_servers.m_collection.at(row).m_list.getStringTagByNameId(libed2k::ST_DESCRIPTION));
 }
 
 quint64 servers_table_model::users(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByName("users");
 }
 
 quint64 servers_table_model::files(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByName("files");
 }
 
 quint64 servers_table_model::soft_files(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByNameId(libed2k::ST_SOFTFILES);
 }
 
 quint64 servers_table_model::hard_files(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByNameId(libed2k::ST_HARDFILES);
 }
 
 quint64 servers_table_model::max_users(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByNameId(libed2k::ST_MAXUSERS);
 }
 
 quint64 servers_table_model::lowid_users(int row) const
 {
-    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.count());
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
     return server_met.m_servers.m_collection.at(row).m_list.getIntTagByNameId(libed2k::ST_LOWIDUSERS);
+}
+
+libed2k::net_identifier servers_table_model::identifier(int row) const
+{
+    Q_ASSERT(static_cast<unsigned int>(row) < server_met.m_servers.m_collection.size());
+    return server_met.m_servers.m_collection.at(row).m_network_point;
 }

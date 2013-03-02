@@ -27,6 +27,9 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    void removeServer(const QModelIndex&);
+    void addServer(const QString& name, const libed2k::net_identifier& point);
+    void clear();
 
     /**
       * save/load model to server.met file
@@ -35,12 +38,13 @@ public:
     void load();
 private:
     libed2k::server_met server_met;
+    libed2k::net_identifier m_connected_identifier;
 
     /**
       * getters to container
      */
     QString ip(int) const;
-    qint16  port(int) const;
+    qint16  port(int) const;    
     QString name(int) const;
     QString description(int) const;
     quint64 users(int) const;
@@ -49,6 +53,7 @@ private:
     quint64 hard_files(int) const;
     quint64 max_users(int) const;
     quint64 lowid_users(int) const;
+    libed2k::net_identifier identifier(int) const;
 signals:
     
 public slots:

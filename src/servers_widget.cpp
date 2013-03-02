@@ -1,24 +1,26 @@
 #include <QMenu>
 #include <QSortFilterProxyModel>
+#include <QHostInfo>
 #include "servers_widget.h"
 #include "preferences.h"
 #include "servers_table_model.h"
 
 servers_widget::servers_widget(QWidget *parent) :
-    QWidget(parent), m_smodel(NULL)
+    QWidget(parent),
+    m_smodel(NULL),
+    m_connect_menu(NULL),
+    m_connect_action(NULL),
+    m_remove_action(NULL),
+    m_remove_all_action(NULL),
+    last_server_name(""),
+    last_server_port(0)
 {
     setupUi(this);
     // prepare menus
     m_connect_menu = new QMenu(this);
-    m_disconnect_menu = new QMenu(this);
-
-    //fileDownload->setIcon(QIcon(":/emule/search/Download.png"));
     m_connect_action = new QAction(this);
     m_connect_action->setText(tr("Connect to"));
     m_connect_action->setIcon(QIcon(":/emule/common/ConnectDo.ico"));
-    m_disconnect_action = new QAction(this);
-    m_disconnect_action->setText(tr("Disconnect from"));
-    m_disconnect_action->setIcon(QIcon(":/emule/common/ConnectStop.ico"));
     m_remove_action = new QAction(this);
     m_remove_action->setText(tr("Remove"));
     m_remove_action->setIcon(QIcon(":/emule/common/DeleteSelected.ico"));
@@ -31,15 +33,9 @@ servers_widget::servers_widget(QWidget *parent) :
     m_connect_menu->addAction(m_remove_action);
     m_connect_menu->addAction(m_remove_all_action);
 
-    m_disconnect_menu->addAction(m_connect_action);
-    m_disconnect_menu->addSeparator();
-    m_disconnect_menu->addAction(m_remove_action);
-    m_disconnect_menu->addAction(m_remove_all_action);
-
-    connect(m_connect_action, SIGNAL(triggered()), this, SLOT(connect_slot()));
-    connect(m_disconnect_action, SIGNAL(triggered()), this, SLOT(disconnect_slot()));
-    connect(m_remove_action, SIGNAL(triggered()), this, SLOT(remove_slot()));
-    connect(m_remove_all_action, SIGNAL(triggered()), this, SLOT(removeAll_slot()));
+    connect(m_connect_action, SIGNAL(triggered()), this, SLOT(connect_handler()));
+    connect(m_remove_action, SIGNAL(triggered()), this, SLOT(remove_handler()));
+    connect(m_remove_all_action, SIGNAL(triggered()), this, SLOT(removeAll_handler()));
 
     m_smodel = new servers_table_model(this);
     m_smodel->load();
@@ -115,9 +111,13 @@ void servers_widget::displayHeaderMenu(const QPoint&)
 
 void servers_widget::on_btnAdd_clicked()
 {
+    last_server_port = spinPort->value();
+    last_server_name = editName->text();
+    QHostInfo::lookupHost(editIP->text(), this, SLOT(lookedUP(QHostInfo)));
     // add new server
     editName->clear();
     editIP->clear();
+    gbxNS->setDisabled(true);
 }
 
 void servers_widget::on_editIP_textChanged(const QString &arg1)
@@ -142,28 +142,39 @@ void servers_widget::switchAddBtn()
     }
 }
 
-void servers_widget::connect_slot()
+void servers_widget::connect_handler()
 {
 
 }
 
-void servers_widget::disconnect_slot()
+void servers_widget::remove_handler()
 {
-
+    m_smodel->removeServer(m_sort_model->mapToSource(tableServers->currentIndex()));
 }
 
-void servers_widget::remove_slot()
+void servers_widget::removeAll_handler()
 {
-
+    m_smodel->clear();
 }
-
-void servers_widget::removeAll_slot()
-{
-
-}
-
 
 void servers_widget::on_tableServers_customContextMenuRequested(const QPoint &pos)
 {
-    m_connect_menu->exec(QCursor::pos());
+    if (tableServers->currentIndex().isValid())
+    {
+        m_connect_menu->exec(QCursor::pos());
+    }
+}
+
+void servers_widget::lookedUP(const QHostInfo& hi)
+{
+    gbxNS->setEnabled(true);
+
+    if (hi.error() == QHostInfo::NoError && !hi.addresses().empty())
+    {
+        m_smodel->addServer(last_server_name, libed2k::net_identifier(hi.addresses().at(0).toIPv4Address(), last_server_port));
+    }
+
+    last_server_name.clear();
+    last_server_port = 0;
+
 }

@@ -292,7 +292,6 @@ void BaseModel::beginRemoveNode(const FileNode* node)
         beginRemoveRows(parent(indx), indx.row(), indx.row());
         m_row_count_changed = true;
     }
-
 }
 
 void BaseModel::endRemoveNode()

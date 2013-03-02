@@ -8,6 +8,7 @@ class servers_table_model;
 class QSortFilterProxyModel;
 class QMenu;
 class QAction;
+class QHostInfo;
 
 class servers_widget : public QWidget, private Ui::servers_widget
 {
@@ -16,13 +17,12 @@ private:
     QSortFilterProxyModel*  m_sort_model;
     servers_table_model*    m_smodel;
     QMenu*                  m_connect_menu;
-    QMenu*                  m_disconnect_menu;
-
     QAction*                m_connect_action;
-    QAction*                m_disconnect_action;
     QAction*                m_remove_action;
     QAction*                m_remove_all_action;
 
+    QString last_server_name;
+    int last_server_port;
     void switchAddBtn();
 public:
     explicit servers_widget(QWidget *parent = 0);
@@ -34,11 +34,11 @@ private slots:
     void on_editName_textChanged(const QString &arg1);
     void displayHeaderMenu(const QPoint&);
 
-    void connect_slot();
-    void disconnect_slot();
-    void remove_slot();
-    void removeAll_slot();
+    void connect_handler();
+    void remove_handler();
+    void removeAll_handler();
     void on_tableServers_customContextMenuRequested(const QPoint &pos);
+    void lookedUP(const QHostInfo&);
 };
 
 #endif // SERVERS_WIDGET_H
