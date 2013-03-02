@@ -136,6 +136,16 @@ void servers_table_model::load()
     }
 }
 
+QString servers_table_model::ip(const QModelIndex& indx) const
+{
+    return ip(indx.row());
+}
+
+qint16 servers_table_model::port(const QModelIndex& indx) const
+{
+    return port(indx.row());
+}
+
 void servers_table_model::removeServer(const QModelIndex& index)
 {
     if (index.isValid())

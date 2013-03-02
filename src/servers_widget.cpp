@@ -4,6 +4,7 @@
 #include "servers_widget.h"
 #include "preferences.h"
 #include "servers_table_model.h"
+#include "session.h"
 
 servers_widget::servers_widget(QWidget *parent) :
     QWidget(parent),
@@ -143,8 +144,10 @@ void servers_widget::switchAddBtn()
 }
 
 void servers_widget::connect_handler()
-{
-
+{    
+    Session::instance()->get_ed2k_session()->startServerConnection(
+                m_smodel->ip(m_sort_model->mapToSource(tableServers->currentIndex())),
+                m_smodel->port(m_sort_model->mapToSource(tableServers->currentIndex())));
 }
 
 void servers_widget::remove_handler()

@@ -36,6 +36,12 @@ public:
      */
     void save();
     void load();
+
+    /**
+      * public getters
+     */
+    QString ip(const QModelIndex&) const;
+    qint16  port(const QModelIndex&) const;
 private:
     libed2k::server_met server_met;
     libed2k::net_identifier m_connected_identifier;
@@ -44,7 +50,7 @@ private:
       * getters to container
      */
     QString ip(int) const;
-    qint16  port(int) const;    
+    qint16  port(int) const;
     QString name(int) const;
     QString description(int) const;
     quint64 users(int) const;

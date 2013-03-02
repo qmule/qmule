@@ -101,7 +101,7 @@ public:
     virtual void saveTempFastResumeData();
     virtual void readAlerts();
     virtual void saveFastResumeData();
-    void startServerConnection();
+    void startServerConnection(const QString& address = QString(), int port = 0);
     void stopServerConnection();
     bool isServerConnected() const;
     void makeTransferParametersAsync(const QString& filepath);

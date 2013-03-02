@@ -251,6 +251,7 @@ void QED2KSession::start()
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(settings.m_known_file);
+
 #ifdef AMD1
     settings.server_hostname = "che-s-amd1";
 #else
@@ -261,6 +262,7 @@ void QED2KSession::start()
     m_session->set_alert_mask(alert::all_categories);
     m_session->set_alert_queue_size_limit(100000);
 
+#if 0
     // attempt load filters
     QFile fdata(misc::ED2KMetaLocation("ipfilter.dat"));
     if (fdata.open(QFile::ReadOnly))
@@ -291,7 +293,7 @@ void QED2KSession::start()
     {
         qDebug() << "ipfilter.dat wasn't found";
     }
-
+#endif
     // start listening on special interface and port and start server connection
     configureSession();
 }
@@ -1023,10 +1025,17 @@ void QED2KSession::enableUPnP(bool b)
     if (natpmp) natpmp->add_mapping(libtorrent::natpmp::tcp, port, port);
 }
 
-void QED2KSession::startServerConnection()
+void QED2KSession::startServerConnection(const QString& address/* = QString()*/, int port /* = 0*/)
 {
     libed2k::session_settings settings = delegate()->settings();
     settings.server_reconnect_timeout = 20;
+
+    if (!address.isEmpty())
+        settings.server_hostname = address.toStdString();
+
+    if (port != 0)
+        settings.server_port = port;
+
     delegate()->set_settings(settings);
     delegate()->server_conn_start();
 }
