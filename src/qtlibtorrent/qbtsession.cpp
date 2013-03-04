@@ -1098,6 +1098,7 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
       qDebug("Successfully loaded fast resume data");
     }
   }
+#if 0
 #if LIBTORRENT_VERSION_MINOR < 16
   else {
     // Generate fake resume data to make sure unwanted files
@@ -1112,6 +1113,7 @@ QTorrentHandle QBtSession::addTorrent(QString path, bool fromScanDir, QString fr
       }
     }
   }
+#endif
 #endif
 
   QString savePath;
