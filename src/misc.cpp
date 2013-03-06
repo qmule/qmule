@@ -1135,6 +1135,31 @@ QStringList misc::cmd2list(const QString& text)
     return res;
 }
 
+QString misc::userHash()
+{
+    QString res;
+    while(res.length() != libed2k::md4_hash::hash_size*2)
+    {
+        QString part;
+        part.setNum(qrand(), libed2k::md4_hash::hash_size*2);
+        res += part;
+
+        if (res.length() > libed2k::md4_hash::hash_size*2)
+        {
+            res.remove(libed2k::md4_hash::hash_size*2, res.length() - libed2k::md4_hash::hash_size*2);
+        }
+    }
+
+    // emule bytes set
+    res[10] = '0';
+    res[11] = 'e';
+    res[28] = '6';
+    res[29] = 'f';
+
+    qDebug() << "user hash " << res;
+    return res;
+}
+
 
 #ifdef Q_WS_WIN32
 
