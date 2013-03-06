@@ -2523,7 +2523,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Connections limit</source>
-        <translation type="obsolete">Ограничение соединений</translation>
+        <translation type="obsolete">Ограничение торрент-соединений</translation>
     </message>
     <message>
         <source>Global maximum number of connections:</source>
@@ -2768,7 +2768,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>Pre-allocate disk space for all files</source>
         <translatorcomment>Или &apos;Предварительно резервировать&apos; будет правильнее?</translatorcomment>
-        <translation>Предварительно зарезервировать место для всех файлов</translation>
+        <translation>Предварительно зарезервировать место для всех торрент-файлов</translation>
     </message>
     <message>
         <source>Keep incomplete torrents in:</source>
@@ -2877,7 +2877,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use UPnP / NAT-PMP port forwarding from my router</source>
-        <translation>Использовать UPnP / NAT-PMP из моего роутера</translation>
+        <translation>Использовать UPnP / NAT-PMP из моего роутера(так-же и для порта ослика)</translation>
     </message>
     <message>
         <source>Privacy</source>
@@ -3005,11 +3005,11 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Listening Port</source>
-        <translation>Прослушиваемый порт</translation>
+        <translation>Прослушиваемый торрент-порт</translation>
     </message>
     <message>
         <source>Connections Limits</source>
-        <translation>Ограничения соединений</translation>
+        <translation>Ограничения торрент-соединений</translation>
     </message>
     <message>
         <source>Proxy Server</source>

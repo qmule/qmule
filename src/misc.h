@@ -204,6 +204,7 @@ public:
   static QSet<QString> torrentRoots(const QTorrentHandle& h);
   static QDir uniquePath(const QDir& path, const QList<QDir>& paths);
   static QStringList cmd2list(const QString&);
+  static QString userHash();
 
   /**
     * eMule migration functions
@@ -226,7 +227,6 @@ public:
   static shared_map migrationShareds();
   static QStringList migrationSharedFiles();
   static void migrateTorrents();
-
 };
 
 //  Trick to get a portable sleep() function

@@ -113,10 +113,11 @@ qlonglong TorrentSpeedMonitor::getETA(const QString &hash) const
 {
   QMutexLocker locker(&m_mutex);
   Transfer h = m_session->getTransfer(hash);
-  if (!h.is_valid() || h.is_paused() || !m_samples.contains(hash)) return -1;
+  TransferStatus st = h.status();
+  if (!h.is_valid() || st.paused || !m_samples.contains(hash)) return -1;
   const qreal speed_average = m_samples.value(hash).average();
   if (speed_average == 0) return -1;
-  return (h.total_wanted() - h.total_done()) / speed_average;
+  return (st.total_wanted - st.total_wanted_done) / speed_average;
 }
 
 void TorrentSpeedMonitor::getSamples()

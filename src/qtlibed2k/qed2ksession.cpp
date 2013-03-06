@@ -238,7 +238,7 @@ void QED2KSession::start()
     libed2k::fingerprint finger;
 
     // set zero to port for stop automatically listening
-	settings.user_agent  = libed2k::md4_hash::fromString("15f52879d10ec9cf57c2310ae41c6fd3"); // we are eMule :)
+    settings.user_agent  = libed2k::md4_hash::fromString(misc::userHash().toStdString());
     settings.listen_port = pref.listenPort();
     settings.server_reconnect_timeout = 20;
     settings.server_keep_alive_timeout = -1;

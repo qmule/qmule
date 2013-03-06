@@ -1134,6 +1134,28 @@ QStringList misc::cmd2list(const QString& text)
     return res;
 }
 
+QString misc::userHash()
+{
+    QString res;
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
+    for (int i = 0; i < libed2k::md4_hash::hash_size*2; ++i)
+    {
+        QString part;
+        part.setNum(qrand() % 16, 16);
+        res += part;
+    }
+
+    // emule bytes set
+    res[10] = '0';
+    res[11] = 'e';
+    res[28] = '6';
+    res[29] = 'f';
+
+    qDebug() << "user hash " << res;
+    return res;
+}
+
 
 #ifdef Q_WS_WIN32
 
