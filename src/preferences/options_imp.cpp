@@ -124,9 +124,6 @@ options_imp::options_imp(QWidget *parent):
   label_anonymous->setVisible(false);
 #endif
 
-  // Connect signals / slots
-  connect(comboProxyType, SIGNAL(currentIndexChanged(int)),this, SLOT(enableProxy(int)));
-  connect(checkAnonymousMode, SIGNAL(toggled(bool)), this, SLOT(toggleAnonymousMode(bool)));
 
   // Apply button is activated when a value is changed
   // General tab
@@ -206,14 +203,6 @@ options_imp::options_imp(QWidget *parent):
   connect(checkMaxRatio, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(spinMaxRatio, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(comboRatioLimitAct, SIGNAL(currentIndexChanged(int)), this, SLOT(enableApplyButton()));
-  // Proxy tab
-  connect(comboProxyType, SIGNAL(currentIndexChanged(int)), this, SLOT(enableApplyButton()));
-  connect(textProxyIP, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(spinProxyPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(checkProxyPeerConnecs, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
-  connect(checkProxyAuth, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
-  connect(textProxyUsername, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(textProxyPassword, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
   // Misc tab
   connect(checkIPFilter, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(textFilterPath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
@@ -413,14 +402,7 @@ void options_imp::saveOptions() {
   pref.setSchedulerEnabled(check_schedule->isChecked());
   pref.setSchedulerStartTime(schedule_from->time());
   pref.setSchedulerEndTime(schedule_to->time());
-  pref.setSchedulerDays((scheduler_days)schedule_days->currentIndex());
-  pref.setProxyType(getProxyType());
-  pref.setProxyIp(getProxyIp());
-  pref.setProxyPort(getProxyPort());
-  pref.setProxyPeerConnections(checkProxyPeerConnecs->isChecked());
-  pref.setProxyAuthEnabled(isProxyAuthEnabled());
-  pref.setProxyUsername(getProxyUsername());
-  pref.setProxyPassword(getProxyPassword());
+  pref.setSchedulerDays((scheduler_days)schedule_days->currentIndex());  
   // End Connection preferences
   // Bittorrent preferences
   pref.setMaxConnecs(getMaxConnecs());
@@ -488,26 +470,6 @@ void options_imp::saveOptions() {
 
 bool options_imp::isFilteringEnabled() const {
   return checkIPFilter->isChecked();
-}
-
-int options_imp::getProxyType() const {
-  switch(comboProxyType->currentIndex()) {
-  case 1:
-    return Proxy::SOCKS4;
-    break;
-  case 2:
-    if (isProxyAuthEnabled()) {
-      return Proxy::SOCKS5_PW;
-    }
-    return Proxy::SOCKS5;
-  case 3:
-    if (isProxyAuthEnabled()) {
-      return Proxy::HTTP_PW;
-    }
-    return Proxy::HTTP;
-  default:
-    return -1;
-  }
 }
 
 void options_imp::loadOptions() {
@@ -653,31 +615,6 @@ void options_imp::loadOptions() {
   schedule_to->setTime(pref.getSchedulerEndTime());
   schedule_days->setCurrentIndex((int)pref.getSchedulerDays());
 
-  intValue = pref.getProxyType();
-  switch(intValue) {
-  case Proxy::SOCKS4:
-    comboProxyType->setCurrentIndex(1);
-    break;
-  case Proxy::SOCKS5:
-  case Proxy::SOCKS5_PW:
-    comboProxyType->setCurrentIndex(2);
-    break;
-  case Proxy::HTTP:
-  case Proxy::HTTP_PW:
-    comboProxyType->setCurrentIndex(3);
-    break;
-  default:
-    comboProxyType->setCurrentIndex(0);
-  }
-  enableProxy(comboProxyType->currentIndex());
-  //if (isProxyEnabled()) {
-  // Proxy is enabled, save settings
-  textProxyIP->setText(pref.getProxyIp());
-  spinProxyPort->setValue(pref.getProxyPort());
-  checkProxyPeerConnecs->setChecked(pref.proxyPeerConnections());
-  checkProxyAuth->setChecked(pref.isProxyAuthEnabled());
-  textProxyUsername->setText(pref.getProxyUsername());
-  textProxyPassword->setText(pref.getProxyPassword());
   //}
   // End Connection preferences
   // Bittorrent preferences
@@ -960,32 +897,6 @@ void options_imp::enableApplyButton() {
   applyButton->setEnabled(true);
 }
 
-void options_imp::enableProxy(int index) {
-  if (index) {
-    //enable
-    lblProxyIP->setEnabled(true);
-    textProxyIP->setEnabled(true);
-    lblProxyPort->setEnabled(true);
-    spinProxyPort->setEnabled(true);
-    checkProxyPeerConnecs->setEnabled(true);
-    if (index > 1) {
-      checkProxyAuth->setEnabled(true);
-    } else {
-      checkProxyAuth->setEnabled(false);
-      checkProxyAuth->setChecked(false);
-    }
-  }else{
-    //disable
-    lblProxyIP->setEnabled(false);
-    textProxyIP->setEnabled(false);
-    lblProxyPort->setEnabled(false);
-    spinProxyPort->setEnabled(false);
-    checkProxyPeerConnecs->setEnabled(false);
-    checkProxyAuth->setEnabled(false);
-    checkProxyAuth->setChecked(false);
-  }
-}
-
 bool options_imp::isSlashScreenDisabled() const {
   return !checkShowSplash->isChecked();
 }
@@ -1004,35 +915,6 @@ bool options_imp::addTorrentsInPause() const {
 
 bool options_imp::isDHTPortSameAsBT() const {
   return !checkDifferentDHTPort->isChecked();
-}
-
-// Proxy settings
-bool options_imp::isProxyEnabled() const {
-  return comboProxyType->currentIndex();
-}
-
-bool options_imp::isProxyAuthEnabled() const {
-  return checkProxyAuth->isChecked();
-}
-
-QString options_imp::getProxyIp() const {
-  return textProxyIP->text().trimmed();
-}
-
-unsigned short options_imp::getProxyPort() const {
-  return spinProxyPort->value();
-}
-
-QString options_imp::getProxyUsername() const {
-  QString username = textProxyUsername->text();
-  username = username.trimmed();
-  return username;
-}
-
-QString options_imp::getProxyPassword() const {
-  QString password = textProxyPassword->text();
-  password = password.trimmed();
-  return password;
 }
 
 // Locale Settings

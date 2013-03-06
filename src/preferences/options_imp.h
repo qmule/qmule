@@ -61,7 +61,6 @@ signals:
   void exitWithCancel();
 
 private slots:
-  void enableProxy(int comboIndex);
   void on_buttonBox_accepted();
   void closeEvent(QCloseEvent *e);
   void on_buttonBox_rejected();
@@ -124,14 +123,6 @@ private:
   bool isLSDEnabled() const;
   int getEncryptionSetting() const;
   qreal getMaxRatio() const;
-  // Proxy options
-  bool isProxyEnabled() const;
-  bool isProxyAuthEnabled() const;
-  QString getProxyIp() const;
-  unsigned short getProxyPort() const;
-  QString getProxyUsername() const;
-  QString getProxyPassword() const;
-  int getProxyType() const;
   // IP Filter
   bool isFilteringEnabled() const;
   QString getFilter() const;
