@@ -1138,16 +1138,13 @@ QStringList misc::cmd2list(const QString& text)
 QString misc::userHash()
 {
     QString res;
-    while(res.length() != libed2k::md4_hash::hash_size*2)
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
+    for (int i = 0; i < libed2k::md4_hash::hash_size*2; ++i)
     {
         QString part;
-        part.setNum(qrand(), libed2k::md4_hash::hash_size*2);
+        part.setNum(qrand() % 16, 16);
         res += part;
-
-        if (res.length() > libed2k::md4_hash::hash_size*2)
-        {
-            res.remove(libed2k::md4_hash::hash_size*2, res.length() - libed2k::md4_hash::hash_size*2);
-        }
     }
 
     // emule bytes set
