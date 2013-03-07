@@ -148,8 +148,7 @@ options_imp::options_imp(QWidget *parent):
 #endif
   // Downloads tab
   connect(textSavePath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(textTempPath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));
-  connect(checkAppendLabel, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(textTempPath, SIGNAL(textChanged(QString)), this, SLOT(enableApplyButton()));  
   connect(checkAppendqB, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkPreallocateAll, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
   connect(checkAdditionDialog, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
@@ -366,8 +365,7 @@ void options_imp::saveOptions() {
 #if defined(Q_WS_WIN) || defined(Q_OS_OS2)
   temp_path.replace("\\", "/");
 #endif
-  pref.setTempPath(temp_path);
-  pref.setAppendTorrentLabel(checkAppendLabel->isChecked());
+  pref.setTempPath(temp_path); 
   pref.useIncompleteFilesExtension(checkAppendqB->isChecked());
   pref.preAllocateAllFiles(preAllocateAllFiles());
   pref.useAdditionDialog(useAdditionDialog());
@@ -515,7 +513,6 @@ void options_imp::loadOptions() {
   temp_path.replace("/", "\\");
 #endif
   textTempPath->setText(temp_path);
-  checkAppendLabel->setChecked(pref.appendTorrentLabel());
   checkAppendqB->setChecked(pref.useIncompleteFilesExtension());
   checkPreallocateAll->setChecked(pref.preAllocateAllFiles());
   checkAdditionDialog->setChecked(pref.useAdditionDialog());
@@ -1130,7 +1127,7 @@ QString options_imp::languageToLocalizedString(QLocale::Language language, const
   case QLocale::Danish: return QString::fromUtf8("Dansk");
   case QLocale::Bulgarian: return QString::fromUtf8("Български");
   case QLocale::Ukrainian: return QString::fromUtf8("Українська");
-  case QLocale::Russian: return QString::fromUtf8("Русский");
+  case QLocale::Russian: return QString::fromUtf8("� усский");
   case QLocale::Japanese: return QString::fromUtf8("日本語");
   case QLocale::Arabic: return QString::fromUtf8("عربي");
   case QLocale::Georgian: return QString::fromUtf8("ქა �თული");
