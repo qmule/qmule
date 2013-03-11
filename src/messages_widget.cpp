@@ -242,7 +242,7 @@ void messages_widget::pushMessage()
 
     for ( QTextBlock block = textMsg->document()->begin(); block.isValid(); block = block.next())
     {
-        lines.append(qPrintable(block.text()));
+        lines.append(block.text());
     }
 
     msg = lines.join("\n");
