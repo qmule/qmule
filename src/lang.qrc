@@ -1,6 +1,7 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-  <file>lang/qmule_ru.qm</file>
-  <file>lang/qmule_en.qm</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>lang/qmule_ru.qm</file>
+        <file>lang/qmule_en.qm</file>
+        <file>lang/qt_ru.qm</file>
+    </qresource>
 </RCC>
