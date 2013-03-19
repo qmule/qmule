@@ -1107,7 +1107,7 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>DL speed: %1 KiB/s</source>
         <comment>e.g: Download speed: 10 KiB/s</comment>
-        <translation type="obsolete">Скорость скач.: %1 KiB/с</translation>
+        <translation type="obsolete">Скорость скачивания: %1 KiB/с</translation>
     </message>
     <message>
         <source>UP speed: %1 KiB/s</source>
