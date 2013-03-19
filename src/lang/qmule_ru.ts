@@ -3161,7 +3161,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use qMule for cmule collections</source>
-        <translation>Исполезовать qMule для eMule коллекций</translation>
+        <translation>Использовать qMule для eMule коллекций</translation>
     </message>
     <message>
         <source>Torrent Rate Limits</source>
