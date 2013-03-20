@@ -4589,7 +4589,7 @@ Do you want to install it now?</source>
     <message>
         <source>ETA</source>
         <comment>i.e: Estimated Time of Arrival / Time left</comment>
-        <translation>Ост. времени</translation>
+        <translation>Осталось времени</translation>
     </message>
     <message>
         <source>Label</source>
@@ -4864,7 +4864,7 @@ Do you want to install it now?</source>
     <message>
         <source>ETA</source>
         <comment>i.e: Estimated Time of Arrival / Time left</comment>
-        <translation type="obsolete">Ост. времени</translation>
+        <translation type="obsolete">Осталось времени</translation>
     </message>
     <message>
         <source>Column visibility</source>
