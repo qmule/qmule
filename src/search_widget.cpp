@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <QWebFrame>
 #include <QWebElementCollection>
-
 #include "collection_save_dlg.h"
 #include "search_widget.h"
 #include "search_filter.h"
@@ -275,7 +274,6 @@ search_widget::search_widget(QWidget *parent)
     tableCond->item(10, 0)->setText(tr("Album"));
     tableCond->item(10, 0)->setFlags(Qt::NoItemFlags);
     tableCond->item(10, 1)->setFlags(Qt::NoItemFlags);
-
     checkOwn->setChecked(Qt::Checked);
 
     model.reset(new SWItemModel(0, SWDelegate::SW_COLUMNS_NUM));
@@ -612,6 +610,11 @@ void search_widget::startSearch()
     QString searchRequest = comboName->currentText();
     if (!searchRequest.length())
         return;
+  
+#ifdef Q_WS_MAC
+    tableCond->setDisabled( true );
+    tableCond->setDisabled( false );
+#endif
 
     bool bOk = false;
     quint64 nMinSize = tableCond->item(0, 1)->text().toLongLong(&bOk);
