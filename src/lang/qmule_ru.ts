@@ -1107,7 +1107,7 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>DL speed: %1 KiB/s</source>
         <comment>e.g: Download speed: 10 KiB/s</comment>
-        <translation type="obsolete">Скорость скач.: %1 KiB/с</translation>
+        <translation type="obsolete">Скорость скачивания: %1 KiB/с</translation>
     </message>
     <message>
         <source>UP speed: %1 KiB/s</source>
@@ -3161,7 +3161,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use eMule for cmule collections</source>
-        <translation>Исполезовать eMule для eMule коллекций</translation>
+        <translation>Использовать eMule для eMule коллекций</translation>
     </message>
     <message>
         <source>Torrent Rate Limits</source>
@@ -4589,7 +4589,7 @@ Do you want to install it now?</source>
     <message>
         <source>ETA</source>
         <comment>i.e: Estimated Time of Arrival / Time left</comment>
-        <translation>Ост. времени</translation>
+        <translation>Осталось времени</translation>
     </message>
     <message>
         <source>Label</source>
@@ -4864,7 +4864,7 @@ Do you want to install it now?</source>
     <message>
         <source>ETA</source>
         <comment>i.e: Estimated Time of Arrival / Time left</comment>
-        <translation type="obsolete">Ост. времени</translation>
+        <translation type="obsolete">Осталось времени</translation>
     </message>
     <message>
         <source>Column visibility</source>
