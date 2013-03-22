@@ -200,9 +200,8 @@ int main(int argc, char *argv[]) {
   qDebug("Program locale: %s", qPrintable(locale));
   setlocale(LC_CTYPE, ""); // TODO - need attention
 
-  if (qtTranslator.load(
-          QString::fromUtf8("qt_") + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath)
-                                                                    )) {
+  if (qtTranslator.load(QString::fromUtf8(":/lang/qt_") + locale))
+  {
     qDebug("Qt %s locale recognized, using translation.", qPrintable(locale));
   }else{
     qDebug("Qt %s locale unrecognized, using default (en_GB).", qPrintable(locale));
