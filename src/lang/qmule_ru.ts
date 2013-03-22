@@ -4574,7 +4574,7 @@ Do you want to install it now?</source>
     <message>
         <source>Down Speed</source>
         <comment>i.e: Download speed</comment>
-        <translation>Скорость скач</translation>
+        <translation>Скорость скачивания</translation>
     </message>
     <message>
         <source>Up Speed</source>
@@ -4885,7 +4885,7 @@ Do you want to install it now?</source>
     <message>
         <source>Down Speed</source>
         <comment>i.e: Download speed</comment>
-        <translation type="obsolete">Скорость скач</translation>
+        <translation type="obsolete">Скорость скачивания</translation>
     </message>
     <message>
         <source>Up Speed</source>
