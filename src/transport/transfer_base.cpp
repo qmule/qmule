@@ -13,7 +13,7 @@ float TransferBase::progress() const
     if (st.total_wanted_done == st.total_wanted)
         return 1.;
     float progress = (float) st.total_wanted_done / (float) st.total_wanted;
-    return progress;
+    return std::min<float>(progress, 1.);
 }
 
 int TransferBase::num_seeds() const { return status().num_seeds; }
