@@ -295,6 +295,7 @@ search_widget::search_widget(QWidget *parent)
     filterModel.data()->setSortCaseSensitivity(Qt::CaseInsensitive);
 
     treeResult->setModel(filterModel.data());
+    treeResult->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 
     itemDelegate = new SWDelegate(treeResult);
     treeResult->setItemDelegate(itemDelegate);
