@@ -222,7 +222,7 @@ void files_widget::openFolder()
 
     if (indx.isValid())
     {
-        QDesktopServices::openUrl(static_cast<FileNode*>(indx.internalPointer())->filepath());
+        QDesktopServices::openUrl(QUrl::fromLocalFile(static_cast<FileNode*>(indx.internalPointer())->filepath()));
     }
 }
 
