@@ -288,6 +288,30 @@ void TransferListWidget::pauseSelectedTorrents() {
   }
 }
 
+void TransferListWidget::clearFinished() {
+  QStringList hashes;
+  for (int i=0; i<nameFilterModel->rowCount(); ++i) {
+    const int row = mapToSource(nameFilterModel->index(i, 0)).row();
+    hashes << getHashFromRow(row);
+  }
+  foreach (const QString &hash, hashes)
+  {
+      Transfer t = BTSession->getTransfer(hash);
+      try
+      {
+          if (t.type() == Transfer::ED2K && t.is_seed())
+          {
+              // delete view only
+              listModel->removeTorrent(hash);
+          }
+      }
+      catch(const libtorrent::libtorrent_exception& )
+      {
+      }
+  }
+}
+
+
 void TransferListWidget::pauseVisibleTorrents() {
   QStringList hashes;
   for (int i=0; i<nameFilterModel->rowCount(); ++i) {

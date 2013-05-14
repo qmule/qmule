@@ -66,6 +66,9 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="editable">
           <bool>true</bool>
          </property>
@@ -541,6 +544,23 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>comboName</tabstop>
+  <tabstop>checkTorrents</tabstop>
+  <tabstop>comboType</tabstop>
+  <tabstop>btnStart</tabstop>
+  <tabstop>checkOwn</tabstop>
+  <tabstop>checkPlus</tabstop>
+  <tabstop>treeResult</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnMore</tabstop>
+  <tabstop>btnCancel</tabstop>
+  <tabstop>tableCond</tabstop>
+  <tabstop>btnResults</tabstop>
+  <tabstop>btnDownload</tabstop>
+  <tabstop>btnPreview</tabstop>
+  <tabstop>btnCloseAll</tabstop>
+ </tabstops>
  <resources>
   <include location="Icons/emule/emule.qrc"/>
  </resources>

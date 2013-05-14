@@ -1,6 +1,7 @@
 #include "base_model.h"
 #include "misc.h"
 #include "session.h"
+#include <QString>
 
 BaseModel::BaseModel(DirNode* root, QObject *parent/* = 0*/) :
     QAbstractItemModel(parent), m_rootItem(root), m_row_count_changed(false)
@@ -166,6 +167,15 @@ QString BaseModel::filepath(const QModelIndex& index) const
 {
     if (!index.isValid()) return QString();
     return node(index)->filepath();
+}
+
+QString BaseModel::folderPath(const QModelIndex& index) const
+{
+    QString tmp;
+    if (!index.isValid()) return tmp;
+    tmp = node(index)->filepath();
+    QFileInfo fi(tmp);
+    return fi.absolutePath();
 }
 
 QString BaseModel::time(const QModelIndex& index) const

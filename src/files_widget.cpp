@@ -3,6 +3,9 @@
 #include <QPainter>
 #include <QClipboard>
 #include <QDesktopServices>
+#include <QMessageBox>
+#include <QString>
+#include <QStack>
 
 #include "files_widget.h"
 #include "session_fs_models/file_model.h"
@@ -49,6 +52,30 @@ files_widget::files_widget(QWidget *parent)
     }
 
     treeView->header()->restoreState(pref.value("FilesWidget/DirectoriesView").toByteArray());
+
+
+    m_filesMenu2 = new QMenu(this);
+    m_filesMenu2->setObjectName(QString::fromUtf8("filesMenu2"));
+    m_filesMenu2->setTitle(tr("Exchange files 2"));
+
+    m_deleteFileZ = new QAction(this);
+    m_deleteFileZ->setObjectName(QString::fromUtf8("deleteFileZ"));
+    m_deleteFileZ->setIcon(QIcon(":/emule/search/clear1.ico"));
+    m_deleteFileZ->setText(tr("Delete file from disk"));
+
+    m_filesMenu3 = new QMenu(this);
+    m_filesMenu3->setObjectName(QString::fromUtf8("filesMenu3"));
+    m_filesMenu3->setTitle(tr("Exchange files 3"));
+
+    m_deleteFileSum = new QAction(this);
+    m_deleteFileSum->setObjectName(QString::fromUtf8("deleteFileZ"));
+    m_deleteFileSum->setIcon(QIcon(":/emule/search/clear1.ico"));
+    m_deleteFileSum->setText(tr("Delete file from disk"));
+
+    m_openFolderSum = new QAction(this);
+    m_openFolderSum->setObjectName(QString::fromUtf8("openFolder"));
+    m_openFolderSum->setIcon(QIcon(":/emule/common/folder_open.ico"));
+    m_openFolderSum->setText(tr("Open folder"));
 
     m_filesMenu = new QMenu(this);
     m_filesMenu->setObjectName(QString::fromUtf8("filesMenu"));
@@ -102,6 +129,16 @@ files_widget::files_widget(QWidget *parent)
     m_filesMenu->addSeparator();
     m_filesMenu->addAction(m_reloadDirectory);
 
+
+    m_filesMenu2->addAction(m_openFolder);
+    m_filesMenu2->addSeparator();
+    m_filesMenu2->addAction(m_deleteFileZ);
+
+    m_filesMenu3->addAction(m_openFolderSum);
+    m_filesMenu3->addSeparator();
+    m_filesMenu3->addAction(m_deleteFileSum);
+
+
     connect(tableView->selectionModel(),
         SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
         SLOT(tableViewSelChanged(const QItemSelection &, const QItemSelection &))
@@ -112,7 +149,10 @@ files_widget::files_widget(QWidget *parent)
         SLOT(treeViewSelChanged(const QItemSelection &, const QItemSelection &))
     );
 
+    connect(m_deleteFileZ,        SIGNAL(triggered()), this, SLOT(deleteFilesAndDirs()));
+    connect(m_deleteFileSum,      SIGNAL(triggered()), this, SLOT(deleteFilesAndDirsSum()));
     connect(m_openFolder,         SIGNAL(triggered()), this, SLOT(openFolder()));
+    connect(m_openFolderSum,      SIGNAL(triggered()), this, SLOT(openFolderSum()));
     connect(m_filesExchDir,       SIGNAL(triggered()), this, SLOT(exchangeDir()));
     connect(m_filesExchSubdir,    SIGNAL(triggered()), this, SLOT(exchangeSubdir()));
     connect(m_filesUnexchDir,     SIGNAL(triggered()), this, SLOT(unexchangeDir()));
@@ -188,11 +228,20 @@ files_widget::files_widget(QWidget *parent)
     connect(tableView_files->horizontalHeader(), SIGNAL(customContextMenuRequested(const QPoint&)),
             this, SLOT(displayHSMenuSummary(const QPoint&)));
 
+    connect(tableView, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayFileMenu(const QPoint&)));
+
+    connect(tableView_files, SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(displayFileMenuSum(const QPoint&)));
+
     connect(tableView_files, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openSumFile(QModelIndex)));
 
     // pre-sort summary models
     tableView_paths->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
     tableView_files->horizontalHeader()->setSortIndicator(BaseModel::DC_NAME, Qt::AscendingOrder);
+
+    treeView->selectionModel()->setCurrentIndex(treeView->model()->index(0,0),QItemSelectionModel::SelectCurrent);
+
 }
 
 files_widget::~files_widget()
@@ -381,6 +430,9 @@ void files_widget::fillLinkWidget(const QStringList& links)
     }
 }
 
+
+
+
 QStringList files_widget::generateLinks()
 {
     QStringList list;
@@ -463,6 +515,7 @@ void files_widget::on_treeView_customContextMenuRequested(const QPoint &pos)
     }
 }
 
+
 void files_widget::tableViewSelChanged(const QItemSelection& sel, const QItemSelection& dsel)
 {    
     switchLinkWidget(generateLinks());
@@ -476,6 +529,7 @@ void files_widget::treeViewSelChanged(const QItemSelection&, const QItemSelectio
     {
         switchLinkWidget(QStringList());
         m_file_model->setRootNode(index);
+        reloadDir();
     }
 }
 
@@ -645,4 +699,85 @@ void files_widget::on_treeView_expanded(const QModelIndex &index)
 void files_widget::on_treeView_collapsed(const QModelIndex &index)
 {
     treeView->resizeColumnToContents(0);
+}
+
+
+void files_widget::displayFileMenu(const QPoint &pos)
+{
+    m_filesMenu2->exec(QCursor::pos());
+}
+
+void files_widget::displayFileMenuSum(const QPoint &pos)
+{
+    m_filesMenu3->exec(QCursor::pos());
+}
+
+
+void files_widget::openFolderSum()
+{
+    const QModelIndexList selectedIndexes = tableView_files->selectionModel()->selectedRows();
+
+    qDebug() << "Open folder";
+
+    if (selectedIndexes.isEmpty())
+        return;
+
+    QModelIndex fileIndex = sort2file_sum(selectedIndexes.first());
+    if (fileIndex.isValid()){
+        QDesktopServices::openUrl(QUrl::fromLocalFile(m_file_model->folderPath(fileIndex)));
+    }
+}
+
+bool files_widget::removeFile(QModelIndex& index){
+    if (!QFile(m_file_model->filepath(index)).remove()){
+        QMessageBox::critical(this, tr("eMule"), tr("File was not deleted"));
+        return false;
+    }
+
+    return true;
+}
+
+void files_widget::deleteFilesAndDirs(){
+    if (QMessageBox::question(0, tr("eMule"),
+                             tr("Do you really want to delete all selected files. If you delete a file included in the torrent, it will be downloaded again"),
+                             QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
+        return;
+
+
+    qDebug() << "try to delete files";
+    foreach(const QModelIndex& i, tableView->selectionModel()->selectedRows())
+    {
+        QModelIndex index = sort2file(i);
+
+        if (index.isValid())
+                removeFile(index);
+    }
+    reloadDir();
+    return;
+}
+
+void files_widget::deleteFilesAndDirsSum(){
+    QStack<void *> tmp;
+
+    if (QMessageBox::question(0, tr("eMule"),
+                             tr("Do you really want to delete all selected files. If you delete a file included in the torrent, it will be downloaded again"),
+                             QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
+        return;
+    qDebug() << "try to delete files";
+    foreach(const QModelIndex& i, tableView_files->selectionModel()->selectedRows())
+    {
+        QModelIndex index= sort2file_sum(i);
+        if (index.isValid()){
+            if (removeFile(index))
+                tmp.push(index.internalPointer());
+        }
+    }
+
+    qDebug() << "clearing tableView_files (delete files)";
+
+    while (!tmp.isEmpty())
+        static_cast<FileNode*>(tmp.pop())->unshare(false);
+
+    reloadDir();
+    return;
 }

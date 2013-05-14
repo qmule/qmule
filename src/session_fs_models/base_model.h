@@ -6,6 +6,7 @@
 #include <QVariant>
 #include "transport/session_filesystem.h"
 
+
 class BaseModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -54,6 +55,7 @@ public:
      QString displayName(const QModelIndex &index) const;
      QString name(const QModelIndex& index) const;
      QString filepath(const QModelIndex& index) const;
+     QString folderPath(const QModelIndex& index) const;
      QString time(const QModelIndex& index) const;
      QDateTime dt(const QModelIndex& index) const;
      QFile::Permissions permissions(const QModelIndex &index) const;

@@ -41,7 +41,20 @@ bool inSession(const QString& hash)
 QColor itemColor(const QModelIndex& inx)
 {
     QString hash = inx.model()->index(inx.row(), SWDelegate::SW_ID, inx.parent()).data().toString();
+    int peers = inx.model()->index(inx.row(), SWDelegate::SW_SOURCES, inx.parent()).data().toInt();
+    if (inSession(hash))
+        return Qt::red;
+    if (peers>29)
+        return Qt::blue;
+    if (peers>9)
+        return Qt::darkBlue;
+    return Qt::black;
+/*    if (peers>14)
+        return inSession(hash) ? Qt::red : Qt::blue;
+    if (peers>4)
+        return inSession(hash) ? Qt::red : Qt::darkBlue;
     return inSession(hash) ? Qt::red : Qt::black;
+    */
 }
 
 UserDir::UserDir(Preferences& pref)
@@ -1466,7 +1479,7 @@ QList<Transfer> search_widget::download()
             continue;
         }
 
-        result << addTransfer(*iter);
+        addTransfer(*iter);
     }
 
     return result;

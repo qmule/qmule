@@ -549,7 +549,12 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
         }
     }
 
-    return QED2KHandle(delegate()->add_transfer(atp));
+    QED2KHandle ret = QED2KHandle(delegate()->add_transfer(atp));
+    Preferences pref;
+    if (pref.addTorrentsInPause()){
+        ret.pause();
+    }
+    return ret;
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }

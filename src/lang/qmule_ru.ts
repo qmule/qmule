@@ -2495,7 +2495,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>When adding a torrent</source>
-        <translation>При добавлении торента</translation>
+        <translation>При добавлении закачки</translation>
     </message>
     <message>
         <source>Display torrent content and some options</source>
@@ -5236,7 +5236,7 @@ Do you want to install it now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ð ÐµÐ·ÑÐ»ÑÑÐ°ÑÑ Ð¿Ð¾Ð¸ÑÐºÐ°</source>
+        <source>Ð ÐµÐ·ÑÐ»ÑÑÐ°ÑÑ Ð¿Ð¾Ð¸ÑÐºÐ°</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6369,6 +6369,18 @@ However, those plugins were disabled.</source>
     <message>
         <source>Open folder</source>
         <translation>Открыть папку</translation>
+    </message>
+    <message>
+        <source>Delete file from disk</source>
+        <translation>Удалить файл с диска</translation>
+    </message>
+    <message>
+        <source>File was not deleted</source>
+        <translation>Не удалось удалить файл(ы)</translation>
+    </message>
+    <message>
+        <source>Do you really want to delete all selected files. If you delete a file included in the torrent, it will be downloaded again</source>
+        <translation>Вы действительно хотите удалить все выбранные файлы? Если вы удалите файлы, находящиеся в активных торрентах, то они будут перезакачены снова</translation>
     </message>
 </context>
 <context>
@@ -7681,6 +7693,10 @@ eD2K Server</source>
     <message>
         <source>Pause</source>
         <translation>Приостановить</translation>
+    </message>
+    <message>
+        <source>Clear finished</source>
+        <translation>Очистить список от завершенных осло-закачек</translation>
     </message>
     <message>
         <source>Split window</source>

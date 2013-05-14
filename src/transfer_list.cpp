@@ -162,17 +162,26 @@ transfer_list::transfer_list(QWidget *parent, MainWindow *mainWindow)
     actionPause->setToolTip(tr("Pause"));
     actionPause->setIcon(IconProvider::instance()->getIcon("media-playback-pause"));
 
+    actionClear = new QAction(this);
+    actionClear->setObjectName(QString::fromUtf8("actionClear"));
+    actionClear->setToolTip(tr("Clear finished"));
+//    actionClear->setIcon(IconProvider::instance()->getIcon(":/emule/transfer_list/ClearFinished.png"));
+    actionClear->setIcon(QIcon(":Icons/oxygen/view-refresh.png"));
+
     mainToolBar->addAction(actionOpen);
     mainToolBar->addAction(actionDelete);
     mainToolBar->addSeparator();
     mainToolBar->addAction(actionStart);
     mainToolBar->addAction(actionPause);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(actionClear);
     addToolBar(Qt::LeftToolBarArea, mainToolBar);
 
     connect(actionOpen, SIGNAL(triggered()), mainWindow, SLOT(on_actionOpen_triggered()));
     connect(actionDelete, SIGNAL(triggered()), transferList, SLOT(deleteSelectedTorrents()));
     connect(actionStart, SIGNAL(triggered()), transferList, SLOT(startSelectedTorrents()));
     connect(actionPause, SIGNAL(triggered()), transferList, SLOT(pauseSelectedTorrents()));
+    connect(actionClear, SIGNAL(triggered()), transferList, SLOT(clearFinished()));
       
     connect(peersList, SIGNAL(sendMessage(const QString&, const libed2k::net_identifier&)), this, SLOT(sendMessageToPeer(const QString&, const libed2k::net_identifier&)));
     connect(peersList, SIGNAL(addFriend(const QString&, const libed2k::net_identifier&)), this, SLOT(addPeerToFriends(const QString&, const libed2k::net_identifier&)));

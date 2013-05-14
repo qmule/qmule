@@ -29,6 +29,7 @@ public:
 private:    
     QMenu*   m_filesMenu;
     QAction* m_openFolder;
+    QAction* m_openFolderSum;
     QAction* m_filesExchDir;
     QAction* m_filesExchSubdir;
     QAction* m_filesUnexchDir;
@@ -36,6 +37,11 @@ private:
     QAction* m_reloadDirectory;
     QAction* m_openFile;
     QAction* m_openSumFile;
+
+    QMenu*   m_filesMenu2;
+    QMenu*   m_filesMenu3;
+    QAction* m_deleteFileZ;
+    QAction* m_deleteFileSum;
 
     DirectoryModel* m_dir_model;
     FilesModel*     m_file_model;
@@ -53,6 +59,7 @@ private:
     QString createLink(const QString& fileName, qint64 fileSize, const QString& fileHash, bool addForum, bool addSize);
     void switchLinkWidget(const QStringList&);
     void fillLinkWidget(const QStringList&);
+    bool removeFile(QModelIndex& index);
     QStringList generateLinks();        // files browser
     QStringList generateLinksSum();     // summary browser
     QStringList generateLinksByTab();   // for 0 files, for 1 summary
@@ -60,12 +67,15 @@ public slots:
     void putToClipboard();
 private slots:
     void openFolder();
+    void openFolderSum();
     void exchangeDir();
     void exchangeSubdir();
     void unexchangeDir();
     void unxchangeSubdir();
     void reloadDir();
     void on_treeView_customContextMenuRequested(const QPoint &pos);
+    void displayFileMenu(const QPoint &pos);
+    void displayFileMenuSum(const QPoint &pos);
     void tableViewSelChanged(const QItemSelection &, const QItemSelection &);
     void treeViewSelChanged(const QItemSelection &, const QItemSelection &);
     void tableViewPathsSumSelChanged(const QItemSelection&, const QItemSelection&);
@@ -88,6 +98,8 @@ private slots:
     void openSelectedSumFile();
     void on_treeView_expanded(const QModelIndex &index);
     void on_treeView_collapsed(const QModelIndex &index);
+    void deleteFilesAndDirs();
+    void deleteFilesAndDirsSum();
 };
 
 #endif // FILES_WIDGET_H
