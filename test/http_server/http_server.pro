@@ -15,3 +15,5 @@ SOURCES += main.cpp \
 
 FORMS += \
     mainwindow.ui
+
+RESOURCES += ../../src/Icons/emule/emule.qrc

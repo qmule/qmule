@@ -173,7 +173,7 @@ void HttpConnection::respond()
     if (url.endsWith("favicon.ico"))
     {
         qDebug("Returning favicon");
-        QFile favicon(":/Icons/skin/qbittorrent16.png");
+        QFile favicon(":/emule/newmule16.png");
 
         if (favicon.open(QIODevice::ReadOnly))
         {
@@ -186,6 +186,7 @@ void HttpConnection::respond()
         }
         else
         {
+            qWarning() << "can't open icon for favicon";
             respondNotFound();
         }
 

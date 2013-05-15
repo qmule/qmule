@@ -76,5 +76,6 @@
         <file>common/folder_share.ico</file>
         <file>common/folder_open.ico</file>
         <file>common/folder_reload.ico</file>
+        <file>newmule16.png</file>
     </qresource>
 </RCC>
