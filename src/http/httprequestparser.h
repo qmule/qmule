@@ -44,6 +44,7 @@ public:
   const QString& url() const;
   const QByteArray& message() const;
   QString get(const QString& key) const;
+  const QHash<QString, QString>& getPairs() const;
   QString post(const QString& key) const;
   const QList<QByteArray>& torrents() const;
   void writeHeader(const QByteArray& ba);

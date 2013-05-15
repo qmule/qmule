@@ -57,6 +57,11 @@ QString HttpRequestParser::get(const QString& key) const {
   return m_getMap.value(key);
 }
 
+const QHash<QString, QString>& HttpRequestParser::getPairs() const
+{
+    return m_getMap;
+}
+
 QString HttpRequestParser::post(const QString& key) const {
   return m_postMap.value(key);
 }

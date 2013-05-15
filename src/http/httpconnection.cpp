@@ -167,7 +167,14 @@ void HttpConnection::translateDocument(QString& data) {
 
 void HttpConnection::respond()
 {
-    QString url  = m_parser.url();
+    QString url  = m_parser.url();    
+    qDebug() << "URL: " << url;
+
+    foreach(QString key, m_parser.getPairs().keys())
+    {
+        qDebug() << "Pair:" << key << "/" << m_parser.get(key);
+    }
+
 
     // Favicon
     if (url.endsWith("favicon.ico"))
