@@ -48,16 +48,17 @@ class HttpServer : public QTcpServer
 {
     Q_OBJECT
     Q_DISABLE_COPY(HttpServer)
-
 public:
-    HttpServer(QObject* parent = 0);
+    HttpServer(quint32 sessionsLimit, QObject* parent = 0);
     ~HttpServer();
+    quint32 sessionsLimit() const { return m_sessionsLimit; }
+    quint32 sessionsCount() const { return m_sessionsCount; }
+    bool allocateSession();
+    void freeSession();
 private:
-  void incomingConnection(int socketDescriptor);
-  void handleNewConnection(QTcpSocket *socket);  
-
-private:
-  QHash<QString, int> m_clientFailedAttempts;
+    quint32 m_sessionsLimit;
+    quint32 m_sessionsCount;
+    void incomingConnection(int socketDescriptor);
 };
 
 #endif

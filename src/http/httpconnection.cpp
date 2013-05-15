@@ -200,8 +200,12 @@ void HttpConnection::respond()
         return;
     }
 
-  if (list.isEmpty())
-    list.append("index.html");
+    if (list.isEmpty())
+      list.append("index.html");
+
+    // index.html -> return main page
+    // download file -> start download thread
+    //               -> too many connections respond
 
   /*
   if (list.size() >= 2) {

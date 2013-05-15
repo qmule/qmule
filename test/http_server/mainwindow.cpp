@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    m_server = new HttpServer(this);
+    m_server = new HttpServer(10, this);
     connect(m_server, SIGNAL(newConnection()), this, SLOT(newConnection()));
     // create actions
     m_startServer = new QAction(tr("&Start..."), this);

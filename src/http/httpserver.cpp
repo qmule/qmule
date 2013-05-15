@@ -23,7 +23,9 @@ private:
   QString m_peerIp;
 };
 
-HttpServer::HttpServer(QObject* parent) : QTcpServer(parent)
+HttpServer::HttpServer(quint32 sessionsLimit, QObject* parent) : QTcpServer(parent),
+    m_sessionsLimit(sessionsLimit),
+    m_sessionsCount(0)
 {
   // Additional translations for Web UI
   QString a = tr("File");
@@ -63,10 +65,10 @@ void HttpServer::incomingConnection(int socketDescriptor)
 {
     QTcpSocket *serverSocket = new QTcpSocket(this);
 
-    if (serverSocket->setSocketDescriptor(socketDescriptor))
+    // check socket set and socket peerAddress passed filters
+    if (serverSocket->setSocketDescriptor(socketDescriptor) /*&& filter(serverSocket->peerAddress()))*/)
     {
-        // check IP, count
-        handleNewConnection(serverSocket);
+        new HttpConnection(serverSocket, this);
     }
     else
     {
@@ -74,7 +76,27 @@ void HttpServer::incomingConnection(int socketDescriptor)
     }
 }
 
-void HttpServer::handleNewConnection(QTcpSocket *socket)
+bool HttpServer::allocateSession()
 {
-    HttpConnection *connection = new HttpConnection(socket, this);
+    bool res = false;
+
+    if (m_sessionsCount < m_sessionsLimit)
+    {
+        ++m_sessionsCount;
+        res = true;
+    }
+
+    return res;
+}
+
+void HttpServer::freeSession()
+{
+    if (m_sessionsCount > 0)
+    {
+        --m_sessionsCount;
+    }
+    else
+    {
+        qWarning() << "Nothing to free, current session count is: " << m_sessionsCount;
+    }
 }
