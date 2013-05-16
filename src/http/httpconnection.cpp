@@ -124,47 +124,6 @@ void HttpConnection::finish()
     m_socket->disconnectFromHost();
 }
 
-/*
-void HttpConnection::translateDocument(QString& data) {
-  static QRegExp regex(QString::fromUtf8("_\\(([\\w\\s?!:\\/\\(\\),%µ&\\-\\.]+)\\)"));
-  static QRegExp mnemonic("\\(?&([a-zA-Z]?\\))?");
-  const std::string contexts[] = {"TransferListFiltersWidget", "TransferListWidget",
-                                  "PropertiesWidget", "MainWindow", "HttpServer",
-                                  "confirmDeletionDlg", "TrackerList", "TorrentFilesModel",
-                                  "options_imp", "Preferences", "TrackersAdditionDlg",
-                                  "ScanFoldersModel", "PropTabBar", "TorrentModel",
-                                  "downloadFromURL"};
-  int i = 0;
-  bool found;
-
-  do {
-    found = false;
-
-    i = regex.indexIn(data, i);
-    if (i >= 0) {
-      //qDebug("Found translatable string: %s", regex.cap(1).toUtf8().data());
-      QByteArray word = regex.cap(1).toUtf8();
-
-      QString translation = word;
-      bool isTranslationNeeded = !Preferences().getLocale().startsWith("en");
-      if (isTranslationNeeded) {
-        int context_index = 0;
-        do {
-          translation = qApp->translate(contexts[context_index].c_str(), word.constData(), 0, QCoreApplication::UnicodeUTF8, 1);
-          ++context_index;
-        } while(translation == word && context_index < 15);
-      }
-      // Remove keyboard shortcuts
-      translation.replace(mnemonic, "");
-
-      data.replace(i, regex.matchedLength(), translation);
-      i += translation.length();
-      found = true;
-    }
-  } while(found && i < data.size());
-}
-*/
-
 void HttpConnection::respond()
 {
     QString url  = m_parser.url();    
@@ -174,7 +133,6 @@ void HttpConnection::respond()
     {
         qDebug() << "Pair:" << key << "/" << m_parser.get(key);
     }
-
 
     // Favicon
     if (url.endsWith("favicon.ico"))
@@ -196,138 +154,36 @@ void HttpConnection::respond()
             qWarning() << "can't open icon for favicon";
             respondNotFound();
         }
-
-        return;
     }
-
-    QStringList list = url.split('/', QString::SkipEmptyParts);
-
-    if (list.contains(".") || list.contains(".."))
+    else
     {
-        respondNotFound();
-        return;
-    }
+        QStringList list = url.split('/', QString::SkipEmptyParts);
 
-    if (list.isEmpty())
-      list.append("index.html");
-
-    // index.html -> return main page
-    // download file -> start download thread
-    //               -> too many connections respond
-
-  /*
-  if (list.size() >= 2) {
-    if (list[0] == "json") {
-      if (list[1] == "torrents") {
-        respondTorrentsJson();
-        return;
-      }
-      if (list.size() > 2) {
-        if (list[1] == "propertiesGeneral") {
-          const QString& hash = list[2];
-          respondGenPropertiesJson(hash);
-          return;
-        }
-        if (list[1] == "propertiesTrackers") {
-          const QString& hash = list[2];
-          respondTrackersPropertiesJson(hash);
-          return;
-        }
-        if (list[1] == "propertiesFiles") {
-          const QString& hash = list[2];
-          respondFilesPropertiesJson(hash);
-          return;
-        }
-      } else {
-        if (list[1] == "preferences") {
-          respondPreferencesJson();
-          return;
-        } else {
-          if (list[1] == "transferInfo") {
-            respondGlobalTransferInfoJson();
+        if (list.contains(".") || list.contains(".."))
+        {
+            respondNotFound();
             return;
-          }
         }
-      }
+
+        if (list.isEmpty())
+        {
+            // display main page
+            m_generator.setStatusLine(200, "OK");
+            //m_generator.setContentTypeByExt(ext);
+            m_generator.setMessage(QString("<html><body><h3>Tentative main page from qmule</h3></body></html>"));
+            finish();
+            return;
+        }
+
+        if (list[0] == "hash") // temp check for hash
+        {
+            // check sessions count - if limit exeeds return info message
+            // search transfer by hash and start upload
+            // if transfer not found - return not found
+        }
     }
 
-
-    if (list[0] == "command") {
-      const QString& command = list[1];
-      if (command == "shutdown") {
-        qDebug() << "Shutdown request from Web UI";
-        // Special case handling for shutdown, we
-        // need to reply to the Web UI before
-        // actually shutting down.
-        m_generator.setStatusLine(200, "OK");
-        finish();
-        qApp->processEvents();
-        // Exit application
-        qApp->exit();
-      } else {
-        respondCommand(command);
-        m_generator.setStatusLine(200, "OK");
-        finish();
-      }
-      return;
-    }
-  }
-*/
-  /*
-  // Icons from theme
-  //qDebug() << "list[0]" << list[0];
-  if (list[0] == "theme" && list.size() == 2) {
-#ifdef DISABLE_GUI
-    url = ":/Icons/oxygen/"+list[1]+".png";
-#else
-    url = IconProvider::instance()->getIconPath(list[1]);
-#endif
-    qDebug() << "There icon:" << url;
-  } else {
-    if (list[0] == "images") {
-      list[0] = "Icons";
-    } else {
-      if (list.last().endsWith(".html"))
-        list.prepend("html");
-      list.prepend("webui");
-    }
-    url = ":/" + list.join("/");
-  }
-
-  QFile file(url);
-
-  if (!file.open(QIODevice::ReadOnly))
-  {
-    qDebug("File %s was not found!", qPrintable(url));
     respondNotFound();
-    return;
-  }
-
-  QString ext = list.last();
-  int index = ext.lastIndexOf('.') + 1;
-  if (index > 0)
-    ext.remove(0, index);
-  else
-    ext.clear();
-  QByteArray data = file.readAll();
-  file.close();
-
-  // Translate the page
-  if (ext == "html" || (ext == "js" && !list.last().startsWith("excanvas")))
-  {
-    QString dataStr = QString::fromUtf8(data.constData());
-    translateDocument(dataStr);
-    if (url.endsWith("about.html")) {
-      dataStr.replace("${VERSION}", VERSION);
-    }
-    data = dataStr.toUtf8();
-  }
-*/
-
-    m_generator.setStatusLine(200, "OK");
-    //m_generator.setContentTypeByExt(ext);
-    m_generator.setMessage(QString("<html><body><h3>Tentative page from qmule</h3></body></html>"));
-    finish();
 }
 
 void HttpConnection::respondNotFound()
@@ -335,48 +191,3 @@ void HttpConnection::respondNotFound()
     m_generator.setStatusLine(404, "File not found");
     finish();
 }
-
-// respond examples
-/*
-void HttpConnection::respondTorrentsJson() {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(btjson::getTorrents());
-  finish();
-}
-
-void HttpConnection::respondGenPropertiesJson(const QString& hash) {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(btjson::getPropertiesForTorrent(hash));
-  finish();
-}
-
-void HttpConnection::respondTrackersPropertiesJson(const QString& hash) {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(btjson::getTrackersForTorrent(hash));
-  finish();
-}
-
-void HttpConnection::respondFilesPropertiesJson(const QString& hash) {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(btjson::getFilesForTorrent(hash));
-  finish();
-}
-
-void HttpConnection::respondPreferencesJson() {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(prefjson::getPreferences());
-  finish();
-}
-
-void HttpConnection::respondGlobalTransferInfoJson() {
-  m_generator.setStatusLine(200, "OK");
-  m_generator.setContentTypeByExt("js");
-  m_generator.setMessage(btjson::getTransferInfo());
-  finish();
-}
-*/

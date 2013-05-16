@@ -160,7 +160,7 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -179,9 +179,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-260</y>
-             <width>465</width>
-             <height>601</height>
+             <y>0</y>
+             <width>486</width>
+             <height>713</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -533,8 +533,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>396</width>
-             <height>616</height>
+             <width>442</width>
+             <height>696</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
@@ -908,8 +908,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>357</width>
-             <height>449</height>
+             <width>486</width>
+             <height>522</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1352,8 +1352,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>275</width>
-             <height>483</height>
+             <width>398</width>
+             <height>560</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_33">
@@ -1869,8 +1869,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>357</width>
-             <height>168</height>
+             <width>504</width>
+             <height>412</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_39">
@@ -1958,6 +1958,49 @@
              </layout>
             </item>
             <item>
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="title">
+               <string>Http server settings</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QCheckBox" name="checkBox">
+                 <property name="text">
+                  <string>Http server active</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QSpinBox" name="spinBox"/>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Incoming http port</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_12">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -1988,8 +2031,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>418</width>
-             <height>442</height>
+             <width>540</width>
+             <height>520</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2399,8 +2442,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>60</width>
+             <height>18</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>

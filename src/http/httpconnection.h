@@ -50,7 +50,6 @@ class HttpConnection : public QObject
 public:
   HttpConnection(QTcpSocket *m_socket, HttpServer *m_httpserver);
   ~HttpConnection();
-  //void translateDocument(QString& data);
 
 protected slots:
   void finish();
