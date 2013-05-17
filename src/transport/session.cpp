@@ -858,6 +858,9 @@ void Session::loadFileSystem()
             share(filepath, false);
         }
     }
+
+
+    qDebug() << m_root.toHtml();
 }
 
 void Session::dropDirectoryTransfers()

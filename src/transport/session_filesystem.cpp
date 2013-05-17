@@ -241,6 +241,18 @@ QString FileNode::string() const
     return (res);
 }
 
+QString FileNode::toHtml() const
+{
+    QString res;
+
+    if (has_transfer())
+    {
+        res = "<li>" + hash() + ":" + filepath() + "</li>\n";
+    }
+
+    return res;
+}
+
 DirNode::DirNode(DirNode* parent, const QFileInfo& info, bool root /*= false*/) :
     FileNode(parent, info),
     m_populated(false),
@@ -669,4 +681,34 @@ void DirNode::populate(bool force /* = false*/)
     }
 
     m_populated = true;
+}
+
+QString DirNode::toHtml() const
+{
+    QString res;
+    QString previous_res;
+
+    foreach(const DirNode* pDir, m_dir_vector)
+    {
+         QString local_res = pDir->toHtml();
+
+         if (!local_res.isEmpty())
+         {
+             previous_res += "<li>" + local_res + "</li>\n";
+         }
+    }
+
+    QString node_res;
+
+    foreach(const FileNode* pFile, m_file_vector)
+    {
+        node_res += pFile->toHtml();
+    }
+
+    if (!previous_res.isEmpty() || !node_res.isEmpty())
+    {
+        res = "<ul><li>Dir: " + filename() + "</li>" + previous_res + node_res + "</ul>";
+    }
+
+    return res;
 }
