@@ -248,7 +248,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
   connect(preventTimer, SIGNAL(timeout()), SLOT(checkForActiveTorrents()));
-  m_http_server.reset(new HttpServer(10));
+  m_http_server.reset(new HttpServer);
 
   // Configure session according to options
   loadPreferences(false);
