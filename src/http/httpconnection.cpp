@@ -28,6 +28,7 @@
  * Contact : chris@qbittorrent.org
  */
 
+#include "transport/session.h"
 #include "httpconnection.h"
 #include "httpserver.h"
 #include <QTcpSocket>
@@ -170,7 +171,26 @@ void HttpConnection::respond()
             // display main page
             m_generator.setStatusLine(200, "OK");
             //m_generator.setContentTypeByExt(ext);
-            m_generator.setMessage(QString("<html><body><h3>Tentative main page from qmule</h3></body></html>"));
+            m_generator.setMessage("<html><head>"
+                                   "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+                                   "<title>qMule start page</title>"
+                                  "</head><body>"
+                                  "<style>"
+                                    "li {"
+                                     "list-style-type: none; /* Убираем маркеры */"
+                                   "}"
+                                    "ul {"
+                                     "margin-left: 4; /* Отступ слева в браузере IE и Opera */"
+                                     "padding-left: 4; /* Отступ слева в браузере Firefox, Safari, Chrome */"
+                                     "margin-top: 4;"
+                                     "padding-top: 4;"
+                                   "}"
+                                    "li.marked {"
+                                     "list-style-type: disc;"
+                                     "margin-left: 20;"
+                                   "}"
+                                   "</style>"
+                                   + Session::instance()->root()->toHtml(m_httpserver->serverAddress().toString(), m_httpserver->serverPort()) + "</body></html>");
             finish();
             return;
         }

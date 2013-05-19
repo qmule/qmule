@@ -83,6 +83,7 @@ private slots:
   void on_removeScanFolderButton_clicked();
   void setLocale(const QString &locale);
   void toggleAnonymousMode(bool enabled);
+  void toggleHttpServer(bool enabled);
 
 private:
   // Methods

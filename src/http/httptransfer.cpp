@@ -20,7 +20,7 @@ void HttpTransfer::run()
     buf += "Host: localhost\r\n";
     buf += "Accept: */*\r\n";
     buf += "Content-Type: application/octet-stream\r\n";
-    buf += QString("Content-Length: %1\r\n\r\n").arg(srcFile.size());
+    buf += QString("Content-Length: %1\r\n\r\n").arg(srcFile.size()).toUtf8();
 
     if (m_dst->write(buf) != -1 && m_dst->waitForBytesWritten())
     {

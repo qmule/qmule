@@ -248,6 +248,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
   connect(preventTimer, SIGNAL(timeout()), SLOT(checkForActiveTorrents()));
+  m_http_server.reset(new HttpServer(10));
 
   // Configure session according to options
   loadPreferences(false);
@@ -1205,6 +1206,29 @@ void MainWindow::loadPreferences(bool configure_session)
 
   if (configure_session)
     Session::instance()->configureSession();
+
+  //
+  if (!m_http_server.isNull())
+  {
+      // close server conditions
+      if (!pref.runHttpServer() || (m_http_server->serverPort() != pref.httpPort()))
+      {
+          qDebug() << "close server";
+          m_http_server->close();
+      }
+
+      if (pref.runHttpServer())
+      {
+          if (m_http_server->listen(QHostAddress::Any, pref.httpPort()))
+          {
+              qDebug() << "report server started on " << pref.httpPort();
+          }
+          else
+          {
+              qDebug() << "report error: " << m_http_server->errorString();
+          }
+      }
+  }
 
   qDebug("GUI settings loaded");
 }

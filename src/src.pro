@@ -91,6 +91,7 @@ include (preferences/preferences.pri)
 include(transport/transport.pri)
 include(qtlibed2k/qtlibed2k.pri)
 include(session_fs_models/session_fs_models.pri)
+include(http/http.pri)
 
 !nox {
   include(lineedit/lineedit.pri)

@@ -160,7 +160,7 @@
      </widget>
      <widget class="QStackedWidget" name="tabOption">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabOptionPage1">
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1964,7 +1964,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
                <item>
-                <widget class="QCheckBox" name="checkBox">
+                <widget class="QCheckBox" name="runHttpServer">
                  <property name="text">
                   <string>Http server active</string>
                  </property>
@@ -1973,7 +1973,7 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
-                  <widget class="QSpinBox" name="spinBox">
+                  <widget class="QSpinBox" name="httpPort">
                    <property name="minimum">
                     <number>1</number>
                    </property>
@@ -2010,7 +2010,7 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <item>
-                  <widget class="QSpinBox" name="spinBox_2">
+                  <widget class="QSpinBox" name="httpSesLimit">
                    <property name="minimum">
                     <number>1</number>
                    </property>
@@ -2489,8 +2489,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>60</width>
-             <height>18</height>
+             <width>504</width>
+             <height>412</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_36"/>

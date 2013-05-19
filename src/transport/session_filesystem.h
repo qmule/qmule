@@ -58,7 +58,7 @@ public:
       * generate <ul><li></li></ul> node representation
       * when node shared and has transfer associated
      */
-    QString toHtml() const;
+    QString toHtml(const QString& address, int port) const;
 
     DirNode*    m_parent;
     bool        m_active;
@@ -122,7 +122,7 @@ public:
     void build_collection();
 
     // like FileNode + recursive call
-    QString toHtml() const;
+    QString toHtml(const QString& address, int port) const;
 
     bool                        m_populated;
     bool                        m_root;

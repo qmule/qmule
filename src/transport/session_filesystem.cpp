@@ -241,14 +241,12 @@ QString FileNode::string() const
     return (res);
 }
 
-QString FileNode::toHtml() const
+QString FileNode::toHtml(const QString& address, int port) const
 {
     QString res;
 
     if (has_transfer())
-    {
-        res = "<li>" + hash() + ":" + filepath() + "</li>\n";
-    }
+        res = "<li class=\"marked\">" + QString("<a href=\"http://%1:%2/%3\">").arg(address).arg(port).arg(hash()) + filename() + "</a></li>\n";
 
     return res;
 }
@@ -683,14 +681,14 @@ void DirNode::populate(bool force /* = false*/)
     m_populated = true;
 }
 
-QString DirNode::toHtml() const
+QString DirNode::toHtml(const QString& address, int port) const
 {
     QString res;
     QString previous_res;
 
     foreach(const DirNode* pDir, m_dir_vector)
     {
-         QString local_res = pDir->toHtml();
+         QString local_res = pDir->toHtml(address, port);
 
          if (!local_res.isEmpty())
          {
@@ -702,12 +700,16 @@ QString DirNode::toHtml() const
 
     foreach(const FileNode* pFile, m_file_vector)
     {
-        node_res += pFile->toHtml();
+        node_res += pFile->toHtml(address, port);
     }
 
     if (!previous_res.isEmpty() || !node_res.isEmpty())
     {
-        res = "<ul><li>Dir: " + filename() + "</li>" + previous_res + node_res + "</ul>";
+        QString self = "<li>" + filename() + "</li>";
+        if (is_root())
+            self = "";
+
+        res = "<ul>" + self + previous_res + node_res + "</ul>";
     }
 
     return res;
