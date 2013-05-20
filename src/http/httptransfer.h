@@ -5,6 +5,8 @@
 #include <QRunnable>
 #include <QString>
 
+class HttpServer;
+
 QT_BEGIN_NAMESPACE
 class QTcpSocket;
 QT_END_NAMESPACE
@@ -12,7 +14,8 @@ QT_END_NAMESPACE
 class HttpTransfer : public QRunnable
 {
 public:
-    HttpTransfer(const QString& srcPath, QTcpSocket* dst);
+    HttpTransfer(HttpServer* httpServer, const QString& srcPath, QTcpSocket* dst);
+    ~HttpTransfer();
 
     void run();
     void interrupt();
@@ -20,6 +23,7 @@ public:
 private:
     QString contentType();
 
+    HttpServer* m_httpServer;
     QString m_srcPath;
     QTcpSocket* m_dst;
     volatile bool m_interrupted;

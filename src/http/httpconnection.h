@@ -60,6 +60,7 @@ private slots:
 
 private:
   void respondNotFound();
+  void respondLimitExceeded();
   QTcpSocket *m_socket;
   HttpServer *m_httpserver;
   HttpRequestParser m_parser;

@@ -1,5 +1,6 @@
 #include "httpserver.h"
 #include "httpconnection.h"
+#include "httptransfer.h"
 #include "preferences.h"
 
 #include <QCryptographicHash>
@@ -24,9 +25,10 @@ private:
   QString m_peerIp;
 };
 
-HttpServer::HttpServer(QObject* parent) : QTcpServer(parent),
-    m_sessionsCount(0)
+HttpServer::HttpServer(QObject* parent):
+    QTcpServer(parent), m_sessionsCount(0)
 {
+    m_transferPool.setMaxThreadCount(2);
 }
 
 HttpServer::~HttpServer() {}
@@ -70,4 +72,28 @@ void HttpServer::freeSession()
     {
         qWarning() << "Nothing to free, current session count is: " << m_sessionsCount;
     }
+}
+
+bool HttpServer::tryUpload(const QString& srcPath, QTcpSocket* dst)
+{
+    HttpTransfer* t = new HttpTransfer(this, srcPath, dst);
+    t->setAutoDelete(true);
+
+    bool started = m_transferPool.tryStart(t);
+    if (!started) delete t;
+    return started;
+}
+
+void HttpServer::registerTransfer(HttpTransfer* t)
+{
+    m_transfersMutex.lock();
+    m_transfers.insert(t);
+    m_transfersMutex.unlock();
+}
+
+void HttpServer::unregisterTransfer(HttpTransfer* t)
+{
+    m_transfersMutex.lock();
+    m_transfers.remove(t);
+    m_transfersMutex.unlock();
 }

@@ -36,8 +36,12 @@
 #include <QByteArray>
 #include <QHash>
 #include <QTimer>
+#include <QThreadPool>
+#include <QMutex>
+#include <QSet>
 
 class EventManager;
+class HttpTransfer;
 
 QT_BEGIN_NAMESPACE
 class QTimer;
@@ -54,9 +58,15 @@ public:
     quint32 sessionsCount() const { return m_sessionsCount; }
     bool allocateSession();
     void freeSession();
+    bool tryUpload(const QString& srcPath, QTcpSocket* dst);
+    void registerTransfer(HttpTransfer* t);
+    void unregisterTransfer(HttpTransfer* t);
 private:
     quint32 m_sessionsLimit;
     quint32 m_sessionsCount;
+    QThreadPool m_transferPool;
+    QSet<HttpTransfer*> m_transfers;
+    QMutex m_transfersMutex;
     void incomingConnection(int socketDescriptor);
 };
 

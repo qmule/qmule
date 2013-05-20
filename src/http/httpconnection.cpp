@@ -31,7 +31,6 @@
 #include "transport/session.h"
 #include "httpconnection.h"
 #include "httpserver.h"
-#include "httptransfer.h"
 #include "misc.h"
 #include <QTcpSocket>
 #include <QDateTime>
@@ -204,11 +203,8 @@ void HttpConnection::respond()
 
             if (t.is_valid())
             {
-                //m_generator.setStatusLine(200, "OK");
-                //m_generator.setMessage(QString("<html><body><h3>ready to download</h3></body></html>"));
-                //finish();
-                HttpTransfer ht(t.absolute_files_path()[0], m_socket);
-                ht.run();
+                if (!m_httpserver->tryUpload(t.absolute_files_path()[0], m_socket))
+                    respondLimitExceeded();
                 return;
             }
         }
@@ -220,5 +216,11 @@ void HttpConnection::respond()
 void HttpConnection::respondNotFound()
 {
     m_generator.setStatusLine(404, "File not found");
+    finish();
+}
+
+void HttpConnection::respondLimitExceeded()
+{
+    m_generator.setStatusLine(503, "Connection limit exceeded");
     finish();
 }

@@ -1,12 +1,19 @@
 
 #include "httptransfer.h"
+#include "httpserver.h"
 #include "misc.h"
 #include <QTcpSocket>
 #include <QFile>
 
-HttpTransfer::HttpTransfer(const QString& srcPath, QTcpSocket* dst):
-    m_srcPath(srcPath), m_dst(dst), m_interrupted(false)
+HttpTransfer::HttpTransfer(HttpServer* httpServer, const QString& srcPath, QTcpSocket* dst):
+    m_httpServer(httpServer), m_srcPath(srcPath), m_dst(dst), m_interrupted(false)
 {
+    m_httpServer->registerTransfer(this);
+}
+
+HttpTransfer::~HttpTransfer()
+{
+    m_httpServer->unregisterTransfer(this);
 }
 
 void HttpTransfer::run()
@@ -17,6 +24,7 @@ void HttpTransfer::run()
     if (srcFile.open(QIODevice::ReadOnly))
     {
         buf += "HTTP/1.1 200 OK\r\n";
+        buf += QString("Content-Disposition: attachment; filename=\"%1\"").arg(misc::fileName(m_srcPath)).toUtf8();
         buf += QString("Content-Type: %1\r\n").arg(contentType()).toUtf8();
         buf += QString("Content-Length: %1\r\n\r\n").arg(srcFile.size()).toUtf8();
 
