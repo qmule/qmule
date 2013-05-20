@@ -31,6 +31,7 @@
 #include "transport/session.h"
 #include "httpconnection.h"
 #include "httpserver.h"
+#include "httptransfer.h"
 #include "misc.h"
 #include <QTcpSocket>
 #include <QDateTime>
@@ -203,9 +204,11 @@ void HttpConnection::respond()
 
             if (t.is_valid())
             {
-                m_generator.setStatusLine(200, "OK");
-                m_generator.setMessage(QString("<html><body><h3>ready to download</h3></body></html>"));
-                finish();
+                //m_generator.setStatusLine(200, "OK");
+                //m_generator.setMessage(QString("<html><body><h3>ready to download</h3></body></html>"));
+                //finish();
+                HttpTransfer ht(t.absolute_files_path()[0], m_socket);
+                ht.run();
                 return;
             }
         }

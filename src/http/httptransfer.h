@@ -12,15 +12,17 @@ QT_END_NAMESPACE
 class HttpTransfer : public QRunnable
 {
 public:
-  HttpTransfer(const QString& srcPath, QTcpSocket* dst);
+    HttpTransfer(const QString& srcPath, QTcpSocket* dst);
 
-  void run();
-  void interrupt();
+    void run();
+    void interrupt();
 
 private:
-  QString m_srcPath;
-  QTcpSocket* m_dst;
-  volatile bool m_interrupted;
+    QString contentType();
+
+    QString m_srcPath;
+    QTcpSocket* m_dst;
+    volatile bool m_interrupted;
 };
 
 #endif
