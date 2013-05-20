@@ -245,7 +245,7 @@ QString FileNode::toHtml(const QString& address, int port) const
 {
     QString res;
 
-    if (has_transfer())
+    if (has_transfer() && misc::isPreviewable(filename().section(".",-1)))
         res = "<li class=\"marked\">" + QString("<a href=\"http://%1:%2/%3\">").arg(address).arg(port).arg(hash()) +
                 filename() +
                 ", " + QString::number(m_info.size()) +

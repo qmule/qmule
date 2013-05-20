@@ -128,6 +128,7 @@ void HttpConnection::finish()
 
 void HttpConnection::respond()
 {
+    Preferences pref;
     QString url  = m_parser.url();    
     qDebug() << "URL: " << url;
 
@@ -174,7 +175,7 @@ void HttpConnection::respond()
             //m_generator.setContentTypeByExt(ext);
             m_generator.setMessage("<html><head>"
                                    "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
-                                   "<title>qMule start page</title>"
+                                   "<title>" + tr("Video files from: %1").arg(pref.nick()) +  + "</title>"
                                   "</head><body>"
                                   "<style>"
                                     "li {"
