@@ -708,11 +708,16 @@ QString DirNode::toHtml(const QString& address, int port) const
 
     if (!previous_res.isEmpty() || !node_res.isEmpty())
     {
-        QString self = "<li>" + filename() + "</li>";
-        if (is_root())
-            self = "";
-
-        res = "<ul>" + self + previous_res + node_res + "</ul>";
+        if (!is_active() && node_res.isEmpty())
+        {
+            // do not output self on non-shared directories + when it doesn't contain any shared files
+            res = previous_res;
+        }
+        else
+        {
+            //             self name
+            res = "<ul>" + QString("<li>" + filename() + "</li>") + previous_res + node_res + "</ul>";
+        }
     }
 
     return res;
