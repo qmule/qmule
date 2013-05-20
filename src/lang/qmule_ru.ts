@@ -2427,6 +2427,22 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
 <context>
     <name>Preferences</name>
     <message>
+        <source>Http server settings</source>
+        <translation>Настройка сервера видеоконтента</translation>
+    </message>
+    <message>
+        <source>Http server active</source>
+        <translation>Запустить http сервер раздачи видеоконтента</translation>
+    </message>
+    <message>
+        <source>Incoming http port</source>
+        <translation>Порт входящих соединений сервера</translation>
+    </message>
+    <message>
+        <source>Download connections limit</source>
+        <translation>Максимальное количество одновременно подключенных клиентов</translation>
+    </message>
+    <message>
         <source>UI</source>
         <extracomment>User Interface</extracomment>
         <translation type="obsolete">Интерфейс</translation>
@@ -7724,6 +7740,13 @@ eD2K Server</source>
     <message>
         <source>Close</source>
         <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
+    <name>HttpConnection</name>
+    <message>
+        <source>Video files from: %1</source>
+        <translation>Видео файлы пользователя: %1</translation>
     </message>
 </context>
 </TS>
