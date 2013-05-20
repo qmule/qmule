@@ -31,6 +31,7 @@
 #include "transport/session.h"
 #include "httpconnection.h"
 #include "httpserver.h"
+#include "misc.h"
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QStringList>
@@ -190,16 +191,23 @@ void HttpConnection::respond()
                                      "margin-left: 20;"
                                    "}"
                                    "</style>"
-                                   + Session::instance()->root()->toHtml(m_httpserver->serverAddress().toString(), m_httpserver->serverPort()) + "</body></html>");
+                                   + Session::instance()->root()->toHtml(m_socket->localAddress().toString(), m_httpserver->serverPort()) + "</body></html>");
             finish();
             return;
         }
 
-        if (list[0] == "hash") // temp check for hash
+
+        if (misc::isMD4Hash(list[0]))
         {
-            // check sessions count - if limit exeeds return info message
-            // search transfer by hash and start upload
-            // if transfer not found - return not found
+            Transfer t = Session::instance()->getTransfer(list[0]);
+
+            if (t.is_valid())
+            {
+                m_generator.setStatusLine(200, "OK");
+                m_generator.setMessage(QString("<html><body><h3>ready to download</h3></body></html>"));
+                finish();
+                return;
+            }
         }
     }
 

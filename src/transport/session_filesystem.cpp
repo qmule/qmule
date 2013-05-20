@@ -246,7 +246,10 @@ QString FileNode::toHtml(const QString& address, int port) const
     QString res;
 
     if (has_transfer())
-        res = "<li class=\"marked\">" + QString("<a href=\"http://%1:%2/%3\">").arg(address).arg(port).arg(hash()) + filename() + "</a></li>\n";
+        res = "<li class=\"marked\">" + QString("<a href=\"http://%1:%2/%3\">").arg(address).arg(port).arg(hash()) +
+                filename() +
+                ", " + QString::number(m_info.size()) +
+                "</a></li>\n";
 
     return res;
 }
