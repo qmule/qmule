@@ -24,7 +24,7 @@ void HttpTransfer::run()
     if (srcFile.open(QIODevice::ReadOnly))
     {
         buf += "HTTP/1.1 200 OK\r\n";
-        buf += QString("Content-Disposition: attachment; filename=\"%1\"").arg(misc::fileName(m_srcPath)).toUtf8();
+        buf += QString("Content-Disposition: inline; filename=\"%1\"").arg(misc::fileName(m_srcPath)).toUtf8();
         buf += QString("Content-Type: %1\r\n").arg(contentType()).toUtf8();
         buf += QString("Content-Length: %1\r\n\r\n").arg(srcFile.size()).toUtf8();
 
