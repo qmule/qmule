@@ -1,6 +1,5 @@
 #include "httpserver.h"
 #include "httpconnection.h"
-#include "httptransfer.h"
 #include "preferences.h"
 
 #include <QCryptographicHash>
@@ -28,24 +27,22 @@ private:
 HttpServer::HttpServer(QObject* parent):
     QTcpServer(parent), m_sessionsCount(0)
 {
-    m_transferPool.setMaxThreadCount(2);
 }
 
 HttpServer::~HttpServer() {}
 
 void HttpServer::incomingConnection(int socketDescriptor)
 {
-    QTcpSocket *serverSocket = new QTcpSocket(this);
+    HttpConnection* conn = new HttpConnection(this, socketDescriptor);
+    QThread* thread = new QThread(this);
 
-    // check socket set and socket peerAddress passed filters
-    if (serverSocket->setSocketDescriptor(socketDescriptor) /*&& filter(serverSocket->peerAddress()))*/)
-    {
-        new HttpConnection(serverSocket, this);
-    }
-    else
-    {
-        serverSocket->deleteLater();
-    }
+    connect(thread, SIGNAL(started()), conn, SLOT(start()));
+    connect(conn, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(conn, SIGNAL(finished()), conn, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    //connect(this, SIGNAL(interrupt()), conn, SLOT(interrupt()));
+    conn->moveToThread(thread);
+    thread->start();
 }
 
 bool HttpServer::allocateSession()
@@ -72,28 +69,4 @@ void HttpServer::freeSession()
     {
         qWarning() << "Nothing to free, current session count is: " << m_sessionsCount;
     }
-}
-
-bool HttpServer::tryUpload(const QString& srcPath, QTcpSocket* dst)
-{
-    HttpTransfer* t = new HttpTransfer(this, srcPath, dst);
-    t->setAutoDelete(true);
-
-    bool started = m_transferPool.tryStart(t);
-    if (!started) delete t;
-    return started;
-}
-
-void HttpServer::registerTransfer(HttpTransfer* t)
-{
-    m_transfersMutex.lock();
-    m_transfers.insert(t);
-    m_transfersMutex.unlock();
-}
-
-void HttpServer::unregisterTransfer(HttpTransfer* t)
-{
-    m_transfersMutex.lock();
-    m_transfers.remove(t);
-    m_transfersMutex.unlock();
 }

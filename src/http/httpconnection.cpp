@@ -44,17 +44,17 @@
 #include <queue>
 #include <vector>
 
-HttpConnection::HttpConnection(QTcpSocket *socket, HttpServer *parent)
-  : QObject(parent), m_socket(socket), m_httpserver(parent)
+HttpConnection::HttpConnection(HttpServer* httpserver, int socketDescriptor):
+    m_httpserver(httpserver), m_socketDescriptor(socketDescriptor), m_interrupted(false)
 {
-    m_socket->setParent(this);
-    connect(m_socket, SIGNAL(readyRead()), SLOT(read()));
-    connect(m_socket, SIGNAL(disconnected()), SLOT(deleteLater()));
 }
 
-HttpConnection::~HttpConnection()
+void HttpConnection::start()
 {
-    delete m_socket;
+    m_socket = new QTcpSocket(this);
+    m_socket->setSocketDescriptor(m_socketDescriptor);
+    connect(m_socket, SIGNAL(readyRead()), SLOT(read()));
+    connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(finished()));
 }
 
 void HttpConnection::read()
@@ -204,14 +204,74 @@ void HttpConnection::respond()
 
             if (t.is_valid())
             {
-                if (!m_httpserver->tryUpload(t.absolute_files_path()[0], m_socket))
-                    respondLimitExceeded();
+                uploadFile(t.absolute_files_path()[0]);
+                //respondLimitExceeded();
                 return;
             }
         }
     }
 
     respondNotFound();
+}
+
+void HttpConnection::uploadFile(const QString& srcPath)
+{
+    QFile srcFile(srcPath);
+    QByteArray buf;
+
+    if (srcFile.open(QIODevice::ReadOnly))
+    {
+        buf += "HTTP/1.1 200 OK\r\n";
+        buf += QString("Content-Disposition: inline; filename=\"%1\"").arg(misc::fileName(srcPath)).toUtf8();
+        buf += QString("Content-Type: %1\r\n").arg(contentType(srcPath)).toUtf8();
+        buf += QString("Content-Length: %1\r\n\r\n").arg(srcFile.size()).toUtf8();
+
+        if (m_socket->write(buf) != -1 && m_socket->waitForBytesWritten())
+        {
+            while(!m_interrupted)
+            {
+                buf = srcFile.read(256 * 1024);
+                if (buf.size() == 0) break;
+                if (m_socket->write(buf) == -1 || !m_socket->waitForBytesWritten())
+                {
+                    qDebug() << "Error: cannot send file: " << srcPath;
+                    break;
+                }
+            }
+        }
+        else
+            qDebug() << "Error: cannot send header: " << srcPath;
+
+        qDebug() << "File upload completed: " << srcPath;
+        srcFile.close();
+    }
+    else
+        qDebug() << "Error: cannot open file: " << srcPath;
+
+    m_socket->disconnectFromHost();
+}
+
+QString HttpConnection::contentType(const QString& srcPath)
+{
+    QString ext = misc::file_extension(srcPath).toUpper();
+    QString type = "application/octet-stream";
+
+    if (ext == "MP2" || ext == "MPA" || ext == "MPE" ||
+        ext == "MPEG" || ext == "MPG" || ext == "MPV2") type = "video/mpeg";
+    if (ext == "MOV" || ext == "QT") type = "video/quicktime";
+    if (ext == "LSF" || ext == "LSX" || ext == "ASF" || ext == "ASR" || ext == "ASX") type = "video/x-la-asf";
+    if (ext == "AVI") type = "video/x-msvideo";
+    if (ext == "MOVIE") type = "video/x-sgi-movie";
+
+    if (ext == "AU" || ext == "SND") type = "audio/basic";
+    if (ext == "MID" || ext == "RMI") type = "audio/mid";
+    if (ext == "MP3") type = "audio/mpeg";
+    if (ext == "AIF" || ext == "AIFC" || ext == "AIFF") type = "audio/x-aiff";
+    if (ext == "M3U") type = "audio/x-mpegurl";
+    if (ext == "RA" || ext == "RAM") type = "audio/x-pn-realaudio";
+    if (ext == "WAV") type = "audio/x-wav";
+
+    return type;
 }
 
 void HttpConnection::respondNotFound()

@@ -48,21 +48,30 @@ class HttpConnection : public QObject
   Q_DISABLE_COPY(HttpConnection)
 
 public:
-  HttpConnection(QTcpSocket *m_socket, HttpServer *m_httpserver);
-  ~HttpConnection();
+  HttpConnection(HttpServer* m_httpserver, int socketDescriptor);
+
+signals:
+  void finished();
 
 protected slots:
   void finish();
   void respond();
 
 private slots:
+  void start();
   void read();
 
 private:
+  void uploadFile(const QString& srcPath);
   void respondNotFound();
   void respondLimitExceeded();
-  QTcpSocket *m_socket;
+  QString contentType(const QString& srcPath);
+
   HttpServer *m_httpserver;
+  int m_socketDescriptor;
+  volatile bool m_interrupted;
+
+  QTcpSocket *m_socket;
   HttpRequestParser m_parser;
   HttpResponseGenerator m_generator;
   QByteArray m_receivedData;
