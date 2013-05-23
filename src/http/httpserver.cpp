@@ -45,6 +45,16 @@ void HttpServer::incomingConnection(int socketDescriptor)
     thread->start();
 }
 
+void HttpServer::stop(bool disconnectClients)
+{
+    close(); // stop server listening
+
+    if (disconnectClients)
+    {
+        // implement client's threads termination
+    }
+}
+
 bool HttpServer::allocateSession()
 {
     Preferences pref;

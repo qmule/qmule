@@ -53,7 +53,8 @@ class HttpServer : public QTcpServer
     Q_DISABLE_COPY(HttpServer)
 public:
     HttpServer(QObject* parent = 0);
-    ~HttpServer();    
+    ~HttpServer();
+    void stop(bool disconnectClients);
     quint32 sessionsCount() const { return m_sessionsCount; }
     bool allocateSession();
     void freeSession();

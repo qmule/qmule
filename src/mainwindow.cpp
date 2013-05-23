@@ -1213,8 +1213,8 @@ void MainWindow::loadPreferences(bool configure_session)
       // close server conditions
       if (!pref.runHttpServer() || (m_http_server->serverPort() != pref.httpPort()))
       {
-          qDebug() << "close server";
-          m_http_server->close();
+          qDebug() << "stop server";
+          m_http_server->stop(!pref.runHttpServer());
       }
 
       if (pref.runHttpServer())
