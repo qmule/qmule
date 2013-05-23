@@ -7746,7 +7746,7 @@ eD2K Server</source>
     <name>HttpConnection</name>
     <message>
         <source>Video files from: %1</source>
-        <translation>Видео файлы пользователя: %1</translation>
+        <translation>Медиа файлы пользователя: %1</translation>
     </message>
     <message>
         <source>Connection limit exceeded</source>
