@@ -41,6 +41,7 @@
 #include <QSet>
 
 class EventManager;
+class HttpConnection;
 
 QT_BEGIN_NAMESPACE
 class QTimer;
@@ -55,12 +56,12 @@ public:
     HttpServer(QObject* parent = 0);
     ~HttpServer();
     void stop(bool disconnectClients);
-    quint32 sessionsCount() const { return m_sessionsCount; }
-    bool allocateSession();
-    void freeSession();
+    bool registerConnection(HttpConnection* c);
+    void unregisterConnection(HttpConnection* c);
 private:
-    quint32 m_sessionsLimit;
-    quint32 m_sessionsCount;
+    QSet<HttpConnection*> m_connections;
+    QMutex m_connectionsMutex;
+
     void incomingConnection(int socketDescriptor);
 };
 

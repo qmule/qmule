@@ -49,6 +49,7 @@ class HttpConnection : public QObject
 
 public:
   HttpConnection(HttpServer* m_httpserver, int socketDescriptor);
+  void interrupt();
 
 signals:
   void finished();
