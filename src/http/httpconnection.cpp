@@ -299,7 +299,11 @@ void HttpConnection::respondNotFound()
 
 void HttpConnection::respondLimitExceeded()
 {
+    Preferences pref;
     m_generator.setStatusLine(503, "Connection limit exceeded");
-    m_generator.setMessage(tr("Connection limit exceeded"));
+    m_generator.setMessage("<html><head>"
+                           "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+                           "<title>" + tr("Video files from: %1").arg(pref.nick()) +  + "</title>"
+                           "</head><body><h3>" + tr("Connection limit exceeded") + "</h3></body></html>");
     finish();
 }

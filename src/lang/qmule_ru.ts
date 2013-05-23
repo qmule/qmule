@@ -7748,5 +7748,9 @@ eD2K Server</source>
         <source>Video files from: %1</source>
         <translation>Видео файлы пользователя: %1</translation>
     </message>
+    <message>
+        <source>Connection limit exceeded</source>
+        <translation>Превышел лимит соединений, попробуйте зайти позже</translation>
+    </message>
 </context>
 </TS>
