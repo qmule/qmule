@@ -49,6 +49,11 @@ HttpConnection::HttpConnection(HttpServer* httpserver, int socketDescriptor):
 {
 }
 
+void HttpConnection::interrupt()
+{
+    m_interrupted = true;
+}
+
 void HttpConnection::start()
 {
     m_socket = new QTcpSocket(this);
@@ -205,7 +210,6 @@ void HttpConnection::respond()
             if (t.is_valid())
             {
                 uploadFile(t.absolute_files_path()[0]);
-                //respondLimitExceeded();
                 return;
             }
         }
@@ -216,9 +220,14 @@ void HttpConnection::respond()
 
 void HttpConnection::uploadFile(const QString& srcPath)
 {
+    if (!m_httpserver->registerConnection(this))
+    {
+        respondLimitExceeded();
+        return;
+    }
+
     QFile srcFile(srcPath);
     QByteArray buf;
-
     if (srcFile.open(QIODevice::ReadOnly))
     {
         buf += "HTTP/1.1 200 OK\r\n";
@@ -228,8 +237,15 @@ void HttpConnection::uploadFile(const QString& srcPath)
 
         if (m_socket->write(buf) != -1 && m_socket->waitForBytesWritten())
         {
-            while(!m_interrupted)
+            qDebug() << "Start uploading file: " << srcPath;
+            while(true)
             {
+                if (m_interrupted)
+                {
+                    qDebug() << "Interrupted uploading file: " << srcPath;
+                    break;
+                }
+
                 buf = srcFile.read(256 * 1024);
                 if (buf.size() == 0) break;
                 if (m_socket->write(buf) == -1 || !m_socket->waitForBytesWritten())
@@ -248,6 +264,7 @@ void HttpConnection::uploadFile(const QString& srcPath)
     else
         qDebug() << "Error: cannot open file: " << srcPath;
 
+    m_httpserver->unregisterConnection(this);
     m_socket->disconnectFromHost();
 }
 
@@ -283,6 +300,11 @@ void HttpConnection::respondNotFound()
 
 void HttpConnection::respondLimitExceeded()
 {
+    Preferences pref;
     m_generator.setStatusLine(503, "Connection limit exceeded");
+    m_generator.setMessage("<html><head>"
+                           "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"
+                           "<title>" + tr("Video files from: %1").arg(pref.nick()) +  + "</title>"
+                           "</head><body><h3>" + tr("Connection limit exceeded") + "</h3></body></html>");
     finish();
 }

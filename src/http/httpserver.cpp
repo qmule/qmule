@@ -24,8 +24,7 @@ private:
   QString m_peerIp;
 };
 
-HttpServer::HttpServer(QObject* parent):
-    QTcpServer(parent), m_sessionsCount(0)
+HttpServer::HttpServer(QObject* parent): QTcpServer(parent)
 {
 }
 
@@ -40,7 +39,6 @@ void HttpServer::incomingConnection(int socketDescriptor)
     connect(conn, SIGNAL(finished()), thread, SLOT(quit()));
     connect(conn, SIGNAL(finished()), conn, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    //connect(this, SIGNAL(interrupt()), conn, SLOT(interrupt()));
     conn->moveToThread(thread);
     thread->start();
 }
@@ -51,32 +49,32 @@ void HttpServer::stop(bool disconnectClients)
 
     if (disconnectClients)
     {
-        // implement client's threads termination
+        m_connectionsMutex.lock();
+        foreach(HttpConnection* c, m_connections)
+            c->interrupt();
+        m_connectionsMutex.unlock();
     }
 }
 
-bool HttpServer::allocateSession()
+bool HttpServer::registerConnection(HttpConnection* c)
 {
     Preferences pref;
     bool res = false;
 
-    if (m_sessionsCount < pref.httpSesLimit())
+    m_connectionsMutex.lock();
+    if (m_connections.size() < pref.httpSesLimit())
     {
-        ++m_sessionsCount;
+        m_connections.insert(c);
         res = true;
     }
+    m_connectionsMutex.unlock();
 
     return res;
 }
 
-void HttpServer::freeSession()
+void HttpServer::unregisterConnection(HttpConnection* c)
 {
-    if (m_sessionsCount > 0)
-    {
-        --m_sessionsCount;
-    }
-    else
-    {
-        qWarning() << "Nothing to free, current session count is: " << m_sessionsCount;
-    }
+    m_connectionsMutex.lock();
+    m_connections.remove(c);
+    m_connectionsMutex.unlock();
 }
