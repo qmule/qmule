@@ -690,51 +690,18 @@ QString misc::friendlyUnit(qreal val, SizeType type) {
 bool misc::isPreviewable(QString extension) {
   if (extension.isEmpty()) return false;
   extension = extension.toUpper();
-  if (extension == "AVI") return true;
-  if (extension == "MP3") return true;
-  if (extension == "OGG") return true;
-  if (extension == "OGV") return true;
-  if (extension == "OGM") return true;
-  if (extension == "WMV") return true;
-  if (extension == "WMA") return true;
-  if (extension == "MPEG") return true;
-  if (extension == "MPG") return true;
-  if (extension == "ASF") return true;
-  if (extension == "QT") return true;
-  if (extension == "RM") return true;
-  if (extension == "RMVB") return true;
-  if (extension == "RMV") return true;
-  if (extension == "SWF") return true;
-  if (extension == "FLV") return true;
-  if (extension == "WAV") return true;
-  if (extension == "MOV") return true;
-  if (extension == "VOB") return true;
-  if (extension == "MID") return true;
-  if (extension == "AC3") return true;
-  if (extension == "MP4") return true;
-  if (extension == "MP2") return true;
-  if (extension == "AVI") return true;
-  if (extension == "FLAC") return true;
-  if (extension == "AU") return true;
-  if (extension == "MPE") return true;
-  if (extension == "MOV") return true;
-  if (extension == "MKV") return true;
-  if (extension == "M4V") return true;
-  if (extension == "AIF") return true;
-  if (extension == "AIFF") return true;
-  if (extension == "AIFC") return true;
-  if (extension == "RA") return true;
-  if (extension == "RAM") return true;
-  if (extension == "M4P") return true;
-  if (extension == "M4A") return true;
-  if (extension == "3GP") return true;
-  if (extension == "AAC") return true;
-  if (extension == "SWA") return true;
-  if (extension == "MPC") return true;
-  if (extension == "MPP") return true;
-  if (extension == "M3U") return true;
-  if (extension == "WEBM") return true;
-  return false;
+  return
+      extension == "AVI" || extension == "MP3" || extension == "OGG" || extension == "OGV" ||
+      extension == "OGM" || extension == "WMV" || extension == "WMA" || extension == "MPEG" ||
+      extension == "MPG" || extension == "ASF" || extension == "QT" || extension == "RM" ||
+      extension == "RMVB" || extension == "RMV" || extension == "SWF" || extension == "FLV" ||
+      extension == "WAV" || extension == "MOV" || extension == "VOB" || extension == "MID" ||
+      extension == "AC3" || extension == "MP4" || extension == "MP2" || extension == "AVI" ||
+      extension == "FLAC" || extension == "AU" || extension == "MPE" || extension == "MOV" ||
+      extension == "MKV" || extension == "M4V" || extension == "AIF" || extension == "AIFF" ||
+      extension == "AIFC" || extension == "RA" || extension == "RAM" || extension == "M4P" ||
+      extension == "M4A" || extension == "3GP" || extension == "AAC" || extension == "SWA" ||
+      extension == "MPC" || extension == "MPP" || extension == "M3U" || extension == "WEBM";
 }
 
 QString misc::bcLinkToMagnet(QString bc_link) {

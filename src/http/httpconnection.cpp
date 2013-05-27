@@ -275,19 +275,18 @@ QString HttpConnection::contentType(const QString& srcPath)
 
     if (ext == "MP2" || ext == "MPA" || ext == "MPE" ||
         ext == "MPEG" || ext == "MPG" || ext == "MPV2") type = "video/mpeg";
-    if (ext == "MOV" || ext == "QT") type = "video/quicktime";
-    if (ext == "LSF" || ext == "LSX" || ext == "ASF" || ext == "ASR" || ext == "ASX") type = "video/x-la-asf";
-    if (ext == "AVI") type = "video/x-msvideo";
-    if (ext == "MOVIE") type = "video/x-sgi-movie";
-
-    if (ext == "AU" || ext == "SND") type = "audio/basic";
-    if (ext == "MID" || ext == "RMI") type = "audio/mid";
-    if (ext == "MP3") type = "audio/mpeg";
-    if (ext == "AIF" || ext == "AIFC" || ext == "AIFF") type = "audio/x-aiff";
-    if (ext == "M3U") type = "audio/x-mpegurl";
-    if (ext == "RA" || ext == "RAM") type = "audio/x-pn-realaudio";
-    if (ext == "WAV") type = "audio/x-wav";
-    if (ext == "WEBM") type = "video/webm";
+    else if (ext == "MOV" || ext == "QT") type = "video/quicktime";
+    else if (ext == "LSF" || ext == "LSX" || ext == "ASF" || ext == "ASR" || ext == "ASX") type = "video/x-la-asf";
+    else if (ext == "AVI") type = "video/x-msvideo";
+    else if (ext == "MOVIE") type = "video/x-sgi-movie";
+    else if (ext == "AU" || ext == "SND") type = "audio/basic";
+    else if (ext == "MID" || ext == "RMI") type = "audio/mid";
+    else if (ext == "MP3") type = "audio/mpeg";
+    else if (ext == "AIF" || ext == "AIFC" || ext == "AIFF") type = "audio/x-aiff";
+    else if (ext == "M3U") type = "audio/x-mpegurl";
+    else if (ext == "RA" || ext == "RAM") type = "audio/x-pn-realaudio";
+    else if (ext == "WAV") type = "audio/x-wav";
+    else if (ext == "WEBM") type = "video/webm";
 
     return type;
 }
