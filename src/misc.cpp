@@ -733,6 +733,7 @@ bool misc::isPreviewable(QString extension) {
   if (extension == "MPC") return true;
   if (extension == "MPP") return true;
   if (extension == "M3U") return true;
+  if (extension == "WEBM") return true;
   return false;
 }
 

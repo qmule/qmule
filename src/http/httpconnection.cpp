@@ -270,6 +270,7 @@ QString HttpConnection::contentType(const QString& srcPath)
     if (ext == "M3U") type = "audio/x-mpegurl";
     if (ext == "RA" || ext == "RAM") type = "audio/x-pn-realaudio";
     if (ext == "WAV") type = "audio/x-wav";
+    if (ext == "WEBM") type = "video/webm";
 
     return type;
 }
