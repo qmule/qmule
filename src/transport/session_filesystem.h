@@ -54,6 +54,11 @@ public:
     QString filename() const { return m_filename; }
     void create_transfer();
     virtual qint64 size_on_disk() const { return m_info.size(); }
+    /**
+      * generate <ul><li></li></ul> node representation
+      * when node shared and has transfer associated
+     */
+    QString toHtml(const QString& address, int port) const;
 
     DirNode*    m_parent;
     bool        m_active;
@@ -115,6 +120,9 @@ public:
       * prepare collection file and add transfer based on it
      */
     void build_collection();
+
+    // like FileNode + recursive call
+    QString toHtml(const QString& address, int port) const;
 
     bool                        m_populated;
     bool                        m_root;

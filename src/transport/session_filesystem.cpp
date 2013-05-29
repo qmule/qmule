@@ -241,6 +241,19 @@ QString FileNode::string() const
     return (res);
 }
 
+QString FileNode::toHtml(const QString& address, int port) const
+{
+    QString res;
+
+    if (has_transfer() && misc::isPreviewable(filename().section(".",-1)))
+        res = "<li class=\"marked\">" + QString("<a href=\"http://%1:%2/%3\">").arg(address).arg(port).arg(hash()) +
+                filename() +
+                ", " + QString::number(m_info.size()) +
+                "</a></li>\n";
+
+    return res;
+}
+
 DirNode::DirNode(DirNode* parent, const QFileInfo& info, bool root /*= false*/) :
     FileNode(parent, info),
     m_populated(false),
@@ -669,4 +682,43 @@ void DirNode::populate(bool force /* = false*/)
     }
 
     m_populated = true;
+}
+
+QString DirNode::toHtml(const QString& address, int port) const
+{
+    QString res;
+    QString previous_res;
+
+    foreach(const DirNode* pDir, m_dir_vector)
+    {
+         QString local_res = pDir->toHtml(address, port);
+
+         if (!local_res.isEmpty())
+         {
+             previous_res += "<li>" + local_res + "</li>\n";
+         }
+    }
+
+    QString node_res;
+
+    foreach(const FileNode* pFile, m_file_vector)
+    {
+        node_res += pFile->toHtml(address, port);
+    }
+
+    if (!previous_res.isEmpty() || !node_res.isEmpty())
+    {
+        if (!is_active() && node_res.isEmpty())
+        {
+            // do not output self on non-shared directories + when it doesn't contain any shared files
+            res = previous_res;
+        }
+        else
+        {
+            //             self name
+            res = "<ul>" + QString("<li>" + filename() + "</li>") + previous_res + node_res + "</ul>";
+        }
+    }
+
+    return res;
 }
