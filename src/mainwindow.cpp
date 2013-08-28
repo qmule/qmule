@@ -1732,11 +1732,12 @@ void MainWindow::endLoadSharedFileSystem()
 
 void MainWindow::new_version_ready(int major,int minor, int update,int build)
 {
-    QMessageBox::information(this, tr("Update"), tr("New version %1.%2.%3.%4 was set, changes will activate after program restart")
+    /*QMessageBox::information(this, tr("Update"), tr("New version %1.%2.%3.%4 was set, changes will activate after program restart")
                              .arg(major)
                              .arg(minor)
                              .arg(update)
                              .arg(build));
+*/
 }
 
 void MainWindow::current_version_obsolete(int major, int minor, int update, int build)
