@@ -114,6 +114,7 @@ public:
 
     libed2k::session* delegate() const;
 
+    const libed2k::ip_filter& session_filter() const;
 private:
     QScopedPointer<libed2k::session> m_session;
     QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading

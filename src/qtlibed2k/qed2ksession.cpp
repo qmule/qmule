@@ -280,6 +280,11 @@ void QED2KSession::start()
                 filter.add_rule(drule.begin, drule.end, libed2k::ip_filter::blocked);
                 ++filters_count;
             }
+            else
+            {
+                qDebug() << "Error code: " << QString(libed2k::libed2k_exception(ec).what())
+                         << " level:" << drule.level;
+            }
         }
 
         m_session->set_ip_filter(filter);
@@ -553,6 +558,8 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
+
+const libed2k::ip_filter& QED2KSession::session_filter() const { return delegate()->get_ip_filter(); }
 
 void QED2KSession::searchFiles(const QString& strQuery,
         quint64 nMinSize,

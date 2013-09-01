@@ -29,6 +29,7 @@
  */
 
 #include "transport/session.h"
+#include "libed2k/ip_filter.hpp" // for ip_filter using
 #include "httpconnection.h"
 #include "httpserver.h"
 #include "misc.h"
@@ -60,6 +61,22 @@ void HttpConnection::start()
     m_socket->setSocketDescriptor(m_socketDescriptor);
     connect(m_socket, SIGNAL(readyRead()), SLOT(read()));
     connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(finished()));
+
+    // check address in filters range IPv4 only!
+    libed2k::error_code ec;
+    boost::asio::ip::address addr = boost::asio::ip::address::from_string(m_socket->peerAddress().toString().toStdString(), ec);
+
+    qDebug() << "Incoming connection from: " << m_socket->peerAddress().toString();
+
+    if (ec || (Session::instance()->get_ed2k_session()->session_filter().access(addr) != 0))
+    {
+        qDebug() << "address parse status: " << misc::toQStringU(libed2k::libed2k_exception(ec).what()) << " or blocked";
+        m_socket->disconnectFromHost();
+    }
+    else
+    {
+        qDebug() << "continue working with socket";
+    }
 }
 
 void HttpConnection::read()
