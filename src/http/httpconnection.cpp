@@ -62,21 +62,24 @@ void HttpConnection::start()
     connect(m_socket, SIGNAL(readyRead()), SLOT(read()));
     connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(finished()));
 
-    // check address in filters range IPv4 only!
-    libed2k::error_code ec;
-    boost::asio::ip::address addr = boost::asio::ip::address::from_string(m_socket->peerAddress().toString().toStdString(), ec);
 
     qDebug() << "Incoming connection from: " << m_socket->peerAddress().toString();
+    // check ip fof non-local ips only
+    if (m_socket->peerAddress() != QHostAddress::LocalHost)
+    {
+        // check address in filters range IPv4 only!
+        libed2k::error_code ec;
+        boost::asio::ip::address addr = boost::asio::ip::address::from_string(m_socket->peerAddress().toString().toStdString(), ec);
 
-    if (ec || (Session::instance()->get_ed2k_session()->session_filter().access(addr) != 0))
-    {
-        qDebug() << "address parse status: " << misc::toQStringU(libed2k::libed2k_exception(ec).what()) << " or blocked";
-        m_socket->disconnectFromHost();
+        if (ec || (Session::instance()->get_ed2k_session()->session_filter().access(addr) != 0))
+        {
+            qDebug() << "address parse status: " << misc::toQStringU(libed2k::libed2k_exception(ec).what()) << " or blocked";
+            m_socket->disconnectFromHost();
+            return;
+        }
     }
-    else
-    {
-        qDebug() << "continue working with socket";
-    }
+
+    qDebug() << "continue working with socket";
 }
 
 void HttpConnection::read()
