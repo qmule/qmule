@@ -248,6 +248,12 @@ void QED2KSession::start()
     settings.client_name  = pref.nick().toUtf8().constData();
     settings.mod_name = misc::productName().toUtf8().constData();
     settings.m_announce_timeout = 60; // announcing every 10 seconds
+    settings.server_attrs.push_back(std::make_pair(std::string("91.200.42.46"), 1176));
+    settings.server_attrs.push_back(std::make_pair(std::string("91.200.42.47"), 3883));
+    settings.server_attrs.push_back(std::make_pair(std::string("91.200.42.119"), 9939));
+    settings.server_attrs.push_back(std::make_pair(std::string("88.191.221.121"), 7111));
+    settings.server_attrs.push_back(std::make_pair(std::string("88.190.202.44"), 7111));
+
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(settings.m_known_file);
