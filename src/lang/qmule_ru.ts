@@ -7401,7 +7401,7 @@ eD2K Server</source>
     </message>
     <message>
         <source>Connection is established with: </source>
-        <translation>Соединение установлено с:</translation>
+        <translation>Соединение установлено с: </translation>
     </message>
     <message>
         <source>Status:</source>

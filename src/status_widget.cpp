@@ -84,7 +84,7 @@ void status_widget::serverAddress(QString strServer)
     charFormatBlue.setForeground(QBrush(QColor(Qt::blue)));
     editServerInfo->setCurrentCharFormat(charFormatBlue);
     QDateTime date_time = QDateTime::currentDateTime();
-    QString msg = date_time.toString("dd.MM.yyyy hh:mm:ss") + ": " + tr("Connection is established with: ") + "emule.is74.ru (" + strServer + ")";
+    QString msg = date_time.toString("dd.MM.yyyy hh:mm:ss") + ": " + tr("Connection is established with: ") + strServer;
     editServerInfo->insertPlainText("\n");
     editServerInfo->insertPlainText(msg);
     editServerInfo->setCurrentCharFormat(charFormat);
