@@ -350,11 +350,11 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(m_updater.data(), SIGNAL(current_version_is_obsolete(int,int,int,int)), SLOT(current_version_obsolete(int,int,int,int)));
 
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(quint32, quint32, quint32)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(int, int)), this, SLOT(ed2kServerStatus(int, int)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(const libed2k::net_identifier&, quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(const libed2k::net_identifier&, quint32, quint32, quint32)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(const libed2k::net_identifier&, int, int)), this, SLOT(ed2kServerStatus(const libed2k::net_identifier&, int, int)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverMessage(QString)), this, SLOT(ed2kServerMessage(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(QString, QString)), this, SLOT(ed2kIdentity(QString, QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(QString)), this, SLOT(ed2kConnectionClosed(QString)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(const libed2k::net_identifier&, QString)), this, SLOT(ed2kConnectionClosed(const libed2k::net_identifier&, QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
 
@@ -1551,7 +1551,8 @@ void MainWindow::ed2kServerNameResolved(QString strServer)
     status->serverAddress(strServer);
 }
 
-void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port)
+void MainWindow::ed2kConnectionInitialized(
+    const libed2k::net_identifier& net_id, quint32 client_id, quint32 tcp_flags, quint32 aux_port)
 {
     qDebug() << Q_FUNC_INFO;
     status->updateConnectedInfo();
@@ -1576,11 +1577,11 @@ void MainWindow::ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags,
     id.setNum(client_id);
     log_msg += id;
     status->addLogMessage(log_msg);
-    status->clientID(client_id);
+    status->clientID(QString::fromUtf8(net_id.toString().c_str()), client_id);
     statusBar->setStatusMsg(log_msg);
 }
 
-void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
+void MainWindow::ed2kServerStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers)
 {
     QString log_msg("Number of server files: ");
     QString num;
@@ -1592,7 +1593,7 @@ void MainWindow::ed2kServerStatus(int nFiles, int nUsers)
     log_msg += num;
     status->addLogMessage(log_msg);
 
-    status->serverStatus(nFiles, nUsers);
+    status->serverStatus(QString::fromUtf8(net_id.toString().c_str()), nFiles, nUsers);
     statusBar->setServerInfo(nFiles, nUsers);
 }
 
@@ -1609,10 +1610,10 @@ void MainWindow::ed2kIdentity(QString strName, QString strDescription)
     status->addLogMessage(strDescription);
 }
 
-void MainWindow::ed2kConnectionClosed(QString strError)
+void MainWindow::ed2kConnectionClosed(const libed2k::net_identifier& net_id, QString strError)
 {
     status->addLogMessage(strError);
-    setDisconnectedStatus();
+    setDisconnectedStatus(QString::fromUtf8(net_id.toString().c_str()));
     statusBar->setStatusMsg(strError);
 }
 
@@ -1670,12 +1671,12 @@ void MainWindow::stopMessageFlickering()
     }
 }
 
-void MainWindow::setDisconnectedStatus()
+void MainWindow::setDisconnectedStatus(const QString& sid)
 {
     actionConnect->setIcon(icon_disconnected);
     actionConnect->setText(tr("Connecting"));
     connectioh_state = csDisconnected;
-    status->setDisconnectedInfo();
+    status->setDisconnectedInfo(sid);
     statusBar->reset();
     icon_CurTray = icon_TrayDisconn;
     if (systrayIcon) {

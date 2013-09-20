@@ -652,11 +652,11 @@ void QED2KSession::readAlerts()
         if (libed2k::server_connection_initialized_alert* p =
             dynamic_cast<libed2k::server_connection_initialized_alert*>(a.get()))
         {
-            emit serverConnectionInitialized(p->m_nClientId, p->m_nTCPFlags, p->m_nAuxPort);
+            emit serverConnectionInitialized(p->m_address, p->m_nClientId, p->m_nTCPFlags, p->m_nAuxPort);
         }
         else if (libed2k::server_status_alert* p = dynamic_cast<libed2k::server_status_alert*>(a.get()))
         {
-            emit serverStatus(p->m_nFilesCount, p->m_nUsersCount);
+            emit serverStatus(p->m_address, p->m_nFilesCount, p->m_nUsersCount);
         }
         else if (libed2k::server_identity_alert* p = dynamic_cast<libed2k::server_identity_alert*>(a.get()))
         {
@@ -670,7 +670,7 @@ void QED2KSession::readAlerts()
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
         {
-            emit serverConnectionClosed(QString::fromLocal8Bit(p->m_error.message().c_str()));
+            emit serverConnectionClosed(p->m_address, QString::fromLocal8Bit(p->m_error.message().c_str()));
         }
         else if (libed2k::shared_files_alert* p = dynamic_cast<libed2k::shared_files_alert*>(a.get()))
         {

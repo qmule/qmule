@@ -261,14 +261,15 @@ private slots:
     void startMessageFlickering();
     void stopMessageFlickering();
     void on_flickerTimer();
-    void setDisconnectedStatus();
+    void setDisconnectedStatus(const QString& sid);
 
     void ed2kServerNameResolved(QString strServer);
-    void ed2kConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
-    void ed2kServerStatus(int nFiles, int nUsers);
+    void ed2kConnectionInitialized(
+        const libed2k::net_identifier& net_id, quint32 client_id, quint32 tcp_flags, quint32 aux_port);
+    void ed2kServerStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers);
     void ed2kServerMessage(QString strMessage);
     void ed2kIdentity(QString strName, QString strDescription);
-    void ed2kConnectionClosed(QString strError);
+    void ed2kConnectionClosed(const libed2k::net_identifier& net_id, QString strError);
 
     void on_actionOpenDownloadPath_triggered();
     void beginLoadSharedFileSystem();

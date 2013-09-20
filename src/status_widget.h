@@ -4,25 +4,31 @@
 #include <QWidget>
 #include "ui_status_widget.h"
 
+struct server_info
+{
+    unsigned int m_nClientId;
+    int m_nFiles;
+    int m_nUsers;
+
+    server_info(): m_nClientId(0), m_nFiles(0), m_nUsers(0){}
+};
+
 class status_widget : public QWidget, private Ui::status_widget
 {
     Q_OBJECT
 
-    QString m_strServer;
-    unsigned int m_nClientId;
-    int m_nFiles;
-    int m_nUsers;
+    QMap<QString, server_info> m_servers;
 
 public:
     status_widget(QWidget *parent = 0);
     ~status_widget();
     void addLogMessage(QString log_message);
-    void setDisconnectedInfo();
+    void setDisconnectedInfo(const QString& sid);
     void updateConnectedInfo();
     void serverAddress(QString strServer);
     void serverInfo(QString strInfo);
-    void serverStatus(int nFiles, int nUsers);
-    void clientID(unsigned int nClientId);
+    void serverStatus(const QString& sid, int nFiles, int nUsers);
+    void clientID(const QString& sid, unsigned int nClientId);
 public slots:
     void addHtmlLogMessage(const QString& msg);
 };

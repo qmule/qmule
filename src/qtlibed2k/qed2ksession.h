@@ -160,9 +160,10 @@ public slots:
 signals:
     void registerNode(Transfer);    // temporary signal for node registration
     void serverNameResolved(QString strName);
-    void serverConnectionInitialized(quint32 client_id, quint32 tcp_flags, quint32 aux_port);
-    void serverConnectionClosed(QString strError);
-    void serverStatus(int nFiles, int nUsers);
+    void serverConnectionInitialized(
+        const libed2k::net_identifier& net_id, quint32 client_id, quint32 tcp_flags, quint32 aux_port);
+    void serverConnectionClosed(const libed2k::net_identifier& net_id, QString strError);
+    void serverStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers);
     void serverMessage(QString strMessage);
     void serverIdentity(QString strName, QString strDescription);
     void searchResult(const libed2k::net_identifier& np, const QString& hash, 
