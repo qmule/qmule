@@ -352,8 +352,8 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverNameResolved(QString)), this, SLOT(ed2kServerNameResolved(QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionInitialized(const libed2k::net_identifier&, quint32, quint32, quint32)), this, SLOT(ed2kConnectionInitialized(const libed2k::net_identifier&, quint32, quint32, quint32)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverStatus(const libed2k::net_identifier&, int, int)), this, SLOT(ed2kServerStatus(const libed2k::net_identifier&, int, int)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverMessage(QString)), this, SLOT(ed2kServerMessage(QString)));
-  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(QString, QString)), this, SLOT(ed2kIdentity(QString, QString)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverMessage(const libed2k::net_identifier&, QString)), this, SLOT(ed2kServerMessage(const libed2k::net_identifier&, QString)));
+  connect(Session::instance()->get_ed2k_session(), SIGNAL(serverIdentity(const libed2k::net_identifier&, QString, QString)), this, SLOT(ed2kIdentity(const libed2k::net_identifier&, QString, QString)));
   connect(Session::instance()->get_ed2k_session(), SIGNAL(serverConnectionClosed(const libed2k::net_identifier&, QString)), this, SLOT(ed2kConnectionClosed(const libed2k::net_identifier&, QString)));
 
   connect(Session::instance(), SIGNAL(newConsoleMessage(const QString&)), status, SLOT(addHtmlLogMessage(const QString&)));
@@ -1572,47 +1572,47 @@ void MainWindow::ed2kConnectionInitialized(
     m_updater->start();
 #endif
 
-    QString log_msg("Client ID: ");
+    QString log_msg(tr("Client ID: "));
     QString id;
     id.setNum(client_id);
     log_msg += id;
-    status->addLogMessage(log_msg);
+    status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
     status->clientID(QString::fromUtf8(net_id.toString().c_str()), client_id);
     statusBar->setStatusMsg(log_msg);
 }
 
 void MainWindow::ed2kServerStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers)
 {
-    QString log_msg("Number of server files: ");
+    QString log_msg(tr("Number of server files: "));
     QString num;
     num.setNum(nFiles);
     log_msg += num;
-    status->addLogMessage(log_msg);
-    log_msg = "Number of server users: ";
+    status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
+    log_msg = tr("Number of server users: ");
     num.setNum(nUsers);
     log_msg += num;
-    status->addLogMessage(log_msg);
+    status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
 
     status->serverStatus(QString::fromUtf8(net_id.toString().c_str()), nFiles, nUsers);
     statusBar->setServerInfo(nFiles, nUsers);
 }
 
-void MainWindow::ed2kServerMessage(QString strMessage)
+void MainWindow::ed2kServerMessage(const libed2k::net_identifier& net_id, QString strMessage)
 {
-    status->addLogMessage(strMessage);
-
+    status->addLogMessage(misc::toQStringU(net_id.toString()), strMessage);
     status->serverInfo(strMessage);
 }
 
-void MainWindow::ed2kIdentity(QString strName, QString strDescription)
+void MainWindow::ed2kIdentity(const libed2k::net_identifier& net_id, QString strName, QString strDescription)
 {
-    status->addLogMessage(strName);
-    status->addLogMessage(strDescription);
+    status->addLogMessage(misc::toQStringU(net_id.toString()), strName);
+    status->addLogMessage(misc::toQStringU(net_id.toString()), strDescription);
+    status->serverIdentity(QString::fromUtf8(net_id.toString().c_str()), strName);
 }
 
 void MainWindow::ed2kConnectionClosed(const libed2k::net_identifier& net_id, QString strError)
 {
-    status->addLogMessage(strError);
+    status->addLogMessage(misc::toQStringU(net_id.toString()), strError);
     setDisconnectedStatus(QString::fromUtf8(net_id.toString().c_str()));
     statusBar->setStatusMsg(strError);
 }

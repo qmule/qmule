@@ -2274,6 +2274,18 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
         <source>Shared filesystem loading was completed...</source>
         <translation>Загрузка расшаренных директорий завершена</translation>
     </message>
+    <message>
+        <source>Client ID: </source>
+        <translation>ID клиента </translation>
+    </message>
+    <message>
+        <source>Number of server files: </source>
+        <translation>Количество файлов на сервере: </translation>
+    </message>
+    <message>
+        <source>Number of server users: </source>
+        <translation>Количество пользователей на сервере: </translation>
+    </message>
 </context>
 <context>
     <name>PeerAdditionDlg</name>

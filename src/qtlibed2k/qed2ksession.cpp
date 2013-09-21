@@ -660,12 +660,12 @@ void QED2KSession::readAlerts()
         }
         else if (libed2k::server_identity_alert* p = dynamic_cast<libed2k::server_identity_alert*>(a.get()))
         {
-            emit serverIdentity(QString::fromUtf8(p->m_strName.c_str(), p->m_strName.size()),
+            emit serverIdentity(p->m_address, QString::fromUtf8(p->m_strName.c_str(), p->m_strName.size()),
                                 QString::fromUtf8(p->m_strDescr.c_str(), p->m_strDescr.size()));
         }
         else if (libed2k::server_message_alert* p = dynamic_cast<libed2k::server_message_alert*>(a.get()))
         {
-            emit serverMessage(QString::fromUtf8(p->m_strMessage.c_str(), p->m_strMessage.size()));
+            emit serverMessage(p->m_address, QString::fromUtf8(p->m_strMessage.c_str(), p->m_strMessage.size()));
         }
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))

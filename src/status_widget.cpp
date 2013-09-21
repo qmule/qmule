@@ -1,4 +1,5 @@
 #include <QDateTime>
+#include <QDebug>
 #include <libed2k/util.hpp>
 #include "status_widget.h"
 
@@ -21,7 +22,13 @@ void status_widget::addLogMessage(QString log_message)
 {
     QDateTime date_time = QDateTime::currentDateTime();
     QString msg = date_time.toString("dd.MM.yyyy hh:mm:ss") + ": " + log_message;
+    qDebug() << "add log message: " << log_message;
     editJournal->appendHtml(msg);
+}
+
+void status_widget::addLogMessage(const QString& net_id, const QString& log_message)
+{
+    addLogMessage("(" + net_id + ")" + log_message);
 }
 
 void status_widget::addHtmlLogMessage(const QString& msg)
@@ -51,29 +58,26 @@ void status_widget::setDisconnectedInfo(const QString& sid)
 void status_widget::updateConnectedInfo()
 {
     editInfo->clear();
+    QTextCharFormat charFormat = editInfo->currentCharFormat();
+    QTextCharFormat charFormatBold = charFormat;
+    charFormatBold.setFontWeight(QFont::Bold);
+    editInfo->setCurrentCharFormat(charFormatBold);
+    editInfo->appendPlainText(tr("eD2K Network"));
+    editInfo->setCurrentCharFormat(charFormat);
+
 
     foreach(QString sid, m_servers.keys())
-    {
-        QTextCharFormat charFormat = editInfo->currentCharFormat();
-        QTextCharFormat charFormatBold = charFormat;
-        charFormatBold.setFontWeight(QFont::Bold);
-
+    {        
         editInfo->setCurrentCharFormat(charFormatBold);
-        editInfo->appendPlainText(tr("eD2K Network"));
-        editInfo->setCurrentCharFormat(charFormat);
-        editInfo->appendPlainText(tr("Status:") + "\t" + tr("connected"));
-        editInfo->appendPlainText(tr("IP:Port:") + "\t");
+        editInfo->appendPlainText("\n" + tr("eD2K Server"));
+        editInfo->setCurrentCharFormat(charFormat);        
+        editInfo->appendPlainText(tr("Name:") + "\t" + m_servers[sid].m_strName);        
+        editInfo->appendPlainText(tr("Description:"));
+        editInfo->appendPlainText(tr("IP:Port:") + "\t" + sid);
         QString num;
         num.setNum(m_servers[sid].m_nClientId);
         editInfo->appendPlainText("ID:\t" + num);
         editInfo->appendPlainText(libed2k::isLowId(m_servers[sid].m_nClientId)?"\tLow ID":"\tHigh ID");
-
-        editInfo->setCurrentCharFormat(charFormatBold);
-        editInfo->appendPlainText("\n" + tr("eD2K Server"));
-        editInfo->setCurrentCharFormat(charFormat);
-        editInfo->appendPlainText(tr("Name:") + "\temule.is74.ru");
-        editInfo->appendPlainText(tr("Description:"));
-        editInfo->appendPlainText(tr("IP:Port:") + "\t" + sid);
         num.setNum(m_servers[sid].m_nUsers);
         editInfo->appendPlainText(tr("Clients:") + "\t" + num);
         num.setNum(m_servers[sid].m_nFiles);
@@ -107,6 +111,12 @@ void status_widget::serverInfo(QString strInfo)
 {
     editServerInfo->insertPlainText("\n");
     editServerInfo->insertPlainText(strInfo);
+}
+
+void status_widget::serverIdentity(const QString& sid, const QString& strIdent)
+{
+    m_servers[sid].m_strName = strIdent;
+    updateConnectedInfo();
 }
 
 void status_widget::serverStatus(const QString& sid, int nFiles, int nUsers)

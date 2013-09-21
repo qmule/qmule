@@ -164,8 +164,8 @@ signals:
         const libed2k::net_identifier& net_id, quint32 client_id, quint32 tcp_flags, quint32 aux_port);
     void serverConnectionClosed(const libed2k::net_identifier& net_id, QString strError);
     void serverStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers);
-    void serverMessage(QString strMessage);
-    void serverIdentity(QString strName, QString strDescription);
+    void serverMessage(const libed2k::net_identifier& net_id, QString strMessage);
+    void serverIdentity(const libed2k::net_identifier& net_id, QString strName, QString strDescription);
     void searchResult(const libed2k::net_identifier& np, const QString& hash, 
                       const std::vector<QED2KSearchResultEntry>& vRes, bool bMoreResult);
 
