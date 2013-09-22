@@ -7356,7 +7356,7 @@ However, those plugins were disabled.</source>
     </message>
     <message>
         <source>Server Info</source>
-        <translation>Информация сервера</translation>
+        <translation>Информация серверов</translation>
     </message>
     <message>
         <source>Journal</source>

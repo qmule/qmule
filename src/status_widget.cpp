@@ -28,7 +28,7 @@ void status_widget::addLogMessage(QString log_message)
 
 void status_widget::addLogMessage(const QString& net_id, const QString& log_message)
 {
-    addLogMessage("(" + net_id + ")" + log_message);
+    addLogMessage("(" + net_id + ") " + log_message);
 }
 
 void status_widget::addHtmlLogMessage(const QString& msg)
@@ -40,6 +40,7 @@ void status_widget::setDisconnectedInfo(const QString& sid)
 {
     m_servers.remove(sid);
 
+    // always set disconnected status, other servers ignore
     if (m_servers.empty())
     {
         editInfo->clear();
@@ -50,6 +51,7 @@ void status_widget::setDisconnectedInfo(const QString& sid)
         editInfo->appendPlainText(tr("eD2K Network"));
         editInfo->setCurrentCharFormat(charFormat);
         editInfo->appendPlainText(tr("Status:") + "\t" + tr("disconnected"));
+        editInfo->setCurrentCharFormat(charFormat);
     }
     else
         updateConnectedInfo();
