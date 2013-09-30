@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QDirIterator>
+#include <QThread>
 
 #include "preferences.h"
 
@@ -1028,6 +1029,8 @@ void QED2KSession::loadFastResumeData()
     }
 }
 
+struct SThread : public QThread { using QThread::sleep; };
+
 void QED2KSession::enableUPnP(bool b)
 {
     QBtSession* btSession = Session::instance()->get_torrent_session();
@@ -1039,6 +1042,7 @@ void QED2KSession::enableUPnP(bool b)
 
     if (upnp) upnp->add_mapping(libtorrent::upnp::tcp, port, port);
     if (natpmp) natpmp->add_mapping(libtorrent::natpmp::tcp, port, port);
+    SThread::sleep(1);
 }
 
 void QED2KSession::startServerConnection()

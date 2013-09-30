@@ -3,6 +3,24 @@
 #include <libed2k/util.hpp>
 #include "status_widget.h"
 
+template<class T>
+class RAI
+{
+private:
+    T* m_owner;
+    QTextCharFormat m_cf;
+public:
+    RAI(T* tb) : m_owner(tb)
+    {
+        m_cf = tb->currentCharFormat();
+    }
+
+    ~RAI()
+    {
+        m_owner->setCurrentCharFormat(m_cf);
+    }
+};
+
 status_widget::status_widget(QWidget *parent)
     : QWidget(parent)
 {
@@ -38,6 +56,8 @@ void status_widget::addHtmlLogMessage(const QString& msg)
 
 void status_widget::setDisconnectedInfo(const QString& sid)
 {
+    RAI<QPlainTextEdit> ri(editInfo);
+    Q_UNUSED(ri);
     m_servers.remove(sid);
 
     // always set disconnected status, other servers ignore
@@ -59,6 +79,8 @@ void status_widget::setDisconnectedInfo(const QString& sid)
 
 void status_widget::updateConnectedInfo()
 {
+    RAI<QPlainTextEdit> ri(editInfo);
+    Q_UNUSED(ri);
     editInfo->clear();
     QTextCharFormat charFormat = editInfo->currentCharFormat();
     QTextCharFormat charFormatBold = charFormat;
@@ -89,6 +111,8 @@ void status_widget::updateConnectedInfo()
 
 void status_widget::serverAddress(QString strServer)
 {
+    RAI<QTextBrowser> ri(editServerInfo);
+    Q_UNUSED(ri);
     m_servers.insert(strServer, server_info());
     updateConnectedInfo();
 
