@@ -22,15 +22,30 @@ class status_bar : public QWidget, public Ui::status_bar
     QIcon imgMsg2;
     QIcon imgEmpty;
 
+    struct server_info {
+        unsigned long m_nClients;
+        unsigned long m_nFiles;
+
+        server_info(unsigned long nClients = 0, unsigned long nFiles = 0):
+            m_nClients(nClients), m_nFiles(nFiles){}
+
+        server_info operator+(server_info si){
+            return server_info(m_nClients + si.m_nClients, m_nFiles + si.m_nFiles);
+        }
+    };
+
+    QMap<QString, server_info> m_servers;
+
 public:
     status_bar(QWidget *parent, QStatusBar *bar);
     ~status_bar();
     void setConnected(bool conn);
     void setUpDown(unsigned long nUp, unsigned long nDown);
-    void setServerInfo(unsigned long nFiles, unsigned long nClients);
+    void setServerInfo(const QString& sid, unsigned long nFiles, unsigned long nClients);
+    void serverInfoChanged();
     void setStatusMsg(QString strMsg);
     void setNewMessageImg(int state);
-    void reset();
+    void reset(const QString& sid);
 
 private slots:
     void doubleClickNewMsg();

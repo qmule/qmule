@@ -1,7 +1,8 @@
-#include "status_bar.h"
 
+#include <numeric>
 #include <QStatusBar>
 
+#include "status_bar.h"
 #include "misc.h"
 
 status_bar::status_bar(QWidget *parent, QStatusBar *bar)
@@ -29,7 +30,7 @@ status_bar::status_bar(QWidget *parent, QStatusBar *bar)
 
     connect(labelMsg, SIGNAL(doubleClicked()), this, SLOT(doubleClickNewMsg()));
 
-    reset();
+    reset(QString());
 }
 
 status_bar::~status_bar()
@@ -62,13 +63,24 @@ void status_bar::setUpDown(unsigned long nUp, unsigned long nDown)
     labelSpeed->setToolTip(text);
 }
 
-void status_bar::setServerInfo(unsigned long nFiles, unsigned long nClients)
+void status_bar::setServerInfo(const QString& sid, unsigned long nFiles, unsigned long nClients)
 {
+    m_servers[sid].m_nFiles += nFiles;
+    m_servers[sid].m_nClients += nClients;
+
+    serverInfoChanged();
+}
+
+void status_bar::serverInfoChanged()
+{
+    QList<server_info> infos = m_servers.values();
+    server_info suminfo = std::accumulate(infos.begin(), infos.end(), server_info());
+
     QString strClients;
     QString strFiles;
 
-    strClients.setNum(nClients);
-    strFiles.setNum(nFiles);
+    strClients.setNum(suminfo.m_nClients);
+    strFiles.setNum(suminfo.m_nFiles);
 
     QString text = tr("Clients: ") + strClients + tr("|Files: ") + strFiles;
     labelInfo->setText(text);
@@ -81,11 +93,13 @@ void status_bar::setStatusMsg(QString strMsg)
     labelServer->setToolTip(strMsg);
 }
 
-void status_bar::reset()
+void status_bar::reset(const QString& sid)
 {
-    setConnected(false);
+    setConnected(!m_servers.empty());
     setUpDown(0, 0);
-    setServerInfo(0, 0);
+
+    m_servers.remove(sid);
+    serverInfoChanged();
 }
 
 void status_bar::setNewMessageImg(int state)

@@ -1577,7 +1577,7 @@ void MainWindow::ed2kConnectionInitialized(
     id.setNum(client_id);
     log_msg += id;
     status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
-    status->clientID(QString::fromUtf8(net_id.toString().c_str()), client_id);
+    status->clientID(misc::toQStringU(net_id.toString()), client_id);
     statusBar->setStatusMsg(log_msg);
 }
 
@@ -1593,8 +1593,8 @@ void MainWindow::ed2kServerStatus(const libed2k::net_identifier& net_id, int nFi
     log_msg += num;
     status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
 
-    status->serverStatus(QString::fromUtf8(net_id.toString().c_str()), nFiles, nUsers);
-    statusBar->setServerInfo(nFiles, nUsers);
+    status->serverStatus(misc::toQStringU(net_id.toString()), nFiles, nUsers);
+    statusBar->setServerInfo(misc::toQStringU(net_id.toString()), nFiles, nUsers);
 }
 
 void MainWindow::ed2kServerMessage(const libed2k::net_identifier& net_id, QString strMessage)
@@ -1607,13 +1607,13 @@ void MainWindow::ed2kIdentity(const libed2k::net_identifier& net_id, QString str
 {
     status->addLogMessage(misc::toQStringU(net_id.toString()), strName);
     status->addLogMessage(misc::toQStringU(net_id.toString()), strDescription);
-    status->serverIdentity(QString::fromUtf8(net_id.toString().c_str()), strName);
+    status->serverIdentity(misc::toQStringU(net_id.toString()), strName);
 }
 
 void MainWindow::ed2kConnectionClosed(const libed2k::net_identifier& net_id, QString strError)
 {
     status->addLogMessage(misc::toQStringU(net_id.toString()), strError);
-    setDisconnectedStatus(QString::fromUtf8(net_id.toString().c_str()));
+    setDisconnectedStatus(misc::toQStringU(net_id.toString()));
     statusBar->setStatusMsg(strError);
 }
 
@@ -1677,7 +1677,7 @@ void MainWindow::setDisconnectedStatus(const QString& sid)
     actionConnect->setText(tr("Connecting"));
     connectioh_state = csDisconnected;
     status->setDisconnectedInfo(sid);
-    statusBar->reset();
+    statusBar->reset(sid);
     icon_CurTray = icon_TrayDisconn;
     if (systrayIcon) {
         systrayIcon->setIcon(getSystrayIcon());
