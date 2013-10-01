@@ -85,12 +85,40 @@ void status_bar::serverInfoChanged()
     QString text = tr("Clients: ") + strClients + tr("|Files: ") + strFiles;
     labelInfo->setText(text);
     labelInfo->setToolTip(text);
+
+    QString msg(tr("Client ID: "));
+    QString ids;
+
+    foreach(server_info si, infos)
+    {
+        QString id;
+        id.setNum(si.m_nClientID);
+        if (!ids.isEmpty()) ids += QString("|");
+        ids += id;
+    }
+    setStatusMsg(msg + ids);
 }
 
 void status_bar::setStatusMsg(QString strMsg)
 {
     labelServer->setText(strMsg);
     labelServer->setToolTip(strMsg);
+}
+
+void status_bar::setClientID(const QString& sid, quint32 nClientID)
+{
+    m_servers[sid].m_nClientID = nClientID;
+    serverInfoChanged();
+}
+
+void status_bar::setDisconnected(const QString& sid, const QString& strError)
+{
+    m_servers.remove(sid);
+
+    if (m_servers.empty())
+        setStatusMsg(strError);
+    else 
+        serverInfoChanged();
 }
 
 void status_bar::reset(const QString& sid)

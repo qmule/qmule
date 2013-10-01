@@ -1578,7 +1578,7 @@ void MainWindow::ed2kConnectionInitialized(
     log_msg += id;
     status->addLogMessage(misc::toQStringU(net_id.toString()), log_msg);
     status->clientID(misc::toQStringU(net_id.toString()), client_id);
-    statusBar->setStatusMsg(log_msg);
+    statusBar->setClientID(misc::toQStringU(net_id.toString()), client_id);
 }
 
 void MainWindow::ed2kServerStatus(const libed2k::net_identifier& net_id, int nFiles, int nUsers)
@@ -1614,7 +1614,7 @@ void MainWindow::ed2kConnectionClosed(const libed2k::net_identifier& net_id, QSt
 {
     status->addLogMessage(misc::toQStringU(net_id.toString()), strError);
     setDisconnectedStatus(misc::toQStringU(net_id.toString()));
-    statusBar->setStatusMsg(strError);
+    statusBar->setDisconnected(misc::toQStringU(net_id.toString()), strError);
 }
 
 

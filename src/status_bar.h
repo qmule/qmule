@@ -25,9 +25,10 @@ class status_bar : public QWidget, public Ui::status_bar
     struct server_info {
         unsigned long m_nClients;
         unsigned long m_nFiles;
+        quint32 m_nClientID;
 
         server_info(unsigned long nClients = 0, unsigned long nFiles = 0):
-            m_nClients(nClients), m_nFiles(nFiles){}
+            m_nClients(nClients), m_nFiles(nFiles), m_nClientID(0){}
 
         server_info operator+(server_info si){
             return server_info(m_nClients + si.m_nClients, m_nFiles + si.m_nFiles);
@@ -43,6 +44,8 @@ public:
     void setUpDown(unsigned long nUp, unsigned long nDown);
     void setServerInfo(const QString& sid, unsigned long nFiles, unsigned long nClients);
     void serverInfoChanged();
+    void setClientID(const QString& sid, quint32 nClientID);
+    void setDisconnected(const QString& sid, const QString& strError);
     void setStatusMsg(QString strMsg);
     void setNewMessageImg(int state);
     void reset(const QString& sid);
