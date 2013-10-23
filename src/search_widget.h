@@ -130,6 +130,7 @@ private:
     QIcon iconUser;
 
     QWebView* torrentSearchView;
+//    QPushButton *clearHistorySearch;
 
 public:
     search_widget(QWidget *parent = 0);
@@ -199,6 +200,7 @@ private slots:
     void torrentSearchFinished(bool ok);
     void addedTransfer(Transfer t);
     void deletedTransfer(const QString& hash);
+    void clearSearchHistory();
 
 signals:
     void sendMessage(const QString& user_name, const libed2k::net_identifier& np);

@@ -527,6 +527,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="clearHistorySearch">
+       <property name="text">
+        <string>Clear Search history</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnCloseAll">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

@@ -1479,6 +1479,13 @@ public:
   void setTrayIconStyle(TrayIcon::Style style) {
     setValue(QString::fromUtf8("Preferences/Advanced/TrayIconStyle"), style);
   }
+  void setStatusStartPage(bool enabled) {
+    setValue(QString::fromUtf8("Preferences/General/StatusStartPage"), enabled);
+  }
+  bool getStatusStartPage() {
+    return value(QString::fromUtf8("Preferences/General/StatusStartPage")).toBool();
+  }
+
 };
 
 #endif // PREFERENCES_H

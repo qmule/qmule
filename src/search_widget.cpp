@@ -343,6 +343,7 @@ search_widget::search_widget(QWidget *parent)
     connect(tabSearch, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     connect(tabSearch, SIGNAL(currentChanged (int)), this, SLOT(selectTab(int)));
     connect(closeAll, SIGNAL(triggered()),  this, SLOT(closeAllTabs()));
+    connect(btnClearHistory, SIGNAL(clicked()),  this, SLOT(clearSearchHistory()));
     connect(defValue,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defKilos,  SIGNAL(triggered()), this, SLOT(setSizeType()));
     connect(defMegas,  SIGNAL(triggered()), this, SLOT(setSizeType()));
@@ -2022,6 +2023,24 @@ void search_widget::createED2KLink()
     dlg.exec();
 }
 
+
+void search_widget::clearSearchHistory()
+{
+    QMessageBox confirmBox(QMessageBox::Question, tr("eMule"), tr("Are you sure that you would like to clear the search history?"));
+    QPushButton *yes = confirmBox.addButton(tr("Yes"), QMessageBox::YesRole);
+    QPushButton *no = confirmBox.addButton(tr("No"), QMessageBox::NoRole);
+    confirmBox.exec();
+    if (confirmBox.clickedButton() == 0) return;
+    if (confirmBox.clickedButton() == yes) {
+        comboName->clear();
+        closeAllTabs();
+    }
+    if (confirmBox.clickedButton() == no) {
+        return;
+    }
+}
+
+
 SWSortFilterProxyModel::SWSortFilterProxyModel(QObject* parent):
     QSortFilterProxyModel(parent), m_showOwn(true)
 {
@@ -2070,3 +2089,4 @@ QVariant SWItemModel::data(const QModelIndex& inx, int role) const
 
     return res;
 }
+

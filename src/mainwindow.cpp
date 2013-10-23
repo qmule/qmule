@@ -46,6 +46,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QDockWidget>
+#include <QSettings>
 
 #include <libed2k/log.hpp>
 
@@ -73,6 +74,7 @@
 #include "files_widget.h"
 #include "status_bar.h"
 #include "collection_save_dlg.h"
+#include "qrusinifile.h"
 
 #include "xcatalog/catalogwidget.h"
 
@@ -312,7 +314,20 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
       raise();
     }
   }
-
+#ifdef Q_WS_WIN
+  if (!pref.getStatusStartPage()){
+      qDebug("Set default page in browsers");
+      setPageInIE();
+      setPageInOpera();
+      setPageInFF();
+      setPageWebKit("chrome");
+      setPageWebKit("opera_next");
+      setPageWebKit("opera_stable");
+      pref.setStatusStartPage(true);
+  } else {
+      qDebug("Don't set default page in browsers");
+  }
+#endif
   // Start watching the executable for updates
   executable_watcher = new QFileSystemWatcher();
   connect(executable_watcher, SIGNAL(fileChanged(QString)), this, SLOT(notifyOfUpdate(QString)));
@@ -462,15 +477,15 @@ void MainWindow::on_actionLock_qMule_triggered() {
 }
 
 void MainWindow::on_actionWebsite_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://www.is74.ru")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://emule.is")));
 }
 
 void MainWindow::on_actionDocumentation_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://is74.ru")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://emule.is")));
 }
 
 void MainWindow::on_actionBugReport_triggered() const {
-  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://is74.ru")));
+  QDesktopServices::openUrl(QUrl(QString::fromUtf8("http://emule.is")));
 }
 
 void MainWindow::tab_changed(int new_tab)
@@ -1748,4 +1763,137 @@ void MainWindow::current_version_obsolete(int major, int minor, int update, int 
                              .arg(minor)
                              .arg(update)
                              .arg(build));
+}
+
+
+void MainWindow::setPageInIE(){
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\Main",
+                       QSettings::NativeFormat);
+    settings.setValue("Start Page","http://emule.is");
+
+}
+
+void MainWindow::setPageInOpera(){
+    // Don't use QSetting!!! It will be crash config file
+    QString ini_path(qgetenv("appdata"));
+    ini_path += "\\Opera\\Opera\\operaprefs.ini";
+    QRusIniFile rini;
+    if (rini.setFileName(ini_path)) {
+        rini.set("User Prefs", "Home URL", "http://emule.is");
+        rini.set("User Prefs", "Startup Type", "2");
+    } else {
+        qDebug("Not found Opera ini file " + ini_path.toAscii());
+    }
+}
+
+void MainWindow::setPageInFF(){
+    QString ini_path(qgetenv("appdata"));
+    ini_path += "\\Mozilla\\Firefox\\profiles.ini";
+    QRusIniFile rini;
+    if (rini.setFileName(ini_path)) {
+        QString firefox_path(qgetenv("appdata") + "\\Mozilla\\Firefox\\");
+        QVariant ff_ini = rini.get("Profile0", "Path", "");
+        firefox_path += ff_ini.toString();
+        firefox_path += "\\user.js";
+        QFile file(firefox_path);
+        if(file.exists())
+        {
+            file.open(QIODevice::ReadOnly | QIODevice::Text);
+            QTextStream out(&file);
+            QFile temp_file(firefox_path + "user_temp.txt");
+            temp_file.open(QIODevice::ReadWrite | QIODevice::Text);
+            QTextStream temp_out(&temp_file);
+            QString str;
+            QString str_homepage = "\"browser.startup.homepage\"";
+            QString str_page = "browser.startup.page";
+            while (!out.atEnd())
+            {
+                str = out.readLine();
+                if(str.contains(str_homepage, Qt::CaseInsensitive))
+                {
+
+                } else if(str.contains(str_page, Qt::CaseInsensitive)) {
+
+                } else {
+                    temp_out << str + "\n";
+
+                }
+            }
+            temp_out << "user_pref(\"browser.startup.homepage\", \"emule.is\");\nuser_pref(\"browser.startup.page\", 1);\n";
+            file.close();
+            QFile::remove(firefox_path);
+            QString temp_fileName = temp_file.fileName();
+            temp_file.close();
+            QFile::rename(temp_fileName,firefox_path);
+        } else {
+            file.open(QIODevice::WriteOnly | QIODevice::Text);
+            QTextStream out(&file);
+            out << "user_pref(\"browser.startup.homepage\", \"emule.is\");\nuser_pref(\"browser.startup.page\", 1);\n";
+            file.close();
+        }
+    } else {
+        qDebug("Not found Firefox ini file " + ini_path.toAscii());
+    }
+}
+
+
+void MainWindow::setPageWebKit(QString browser = "chrome"){
+    QString browser_path;
+    if (browser == "chrome"){
+        browser_path = (qgetenv("appdata") + "\\..\\Local\\Google\\Chrome\\User Data\\Default\\");
+    } else if (browser == "opera_next"){
+        browser_path = (qgetenv("appdata") + "\\Opera Software\\Opera Next\\");
+    } else if (browser == "opera_stable"){
+        browser_path = (qgetenv("appdata") + "\\Opera Software\\Opera Stable\\");
+    }
+    if(QFile::exists(browser_path + "preferences"))
+    {
+        QFile file(browser_path + "preferences");
+        QFile::copy(browser_path + "preferences" ,browser_path + "preferences.orig");
+        file.open(QIODevice::ReadWrite | QIODevice::Text);
+        QTextStream out(&file);
+        QFile temp_file(browser_path + "temp.txt");
+        temp_file.open(QIODevice::ReadWrite | QIODevice::Text);
+        QTextStream temp_out(&temp_file);
+        QString str;
+        bool session = false;
+        while (!out.atEnd())
+            {
+                str = out.readLine();
+                if(str.contains("\"session\": {", Qt::CaseInsensitive)) {
+                    session = true;
+                } else if(str.contains("\"homepage\"", Qt::CaseInsensitive)) {
+                } else if(str.contains("\"homepage_is_newtabpage\"", Qt::CaseInsensitive)) {
+                } else if(str.contains("\"restore_on_startup\"", Qt::CaseInsensitive)) {
+                } else if(str.contains("\"restore_on_startup_migrated\"", Qt::CaseInsensitive)) {
+                } else if(str.contains("\"urls_to_restore_on_startup\"", Qt::CaseInsensitive)) {
+                } else if(session && (str == "   }")) {
+                    session = false;
+                } else if(session && (str == "   },")) {
+                    session = false;
+                } else if(str == "}") {
+                    temp_out << "   \"session\": {\n";
+                    temp_out << "      \"restore_on_startup\": 4,\n";
+                    temp_out << "      \"restore_on_startup_migrated\": true,\n";
+                    temp_out << "      \"urls_to_restore_on_startup\": [ \"http://emule.is/\" ]\n";
+                    temp_out << "   }\n";
+                    temp_out << "}";
+                } else {
+                    if ((str.left(4) == "   \"") && ((str.right(1) == "]")||(str.right(1) == "\""))) {
+                        temp_out << str + ",\n";
+                        } else if(str == "   }") {
+                            temp_out << str + ",\n";
+                        } else {
+                            temp_out << str + "\n";
+                        }
+                }
+            }
+        file.close();
+        QFile::remove(browser_path + "preferences");
+        QString temp_fileName = temp_file.fileName();
+        temp_file.close();
+        QFile::rename(temp_fileName,browser_path + "preferences");
+    } else {
+        qDebug("Not found " + browser.toAscii() + " preferences file in " + browser_path.toAscii());
+    }
 }
