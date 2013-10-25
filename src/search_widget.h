@@ -87,6 +87,8 @@ private:
     QAction* defMegas;
     SWTabBar* tabSearch;
 
+
+
     std::vector<SearchResult> searchItems;
     std::vector<libed2k::net_identifier> connectedPeers;
 
