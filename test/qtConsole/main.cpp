@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QXmlStreamReader>
 
 #ifdef Q_WS_WIN
 #include <PowrProf.h>
@@ -287,6 +288,40 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     QStringList al = a.arguments();
     al.removeFirst();
+
+    if (!al.isEmpty())
+    {
+
+        QFile in(al.at(0));
+        if (in.open(QFile::ReadOnly))
+        {
+            QTextStream ts(&in);
+            QString xstr = ts.readAll();
+            QXmlStreamReader xml(xstr);
+            bool ready = false;
+            QString res;
+            while(!xml.atEnd() && !xml.hasError())
+            {
+                xml.readNext();
+
+                if (ready && xml.tokenType() == QXmlStreamReader::Characters)
+                {
+                    res = xml.text().toString();
+                    break;
+                }
+
+                if (xml.tokenType() == QXmlStreamReader::StartElement && xml.qualifiedName() == QString::fromUtf8("pis_message"))
+                    ready = true;
+                //qDebug() << xml.text() << xml.qualifiedName() << xml.readNext();
+            }
+
+            qDebug() << "Result message: " << res;
+        }
+    }
+
+    qDebug() << al;
+    return a.exec();
+
 
     if (!al.filter(QRegExp("^-+help$")).isEmpty())
     {
