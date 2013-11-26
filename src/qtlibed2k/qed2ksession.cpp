@@ -23,7 +23,7 @@
 #include <libtorrent/natpmp.hpp>
 #include "transport/session.h"
 
-#define RD_SINGLE
+//#define RD_SINGLE
 
 using namespace libed2k;
 
@@ -775,9 +775,10 @@ void QED2KSession::readAlerts()
             if (!m_fast_resume_transfers.empty())
             {
                 remove_by_state();
+
                 if (m_fast_resume_transfers.empty())
                 {
-                    emit fastResumeDataLoadCompleted();
+                    //emit fastResumeDataLoadCompleted();
                 }
             }
         }
@@ -816,7 +817,7 @@ void QED2KSession::readAlerts()
 
                 if (m_fast_resume_transfers.empty())
                 {
-                    emit fastResumeDataLoadCompleted();
+                    //emit fastResumeDataLoadCompleted();
                 }                
             }
 
@@ -1115,6 +1116,8 @@ void QED2KSession::loadFastResumeData()
         // no fast resume data found - session ready for share
         emit fastResumeDataLoadCompleted();
     }
+
+    emit fastResumeDataLoadCompleted();
 }
 
 void QED2KSession::enableUPnP(bool b)

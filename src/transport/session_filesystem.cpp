@@ -56,7 +56,7 @@ void FileNode::create_transfer()
     }
 }
 
-void FileNode::share(bool recursive)
+void FileNode::share(bool recursive, bool share_files/* = true*/)
 {
     Q_UNUSED(recursive);
     if (m_active) return;
@@ -266,7 +266,7 @@ DirNode::~DirNode()
     foreach(DirNode* p, m_dir_children.values()) { delete p; }
 }
 
-void DirNode::share(bool recursive)
+void DirNode::share(bool recursive, bool share_files /* = true*/)
 {
     if (!m_active)
     {
@@ -277,9 +277,12 @@ void DirNode::share(bool recursive)
         // we can re-share files were unshared after directory was shared        
         populate(true);  // re-scan directory
 
-        foreach(FileNode* p, m_file_children.values())
+        if (share_files)
         {
-            p->share(recursive);
+            foreach(FileNode* p, m_file_children.values())
+            {
+                p->share(recursive);
+            }
         }
 
         // update state on all children

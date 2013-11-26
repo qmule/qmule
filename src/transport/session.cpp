@@ -828,7 +828,7 @@ void Session::loadFileSystem()
         if (dir_node != &m_root)
         {
             qDebug() << "load shared directory: " << dir_node->filepath();
-            dir_node->share(false);
+            dir_node->share(false, false); // do not share files!
             QDir filepath(item.first);
 
             for(int i = 0; i < item.second.size(); ++i)

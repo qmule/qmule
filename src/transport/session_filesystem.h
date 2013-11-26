@@ -27,7 +27,7 @@ public:
     FileNode(DirNode* parent, const QFileInfo& info);
     virtual ~FileNode();
 
-    virtual void share(bool recursive);
+    virtual void share(bool recursive, bool share_files = true);
     virtual void unshare(bool recursive);
     virtual bool has_metadata() const { return m_atp != NULL; }
     virtual bool has_transfer() const { return !m_hash.isEmpty(); }
@@ -83,7 +83,7 @@ public:
     virtual bool contains_active_children() const;
     virtual bool all_active_children() const;
 
-    virtual void share(bool recursive);
+    virtual void share(bool recursive, bool share_files = true);
     virtual void unshare(bool recursive);
     void deleteTransfer();
 
