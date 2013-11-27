@@ -478,6 +478,11 @@ void Session::on_transferAboutToBeRemoved(const Transfer& t, bool del_files)
         }
     }
 
+    if (m_h2f_dict.contains(t.hash()))
+    {
+        m_h2f_dict.remove(t.hash());
+    }
+
     emit transferAboutToBeRemoved(t, del_files);
 
 }
