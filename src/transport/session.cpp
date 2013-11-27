@@ -525,9 +525,16 @@ void Session::on_registerNode(Transfer t)
 {        
     if (!m_files.contains(t.hash()))
     {
-        FileNode* n = NULL;
+        // ok, attempt to load file node from global dictionary
+        FileNode* n = m_h2f_dict.value(t.hash(), NULL);
         qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
-        n = node(t.absolute_files_path().at(0));
+        if (!n)
+            n = node(t.absolute_files_path().at(0));
+        else
+        {
+            qDebug() << "associate by dictionary succesfull on hash: " << t.hash();
+        }
+
         Q_ASSERT(n != &m_root);
         if (n != &m_root)
             n->on_transfer_finished(t);
@@ -599,7 +606,7 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
-FileNode* Session::node(const QString& filepath)
+FileNode* Session::node(const QString& filepath, const QHash<QString, QString>* pdict/* = NULL*/)
 {
     qDebug() << "node: " << filepath;
     if (filepath.isEmpty() || filepath == tr("My Computer") ||
@@ -714,7 +721,7 @@ FileNode* Session::node(const QString& filepath)
         else if (info.isDir())
         {
             p = new DirNode(parent, info);
-            ((DirNode*)p)->populate();
+            ((DirNode*)p)->populate(false, pdict);
             parent->add_node(p);
         }
     }
@@ -777,6 +784,23 @@ void Session::saveFileSystem()
         }
 
         pref.endArray();
+        // transfer links
+        pref.beginWriteArray("TransferLinks");
+        int nf_index = 0;
+        foreach(FileNode* pnf, p->files())
+        {
+            if (pnf->has_transfer())
+            {
+                pref.setArrayIndex(nf_index);
+                QString lstr = pnf->hash() +  pnf->filename();
+                pref.setValue("TFLink", lstr);
+                qDebug() << "save link: " << lstr;
+                ++nf_index;
+            }
+        }
+
+        pref.endArray();
+
         ++dir_indx;
     }
 
@@ -797,10 +821,9 @@ void Session::loadFileSystem()
     vf.resize(dcount);
 
     for (int i = 0; i < dcount; ++i)
-    {
-
+    {    
         pref.setArrayIndex(i);
-        vf[i].first = pref.value("Path").toString();
+        vf[i].first = pref.value("Path").toString();        
 
         int fcount = pref.beginReadArray("ExcludeFiles");
         vf[i].second.resize(fcount);
@@ -812,7 +835,22 @@ void Session::loadFileSystem()
         }
 
         pref.endArray();
+        QHash<QString, QString> dict;
 
+        // load transfer links
+        fcount = pref.beginReadArray("TransferLinks");
+
+        for (int j = 0; j < fcount; ++ j)
+        {
+            pref.setArrayIndex(j);
+            QString lstr = pref.value("TFLink").toString();
+            dict.insert(lstr.right(lstr.length() - 32), lstr.left(32));
+            qDebug() << "load link: " << lstr.left(32) << ":" <<  lstr.right(lstr.length() - 32);
+        }
+
+        pref.endArray();
+
+        FileNode* dir_node = node(vf[i].first, &dict);
     }
 
     pref.endArray();

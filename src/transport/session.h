@@ -78,6 +78,7 @@ public:
     DirNode* root() { return &m_root; }
     std::set<DirNode*>& directories() { return m_dirs; }
     QHash<QString, FileNode*>& files() { return m_files; }
+    QHash<QString, FileNode*>& h2f_dict() { return m_h2f_dict; }
 
 public slots:
     void playPendingMedia();
@@ -147,7 +148,7 @@ private:
     void removeDirectory(DirNode* dir);
     void setDirectLink(const QString& hash, DirNode* node);
     void registerNode(FileNode*);
-    FileNode* node(const QString& filepath);
+    FileNode* node(const QString& filepath, const QHash<QString, QString>* pdict = NULL);
 
     // emitters
     void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
@@ -174,6 +175,7 @@ private:
     QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
     std::set<DirNode*>          m_dirs;     // shared directories
     QString                     m_incoming; // incoming filepath
+    QHash<QString, FileNode*>   m_h2f_dict; // transfer hash to file dictionary
 
     friend class DirNode;
     friend class FileNode;

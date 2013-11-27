@@ -617,7 +617,12 @@ QStringList DirNode::exclude_files() const
     return res;
 }
 
-void DirNode::populate(bool force /* = false*/)
+const QList<FileNode*>& DirNode::files() const
+{
+    return m_file_vector;
+}
+
+void DirNode::populate(bool force /* = false*/, const QHash<QString, QString>* pdict /*= NULL*/)
 {
     if (m_populated && !force) return;
 
@@ -669,7 +674,17 @@ void DirNode::populate(bool force /* = false*/)
             if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()) &&
                 !incompleteFiles.contains(fileInfo.filePath()))
             {
-                add_node(new FileNode(this, fileInfo));
+                FileNode* pfn = new FileNode(this, fileInfo);
+                qDebug() << "search link for: " << fileInfo.fileName();
+
+                if (pdict && pdict->contains(fileInfo.fileName()))
+                {
+                    QString hash = pdict->value(fileInfo.fileName(), QString(""));
+                    qDebug() << "assign node to hash: " << hash;
+                    Session::instance()->h2f_dict().insert(hash, pfn);
+                }
+
+                add_node(pfn);
                 continue;
             }
         }

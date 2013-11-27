@@ -95,13 +95,14 @@ public:
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);
     void delete_node(const FileNode* node);
-    QStringList exclude_files() const;
+    QStringList exclude_files() const;  
+    const QList<FileNode*>& files() const;
     virtual qint64 size_on_disk() const { return 0; }
 
     /**
       * pupulate directory with items no_share status
      */
-    void populate(bool force = false);
+    void populate(bool force = false, const QHash<QString, QString>* pdict = NULL);
 
     bool is_populated() const { return m_populated; }
 
@@ -130,6 +131,7 @@ public:
     QHash<QString, DirNode*>    m_dir_children;
     QList<FileNode*>            m_file_vector;
     QList<DirNode*>             m_dir_vector;
+    QHash<QString, QString>     m_f2h_dict; // this uses for get transfer hash by name on load stage
 };
 
 
