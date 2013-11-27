@@ -82,6 +82,7 @@ public:
     void super_seeding(bool ss) const;
     void set_sequential_download(bool sd) const;
     void save_resume_data() const;
+    bool need_save_resume_data() const;
     void set_upload_mode(bool b) const;
 
 private:

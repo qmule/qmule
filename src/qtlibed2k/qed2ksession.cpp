@@ -864,19 +864,20 @@ void QED2KSession::saveTempFastResumeData()
 {
     std::vector<libed2k::transfer_handle> transfers =  m_session->get_transfers();
 
-    for (std::vector<libed2k::transfer_handle>::iterator th_itr = transfers.begin(); th_itr != transfers.end(); ++th_itr)
+    for (std::vector<libed2k::transfer_handle>::iterator th_itr = transfers.begin();
+         th_itr != transfers.end(); ++th_itr)
     {
         QED2KHandle h = QED2KHandle(*th_itr);
 
         try
         {
-            if (!h.is_valid() || !h.has_metadata()) continue;
-
-            if (h.state() == qt_checking_files ||
-                  h.state() == qt_queued_for_checking) continue;
-
-            qDebug("Saving fastresume data for %s", qPrintable(h.name()));
-            h.save_resume_data();
+            if (h.is_valid() && h.has_metadata() &&
+                h.state() != qt_checking_files && h.state() != qt_queued_for_checking &&
+                h.need_save_resume_data())
+            {
+                qDebug("Saving fastresume data for %s", qPrintable(h.name()));
+                h.save_resume_data();
+            }
         }
         catch(std::exception&)
         {}
@@ -909,8 +910,11 @@ void QED2KSession::saveFastResumeData()
                 continue;
             }
 
-            h.save_resume_data();
-            ++num_resume_data;
+            if (h.need_save_resume_data())
+            {
+                h.save_resume_data();
+                ++num_resume_data;
+            }
         }
         catch(libed2k::libed2k_exception& e)
         {
@@ -1102,13 +1106,13 @@ void QED2KSession::loadFastResumeData()
                             qDebug() << "file not exists: " << qfi.fileName();
                         }
                     }
+                    else // bad file
+                        QFile::remove(file_abspath);
                 }
             }
             catch(const libed2k::libed2k_exception&)
             {}
         }
-
-        QFile::remove(file_abspath);
     }
 #endif
     if (m_fast_resume_transfers.empty())
