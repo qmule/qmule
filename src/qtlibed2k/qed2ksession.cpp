@@ -23,8 +23,6 @@
 #include <libtorrent/natpmp.hpp>
 #include "transport/session.h"
 
-//#define RD_SINGLE
-
 using namespace libed2k;
 
 /* Converts a QString hash into a  libed2k md4_hash */
@@ -771,15 +769,13 @@ void QED2KSession::readAlerts()
         else if (libed2k::added_transfer_alert* p =
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
-            emit addedTransfer(Transfer(QED2KHandle(p->m_handle)));
-            if (!m_fast_resume_transfers.empty())
-            {
-                remove_by_state();
+            Transfer t(QED2KHandle(p->m_handle));
+            emit addedTransfer(t);
 
-                if (m_fast_resume_transfers.empty())
-                {
-                    //emit fastResumeDataLoadCompleted();
-                }
+            m_fast_resume_transfers.remove(t.hash());
+            if (m_fast_resume_transfers.empty())
+            {
+                emit fastResumeDataLoadCompleted();
             }
         }
         else if (libed2k::paused_transfer_alert* p =
@@ -810,16 +806,7 @@ void QED2KSession::readAlerts()
             if (t.is_seed())
                 emit registerNode(t);
 
-            if (!m_fast_resume_transfers.empty())
-            {
-                m_fast_resume_transfers.remove(t.hash());
-                remove_by_state();
-
-                if (m_fast_resume_transfers.empty())
-                {
-                    //emit fastResumeDataLoadCompleted();
-                }                
-            }
+            m_fast_resume_transfers.remove(t.hash());
 
             Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
@@ -827,9 +814,7 @@ void QED2KSession::readAlerts()
         }
         else if (libed2k::save_resume_data_alert* p = dynamic_cast<libed2k::save_resume_data_alert*>(a.get()))
         {
-#ifndef RD_SINGLE
             writeResumeData(p);
-#endif
         }
         else if (libed2k::transfer_params_alert* p = dynamic_cast<libed2k::transfer_params_alert*>(a.get()))
         {
@@ -921,11 +906,7 @@ void QED2KSession::saveFastResumeData()
             qDebug() << "exception on request saving " << misc::toQStringU(e.what());
         }
     }
-#ifdef RD_SINGLE
-    QDir libed2kBackup(misc::ED2KBackupLocation());
-    const QString filepath = libed2kBackup.absoluteFilePath("resume.single");
-    std::ofstream single(filepath.toLocal8Bit(), std::ios_base::out | std::ios_base::binary);
-#endif
+
     int real_num = 0;
     while (num_resume_data > 0)
     {
@@ -956,12 +937,8 @@ void QED2KSession::saveFastResumeData()
         else if (libed2k::save_resume_data_alert const* rd = dynamic_cast<libed2k::save_resume_data_alert const*>(a))
         {
             --num_resume_data;
-#ifdef RD_SINGLE
-            if (writeResumeDataOne(single, rd))
-                ++real_num;
-#else
             writeResumeData(rd);
-#endif
+
             try
             {
                 delegate()->remove_transfer(rd->m_handle);
@@ -974,74 +951,11 @@ void QED2KSession::saveFastResumeData()
 
         delegate()->pop_alert();
     }
-#ifdef RD_SINGLE
-    // tentative write count items
-    Preferences().setValue("Preferences/RDCount", real_num);
-#endif
 }
 
 void QED2KSession::loadFastResumeData()
 {
     qDebug("load fast resume data");
-#ifdef RD_SINGLE
-    int real_num = Preferences().value("Preferences/RDCount", 0).toInt();
-    qDebug() << "real count " << real_num;
-    QDir libed2kBackup(misc::ED2KBackupLocation());
-    const QString filepath = libed2kBackup.absoluteFilePath("resume.single");
-
-    {
-        std::ifstream single(filepath.toLocal8Bit(), std::ios_base::in | std::ios_base::binary);
-
-        if (single)
-        {
-            for(int i = 0; i < real_num; ++i)
-            {
-                try
-                {
-                    qDebug() << "load index " << i;
-                    libed2k::transfer_resume_data trd;
-                    libed2k::archive::ed2k_iarchive ia(single, true);
-                    ia >> trd;
-                    // add transfer
-                    libed2k::add_transfer_params params;
-                    params.seed_mode = false;
-                    params.file_path = trd.m_filepath.m_collection;
-                    params.file_size = trd.m_filesize;
-                    params.file_hash = trd.m_hash;
-
-                    if (trd.m_fast_resume_data.count() > 0)
-                    {
-                        params.resume_data = const_cast<std::vector<char>* >(&trd.m_fast_resume_data.getTagByNameId(libed2k::FT_FAST_RESUME_DATA)->asBlob());
-                    }
-
-                    QFileInfo qfi(QString::fromUtf8(trd.m_filepath.m_collection.c_str()));
-
-                    // add transfer only when file still exists
-                    if (qfi.exists() && qfi.isFile())
-                    {
-                        QED2KHandle h(delegate()->add_transfer(params));
-                        m_fast_resume_transfers.insert(h.hash(), h);
-                    }
-                    else
-                    {
-                        qDebug() << "file not exists: " << qfi.fileName();
-                    }
-                }
-                catch(const libed2k::libed2k_exception&)
-                {
-                    qDebug() << "exception on load";
-                }
-            }
-        }
-        else
-        {
-            qDebug() << "file is not exist";
-        }
-
-    }
-
-    QFile::remove(filepath);
-#else
 
     // avoid load collections from previous fail
     QDir bkp_dir(misc::ED2KCollectionLocation());
@@ -1066,7 +980,8 @@ void QED2KSession::loadFastResumeData()
         qDebug("Trying to load fastresume data: %s", qPrintable(file));
         const QString file_abspath = fastresume_dir.absoluteFilePath(file);
         // extract hash from name
-        libed2k::md4_hash hash = libed2k::md4_hash::fromString(file.toStdString().substr(0, libed2k::MD4_HASH_SIZE*2));
+        libed2k::md4_hash hash = libed2k::md4_hash::fromString(
+            file.toStdString().substr(0, libed2k::MD4_HASH_SIZE*2));
 
         if (hash.defined())
         {
@@ -1091,7 +1006,8 @@ void QED2KSession::loadFastResumeData()
 
                         if (trd.m_fast_resume_data.count() > 0)
                         {
-                            params.resume_data = const_cast<std::vector<char>* >(&trd.m_fast_resume_data.getTagByNameId(libed2k::FT_FAST_RESUME_DATA)->asBlob());
+                            params.resume_data = const_cast<std::vector<char>* >(
+                                &trd.m_fast_resume_data.getTagByNameId(libed2k::FT_FAST_RESUME_DATA)->asBlob());
                         }
 
                         QFileInfo qfi(QString::fromUtf8(trd.m_filepath.m_collection.c_str()));
@@ -1114,14 +1030,6 @@ void QED2KSession::loadFastResumeData()
             {}
         }
     }
-#endif
-    if (m_fast_resume_transfers.empty())
-    {
-        // no fast resume data found - session ready for share
-        emit fastResumeDataLoadCompleted();
-    }
-
-    emit fastResumeDataLoadCompleted();
 }
 
 void QED2KSession::enableUPnP(bool b)
@@ -1166,26 +1074,6 @@ void QED2KSession::makeTransferParametersAsync(const QString& filepath)
 void QED2KSession::cancelTransferParameters(const QString& filepath)
 {
     delegate()->cancel_transfer_parameters(filepath.toUtf8().constData());
-}
-
-void QED2KSession::remove_by_state()
-{
-    // begin analize states
-    QHash<QString, Transfer>::iterator i = m_fast_resume_transfers.begin();
-
-    while (i != m_fast_resume_transfers.end())
-    {
-        if (!i.value().is_valid() ||
-                (i.value().state() == qt_downloading))
-        {
-            qDebug() << "remove state " << i.value().hash() << " is valid " << i.value().is_valid();
-            i = m_fast_resume_transfers.erase(i);
-        }
-        else
-        {
-            ++i;
-        }
-    }
 }
 
 std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeTransferParameters(const QString& filepath) const
