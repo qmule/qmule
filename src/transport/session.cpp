@@ -520,10 +520,38 @@ void Session::saveFastResumeData()
     m_edSession.saveFastResumeData();
 }
 
-void Session::on_ED2KResumeDataLoaded()
+void Session::loadSharedFileSystemNotify()
 {
     emit beginLoadSharedFileSystem();
     loadFileSystem();
+}
+
+void Session::on_ED2KResumeDataLoaded()
+{    
+    Preferences pref;
+    // migrate after session ready!
+    if (pref.isMigrationStage())
+    {
+        share(m_incoming, false);
+        qDebug() << "on migration stage process shared files also";
+
+        foreach(QString filepath, misc::migrationSharedFiles())
+        {
+            qDebug() << "migrate file " << filepath;
+            share(filepath, false);
+        }
+    }
+
+    // after load transfers completed we must execute share on all shared directories for catch new files
+    foreach(DirNode* pdn, m_shared_dirs)
+    {
+        qDebug() << "share2 on " << pdn->filename();
+        pdn->reshare();
+    }
+
+    // cleanup helpers
+    m_h2f_dict.clear();
+    m_shared_dirs.clear();
     emit endLoadSharedFileSystem();
 }
 
@@ -856,7 +884,12 @@ void Session::loadFileSystem()
 
         pref.endArray();
 
-        FileNode* dir_node = node(vf[i].first, &dict);
+        DirNode* dir_node = dynamic_cast<DirNode*>(node(vf[i].first, &dict));
+
+        if (dir_node != &m_root)
+        {
+            m_shared_dirs.push_back(dir_node);
+        }
     }
 
     pref.endArray();
@@ -883,23 +916,9 @@ void Session::loadFileSystem()
                 {
                     qDebug() << "  exclude file: " << file_node->filename();
                     file_node->unshare(false);
+                    file_node->m_unshared_by_user = true;
                 }
             }
-        }
-    }
-
-    // this call do nothing when incoming dir in share list
-    // because call executes on shared node in non-recursive manner does nothing
-    share(m_incoming, false);
-
-    if (pref.isMigrationStage())
-    {
-        qDebug() << "on migration stage process shared files also";
-
-        foreach(QString filepath, misc::migrationSharedFiles())
-        {
-            qDebug() << "migrate file " << filepath;
-            share(filepath, false);
         }
     }
 }
