@@ -32,6 +32,7 @@ FileNode::FileNode(DirNode* parent, const QFileInfo& info) :
     m_atp(NULL)
 {
     m_filename = m_info.fileName();
+    m_unshared_by_user = false;
 }
 
 FileNode::~FileNode()
@@ -269,7 +270,7 @@ DirNode::~DirNode()
 void DirNode::share(bool recursive, bool share_files /* = true*/)
 {
     if (!m_active)
-    {
+    {        
         m_active = true;
         Session::instance()->addDirectory(this);
 
@@ -300,6 +301,18 @@ void DirNode::share(bool recursive, bool share_files /* = true*/)
         {
             p->share(recursive);
         }
+    }
+
+    Session::instance()->signal_changeNode(this);
+}
+
+void DirNode::reshare()
+{
+    foreach(FileNode* p, m_file_children.values())
+    {
+        qDebug() << "reshare: " << p->filename();
+        if (!p->is_active() && !p->m_unshared_by_user)
+            p->share(false);
     }
 
     Session::instance()->signal_changeNode(this);

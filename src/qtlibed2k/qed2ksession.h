@@ -117,12 +117,11 @@ public:
     const libed2k::ip_filter& session_filter() const;
 private:
     QScopedPointer<libed2k::session> m_session;
-    QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
-    void remove_by_state();
+    QHash<QString, Transfer> m_fast_resume_transfers;   // contains fast resume data were loading
 public slots:
 	void startUpTransfers();
 	void configureSession();
-	void enableIPFilter(const QString &filter_path, bool force=false);	
+	void enableIPFilter(const QString &filter_path, bool force=false);
     virtual QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
