@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="ru">
 <context>
@@ -7084,6 +7084,14 @@ However, those plugins were disabled.</source>
     <message>
         <source>Close all</source>
         <translation>Закрыть все</translation>
+    </message>
+    <message>
+        <source>Clear search history</source>
+        <translation>Очистить историю</translation>
+    </message>
+    <message>
+        <source>Are you sure that you would like to clear the search history?</source>
+        <translation>Вы действительно хотите удалить всю историю поисков?</translation>
     </message>
     <message>
         <source>Default</source>

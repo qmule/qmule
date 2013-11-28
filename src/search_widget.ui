@@ -527,9 +527,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="clearHistorySearch">
+      <widget class="QPushButton" name="btnClearHistory">
        <property name="text">
-        <string>Clear Search history</string>
+        <string>Clear search history</string>
        </property>
       </widget>
      </item>

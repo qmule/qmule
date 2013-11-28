@@ -278,12 +278,6 @@ private slots:
     void new_version_ready(int,int,int,int);
     void current_version_obsolete(int,int,int,int);
 
-    void setPageInIE();
-    void setPageInOpera();
-    void setPageInFF();
-//    void setPageInChrome();
-//    void setPageInOperaNext(QString version="Opera Next");
-    void setPageWebKit(QString browser);
 };
 
 #endif
