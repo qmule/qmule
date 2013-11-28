@@ -152,7 +152,7 @@ Session::Session() : m_root(NULL, QFileInfo(), true), m_delay(10000)
     connect(&m_edSession, SIGNAL(fileError(Transfer, QString)),
             this, SIGNAL(fileError(Transfer, QString)));
     connect(&m_edSession, SIGNAL(savePathChanged(Transfer)), this, SIGNAL(savePathChanged(Transfer)));
-    connect(&m_edSession, SIGNAL(fastResumeDataLoadCompleted()), this, SLOT(on_ED2KResumeDataLoaded()));
+    //connect(&m_edSession, SIGNAL(fastResumeDataLoadCompleted()), this, SLOT(on_ED2KResumeDataLoaded()));
 
     m_speedMonitor.reset(new TorrentSpeedMonitor(this));
     m_speedMonitor->start();

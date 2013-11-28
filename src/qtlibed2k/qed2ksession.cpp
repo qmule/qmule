@@ -983,6 +983,7 @@ void QED2KSession::saveFastResumeData()
 void QED2KSession::loadFastResumeData()
 {
     qDebug("load fast resume data");
+    emit fastResumeDataLoadCompleted();
 #ifdef RD_SINGLE
     int real_num = Preferences().value("Preferences/RDCount", 0).toInt();
     qDebug() << "real count " << real_num;
@@ -1119,9 +1120,7 @@ void QED2KSession::loadFastResumeData()
     {
         // no fast resume data found - session ready for share
         emit fastResumeDataLoadCompleted();
-    }
-
-    emit fastResumeDataLoadCompleted();
+    }    
 }
 
 void QED2KSession::enableUPnP(bool b)
