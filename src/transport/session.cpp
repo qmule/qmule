@@ -523,7 +523,6 @@ void Session::loadSharedFileSystemNotify()
 {
     emit beginLoadSharedFileSystem();
     loadFileSystem();
-    emit endLoadSharedFileSystem();
 }
 
 void Session::on_ED2KResumeDataLoaded()
@@ -552,6 +551,7 @@ void Session::on_ED2KResumeDataLoaded()
     // cleanup helpers
     m_h2f_dict.clear();
     m_shared_dirs.clear();
+    emit endLoadSharedFileSystem();
 }
 
 void Session::on_registerNode(Transfer t)

@@ -1676,7 +1676,7 @@ void MainWindow::endLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
     {
-        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);        
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);
         m_sscrn.reset();
     }
 
