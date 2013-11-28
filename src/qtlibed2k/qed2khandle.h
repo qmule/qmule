@@ -84,6 +84,7 @@ public:
     void save_resume_data() const;
     bool need_save_resume_data() const;
     void set_upload_mode(bool b) const;
+    void set_eager_mode(bool b) const;
 
 private:
     libed2k::transfer_handle m_delegate;

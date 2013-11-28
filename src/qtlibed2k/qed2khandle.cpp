@@ -219,3 +219,4 @@ void QED2KHandle::set_sequential_download(bool sd) const { m_delegate.set_sequen
 void QED2KHandle::save_resume_data() const { m_delegate.save_resume_data(); }
 bool QED2KHandle::need_save_resume_data() const { return m_delegate.need_save_resume_data(); }
 void QED2KHandle::set_upload_mode(bool b) const { m_delegate.set_upload_mode(b); }
+void QED2KHandle::set_eager_mode(bool b) const { m_delegate.set_eager_mode(b); }

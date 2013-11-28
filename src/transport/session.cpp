@@ -319,6 +319,7 @@ void Session::deferPlayMedia(Transfer t, int fileIndex)
         qDebug() << "Defer playing file: " << t.filename_at(fileIndex);
         t.set_sequential_download(false);
         t.prioritize_extremity_pieces(true, fileIndex);
+        t.set_eager_mode(true);
         m_pending_medias.insert(qMakePair(t.hash(), fileIndex));
     }
 }

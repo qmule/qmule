@@ -118,6 +118,7 @@ public:
     void queue_position_bottom() const;
     void super_seeding(bool ss) const;
     void set_sequential_download(bool sd) const;
+    void set_eager_mode(bool b) const;
 
 private:
     QSharedPointer<TransferBase> m_delegate;
