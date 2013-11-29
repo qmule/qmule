@@ -306,13 +306,29 @@ void DirNode::share(bool recursive, bool share_files /* = true*/)
     Session::instance()->signal_changeNode(this);
 }
 
-void DirNode::reshare()
+void DirNode::reshare(QList<QDir>& ex)
 {
+    QList<FileNode*> forErase;
     foreach(FileNode* p, m_file_children.values())
     {
-        qDebug() << "reshare: " << p->filename();
         if (!p->is_active() && !p->m_unshared_by_user)
-            p->share(false);
+        {
+            if (ex.contains(p->filepath()))
+            {
+                qDebug() << "erase partial file: " << p->filepath();
+                forErase.push_back(p);
+            }
+            else
+            {
+                qDebug() << "reshare: " << p->filename();
+                p->share(false);
+            }
+        }
+    }
+
+    foreach(FileNode* p, forErase)
+    {
+        delete_node(p);
     }
 
     Session::instance()->signal_changeNode(this);

@@ -770,13 +770,7 @@ void QED2KSession::readAlerts()
                  dynamic_cast<libed2k::added_transfer_alert*>(a.get()))
         {
             Transfer t(QED2KHandle(p->m_handle));
-            emit addedTransfer(t);
-
-            m_fast_resume_transfers.remove(t.hash());
-            if (m_fast_resume_transfers.empty())
-            {
-                emit fastResumeDataLoadCompleted();
-            }
+            emit addedTransfer(t);           
         }
         else if (libed2k::paused_transfer_alert* p =
                  dynamic_cast<libed2k::paused_transfer_alert*>(a.get()))
@@ -805,6 +799,18 @@ void QED2KSession::readAlerts()
 
             if (t.is_seed())
                 emit registerNode(t);
+
+            if (!m_fast_resume_transfers.empty())
+            {
+                m_fast_resume_transfers.remove(t.hash());
+                remove_by_state();
+                if (m_fast_resume_transfers.empty())
+                {
+                    emit fastResumeDataLoadCompleted();
+                }
+            }
+
+            m_fast_resume_transfers.remove(t.hash());
 
             m_fast_resume_transfers.remove(t.hash());
 
@@ -1083,6 +1089,26 @@ std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeT
 {
     bool cancel = false;
     return libed2k::file2atp()(filepath.toUtf8().constData(), cancel);
+}
+
+void QED2KSession::remove_by_state()
+{
+    // begin analize states
+
+    QHash<QString, Transfer>::iterator i = m_fast_resume_transfers.begin();
+
+    while (i != m_fast_resume_transfers.end())
+    {
+        if (!i.value().is_valid() || (i.value().state() == qt_downloading))
+        {
+            qDebug() << "remove state " << i.value().hash() << " is valid " << i.value().is_valid();
+            i = m_fast_resume_transfers.erase(i);
+        }
+        else
+        {
+            ++i;
+        }
+   }
 }
 
 }

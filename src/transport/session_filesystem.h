@@ -85,7 +85,7 @@ public:
     virtual bool all_active_children() const;
 
     virtual void share(bool recursive, bool share_files = true);
-    void reshare(); // after-load helper - simple share all files again
+    void reshare(QList<QDir>&); // after-load helper - simple share all files again
     virtual void unshare(bool recursive);
     void deleteTransfer();
 

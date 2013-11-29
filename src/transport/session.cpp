@@ -542,11 +542,15 @@ void Session::on_ED2KResumeDataLoaded()
         }
     }
 
+
+    // remove extra files - incompleted
+    QList<QDir> il = Session::instance()->incompleteFiles();
+
     // after load transfers completed we must execute share on all shared directories for catch new files
     foreach(DirNode* pdn, m_shared_dirs)
     {
         qDebug() << "share2 on " << pdn->filename();
-        pdn->reshare();
+        pdn->reshare(il);
     }
 
     // cleanup helpers
