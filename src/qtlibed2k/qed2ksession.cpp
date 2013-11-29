@@ -653,6 +653,7 @@ libed2k::peer_connection_handle QED2KSession::findPeer(const libed2k::net_identi
 
 void QED2KSession::readAlerts()
 {
+    Preferences pref;
     std::auto_ptr<libed2k::alert> a = m_session->pop_alert();
 
     while (a.get())
@@ -803,7 +804,9 @@ void QED2KSession::readAlerts()
             if (!m_fast_resume_transfers.empty())
             {
                 m_fast_resume_transfers.remove(t.hash());
-                remove_by_state();
+
+                remove_by_state(pref.getPartialTransfersCount());
+
                 if (m_fast_resume_transfers.empty())
                 {
                     emit fastResumeDataLoadCompleted();
@@ -812,9 +815,6 @@ void QED2KSession::readAlerts()
 
             m_fast_resume_transfers.remove(t.hash());
 
-            m_fast_resume_transfers.remove(t.hash());
-
-            Preferences pref;
             if (pref.isAutoRunEnabled() && p->m_had_picker)
                 autoRunExternalProgram(t);
         }
@@ -878,6 +878,7 @@ void QED2KSession::saveTempFastResumeData()
 void QED2KSession::saveFastResumeData()
 {
     qDebug("Saving fast resume data...");
+    int part_num = 0;
     int num_resume_data = 0;
     // Pause session
     delegate()->pause();
@@ -903,6 +904,9 @@ void QED2KSession::saveFastResumeData()
 
             if (h.need_save_resume_data())
             {
+                if(!h.is_seed())
+                    ++part_num;
+
                 h.save_resume_data();
                 ++num_resume_data;
             }
@@ -957,6 +961,8 @@ void QED2KSession::saveFastResumeData()
 
         delegate()->pop_alert();
     }
+
+    Preferences().setPartialTransfersCount(part_num);
 }
 
 void QED2KSession::loadFastResumeData()
@@ -1091,9 +1097,11 @@ std::pair<libed2k::add_transfer_params, libed2k::error_code> QED2KSession::makeT
     return libed2k::file2atp()(filepath.toUtf8().constData(), cancel);
 }
 
-void QED2KSession::remove_by_state()
+void QED2KSession::remove_by_state(int sborder)
 {
     // begin analize states
+    if (sborder < m_fast_resume_transfers.size())
+        return;
 
     QHash<QString, Transfer>::iterator i = m_fast_resume_transfers.begin();
 

@@ -118,7 +118,7 @@ public:
 private:
     QScopedPointer<libed2k::session> m_session;
     QHash<QString, Transfer> m_fast_resume_transfers;   // contains fast resume data were loading
-    void remove_by_state();
+    void remove_by_state(int sborder);  // begin remove when start border great or equal transfers count
 public slots:
 	void startUpTransfers();
 	void configureSession();

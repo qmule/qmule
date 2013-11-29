@@ -467,6 +467,16 @@ public:
   }
 
   // ED2K options
+  int getPartialTransfersCount() const
+  {
+      return value("Preferences/Connection/ED2KPartialTransfersCount", 100).toInt();
+  }
+
+  void setPartialTransfersCount(int tcount)
+  {
+      setValue("Preferences/Connection/ED2KPartialTransfersCount", tcount);
+  }
+
 
   int getED2KDownloadLimit() const
   {
