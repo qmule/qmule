@@ -68,7 +68,9 @@ void FileNode::share(bool recursive, bool share_files/* = true*/)
         create_transfer();
     }
     else
-    {        
+    {
+        QString fp = filepath();
+        Session::instance()->addToProgress(fp, this);
         Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 

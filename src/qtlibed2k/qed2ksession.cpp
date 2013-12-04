@@ -653,7 +653,6 @@ libed2k::peer_connection_handle QED2KSession::findPeer(const libed2k::net_identi
 
 void QED2KSession::readAlerts()
 {
-    Preferences pref;
     std::auto_ptr<libed2k::alert> a = m_session->pop_alert();
 
     while (a.get())
@@ -793,6 +792,7 @@ void QED2KSession::readAlerts()
         else if (libed2k::finished_transfer_alert* p =
                  dynamic_cast<libed2k::finished_transfer_alert*>(a.get()))
         {
+            Preferences pref;
             Transfer t(QED2KHandle(p->m_handle));
 
             if (p->m_had_picker)
@@ -812,8 +812,6 @@ void QED2KSession::readAlerts()
                     emit fastResumeDataLoadCompleted();
                 }
             }
-
-            m_fast_resume_transfers.remove(t.hash());
 
             if (pref.isAutoRunEnabled() && p->m_had_picker)
                 autoRunExternalProgram(t);

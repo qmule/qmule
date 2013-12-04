@@ -581,7 +581,19 @@ void Session::on_registerNode(Transfer t)
 
 void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {
-    FileNode* p = node(misc::toQStringU(atp.file_path));
+    qDebug() << Q_FUNC_INFO;
+    QString filepath = misc::toQStringU(atp.file_path);
+    FileNode* p = m_progress_files.value(filepath, NULL);
+
+    if (!p)
+    {
+        qDebug() << "something went wrong, file wasn't in hm: " << filepath;
+        p = node(filepath);
+    }
+    else
+    {
+        m_progress_files.remove(filepath);
+    }
 
     if (p != &m_root)
     {
@@ -953,4 +965,9 @@ void Session::unshare(const QString& filepath, bool recursive)
 {
     FileNode* p = node(filepath);
     if (p != &m_root) p->unshare(recursive);
+}
+
+void Session::addToProgress(const QString& filepath, FileNode* node)
+{
+    m_progress_files.insert(filepath, node);
 }
