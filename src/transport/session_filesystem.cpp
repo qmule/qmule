@@ -45,7 +45,7 @@ void FileNode::create_transfer()
     try
     {
         m_atp->duplicate_is_error = true;
-        m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
+        m_hash = Session::instance()->get_ed2k_session()->postTransfer(*m_atp);
         Session::instance()->registerNode(this);
         m_parent->drop_transfer_by_file();
         m_error = libed2k::errors::no_error;

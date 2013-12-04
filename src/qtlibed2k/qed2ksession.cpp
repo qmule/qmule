@@ -556,13 +556,12 @@ void QED2KSession::addTransferFromFile(const QString& filename)
     }
 }
 
-QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
+QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& atp)
 {
-    QDir fpath = misc::uniquePath(QString::fromUtf8(_atp.file_path.c_str()), files());
-    add_transfer_params atp = _atp;
-    atp.file_path = fpath.absolutePath().toUtf8().constData();
-
-    qDebug() << "add transfer for " << fpath;
+    //QDir fpath = misc::uniquePath(QString::fromUtf8(_atp.file_path.c_str()), files());
+    //add_transfer_params atp = _atp;
+    //atp.file_path = fpath.absolutePath().toUtf8().constData();
+    //qDebug() << "add transfer for " << fpath;
 
     {
         // do not create file on windows with last point because of Qt truncate it point!
@@ -579,6 +578,26 @@ QED2KHandle QED2KSession::addTransfer(const libed2k::add_transfer_params& _atp)
     }
 
     return QED2KHandle(delegate()->add_transfer(atp));
+}
+
+QString QED2KSession::postTransfer(const libed2k::add_transfer_params& atp)
+{
+    {
+        // do not create file on windows with last point because of Qt truncate it point!
+        bool touch = true;
+#ifdef Q_WS_WIN
+        touch = (!atp.file_path.empty() && (atp.file_path.at(atp.file_path.size() - 1) != '.'));
+#endif
+        QFile f(misc::toQStringU(atp.file_path));
+        // file not exists, need touch and transfer are not exists
+        if (!f.exists() && touch && !QED2KHandle(delegate()->find_transfer(atp.file_hash)).is_valid())
+        {
+            f.open(QIODevice::WriteOnly);
+        }
+    }
+
+    delegate()->post_transfer(atp);
+    return misc::toQString(atp.file_hash);
 }
 
 libed2k::session* QED2KSession::delegate() const { return m_session.data(); }
