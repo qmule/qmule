@@ -824,7 +824,7 @@ void QED2KSession::readAlerts()
             {
                 m_fast_resume_transfers.remove(t.hash());
 
-                remove_by_state(std::max(pref.getPartialTransfersCount(), 5));
+                remove_by_state(std::max(pref.getPartialTransfersCount(), 50));
 
                 if (m_fast_resume_transfers.empty())
                 {
