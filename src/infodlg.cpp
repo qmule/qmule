@@ -29,7 +29,7 @@ is_info_dlg::~is_info_dlg()
 
 void is_info_dlg::onAccepted()
 {
-    m_answer->get(QNetworkRequest(QUrl(url))); //"http://pis.is74.ru/message_emule.php?source=emule&submit=1")));
+    m_answer->get(QNetworkRequest(QUrl("http://pis.is74.ru/message_emule.php?source=emule&xml=1&submit=1")));
     m_alert->start(3600000);    // one hour
 }
 
@@ -37,11 +37,11 @@ void is_info_dlg::onTimeout()
 {
     m_alert->stop();
 
-    QString strQuery(url); //"http://pis.is74.ru/message_emule.php?source=emule");
+    QString strQuery("http://pis.is74.ru/message_emule.php?source=emule&xml=1");
 
     if (m_first_call)
     {
-        //strQuery += "&firstrun=1";
+        strQuery += "&firstrun=1";
     }
 
     m_query->get(QNetworkRequest(QUrl(strQuery)));
@@ -72,11 +72,6 @@ void is_info_dlg::replyFinished(QNetworkReply* pReply)
             if (xml.tokenType() == QXmlStreamReader::StartElement && xml.qualifiedName() == QString::fromUtf8("pis_message"))
                 ready = true;
         }
-
-
-
-        //QString strAnswer = QString::fromUtf16((const ushort*)(data.constData()), data.length()/2);
-        //QRegExp re1("<body>[\n\t\s\r]*</body>", Qt::CaseInsensitive);
 
         // answer is not empty and html body is not empty
         if (!strAnswer.isEmpty() /*&& !strAnswer.contains(re1)*/)

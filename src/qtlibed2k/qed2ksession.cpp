@@ -371,6 +371,18 @@ std::vector<Transfer> QED2KSession::getActiveTransfers() const
     return transfers;
 }
 
+bool QED2KSession::hasActiveTransfers() const
+{
+    std::vector<Transfer> torrents = getActiveTransfers();
+    std::vector<Transfer>::iterator torrentIT;
+    for (torrentIT = torrents.begin(); torrentIT != torrents.end(); torrentIT++) {
+        const Transfer h(*torrentIT);
+        if (h.is_valid() && !h.is_seed() && !h.is_paused() && !h.is_queued() )
+            return true;
+    }
+    return false;
+}
+
 qreal QED2KSession::getMaxRatioPerTransfer(const QString& hash, bool* use_global) const { return 0; }
 SessionStatus QED2KSession::getSessionStatus() const { return m_session->status(); }
 void QED2KSession::changeLabelInSavePath(
