@@ -251,7 +251,8 @@ namespace aux
 {
 
 QED2KSession::QED2KSession()
-{    
+{
+    connect(&finishTimer, SIGNAL(timeout()), this, SLOT(finishLoad()));
 }
 
 void QED2KSession::start()
@@ -427,6 +428,19 @@ void QED2KSession::setUploadRateLimit(long rate) {
     settings.upload_rate_limit = rate;
     m_session->set_settings(settings);
 }
+
+void QED2KSession::finishLoad()
+{
+    qDebug() << "finish timer exeuted";
+    if (!m_fast_resume_transfers.empty())
+    {
+        qDebug() << "emit load completed";
+        emit fastResumeDataLoadCompleted();
+    }
+
+    finishTimer.stop();
+}
+
 void QED2KSession::startUpTransfers()
 {
     loadFastResumeData();
@@ -842,6 +856,11 @@ void QED2KSession::readAlerts()
                 {
                     emit fastResumeDataLoadCompleted();
                 }
+                else
+                {
+                    qDebug() << "start finish timer";
+                    finishTimer.start(1000);
+                }
             }
 
             if (pref.isAutoRunEnabled() && p->m_had_picker)
@@ -1070,6 +1089,8 @@ void QED2KSession::loadFastResumeData()
             {}
         }
     }
+
+    finishTimer.start(1000);
 
     // migration stage or empty transfers - immediately emit signal
     if (m_fast_resume_transfers.isEmpty())
