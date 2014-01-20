@@ -545,8 +545,9 @@ void files_widget::tableViewPathsSumSelChanged(const QItemSelection&, const QIte
 }
 
 void files_widget::tableViewFilesSumSelChanged(const QItemSelection&, const QItemSelection&)
-{
-    switchLinkWidget(generateLinksSum());
+{    
+    if (!generateLinksSum().isEmpty())
+        switchLinkWidget(generateLinksSum());
 }
 
 void files_widget::sortChanged(int column, Qt::SortOrder order)
@@ -596,7 +597,7 @@ void files_widget::changeRow(const QModelIndex& left, const QModelIndex& right)
     Q_UNUSED(right);    
 
     // process only first signal (FileModel emits second signal to refresh hash and errors)
-    if (left.isValid() && (left.column() == 0))
+    if (left.isValid() && (left.column() == 0) && tabWidget->currentIndex() == 0)
     {
         switchLinkWidget(generateLinks());
     }
@@ -663,6 +664,7 @@ void files_widget::on_tabWidget_currentChanged(int index)
 {
     tableView->clearSelection();
     tableView_files->clearSelection();
+    editLink->clear();
 }
 
 void files_widget::openFile(const QModelIndex& index)

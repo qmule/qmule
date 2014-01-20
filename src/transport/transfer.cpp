@@ -246,3 +246,5 @@ void Transfer::queue_position_bottom() const { m_delegate->queue_position_bottom
 void Transfer::super_seeding(bool ss) const { m_delegate->super_seeding(ss); }
 
 void Transfer::set_sequential_download(bool sd) const { m_delegate->set_sequential_download(sd); }
+
+void Transfer::set_eager_mode(bool b) const { m_delegate->set_eager_mode(b); }

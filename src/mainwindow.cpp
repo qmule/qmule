@@ -367,6 +367,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
 
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
+  Session::instance()->loadSharedFileSystemNotify();
   Session::instance()->start();
   // after start download new ipfilter.dat
   m_ipf_getter.reset(new wgetter("http://tcs.is74.ru/ipfilter.dat", misc::ED2KMetaLocation("ipfilter.dat")));
@@ -1702,7 +1703,7 @@ void MainWindow::endLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
     {
-        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);        
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);
         m_sscrn.reset();
     }
 

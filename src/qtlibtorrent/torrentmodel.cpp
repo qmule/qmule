@@ -210,6 +210,7 @@ TorrentModel::TorrentModel(QObject *parent) :
 }
 
 void TorrentModel::populate() {
+
   // Load the torrents
   std::vector<Transfer> torrents = Session::instance()->getTransfers();
   std::vector<Transfer>::const_iterator it;

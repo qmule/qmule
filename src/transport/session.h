@@ -78,7 +78,10 @@ public:
     DirNode* root() { return &m_root; }
     std::set<DirNode*>& directories() { return m_dirs; }
     QHash<QString, FileNode*>& files() { return m_files; }
+    QHash<QString, FileNode*>& h2f_dict() { return m_h2f_dict; }
+    void addToProgress(const QString& filepath, FileNode* node);
 
+    void loadSharedFileSystemNotify();
 public slots:
     void playPendingMedia();
 	void startUpTransfers();
@@ -114,6 +117,8 @@ signals:
 
     void beginLoadSharedFileSystem();
     void endLoadSharedFileSystem();
+public slots:
+    void on_ED2KResumeDataLoaded();
 private slots:
     void on_addedTorrent(const QTorrentHandle& h);
     void on_pausedTorrent(const QTorrentHandle& h);
@@ -130,7 +135,6 @@ private slots:
 
     void on_registerNode(Transfer);
     void on_transferParametersReady(const libed2k::add_transfer_params&, const libed2k::error_code&);
-    void on_ED2KResumeDataLoaded();
 
 private:
     Session();
@@ -147,7 +151,7 @@ private:
     void removeDirectory(DirNode* dir);
     void setDirectLink(const QString& hash, DirNode* node);
     void registerNode(FileNode*);
-    FileNode* node(const QString& filepath);
+    FileNode* node(const QString& filepath, const QHash<QString, QString>* pdict = NULL);
 
     // emitters
     void signal_beginRemoveNode(const FileNode* node) { emit beginRemoveNode(node);}
@@ -174,6 +178,9 @@ private:
     QHash<QString, FileNode*>   m_files;    // all registered files in ed2k filesystem
     std::set<DirNode*>          m_dirs;     // shared directories
     QString                     m_incoming; // incoming filepath
+    QHash<QString, FileNode*>   m_h2f_dict;     // transfer hash to file dictionary - load helper
+    QList<DirNode*>             m_shared_dirs;  // shared directories - load helper
+    QHash<QString, FileNode*>   m_progress_files;   // files which transfer parameters in progress
 
     friend class DirNode;
     friend class FileNode;

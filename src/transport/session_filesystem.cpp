@@ -32,6 +32,7 @@ FileNode::FileNode(DirNode* parent, const QFileInfo& info) :
     m_atp(NULL)
 {
     m_filename = m_info.fileName();
+    m_unshared_by_user = false;
 }
 
 FileNode::~FileNode()
@@ -44,7 +45,7 @@ void FileNode::create_transfer()
     try
     {
         m_atp->duplicate_is_error = true;
-        m_hash = Session::instance()->get_ed2k_session()->addTransfer(*m_atp).hash();
+        m_hash = Session::instance()->get_ed2k_session()->postTransfer(*m_atp);
         Session::instance()->registerNode(this);
         m_parent->drop_transfer_by_file();
         m_error = libed2k::errors::no_error;
@@ -56,7 +57,7 @@ void FileNode::create_transfer()
     }
 }
 
-void FileNode::share(bool recursive)
+void FileNode::share(bool recursive, bool share_files/* = true*/)
 {
     Q_UNUSED(recursive);
     if (m_active) return;
@@ -67,7 +68,9 @@ void FileNode::share(bool recursive)
         create_transfer();
     }
     else
-    {        
+    {
+        QString fp = filepath();
+        Session::instance()->addToProgress(fp, this);
         Session::instance()->get_ed2k_session()->makeTransferParametersAsync(filepath());
     }
 
@@ -266,10 +269,10 @@ DirNode::~DirNode()
     foreach(DirNode* p, m_dir_children.values()) { delete p; }
 }
 
-void DirNode::share(bool recursive)
+void DirNode::share(bool recursive, bool share_files /* = true*/)
 {
     if (!m_active)
-    {
+    {        
         m_active = true;
         Session::instance()->addDirectory(this);
 
@@ -277,9 +280,12 @@ void DirNode::share(bool recursive)
         // we can re-share files were unshared after directory was shared        
         populate(true);  // re-scan directory
 
-        foreach(FileNode* p, m_file_children.values())
+        if (share_files)
         {
-            p->share(recursive);
+            foreach(FileNode* p, m_file_children.values())
+            {
+                p->share(recursive);
+            }
         }
 
         // update state on all children
@@ -297,6 +303,34 @@ void DirNode::share(bool recursive)
         {
             p->share(recursive);
         }
+    }
+
+    Session::instance()->signal_changeNode(this);
+}
+
+void DirNode::reshare(QList<QDir>& ex)
+{
+    QList<FileNode*> forErase;
+    foreach(FileNode* p, m_file_children.values())
+    {
+        if (!p->is_active() && !p->m_unshared_by_user)
+        {
+            if (ex.contains(p->filepath()))
+            {
+                qDebug() << "erase partial file: " << p->filepath();
+                forErase.push_back(p);
+            }
+            else
+            {
+                qDebug() << "reshare: " << p->filename();
+                p->share(false);
+            }
+        }
+    }
+
+    foreach(FileNode* p, forErase)
+    {
+        delete_node(p);
     }
 
     Session::instance()->signal_changeNode(this);
@@ -614,7 +648,12 @@ QStringList DirNode::exclude_files() const
     return res;
 }
 
-void DirNode::populate(bool force /* = false*/)
+const QList<FileNode*>& DirNode::files() const
+{
+    return m_file_vector;
+}
+
+void DirNode::populate(bool force /* = false*/, const QHash<QString, QString>* pdict /*= NULL*/)
 {
     if (m_populated && !force) return;
 
@@ -666,7 +705,17 @@ void DirNode::populate(bool force /* = false*/)
             if (fileInfo.isFile() && !m_file_children.contains(fileInfo.fileName()) &&
                 !incompleteFiles.contains(fileInfo.filePath()))
             {
-                add_node(new FileNode(this, fileInfo));
+                FileNode* pfn = new FileNode(this, fileInfo);
+                qDebug() << "search link for: " << fileInfo.fileName();
+
+                if (pdict && pdict->contains(fileInfo.fileName()))
+                {
+                    QString hash = pdict->value(fileInfo.fileName(), QString(""));
+                    qDebug() << "assign node to hash: " << hash;
+                    Session::instance()->h2f_dict().insert(hash, pfn);
+                }
+
+                add_node(pfn);
                 continue;
             }
         }

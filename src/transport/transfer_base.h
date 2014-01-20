@@ -372,6 +372,7 @@ public:
     virtual void super_seeding(bool ss) const = 0;
     virtual void set_sequential_download(bool sd) const = 0;
     virtual void set_upload_mode(bool b) const = 0;
+    virtual void set_eager_mode(bool b) const = 0;
 
     // implemented methods    
     virtual qreal download_payload_rate() const;
