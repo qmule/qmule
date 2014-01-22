@@ -238,6 +238,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
   m_pwr = new PowerManagement(this);
   preventTimer = new QTimer(this);
   connect(preventTimer, SIGNAL(timeout()), SLOT(checkForActiveTorrents()));
+  m_http_server.reset(new HttpServer);
 
   // Configure session according to options
   loadPreferences(false);
@@ -343,6 +344,7 @@ MainWindow::MainWindow(QSplashScreen* sscrn, QWidget *parent, QStringList torren
 
   if (!m_sscrn.isNull())
       m_sscrn->showMessage(tr("Startup sessions..."), Qt::AlignLeft | Qt::AlignBottom);
+  Session::instance()->loadSharedFileSystemNotify();
   Session::instance()->start();
   // after start download new ipfilter.dat
   m_ipf_getter.reset(new wgetter("http://tcs.is74.ru/ipfilter.dat", misc::ED2KMetaLocation("ipfilter.dat")));
@@ -1197,6 +1199,29 @@ void MainWindow::loadPreferences(bool configure_session)
   if (configure_session)
     Session::instance()->configureSession();
 
+  //
+  if (!m_http_server.isNull())
+  {
+      // close server conditions
+      if (!pref.runHttpServer() || (m_http_server->serverPort() != pref.httpPort()))
+      {
+          qDebug() << "stop server";
+          m_http_server->stop(!pref.runHttpServer());
+      }
+
+      if (pref.runHttpServer())
+      {
+          if (m_http_server->listen(QHostAddress::Any, pref.httpPort()))
+          {
+              qDebug() << "report server started on " << pref.httpPort();
+          }
+          else
+          {
+              qDebug() << "report error: " << m_http_server->errorString();
+          }
+      }
+  }
+
   qDebug("GUI settings loaded");
 }
 
@@ -1640,7 +1665,7 @@ void MainWindow::endLoadSharedFileSystem()
 {
     if (!m_sscrn.isNull())
     {
-        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);        
+        m_sscrn->showMessage(tr("Shared filesystem loading was completed..."), Qt::AlignLeft | Qt::AlignBottom);
         m_sscrn.reset();
     }
 

@@ -79,6 +79,7 @@ public:
     void downloading_pieces(TransferBitfield& bf) const;
     void piece_availability(std::vector<int>& avail) const;
     std::vector<int> piece_priorities() const;
+    TransferSize total_size() const;
     TransferSize piece_length() const;
     bool extremity_pieces_first() const;
     void file_progress(std::vector<TransferSize>& fp) const;
@@ -117,6 +118,7 @@ public:
     void queue_position_bottom() const;
     void super_seeding(bool ss) const;
     void set_sequential_download(bool sd) const;
+    void set_eager_mode(bool b) const;
 
 private:
     QSharedPointer<TransferBase> m_delegate;

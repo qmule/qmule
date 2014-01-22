@@ -1107,7 +1107,7 @@ You should get this information from your Web browser preferences.</source>
     <message>
         <source>DL speed: %1 KiB/s</source>
         <comment>e.g: Download speed: 10 KiB/s</comment>
-        <translation type="obsolete">Скорость скач.: %1 KiB/с</translation>
+        <translation type="obsolete">Скорость скачивания: %1 KiB/с</translation>
     </message>
     <message>
         <source>UP speed: %1 KiB/s</source>
@@ -2427,6 +2427,22 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
 <context>
     <name>Preferences</name>
     <message>
+        <source>Http server settings</source>
+        <translation>Настройка сервера видеоконтента</translation>
+    </message>
+    <message>
+        <source>Http server active</source>
+        <translation>Запустить http сервер раздачи видеоконтента</translation>
+    </message>
+    <message>
+        <source>Incoming http port</source>
+        <translation>Порт входящих соединений сервера</translation>
+    </message>
+    <message>
+        <source>Download connections limit</source>
+        <translation>Максимальное количество одновременно подключенных клиентов</translation>
+    </message>
+    <message>
         <source>UI</source>
         <extracomment>User Interface</extracomment>
         <translation type="obsolete">Интерфейс</translation>
@@ -2523,7 +2539,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Connections limit</source>
-        <translation type="obsolete">Ограничение соединений</translation>
+        <translation type="obsolete">Ограничение торрент-соединений</translation>
     </message>
     <message>
         <source>Global maximum number of connections:</source>
@@ -2768,7 +2784,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     <message>
         <source>Pre-allocate disk space for all files</source>
         <translatorcomment>Или &apos;Предварительно резервировать&apos; будет правильнее?</translatorcomment>
-        <translation>Предварительно зарезервировать место для всех файлов</translation>
+        <translation>Предварительно зарезервировать место для всех торрент-файлов</translation>
     </message>
     <message>
         <source>Keep incomplete torrents in:</source>
@@ -2877,7 +2893,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use UPnP / NAT-PMP port forwarding from my router</source>
-        <translation>Использовать UPnP / NAT-PMP из моего роутера</translation>
+        <translation>Использовать UPnP / NAT-PMP из моего роутера(так-же и для порта ослика)</translation>
     </message>
     <message>
         <source>Privacy</source>
@@ -3005,11 +3021,11 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Listening Port</source>
-        <translation>Прослушиваемый порт</translation>
+        <translation>Прослушиваемый торрент-порт</translation>
     </message>
     <message>
         <source>Connections Limits</source>
-        <translation>Ограничения соединений</translation>
+        <translation>Ограничения торрент-соединений</translation>
     </message>
     <message>
         <source>Proxy Server</source>
@@ -3161,7 +3177,7 @@ Do you want to associate qMule to torrent files, Magnet links and eMule collecti
     </message>
     <message>
         <source>Use qMule for cmule collections</source>
-        <translation>Исполезовать qMule для eMule коллекций</translation>
+        <translation>Использовать qMule для eMule коллекций</translation>
     </message>
     <message>
         <source>Torrent Rate Limits</source>
@@ -7724,6 +7740,17 @@ eD2K Server</source>
     <message>
         <source>Close</source>
         <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
+    <name>HttpConnection</name>
+    <message>
+        <source>Video files from: %1</source>
+        <translation>Медиа файлы пользователя: %1</translation>
+    </message>
+    <message>
+        <source>Connection limit exceeded</source>
+        <translation>Превышел лимит соединений, попробуйте зайти позже</translation>
     </message>
 </context>
 </TS>

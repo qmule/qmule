@@ -85,6 +85,7 @@ public:
     Transfer getTransfer(const QString& hash) const;
     std::vector<Transfer> getTransfers() const;
     std::vector<Transfer> getActiveTransfers() const;
+    virtual bool hasActiveTransfers() const; // override default behaviour by active transfers usage
     qreal getMaxRatioPerTransfer(const QString& hash, bool* use_global) const;
     SessionStatus getSessionStatus() const;
     void changeLabelInSavePath(const Transfer& t, const QString& old_label, const QString& new_label);
@@ -114,17 +115,22 @@ public:
 
     libed2k::session* delegate() const;
 
+    const libed2k::ip_filter& session_filter() const;
 private:
     QScopedPointer<libed2k::session> m_session;
-    QHash<QString, Transfer>      m_fast_resume_transfers;   // contains fast resume data were loading
-    void remove_by_state();
+    QHash<QString, Transfer> m_fast_resume_transfers;   // contains fast resume data were loading
+    void remove_by_state(int sborder);  // begin remove when start border great or equal transfers count
+    QTimer finishTimer;
+private slots:
+    void finishLoad();
 public slots:
 	void startUpTransfers();
 	void configureSession();
-	void enableIPFilter(const QString &filter_path, bool force=false);	
+	void enableIPFilter(const QString &filter_path, bool force=false);
     virtual QPair<Transfer,ErrorCode> addLink(QString strLink, bool resumed = false);
     virtual void addTransferFromFile(const QString& filename);
     virtual QED2KHandle addTransfer(const libed2k::add_transfer_params&);
+    QString postTransfer(const libed2k::add_transfer_params&);  // async add transfer and return hash from atp
 
 	/**
 	  * number parameters were ignored on zero value
@@ -154,8 +160,7 @@ public slots:
     void cancelSearch();
 
     libed2k::peer_connection_handle getPeer(const libed2k::net_identifier& np);
-    libed2k::peer_connection_handle findPeer(const libed2k::net_identifier& np);
-
+    libed2k::peer_connection_handle findPeer(const libed2k::net_identifier& np);    
 signals:
     void registerNode(Transfer);    // temporary signal for node registration
     void serverNameResolved(QString strName);

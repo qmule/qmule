@@ -76,9 +76,6 @@
         <file>common/folder_share.ico</file>
         <file>common/folder_open.ico</file>
         <file>common/folder_reload.ico</file>
-        <file>common/ConnectDo.ico</file>
-        <file>common/ConnectStop.ico</file>
-        <file>common/DeleteAll.ico</file>
-        <file>common/DeleteSelected.ico</file>
+        <file>newmule16.png</file>
     </qresource>
 </RCC>

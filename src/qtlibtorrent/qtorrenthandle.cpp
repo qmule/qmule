@@ -422,7 +422,9 @@ bool QTorrentHandle::is_seed() const {
 #if LIBTORRENT_VERSION_MINOR > 15
   return torrent_handle::status(0x0).is_seeding;
 #else
-  return torrent_handle::is_seed();
+    TransferState st = state();
+    return (st == qt_finished || st == qt_seeding);
+    //return torrent_handle::is_seed();
 #endif
 }
 

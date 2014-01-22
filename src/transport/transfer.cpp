@@ -139,6 +139,8 @@ void Transfer::piece_availability(std::vector<int>& avail) const {
 
 std::vector<int> Transfer::piece_priorities() const { return m_delegate->piece_priorities(); }
 
+TransferSize Transfer::total_size() const { return m_delegate->total_size(); }
+
 TransferSize Transfer::piece_length() const { return m_delegate->piece_length(); }
 
 bool Transfer::extremity_pieces_first() const { return m_delegate->extremity_pieces_first(); }
@@ -244,3 +246,5 @@ void Transfer::queue_position_bottom() const { m_delegate->queue_position_bottom
 void Transfer::super_seeding(bool ss) const { m_delegate->super_seeding(ss); }
 
 void Transfer::set_sequential_download(bool sd) const { m_delegate->set_sequential_download(sd); }
+
+void Transfer::set_eager_mode(bool b) const { m_delegate->set_eager_mode(b); }

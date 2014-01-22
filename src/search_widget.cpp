@@ -297,6 +297,7 @@ search_widget::search_widget(QWidget *parent)
     filterModel.data()->setSortCaseSensitivity(Qt::CaseInsensitive);
 
     treeResult->setModel(filterModel.data());
+    treeResult->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 
     itemDelegate = new SWDelegate(treeResult);
     treeResult->setItemDelegate(itemDelegate);
@@ -743,7 +744,7 @@ void search_widget::startSearch()
         fileType != ED2KFTSTR_FOLDER.c_str() &&
         fileType != ED2KFTSTR_USER.c_str())
     {
-        torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/0/") + searchRequest));
+        torrentSearchView->load(QUrl(QString("http://torrtilla.ru/torrents/") + comboName->currentText()));
         nSearchesInProgress++;
     }
 }

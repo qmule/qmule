@@ -333,6 +333,7 @@ public:
     virtual void downloading_pieces(TransferBitfield& bf) const = 0;
     virtual void piece_availability(std::vector<int>& avail) const = 0;
     virtual std::vector<int> piece_priorities() const = 0;
+    virtual TransferSize total_size() const = 0;
     virtual TransferSize piece_length() const = 0;
     virtual bool extremity_pieces_first() const = 0;
     virtual void file_progress(std::vector<TransferSize>& fp) const = 0;
@@ -371,6 +372,7 @@ public:
     virtual void super_seeding(bool ss) const = 0;
     virtual void set_sequential_download(bool sd) const = 0;
     virtual void set_upload_mode(bool b) const = 0;
+    virtual void set_eager_mode(bool b) const = 0;
 
     // implemented methods    
     virtual qreal download_payload_rate() const;

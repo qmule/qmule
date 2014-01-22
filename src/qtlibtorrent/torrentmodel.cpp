@@ -210,6 +210,7 @@ TorrentModel::TorrentModel(QObject *parent) :
 }
 
 void TorrentModel::populate() {
+
   // Load the torrents
   std::vector<Transfer> torrents = Session::instance()->getTransfers();
   std::vector<Transfer>::const_iterator it;
@@ -351,7 +352,7 @@ void TorrentModel::addTorrent(const Transfer& h)
   }
   if (h.type() == Transfer::ED2K && h.state() == qt_checking_resume_data) {
     // we don't know yet whether this transfer finished or not
-    m_pendingTransfers << h;
+    m_uncheckedTransfers << h;
     return;
   }
 
@@ -397,10 +398,10 @@ void TorrentModel::endRemoveTorrent()
   endRemoveRows();
 }
 
-void TorrentModel::processPendingTransfers()
+void TorrentModel::processUncheckedTransfers()
 {
-    for(QList<Transfer>::iterator i = m_pendingTransfers.begin();
-        i != m_pendingTransfers.end();)
+    for(QList<Transfer>::iterator i = m_uncheckedTransfers.begin();
+        i != m_uncheckedTransfers.end();)
     {
         TransferState state = i->state();
         if (state != qt_checking_resume_data)
@@ -408,11 +409,42 @@ void TorrentModel::processPendingTransfers()
             // now we know whether transfer finished or not
             // do not show finished transfers
             if (state != qt_seeding) addTorrent(*i);
-            i = m_pendingTransfers.erase(i);
+            i = m_uncheckedTransfers.erase(i);
         }
         else
             ++i;
     }
+}
+
+void TorrentModel::processDanglingTorrents()
+{
+#if LIBTORRENT_VERSION_NUM < 1602
+    // workaround for the next libtorrent bug:
+    // torrents do not enter end-game mode if parts of the torrent have priority zero.
+    // http://code.google.com/p/libtorrent/issues/detail?id=169
+    std::vector<Transfer> torrents =
+        Session::instance()->get_torrent_session()->getTransfers();
+    foreach(Transfer t, torrents)
+    {
+        TransferStatus st = t.status();
+        if (st.state == qt_downloading && !st.paused && st.download_payload_rate == 0 &&
+            st.total_wanted < t.total_size() && t.progress() > 0)
+        {
+            int times = m_danglingTorrents.value(t.hash(), 0);
+            if (times > 10)
+            {
+                qDebug() << "Partial torrent: " << t.name() << " seems dangles, restart it ";
+                t.pause();
+                t.resume();
+                m_danglingTorrents[t.hash()] = 0;
+            }
+            else
+                m_danglingTorrents[t.hash()] = times + 1;
+        }
+        else
+            m_danglingTorrents.remove(t.hash());
+    }
+#endif
 }
 
 void TorrentModel::handleTorrentUpdate(const Transfer& h)
@@ -439,7 +471,8 @@ void TorrentModel::setRefreshInterval(int refreshInterval)
 
 void TorrentModel::forceModelRefresh()
 {
-  processPendingTransfers();
+  processUncheckedTransfers();
+  processDanglingTorrents();
   emit dataChanged(index(0, 0), index(rowCount()-1, columnCount()-1));
 }
 

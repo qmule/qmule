@@ -319,6 +319,7 @@ void Session::deferPlayMedia(Transfer t, int fileIndex)
         qDebug() << "Defer playing file: " << t.filename_at(fileIndex);
         t.set_sequential_download(false);
         t.prioritize_extremity_pieces(true, fileIndex);
+        t.set_eager_mode(true);
         m_pending_medias.insert(qMakePair(t.hash(), fileIndex));
     }
 }
@@ -478,6 +479,11 @@ void Session::on_transferAboutToBeRemoved(const Transfer& t, bool del_files)
         }
     }
 
+    if (m_h2f_dict.contains(t.hash()))
+    {
+        m_h2f_dict.remove(t.hash());
+    }
+
     emit transferAboutToBeRemoved(t, del_files);
 
 }
@@ -514,10 +520,42 @@ void Session::saveFastResumeData()
     m_edSession.saveFastResumeData();
 }
 
-void Session::on_ED2KResumeDataLoaded()
+void Session::loadSharedFileSystemNotify()
 {
     emit beginLoadSharedFileSystem();
     loadFileSystem();
+}
+
+void Session::on_ED2KResumeDataLoaded()
+{    
+    Preferences pref;
+    // migrate after session ready!
+    if (pref.isMigrationStage())
+    {
+        share(m_incoming, false);
+        qDebug() << "on migration stage process shared files also";
+
+        foreach(QString filepath, misc::migrationSharedFiles())
+        {
+            qDebug() << "migrate file " << filepath;
+            share(filepath, false);
+        }
+    }
+
+
+    // remove extra files - incompleted
+    QList<QDir> il = Session::instance()->incompleteFiles();
+
+    // after load transfers completed we must execute share on all shared directories for catch new files
+    foreach(DirNode* pdn, m_shared_dirs)
+    {
+        qDebug() << "share2 on " << pdn->filename();
+        pdn->reshare(il);
+    }
+
+    // cleanup helpers
+    m_h2f_dict.clear();
+    m_shared_dirs.clear();
     emit endLoadSharedFileSystem();
 }
 
@@ -525,9 +563,16 @@ void Session::on_registerNode(Transfer t)
 {        
     if (!m_files.contains(t.hash()))
     {
-        FileNode* n = NULL;
+        // ok, attempt to load file node from global dictionary
+        FileNode* n = m_h2f_dict.value(t.hash(), NULL);
         qDebug() << "register node " << t.absolute_files_path().at(0) << "{" << t.hash() << "}";
-        n = node(t.absolute_files_path().at(0));
+        if (!n)
+            n = node(t.absolute_files_path().at(0));
+        else
+        {
+            qDebug() << "associate by dictionary succesfull on hash: " << t.hash();
+        }
+
         Q_ASSERT(n != &m_root);
         if (n != &m_root)
             n->on_transfer_finished(t);
@@ -536,7 +581,19 @@ void Session::on_registerNode(Transfer t)
 
 void Session::on_transferParametersReady(const libed2k::add_transfer_params& atp, const libed2k::error_code& ec)
 {
-    FileNode* p = node(misc::toQStringU(atp.file_path));
+    qDebug() << Q_FUNC_INFO;
+    QString filepath = misc::toQStringU(atp.file_path);
+    FileNode* p = m_progress_files.value(filepath, NULL);
+
+    if (!p)
+    {
+        qDebug() << "something went wrong, file wasn't in hm: " << filepath;
+        p = node(filepath);
+    }
+    else
+    {
+        m_progress_files.remove(filepath);
+    }
 
     if (p != &m_root)
     {
@@ -599,7 +656,7 @@ static QString qt_GetLongPathName(const QString &strShortPath)
 }
 #endif
 
-FileNode* Session::node(const QString& filepath)
+FileNode* Session::node(const QString& filepath, const QHash<QString, QString>* pdict/* = NULL*/)
 {
     qDebug() << "node: " << filepath;
     if (filepath.isEmpty() || filepath == tr("My Computer") ||
@@ -714,7 +771,7 @@ FileNode* Session::node(const QString& filepath)
         else if (info.isDir())
         {
             p = new DirNode(parent, info);
-            ((DirNode*)p)->populate();
+            ((DirNode*)p)->populate(false, pdict);
             parent->add_node(p);
         }
     }
@@ -777,6 +834,23 @@ void Session::saveFileSystem()
         }
 
         pref.endArray();
+        // transfer links
+        pref.beginWriteArray("TransferLinks");
+        int nf_index = 0;
+        foreach(FileNode* pnf, p->files())
+        {
+            if (pnf->has_transfer())
+            {
+                pref.setArrayIndex(nf_index);
+                QString lstr = pnf->hash() +  pnf->filename();
+                pref.setValue("TFLink", lstr);
+                qDebug() << "save link: " << lstr;
+                ++nf_index;
+            }
+        }
+
+        pref.endArray();
+
         ++dir_indx;
     }
 
@@ -797,10 +871,9 @@ void Session::loadFileSystem()
     vf.resize(dcount);
 
     for (int i = 0; i < dcount; ++i)
-    {
-
+    {    
         pref.setArrayIndex(i);
-        vf[i].first = pref.value("Path").toString();
+        vf[i].first = pref.value("Path").toString();        
 
         int fcount = pref.beginReadArray("ExcludeFiles");
         vf[i].second.resize(fcount);
@@ -812,7 +885,27 @@ void Session::loadFileSystem()
         }
 
         pref.endArray();
+        QHash<QString, QString> dict;
 
+        // load transfer links
+        fcount = pref.beginReadArray("TransferLinks");
+
+        for (int j = 0; j < fcount; ++ j)
+        {
+            pref.setArrayIndex(j);
+            QString lstr = pref.value("TFLink").toString();
+            dict.insert(lstr.right(lstr.length() - 32), lstr.left(32));
+            qDebug() << "load link: " << lstr.left(32) << ":" <<  lstr.right(lstr.length() - 32);
+        }
+
+        pref.endArray();
+
+        DirNode* dir_node = dynamic_cast<DirNode*>(node(vf[i].first, &dict));
+
+        if (dir_node != &m_root)
+        {
+            m_shared_dirs.push_back(dir_node);
+        }
     }
 
     pref.endArray();
@@ -828,7 +921,7 @@ void Session::loadFileSystem()
         if (dir_node != &m_root)
         {
             qDebug() << "load shared directory: " << dir_node->filepath();
-            dir_node->share(false);
+            dir_node->share(false, false); // do not share files!
             QDir filepath(item.first);
 
             for(int i = 0; i < item.second.size(); ++i)
@@ -839,23 +932,9 @@ void Session::loadFileSystem()
                 {
                     qDebug() << "  exclude file: " << file_node->filename();
                     file_node->unshare(false);
+                    file_node->m_unshared_by_user = true;
                 }
             }
-        }
-    }
-
-    // this call do nothing when incoming dir in share list
-    // because call executes on shared node in non-recursive manner does nothing
-    share(m_incoming, false);
-
-    if (pref.isMigrationStage())
-    {
-        qDebug() << "on migration stage process shared files also";
-
-        foreach(QString filepath, misc::migrationSharedFiles())
-        {
-            qDebug() << "migrate file " << filepath;
-            share(filepath, false);
         }
     }
 }
@@ -886,4 +965,9 @@ void Session::unshare(const QString& filepath, bool recursive)
 {
     FileNode* p = node(filepath);
     if (p != &m_root) p->unshare(recursive);
+}
+
+void Session::addToProgress(const QString& filepath, FileNode* node)
+{
+    m_progress_files.insert(filepath, node);
 }

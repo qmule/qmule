@@ -467,6 +467,16 @@ public:
   }
 
   // ED2K options
+  int getPartialTransfersCount() const
+  {
+      return value("Preferences/Connection/ED2KPartialTransfersCount", 100).toInt();
+  }
+
+  void setPartialTransfersCount(int tcount)
+  {
+      setValue("Preferences/Connection/ED2KPartialTransfersCount", tcount);
+  }
+
 
   int getED2KDownloadLimit() const
   {
@@ -490,7 +500,7 @@ public:
     setValue("Preferences/Connection/ED2KUPLimit", limit);
   }
 
-  int serverPort()
+  int serverPort() const
   {            
       return value(QString::fromUtf8("Preferences/Connection/ServerPort"), 4661).toInt();
   }
@@ -798,6 +808,37 @@ public:
   void setNick(const QString& nick)
   {
       setValue(QString::fromUtf8("Preferences/eDonkey/Nick"), nick);
+  }
+
+  void setHttpSesLimit(int slimit)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/HttpSesLimit"), slimit);
+  }
+
+  int httpSesLimit() const
+  {
+      return value(QString::fromUtf8("Preferences/eDonkey/HttpSesLimit"), 2).toInt();
+  }
+
+  void setHttpPort(int port)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/HttpPort"), port);
+  }
+
+  int httpPort() const
+  {
+      return value(QString::fromUtf8("Preferences/eDonkey/HttpPort"), 8080).toInt();
+  }
+
+  void setRunHttpServer(bool enabled)
+  {
+      setValue(QString::fromUtf8("Preferences/eDonkey/RunHttpServer"), enabled);
+  }
+
+  bool runHttpServer() const
+  {
+      // WARNING: next line activates http service on all updated clients
+      return value(QString::fromUtf8("Preferences/eDonkey/RunHttpServer"), true).toBool();
   }
 
   // IP Filter

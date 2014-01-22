@@ -228,6 +228,10 @@ options_imp::options_imp(QWidget *parent):
   //eMule tab
   connect(emuleSpinPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
   connect(checkEmuleSD, SIGNAL(toggled(bool)), SLOT(enableApplyButton()));
+  connect(runHttpServer, SIGNAL(toggled(bool)), this, SLOT(enableApplyButton()));
+  connect(httpPort, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
+  connect(httpSesLimit, SIGNAL(valueChanged(QString)), this, SLOT(enableApplyButton()));
+  connect(runHttpServer, SIGNAL(toggled(bool)), this, SLOT(toggleHttpServer(bool)));
 
   // Disable apply Button
   applyButton->setEnabled(false);
@@ -479,6 +483,9 @@ void options_imp::saveOptions() {
   pref.setListenPort(nEmuleSpinPort);
   pref.setShowSharedFiles(checkEmuleSD->isChecked());
   pref.setShowSharedDirectories(checkEmuleSD->isChecked());
+  pref.setHttpSesLimit(httpSesLimit->value());
+  pref.setRunHttpServer(runHttpServer->isChecked());
+  pref.setHttpPort(httpPort->value());
 
   // End Emule
   // End preferences
@@ -756,6 +763,10 @@ void options_imp::loadOptions() {
   editUserName->setText(pref.nick());
   emuleSpinPort->setValue(pref.listenPort());
   checkEmuleSD->setChecked(pref.isShowSharedDirectories() && pref.isShowSharedFiles());
+  runHttpServer->setChecked(pref.runHttpServer());
+  toggleHttpServer(pref.runHttpServer());
+  httpSesLimit->setValue(pref.httpSesLimit());
+  httpPort->setValue(pref.httpPort());
 
   // Random stuff
   srand(time(0));
@@ -1286,4 +1297,10 @@ void options_imp::toggleAnonymousMode(bool enabled)
     checkLSD->setEnabled(true);
     checkUPnP->setEnabled(true);
   }
+}
+
+void options_imp::toggleHttpServer(bool enabled)
+{
+    httpPort->setEnabled(enabled);
+    httpSesLimit->setEnabled(enabled);
 }

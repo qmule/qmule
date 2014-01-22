@@ -44,6 +44,7 @@
 #include "silent_updater.h"
 #include "taskbar_iface.h"
 #include "wgetter.h"
+#include "http/httpserver.h"
 
 class downloadFromURL;
 class options_imp;
@@ -223,6 +224,7 @@ private:
   QScopedPointer<taskbar_iface>  m_tbar;
   QScopedPointer<QSplashScreen>  m_sscrn;
   QScopedPointer<wgetter>        m_ipf_getter;
+  QScopedPointer<HttpServer>     m_http_server;
   unsigned int m_nTaskbarButtonCreated;
 
   QIcon icon_disconnected;

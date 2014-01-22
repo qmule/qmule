@@ -27,7 +27,7 @@ public:
     FileNode(DirNode* parent, const QFileInfo& info);
     virtual ~FileNode();
 
-    virtual void share(bool recursive);
+    virtual void share(bool recursive, bool share_files = true);
     virtual void unshare(bool recursive);
     virtual bool has_metadata() const { return m_atp != NULL; }
     virtual bool has_transfer() const { return !m_hash.isEmpty(); }
@@ -54,6 +54,11 @@ public:
     QString filename() const { return m_filename; }
     void create_transfer();
     virtual qint64 size_on_disk() const { return m_info.size(); }
+    /**
+      * generate <ul><li></li></ul> node representation
+      * when node shared and has transfer associated
+     */
+    QString toHtml(const QString& address, int port) const;
 
     DirNode*    m_parent;
     bool        m_active;
@@ -64,6 +69,7 @@ public:
     QString     m_displayType;
     QString     m_hash;
     QString     m_filename;
+    bool        m_unshared_by_user; // load helper only!
 };
 
 class DirNode : public FileNode
@@ -78,7 +84,8 @@ public:
     virtual bool contains_active_children() const;
     virtual bool all_active_children() const;
 
-    virtual void share(bool recursive);
+    virtual void share(bool recursive, bool share_files = true);
+    void reshare(QList<QDir>&); // after-load helper - simple share all files again
     virtual void unshare(bool recursive);
     void deleteTransfer();
 
@@ -90,13 +97,14 @@ public:
     FileNode* child(const QString& filename);
     void add_node(FileNode* node);
     void delete_node(const FileNode* node);
-    QStringList exclude_files() const;
+    QStringList exclude_files() const;  
+    const QList<FileNode*>& files() const;
     virtual qint64 size_on_disk() const { return 0; }
 
     /**
       * pupulate directory with items no_share status
      */
-    void populate(bool force = false);
+    void populate(bool force = false, const QHash<QString, QString>* pdict = NULL);
 
     bool is_populated() const { return m_populated; }
 
@@ -116,12 +124,16 @@ public:
      */
     void build_collection();
 
+    // like FileNode + recursive call
+    QString toHtml(const QString& address, int port) const;
+
     bool                        m_populated;
     bool                        m_root;
     QHash<QString, FileNode*>   m_file_children;
     QHash<QString, DirNode*>    m_dir_children;
     QList<FileNode*>            m_file_vector;
     QList<DirNode*>             m_dir_vector;
+    QHash<QString, QString>     m_f2h_dict; // this uses for get transfer hash by name on load stage
 };
 
 

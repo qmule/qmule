@@ -43,6 +43,7 @@ public:
     void downloading_pieces(TransferBitfield& bf) const;
     void piece_availability(std::vector<int>& avail) const;
     std::vector<int> piece_priorities() const;
+    TransferSize total_size() const;
     TransferSize piece_length() const;
     bool extremity_pieces_first() const;
     void file_progress(std::vector<TransferSize>& fp) const;
@@ -81,7 +82,9 @@ public:
     void super_seeding(bool ss) const;
     void set_sequential_download(bool sd) const;
     void save_resume_data() const;
+    bool need_save_resume_data() const;
     void set_upload_mode(bool b) const;
+    void set_eager_mode(bool b) const;
 
 private:
     libed2k::transfer_handle m_delegate;

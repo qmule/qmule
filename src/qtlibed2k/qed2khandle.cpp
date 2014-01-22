@@ -110,6 +110,7 @@ bool QED2KHandle::is_sequential_download() const { return m_delegate.is_sequenti
 void QED2KHandle::downloading_pieces(TransferBitfield& bf) const {}
 void QED2KHandle::piece_availability(std::vector<int>& avail) const { m_delegate.piece_availability(avail); }
 std::vector<int> QED2KHandle::piece_priorities() const { return m_delegate.piece_priorities(); }
+TransferSize QED2KHandle::total_size() const { return m_delegate.size(); }
 TransferSize QED2KHandle::piece_length() const { return libed2k::PIECE_SIZE; }
 bool QED2KHandle::extremity_pieces_first() const {
     const QString ext = misc::file_extension(filename_at(0));
@@ -216,4 +217,6 @@ void QED2KHandle::queue_position_bottom() const {}
 void QED2KHandle::super_seeding(bool ss) const {}
 void QED2KHandle::set_sequential_download(bool sd) const { m_delegate.set_sequential_download(sd); }
 void QED2KHandle::save_resume_data() const { m_delegate.save_resume_data(); }
+bool QED2KHandle::need_save_resume_data() const { return m_delegate.need_save_resume_data(); }
 void QED2KHandle::set_upload_mode(bool b) const { m_delegate.set_upload_mode(b); }
+void QED2KHandle::set_eager_mode(bool b) const { m_delegate.set_eager_mode(b); }
