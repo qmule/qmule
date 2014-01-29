@@ -6,19 +6,19 @@ include(conf.pri)
   QT += dbus
 }
 
-QMAKE_CXXFLAGS += -Wformat -Wformat-security -Werror=return-type -DBOOST_FILESYSTEM_VERSION=2
+QMAKE_CXXFLAGS += -Wformat -Wformat-security -Werror=return-type
 QMAKE_LFLAGS_APP += -rdynamic
 CONFIG += link_pkgconfig
 PKGCONFIG += libtorrent-rasterbar
 INCLUDEPATH += $$(LIBED2K_ROOT)/include 
 INCLUDEPATH += $$(BOOST_ROOT)/include
-LIBS += -L$$(LIBED2K_ROOT)/lib -led2k -lboost_thread -lpthread -lboost_system -lboost_filesystem -lrt -lssl -lcrypto
+LIBS += -L$$(LIBED2K_ROOT)/lib -led2k -lboost_thread -lpthread -lboost_system -lrt -lssl -lcrypto
 LIBS += -L$$(BOOST_ROOT)/lib
 
 DEFINES += LIBED2K_USE_BOOST_DATE_TIME
 
 CONFIG(debug, debug|release) {
-  DEFINES += TORRENT_DEBUG
+  #DEFINES += TORRENT_DEBUG
   DEFINES += LIBED2K_DEBUG
 } else {
   DEFINES += NDEBUG
