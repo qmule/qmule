@@ -10,6 +10,7 @@
 #include <libed2k/alert_types.hpp>
 #include <libed2k/ip_filter.hpp>
 #include <libed2k/util.hpp>
+#include <libed2k/server_connection.hpp>
 
 #include <QNetworkInterface>
 #include <QMessageBox>
@@ -264,24 +265,14 @@ void QED2KSession::start()
 
     // set zero to port for stop automatically listening
     settings.user_agent  = libed2k::md4_hash::fromString(misc::userHash().toStdString());
-    settings.listen_port = pref.listenPort();
-    settings.server_reconnect_timeout = 20;
-    settings.server_keep_alive_timeout = -1;
-    settings.server_timeout = 8; // attempt connect to ed2k server in 8 seconds
+    settings.listen_port = pref.listenPort();    
     settings.m_collections_directory = misc::ED2KCollectionLocation().toUtf8().constData();
     settings.m_known_file = misc::emuleConfig("known.met").toUtf8().constData(); // always set known because user can close before all hashes will process
     settings.client_name  = pref.nick().toUtf8().constData();
     settings.mod_name = misc::productName().toUtf8().constData();
-    settings.m_announce_timeout = 60; // announcing every 10 seconds
     const QString iface_name = misc::ifaceFromHumanName(pref.getNetworkInterfaceMule());
 
     qDebug() << "known " << misc::toQStringU(settings.m_known_file);
-
-#ifdef AMD1
-    settings.server_hostname = "che-s-amd1";
-#else
-    settings.server_hostname = "emule.is74.ru";
-#endif
 
     m_session.reset(new libed2k::session(finger, NULL, settings));
     m_session->set_alert_mask(alert::all_categories);
@@ -497,11 +488,9 @@ void QED2KSession::configureSession()
                 {
                     qDebug("Trying to listen on IP %s (%s)", qPrintable(entry.ip().toString()), qPrintable(iface_name));
 
-                    if (m_session->listen_on(new_listenPort, entry.ip().toString().toAscii().constData()))
-                    {
-                        ip = entry.ip().toString();
-                        break;
-                    }
+                    m_session->listen_on(new_listenPort, entry.ip().toString().toAscii().constData());
+                    ip = entry.ip().toString();
+                    break;
                 }
 
                 if (m_session->is_listening())
@@ -707,25 +696,25 @@ void QED2KSession::readAlerts()
         if (libed2k::server_name_resolved_alert* p =
             dynamic_cast<libed2k::server_name_resolved_alert*>(a.get()))
         {
-            emit serverNameResolved(QString::fromUtf8(p->m_strServer.c_str(), p->m_strServer.size()));
+            emit serverNameResolved(QString::fromUtf8(p->endpoint.c_str(), p->endpoint.size()));
         }
         if (libed2k::server_connection_initialized_alert* p =
             dynamic_cast<libed2k::server_connection_initialized_alert*>(a.get()))
         {
-            emit serverConnectionInitialized(p->m_nClientId, p->m_nTCPFlags, p->m_nAuxPort);
+            emit serverConnectionInitialized(p->client_id, p->tcp_flags, p->aux_port);
         }
         else if (libed2k::server_status_alert* p = dynamic_cast<libed2k::server_status_alert*>(a.get()))
         {
-            emit serverStatus(p->m_nFilesCount, p->m_nUsersCount);
+            emit serverStatus(p->files_count, p->users_count);
         }
         else if (libed2k::server_identity_alert* p = dynamic_cast<libed2k::server_identity_alert*>(a.get()))
         {
-            emit serverIdentity(QString::fromUtf8(p->m_strName.c_str(), p->m_strName.size()),
-                                QString::fromUtf8(p->m_strDescr.c_str(), p->m_strDescr.size()));
+            emit serverIdentity(QString::fromUtf8(p->server_name.c_str(), p->server_name.size()),
+                                QString::fromUtf8(p->server_descr.c_str(), p->server_descr.size()));
         }
         else if (libed2k::server_message_alert* p = dynamic_cast<libed2k::server_message_alert*>(a.get()))
         {
-            emit serverMessage(QString::fromUtf8(p->m_strMessage.c_str(), p->m_strMessage.size()));
+            emit serverMessage(QString::fromUtf8(p->server_message.c_str(), p->server_message.size()));
         }
         else if (libed2k::server_connection_closed* p =
                  dynamic_cast<libed2k::server_connection_closed*>(a.get()))
@@ -765,12 +754,6 @@ void QED2KSession::readAlerts()
             {
                 emit searchResult(p->m_np, md4toQString(p->m_hash), vRes, bMoreResult);
             }
-        }
-        else if (libed2k::mule_listen_failed_alert* p =
-                 dynamic_cast<libed2k::mule_listen_failed_alert*>(a.get()))
-        {
-            Q_UNUSED(p)
-            // TODO - process signal - it means we have different client on same port
         }
         else if (libed2k::peer_connected_alert* p = dynamic_cast<libed2k::peer_connected_alert*>(a.get()))
         {
@@ -1114,30 +1097,26 @@ void QED2KSession::enableUPnP(bool b)
 
 void QED2KSession::startServerConnection(const QString& address/* = QString()*/, int port /* = 0*/)
 {
-    libed2k::session_settings settings = delegate()->settings();
-    settings.server_reconnect_timeout = 20;
-
-    if (!address.isEmpty())
-        settings.server_hostname = address.toStdString();
-
-    if (port != 0)
-        settings.server_port = port;
-
-    delegate()->set_settings(settings);
-    delegate()->server_conn_start();
+    libed2k::server_connection_parameters params;
+    params.name = "Single server";
+    params.host = "emule.is74.ru";
+    params.port = 4661;
+    params.set_operations_timeout(30);
+    params.set_keep_alive_timeout(100);
+    params.set_reconnect_timeout(100);
+    params.set_announce_timeout(60);
+    params.announce_items_per_call_limit = 60;
+    delegate()->server_connect(params);
 }
 
 void QED2KSession::stopServerConnection()
 {
-    libed2k::session_settings settings = delegate()->settings();
-    settings.server_reconnect_timeout = -1;
-    delegate()->set_settings(settings);
-    delegate()->server_conn_stop();
+    delegate()->server_disconnect();
 }
 
 bool QED2KSession::isServerConnected() const
 {
-    return (delegate()->server_conn_online());
+    return (delegate()->server_connection_established());
 }
 
 void QED2KSession::makeTransferParametersAsync(const QString& filepath)
